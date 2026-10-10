@@ -1,11 +1,10 @@
-# FITLIFE GYM MANAGEMENT SYSTEM (FitLife Pro)
+# FITLIFE GYM MANAGEMENT SYSTEM
 Hệ thống Quản lý và Vận hành Phòng Gym - Nhóm 12
 
 ---
 
 ## 1. THÔNG TIN NHÓM VÀ BẢNG PHÂN CÔNG CÔNG VIỆC
 
-Đề tài: Phần mềm Quản lý Phòng Gym FitLife
 Nhóm thực hiện: Nhóm 12
 
 | Thành viên | Vai trò | Nhiệm vụ chính phụ trách | Tỷ lệ đóng góp |

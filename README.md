@@ -53,7 +53,3 @@ Mật khẩu mặc định cho tất cả tài khoản: 123456
 | quanly1 | 123456 | Quản lý chi nhánh | Phân ca làm việc nhân viên, quản lý kho hàng, giám sát thiết bị. |
 | hoivien1 | 123456 | Hội viên VIP | Cổng thông tin hội viên, thẻ QR điện tử, đặt chỗ lớp học. |
 
-Bộ mã test nhanh tại Trạm Check-In:
-- QR001: Thẻ hợp lệ (VIP Diamond) - Cổng mở (Open), âm bíp cao.
-- QR002: Thẻ hết hạn - Báo động, hiện nút gia hạn nhanh.
-- QR003: Thẻ bị tạm khóa - Từ chối truy cập.

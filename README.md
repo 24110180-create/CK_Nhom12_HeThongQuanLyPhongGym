@@ -56,7 +56,6 @@ Mật khẩu mặc định cho tất cả tài khoản: 123456
 
 Yêu cầu trước khi chạy:
 - Máy đã cài đặt JDK 17 trở lên.
-- SQL Server đang chạy ở cổng 1433.
 
 Bước 1: Cài đặt cơ sở dữ liệu
 1. Mở SQL Server Management Studio (SSMS).
@@ -89,15 +88,7 @@ Chọn 1 trong 3 cách:
 - develop: Nhánh phát triển tích hợp code chung của cả nhóm.
 - feature/<ten-chuc-nang>: Nhánh làm việc riêng của từng thành viên (ví dụ: feature/checkin, feature/quanly-hoivien, feature/pos).
 
-2. Quy tắc Commit Message:
-- feat: Thêm tính năng mới (ví dụ: feat: them chuc nang xuat excel hoi vien)
-- fix: Sửa lỗi (ví dụ: fix: sua loi ket noi session hibernate khi check-in)
-- refactor: Tối ưu hoặc cấu trúc lại code mà không đổi logic
-- docs: Cập nhật tài liệu hướng dẫn
-
-3. Quy trình đồng bộ code:
+2. Quy trình đồng bộ code:
 - Trước khi bắt đầu làm tính năng mới: git pull origin develop
 - Sau khi hoàn thành: Đẩy lên nhánh feature của mình và tạo Pull Request (PR) vào nhánh develop để nhóm trưởng kiểm tra trước khi gộp code.
-
----
 

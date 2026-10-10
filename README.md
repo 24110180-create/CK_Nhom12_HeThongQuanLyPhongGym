@@ -10,9 +10,9 @@ Nhóm thực hiện: Nhóm 12
 
 | Thành viên | Vai trò | Nhiệm vụ chính phụ trách | Tỷ lệ đóng góp |
 | :--- | :--- | :--- | :---: |
-| Lê Anh Duy | Nhóm trưởng | - Quản lý tiến độ, thiết kế CSDL (Database.sql) và Hibernate.<br>- Phát triển Module Xác thực, Phân quyền và Khung MainDashboard.<br>- Xây dựng chức năng Check-in hội viên và ghi nhận Log ra/vào. | 100% |
-| Võ Lê Ngọc Hưng | Thành viên | - Module Quản lý Hội viên (đăng ký, gia hạn, hồ sơ chi tiết).<br>- Module Quản lý Huấn luyện viên và Phân ca nhân sự.<br>- Module Lịch lớp học và Huấn luyện (PT). | 100% |
-| Võ Tấn Phát | Thành viên | - Module Điểm bán hàng POS, Kho hàng và Hóa đơn.<br>- Module Báo cáo doanh thu và Biểu đồ nhiệt (Heatmap).<br>- Tích hợp tiện ích: Xuất Excel, sinh mã QR và Âm thanh. | 100% |
+| Lê Anh Duy | Thành Viên | - Quản lý tiến độ, thiết kế CSDL (Database.sql) và Hibernate.<br>- Phát triển Module Xác thực, Phân quyền và Khung MainDashboard.<br>- Xây dựng chức năng Check-in hội viên và ghi nhận Log ra/vào.
+| Võ Lê Ngọc Hưng | Thành viên | - Module Quản lý Hội viên (đăng ký, gia hạn, hồ sơ chi tiết).<br>- Module Quản lý Huấn luyện viên và Phân ca nhân sự.<br>- Module Lịch lớp học và Huấn luyện (PT).
+| Võ Tấn Phát | Thành viên | - Module Điểm bán hàng POS, Kho hàng và Hóa đơn.<br>- Module Báo cáo doanh thu và Biểu đồ nhiệt (Heatmap).<br>- Tích hợp tiện ích: Xuất Excel, sinh mã QR và Âm thanh.
 
 ---
 

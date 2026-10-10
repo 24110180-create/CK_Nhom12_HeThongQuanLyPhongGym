@@ -52,4 +52,52 @@ Mật khẩu mặc định cho tất cả tài khoản: 123456
 | hlv1 | 123456 | Huấn luyện viên | Lịch dạy cá nhân, điểm danh lớp học, theo dõi chỉ số InBody hội viên. |
 | quanly1 | 123456 | Quản lý chi nhánh | Phân ca làm việc nhân viên, quản lý kho hàng, giám sát thiết bị. |
 | hoivien1 | 123456 | Hội viên VIP | Cổng thông tin hội viên, thẻ QR điện tử, đặt chỗ lớp học. |
+## 5. HƯỚNG DẪN CÀI ĐẶT VÀ CHẠY ỨNG DỤNG
+
+Yêu cầu trước khi chạy:
+- Máy đã cài đặt JDK 17 trở lên.
+- SQL Server đang chạy ở cổng 1433.
+
+Bước 1: Cài đặt cơ sở dữ liệu
+1. Mở SQL Server Management Studio (SSMS).
+2. Mở file Database.sql tại thư mục gốc của dự án.
+3. Chọn Execute (F5) để tạo Database 'FitLifeGym' và nạp dữ liệu mẫu.
+
+Bước 2: Cấu hình kết nối
+Mở file: GYM/src/main/resources/hibernate.cfg.xml
+Kiểm tra và sửa username/password phù hợp với tài khoản SQL Server trên máy:
+- hibernate.connection.username: điền username (ví dụ: sa hoặc admin123)
+- hibernate.connection.password: điền mật khẩu SQL Server của máy bạn
+
+Bước 3: Khởi chạy ứng dụng
+Chọn 1 trong 3 cách:
+- Cách 1: Click đúp vào file run.bat tại thư mục gốc để chạy nhanh.
+- Cách 2: Sử dụng lệnh Maven qua terminal:
+  cd GYM
+  mvn clean compile
+  mvn exec:java -Dexec.mainClass="com.nhom12.gym.gui.LoginForm"
+- Cách 3: Mở thư mục GYM bằng IntelliJ IDEA hoặc Eclipse -> Tìm file LoginForm.java -> Run.
+
+---
+
+## 6. QUY ƯỚC LÀM VIỆC (WORKFLOW VÀ GIT CONVENTION)
+
+Để đảm bảo tính đồng bộ giữa các thành viên trong nhóm:
+
+1. Quy tắc rẽ nhánh (Branching Strategy):
+- main: Chỉ chứa code ổn định nhất dùng để báo cáo và demo.
+- develop: Nhánh phát triển tích hợp code chung của cả nhóm.
+- feature/<ten-chuc-nang>: Nhánh làm việc riêng của từng thành viên (ví dụ: feature/checkin, feature/quanly-hoivien, feature/pos).
+
+2. Quy tắc Commit Message:
+- feat: Thêm tính năng mới (ví dụ: feat: them chuc nang xuat excel hoi vien)
+- fix: Sửa lỗi (ví dụ: fix: sua loi ket noi session hibernate khi check-in)
+- refactor: Tối ưu hoặc cấu trúc lại code mà không đổi logic
+- docs: Cập nhật tài liệu hướng dẫn
+
+3. Quy trình đồng bộ code:
+- Trước khi bắt đầu làm tính năng mới: git pull origin develop
+- Sau khi hoàn thành: Đẩy lên nhánh feature của mình và tạo Pull Request (PR) vào nhánh develop để nhóm trưởng kiểm tra trước khi gộp code.
+
+---
 

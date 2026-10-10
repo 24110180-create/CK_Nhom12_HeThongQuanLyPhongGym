@@ -1,0 +1,28 @@
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!-- Cấu hình kết nối SQL Server -->
+        <property name="hibernate.connection.driver_class">com.microsoft.sqlserver.jdbc.SQLServerDriver</property>
+        <property name="hibernate.connection.url">jdbc:sqlserver://localhost;databaseName=FitLifeGym;encrypt=true;trustServerCertificate=true;</property>
+
+        <!-- Tài khoản và mật khẩu SQL Server -->
+        <property name="hibernate.connection.username">admin123</property>
+        <property name="hibernate.connection.password">123456</property>
+
+        <!-- Cấu hình hiển thị câu lệnh SQL trong console để dễ debug -->
+        <property name="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</property>
+        <property name="hibernate.show_sql">true</property>
+
+        <!-- Khai báo đầy đủ các class Entity -->
+        <mapping class="com.nhom12.gym.entity.HoiVien"/>
+        <mapping class="com.nhom12.gym.entity.TaiKhoan"/>
+        <mapping class="com.nhom12.gym.entity.GoiTap"/>
+        <mapping class="com.nhom12.gym.entity.LopHoc"/>
+        <mapping class="com.nhom12.gym.entity.LichSuCheckIn"/>
+        <mapping class="com.nhom12.gym.entity.HoaDon"/>
+        <mapping class="com.nhom12.gym.entity.HuanLuyenVien"/>
+        <mapping class="com.nhom12.gym.entity.DangKyLop"/>
+    </session-factory>
+</hibernate-configuration>

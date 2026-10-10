@@ -50,7 +50,7 @@ Mật khẩu mặc định cho tất cả tài khoản: 123456
 | letan1 | 123456 | Lễ tân | Check-in thẻ/QR, bán hàng POS, đăng ký hội viên, sơ đồ tủ Locker. |
 | hlv1 | 123456 | Huấn luyện viên | Lịch dạy cá nhân, điểm danh lớp học, theo dõi chỉ số InBody hội viên. |
 | quanly1 | 123456 | Quản lý chi nhánh | Phân ca làm việc nhân viên, quản lý kho hàng, giám sát thiết bị. |
-| hoivien1 | 123456 | Hội viên VIP | Cổng thông tin hội viên, thẻ QR điện tử, đặt chỗ lớp học. |
+| hoivien1 | 123456 | Hội viên | Cổng thông tin hội viên, thẻ QR điện tử, đặt chỗ lớp học. |
 ## 5. HƯỚNG DẪN CÀI ĐẶT VÀ CHẠY ỨNG DỤNG
 
 Yêu cầu trước khi chạy:

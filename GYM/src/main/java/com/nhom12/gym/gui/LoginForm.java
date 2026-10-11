@@ -81,7 +81,7 @@ public class LoginForm extends JFrame {
         JLabel lblQuote = new JLabel("<html><i style='color:#e2e8f0;'>\"Đẳng cấp tạo nên phong độ. Hãy biến từng giọt mồ hôi thành kết quả vượt trội mỗi ngày.\"</i></html>");
         lblQuote.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 
-        JLabel lblAuthor = new JLabel("Ban Điều Hành FitLife Gym - Nhóm 12");
+        JLabel lblAuthor = new JLabel("Nhóm 12 - Hệ thống quản lý phòng gym");
         lblAuthor.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblAuthor.setForeground(new Color(148, 163, 184));
 

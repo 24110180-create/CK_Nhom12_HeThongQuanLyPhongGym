@@ -102,7 +102,7 @@ public class LoginForm extends JFrame {
         lblFormTitle.setForeground(new Color(15, 23, 42));
         lblFormTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel lblFormSub = new JLabel("Vui lòng nhập tài khoản nhân viên hoặc quản lý");
+        JLabel lblFormSub = new JLabel("Vui lòng nhập tài khoản và mật khẩu để tiếp tục");
         lblFormSub.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         lblFormSub.setForeground(new Color(100, 116, 139));
         lblFormSub.setAlignmentX(Component.LEFT_ALIGNMENT);

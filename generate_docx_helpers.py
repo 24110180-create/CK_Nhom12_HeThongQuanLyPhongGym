@@ -89,6 +89,18 @@ def add_heading_2(doc, text):
     r.font.color.rgb = RGBColor(13, 148, 136) # Teal
     return h
 
+def add_heading_3(doc, text):
+    h = doc.add_paragraph()
+    h.paragraph_format.space_before = Pt(8)
+    h.paragraph_format.space_after = Pt(2)
+    h.paragraph_format.keep_with_next = True
+    r = h.add_run(text)
+    r.font.name = "Segoe UI"
+    r.font.size = Pt(11)
+    r.font.bold = True
+    r.font.color.rgb = RGBColor(79, 70, 229) # Indigo
+    return h
+
 def add_paragraph(doc, text, bold_prefix="", italic=False):
     p = doc.add_paragraph()
     p.paragraph_format.space_after = Pt(4)
@@ -200,4 +212,24 @@ def create_table(doc, headers, rows, col_widths=None):
 
     doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
+def safe_save(doc, primary_path, copy_path=None):
+    import shutil
+    try:
+        doc.save(primary_path)
+        print(f"Saved: {primary_path}")
+    except PermissionError:
+        print(f"[LƯU Ý] {primary_path} đang được mở trong ứng dụng khác (MS Word).")
+    except Exception as e:
+        print(f"Lỗi khi lưu {primary_path}: {e}")
+
+    if copy_path:
+        try:
+            shutil.copyfile(primary_path, copy_path)
+            print(f"Copied: {copy_path}")
+        except PermissionError:
+            print(f"[LƯU Ý] {copy_path} đang được mở trong MS Word.")
+        except Exception as e:
+            print(f"Lỗi khi sao chép {copy_path}: {e}")
+
 print("Helper functions defined successfully")
+

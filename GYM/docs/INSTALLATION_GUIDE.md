@@ -232,7 +232,7 @@ Sau khi khởi chạy ứng dụng thành công, màn hình đăng nhập giao d
 
 | Tên Đăng Nhập | Mật Khẩu | Vai Trò | Chức Năng Chính Được Trải Nghiệm |
 |---|---|---|---|
-| **`admin`** | **`123456`** | **Chủ Hệ Thống** | **Executive Cockpit 5 Trụ Cột:** Báo cáo doanh thu 3 chi nhánh, Biểu đồ lưu lượng Heatmap, Xem Live KPI tài chính, Quản trị hệ thống, Chính sách giá ẩn của khách VIP. |
+| **`admin`** | **`123456`** | **Chủ Hệ Thống** | **Executive Cockpit 5 Trụ Cột:** Báo cáo doanh thu đa chi nhánh (2 cơ sở), Biểu đồ lưu lượng Heatmap, Xem Live KPI tài chính, Quản trị hệ thống, Chính sách giá ẩn của khách VIP. |
 | **`letan1`** | **`123456`** | **Lễ Tân** | **Front-Desk Workstation:** Quét thẻ Check-in âm thanh máy quét Honeywell, Quầy bán hàng POS in bill, Đăng ký hội viên mới, Quản lý sơ đồ 20 tủ Locker, Nhắc hạn SMS. |
 | **`hlv1`** | **`123456`** | **Huấn Luyện Viên** | **Trainer Studio:** Lịch dạy lớp Yoga/Zumba/Boxing, Điểm danh học viên, Sổ tay theo dõi tiến độ PT 1:1, Đo đạc và cập nhật chỉ số InBody. |
 | **`quanly1`** | **`123456`** | **Quản Lý Chi Nhánh** | **Operations Center:** Giám sát sức chứa cơ sở, Xếp lịch phân ca trực tuần, Quản lý kho hàng xuất nhập tồn, Quản lý bảo trì thiết bị máy móc. |

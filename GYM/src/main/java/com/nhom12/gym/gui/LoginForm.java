@@ -222,9 +222,8 @@ public class LoginForm extends JFrame {
         JTextField tfPhone = new JTextField();
         JPasswordField tfPass = new JPasswordField();
         JComboBox<String> cbBr = new JComboBox<>(new String[]{
-                "Cơ sở 1 - Gò Vấp",
-                "Cơ sở 2 - Quận 7",
-                "Cơ sở 3 - Bình Thạnh"
+                "CN01 - Cơ sở 1 (Quận 1)",
+                "CN02 - Cơ sở 2 (Tân Bình)"
         });
 
         form.add(new JLabel("Họ Và Tên (*):"));

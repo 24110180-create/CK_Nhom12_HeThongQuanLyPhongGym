@@ -96,7 +96,7 @@ public class MainDashboard extends JFrame {
 
         // Trụ cột 0: Báo Cáo & Thống Kê
         OwnerPillar p0 = new OwnerPillar("Báo Cáo & Thống Kê", new Color(99, 102, 241));
-        p0.items.add(new OwnerModuleItem("Báo Cáo Doanh Thu", "Doanh thu 3 chi nhánh & hội viên hết hạn", () -> new BaoCaoThongKePanel()));
+        p0.items.add(new OwnerModuleItem("Báo Cáo Doanh Thu", "Doanh thu đa chi nhánh (2 cơ sở) & hội viên hết hạn", () -> new BaoCaoThongKePanel()));
         p0.items.add(new OwnerModuleItem("Phân Tích Giờ Cao Điểm", "Phân tích mật độ tập luyện 6h-22h", () -> new HeatmapGioCaoDiemPanel()));
         p0.items.add(new OwnerModuleItem("Tổng Quan Sức Chứa", "KPIs tổng hợp & tỷ lệ lấp đầy", () -> new TrangChuPanel()));
         p0.items.add(new OwnerModuleItem("Lịch Sử Giao Dịch", "Nhật ký hóa đơn & dòng tiền", () -> new LichSuGiaoDichPanel()));
@@ -674,8 +674,9 @@ public class MainDashboard extends JFrame {
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên ra vào", () -> new CheckInForm(), accent, true);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Bán nước, whey & phụ kiện", () -> new BanHangPOSPanel(), accent, false);
         addSidebarItem(menuContainer, "Đăng Ký Hội Viên Mới", "Tạo thẻ và hợp đồng mới", () -> new DangKyHoiVienPanel(), accent, false);
-        addSidebarItem(menuContainer, "Tài Khoản App Hội Viên", "Cấp & mở khóa tài khoản app", () -> new QuanLyTaiKhoanAppPanel(), accent, false);
         addSidebarItem(menuContainer, "Gia Hạn Gói Tập", "Nâng cấp và gia hạn thẻ", () -> new GiaHanGoiTapPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý Gói Tập", "Bảng giá & cấu hình gói tập", () -> new QuanLyGoiTapPanel(), accent, false);
+        addSidebarItem(menuContainer, "Tài Khoản App Hội Viên", "Cấp & mở khóa tài khoản app", () -> new QuanLyTaiKhoanAppPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Tủ Đồ Locker", "Sơ đồ 20 tủ đồ thông minh", () -> new QuanLyLockerPanel(), accent, false);
         addSidebarItem(menuContainer, "Lịch Lớp Học", "Lớp Yoga, Zumba, Boxing", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Chăm Sóc Khách Hàng", "Gửi SMS & Zalo nhắc hạn", () -> new ChamSocKhachHangPanel(), accent, false);
@@ -706,6 +707,7 @@ public class MainDashboard extends JFrame {
     private void setupManagerMenu(JPanel menuContainer, Color accent) {
         addSidebarItem(menuContainer, "Tổng Quan Vận Hành", "Sức chứa & doanh số ngày", () -> new TrangChuPanel(), accent, true);
         addSidebarItem(menuContainer, "Báo Cáo Doanh Thu", "Doanh thu tuần, tháng, quý", () -> new BaoCaoThongKePanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý Gói Tập", "Bảng giá & cấu hình gói tập", () -> new QuanLyGoiTapPanel(), accent, false);
         addSidebarItem(menuContainer, "Mật Độ Giờ Cao Điểm", "Heatmap lưu lượng phòng gym", () -> new HeatmapGioCaoDiemPanel(), accent, false);
         addSidebarItem(menuContainer, "Tài Khoản App Hội Viên", "Quản lý truy cập app hội viên", () -> new QuanLyTaiKhoanAppPanel(), accent, false);
         addSidebarItem(menuContainer, "Lịch Trực & Phân Ca", "Xếp ca làm việc nhân viên", () -> new PhanCaLamViecPanel(), accent, false);

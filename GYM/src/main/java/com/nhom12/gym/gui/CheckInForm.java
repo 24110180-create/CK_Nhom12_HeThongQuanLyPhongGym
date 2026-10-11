@@ -78,7 +78,7 @@ public class CheckInForm extends JPanel {
 
         JLabel lblBr = new JLabel("Trạm kiểm soát tại:");
         lblBr.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        cbStationBranch = new JComboBox<>(new String[]{"Cơ sở 1 - Gò Vấp", "Cơ sở 2 - Quận 7", "Cơ sở 3 - Bình Thạnh"});
+        cbStationBranch = new JComboBox<>(new String[]{"CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)"});
         cbStationBranch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         cbStationBranch.setPreferredSize(new Dimension(170, 32));
 

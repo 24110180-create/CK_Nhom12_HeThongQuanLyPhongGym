@@ -9,7 +9,7 @@
 1. [Giới Thiệu & Đăng Nhập Hệ Thống](#1-giới-thiệu--đăng-nhập-hệ-thống)
 2. [Hướng Dẫn Dành Cho Chủ Phòng Tập (Executive Command Cockpit)](#2-hướng-dẫn-dành-cho-chủ-phòng-tập-executive-command-cockpit)
    - 2.1. Thanh Điều Hành 2 Tầng Ribbon & Dải Live KPI
-   - 2.2. Báo Cáo Doanh Thu 3 Chi Nhánh
+   - 2.2. Báo Cáo Doanh Thu Đa Chi Nhánh (2 Cơ Sở)
    - 2.3. Bản Đồ Nhiệt Mật Độ Giờ Cao Điểm (Heatmap 06:00 - 22:00)
    - 2.4. Chính Sách Khách VIP Ẩn Giá
 3. [Hướng Dẫn Dành Cho Lễ Tân (Front-Desk Workstation)](#3-hướng-dẫn-dành-cho-lễ-tân-front-desk-workstation)
@@ -74,11 +74,11 @@ Giao diện của Chủ phòng tập được thiết kế theo phong cách **Ex
 
 ---
 
-### 2.2. Báo Cáo Doanh Thu 3 Chi Nhánh
+### 2.2. Báo Cáo Doanh Thu Đa Chi Nhánh (2 Cơ Sở)
 1. Chọn **Trụ cột Báo Cáo & Thống Kê** -> Click chọn module **Báo Cáo Doanh Thu**.
 2. **Bộ Lọc Báo Cáo:**
    - Chọn chu kỳ xem: *Hôm nay*, *Tuần này*, *Tháng hiện tại*, *Quý này*, hoặc *Cả năm*.
-   - Chọn phạm vi: *Toàn hệ thống* hoặc từng cơ sở cụ thể (*CN01 - Quận 1*, *CN02 - Tân Bình*, *CN03 - Quận 7*).
+   - Chọn phạm vi: *Toàn hệ thống* hoặc từng cơ sở cụ thể (*CN01 - Quận 1*, *CN02 - Tân Bình*).
 3. **Biểu Đồ So Sánh:** Quan sát tỷ trọng đóng góp doanh thu giữa các chi nhánh được trực quan hóa bằng các thanh đo màu sắc chuyên nghiệp.
 4. **Xuất Báo Cáo Ra Excel:**
    - Nhấn nút **`[ 📊 Xuất Excel UTF-8 ]`**.

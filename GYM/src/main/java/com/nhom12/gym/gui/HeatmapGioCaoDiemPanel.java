@@ -51,9 +51,8 @@ public class HeatmapGioCaoDiemPanel extends JPanel {
         topToolBar.add(lBranch);
 
         cbBranch = new JComboBox<>(new String[]{
-                "Cơ sở 1 - Gò Vấp (Trụ Sở Chính)",
-                "Cơ sở 2 - Quận 7 (Phú Mỹ Hưng)",
-                "Cơ sở 3 - Bình Thạnh (Landmark)"
+                "CN01 - Cơ sở 1 (Quận 1 - Trụ Sở Chính)",
+                "CN02 - Cơ sở 2 (Tân Bình - Chi Nhánh)"
         });
         cbBranch.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         topToolBar.add(cbBranch);

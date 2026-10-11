@@ -80,9 +80,9 @@ public class CheckInService {
         String code = maQR.trim().toUpperCase();
         HoiVien hv = null;
 
-        // 1. Tra cứu Database
+        // 1. Tra cứu Database / Bộ nhớ cache (Hỗ trợ cả Mã QR và Mã Hội Viên ID)
         try {
-            hv = this.hoiVienDAO.timTheoMaQR(code);
+            hv = this.hoiVienDAO.timKiemThongMinh(code);
         } catch (Exception ignored) {
         }
 
@@ -109,7 +109,7 @@ public class CheckInService {
                 hv.setMaHoiVien(3);
                 hv.setHoTen("Trần Văn Khóa");
                 hv.setMaTheQR(code);
-                hv.setChiNhanhDangKy("Cơ sở 2 - Quận 7");
+                hv.setChiNhanhDangKy("CN02 - Cơ sở 2 (Tân Bình)");
                 hv.setTrangThai("Tạm khóa");
                 hv.setNgayHetHan(new Date(System.currentTimeMillis() + 86400000L * 60));
             } else if ("VIP007".equals(code) || "VIP-DUC".equals(code)) {
@@ -122,12 +122,12 @@ public class CheckInService {
                 hv.setTrangThai("Hoạt động");
                 hv.setNgayHetHan(new Date(System.currentTimeMillis() + 86400000L * 300));
             } else if ("QR004".equals(code) || "HV004".equals(code)) {
-                // Hội viên đăng ký Cơ sở 2 - Quận 7 (Thẻ cơ sở)
+                // Hội viên đăng ký Cơ sở 2 - Tân Bình (Thẻ cơ sở)
                 hv = new HoiVien();
                 hv.setMaHoiVien(4);
                 hv.setHoTen("Phạm Trọng Thủy");
                 hv.setMaTheQR(code);
-                hv.setChiNhanhDangKy("Cơ sở 2 - Quận 7");
+                hv.setChiNhanhDangKy("CN02 - Cơ sở 2 (Tân Bình)");
                 hv.setTrangThai("Hoạt động");
                 hv.setNgayHetHan(new Date(System.currentTimeMillis() + 86400000L * 45));
             }

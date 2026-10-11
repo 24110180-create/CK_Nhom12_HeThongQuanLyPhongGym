@@ -103,7 +103,7 @@ INSERT INTO HuanLuyenVien (MaHLV, HoTen, SoDienThoai, ChuyenMon, KinhNghiemNam, 
 ('HLV02', N'Nguyễn Thu Thảo', '0987654321', N'Yoga Thảo dược / Pilates', 5, N'CN01 - Quận 1', N'Ca sáng (06:00 - 14:00)', 5.0, N'Đang làm việc'),
 ('HLV03', N'Phan Thanh Sơn', '0903112233', N'Kickboxing & HIIT Cardio', 4, N'CN02 - Tân Bình', N'Ca chiều (14:00 - 22:00)', 4.8, N'Đang làm việc'),
 ('HLV04', N'Lê Mai Hương', '0934556677', N'Zumba Dance & Aerobic', 3, N'CN02 - Tân Bình', N'Ca sáng (06:00 - 14:00)', 4.9, N'Đang làm việc'),
-('HLV05', N'Đặng Minh Trí', '0977889900', N'CrossFit & Phục hồi cơ', 7, N'CN03 - Quận 7', N'Ca sáng (06:00 - 14:00)', 4.9, N'Đang làm việc');
+('HLV05', N'Đặng Minh Trí', '0977889900', N'CrossFit & Phục hồi cơ', 7, N'CN02 - Tân Bình', N'Ca sáng (06:00 - 14:00)', 4.9, N'Đang làm việc');
 GO
 
 -- 6. BẢNG LỚP HỌC THEO LỊCH (YOGA, ZUMBA, PILATES, CARDIO)
@@ -195,5 +195,5 @@ INSERT INTO HoaDon (MaHoaDon, MaHoiVien, TenHoiVien, LoaiGiaoDich, TongTien, Gia
 ('HD2026-002', 2, N'Võ Lê Ngọc Hưng', N'Gia hạn gói 3 Tháng', 1350000, 100000, 1250000, N'Tiền mặt', 'letan1', N'CN02 - Tân Bình', DATEADD(DAY, -5, GETDATE()), N'Đã thanh toán', N'Khuyến mãi voucher 100k'),
 ('HD2026-003', 4, N'Trần Minh Quân', N'Đăng ký Gói PT 1:1', 7500000, 500000, 7000000, N'Chuyển khoản VietQR', 'letan1', N'CN01 - Quận 1', DATEADD(DAY, -3, GETDATE()), N'Đã thanh toán', N'30 buổi cùng HLV Trần Tuấn Kiệt'),
 ('HD2026-004', 5, N'Hoàng Thùy Linh', N'Thuê tủ Locker 6 tháng', 600000, 0, 600000, N'Tiền mặt', 'letan1', N'CN02 - Tân Bình', DATEADD(DAY, -2, GETDATE()), N'Đã thanh toán', N'Locker VIP A12'),
-('HD2026-005', 6, N'Đỗ Minh Trí', N'Đăng ký gói 6 Tháng', 2500000, 200000, 2300000, N'Chuyển khoản VietQR', 'admin', N'CN03 - Quận 7', DATEADD(DAY, -1, GETDATE()), N'Đã thanh toán', N'Khách VIP hệ thống');
+('HD2026-005', 6, N'Đỗ Minh Trí', N'Đăng ký gói 6 Tháng', 2500000, 200000, 2300000, N'Chuyển khoản VietQR', 'admin', N'CN02 - Tân Bình', DATEADD(DAY, -1, GETDATE()), N'Đã thanh toán', N'Khách VIP hệ thống');
 GO

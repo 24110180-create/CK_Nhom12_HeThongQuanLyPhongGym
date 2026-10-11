@@ -1,7 +1,12 @@
 package com.nhom12.gym.gui;
 
+import com.nhom12.gym.dao.GoiTapDAO;
+import com.nhom12.gym.dao.HoaDonDAO;
 import com.nhom12.gym.dao.HoiVienDAO;
+import com.nhom12.gym.entity.GoiTap;
+import com.nhom12.gym.entity.HoaDon;
 import com.nhom12.gym.entity.HoiVien;
+import com.nhom12.gym.util.Auth;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -11,8 +16,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -24,7 +31,12 @@ import javax.swing.JTextField;
 
 public class GiaHanGoiTapPanel extends JPanel {
     private final HoiVienDAO hoiVienDAO = new HoiVienDAO();
+    private final HoaDonDAO hoaDonDAO = new HoaDonDAO();
+    private final GoiTapDAO goiTapDAO = new GoiTapDAO();
     private final DecimalFormat df = new DecimalFormat("#,### đ");
+    private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+    private List<GoiTap> danhSachGoiTap = new ArrayList<>();
 
     private JTextField txtSearch;
     private JButton btnSearch;
@@ -40,8 +52,8 @@ public class GiaHanGoiTapPanel extends JPanel {
     private JButton btnCancel;
     private JButton btnConfirm;
 
-    private String currentMemberName = "Lê Thị Lan";
-    private String currentMemberCode = "HV022";
+    // Hội viên đang được chọn thực tế từ hệ thống
+    private HoiVien currentHoiVien = null;
     private long basePrice = 2500000;
     private int discountPercent = 0;
 
@@ -56,7 +68,7 @@ public class GiaHanGoiTapPanel extends JPanel {
         JLabel lblTitle = new JLabel("GIA HẠN & NÂNG CẤP GÓI TẬP HỘI VIÊN");
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
         lblTitle.setForeground(new Color(30, 41, 59));
-        JLabel lblSubtitle = new JLabel("Tra cứu hội viên sắp hết hạn, chuyển đổi gói tập và xuất hóa đơn gia hạn");
+        JLabel lblSubtitle = new JLabel("Tra cứu hội viên thực tế trong danh sách (theo Mã HV, Mã QR hoặc Tên) và xuất hóa đơn gia hạn");
         lblSubtitle.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         lblSubtitle.setForeground(new Color(100, 116, 139));
         headerPanel.add(lblTitle, BorderLayout.NORTH);
@@ -74,13 +86,13 @@ public class GiaHanGoiTapPanel extends JPanel {
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
 
-        JLabel lblPrompt = new JLabel("Mã Hội Viên / SĐT / Tên:");
+        JLabel lblPrompt = new JLabel("Tra cứu Hội Viên (Mã HV / Mã QR / Họ Tên):");
         lblPrompt.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        txtSearch = new JTextField(18);
+        txtSearch = new JTextField(20);
         txtSearch.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        txtSearch.setText("HV022");
+        txtSearch.putClientProperty("JTextField.placeholderText", "Ví dụ: 12, HV861, QR001 hoặc Lê Anh Duy");
 
-        btnSearch = new JButton("Tra Cứu Hội Viên");
+        btnSearch = new JButton("Tra Cứu");
         btnSearch.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnSearch.setBackground(new Color(37, 99, 235));
         btnSearch.setForeground(Color.WHITE);
@@ -109,24 +121,24 @@ public class GiaHanGoiTapPanel extends JPanel {
         int r = 0;
         // Member Info Row
         gbc.gridx = 0; gbc.gridy = r; gbc.weightx = 0.25;
-        JLabel l1 = new JLabel("Hội Viên:"); l1.setFont(fontLabel);
+        JLabel l1 = new JLabel("Hội Viên Đang Chọn:"); l1.setFont(fontLabel);
         formPanel.add(l1, gbc);
 
         gbc.gridx = 1; gbc.weightx = 0.75;
-        lblTen = new JLabel("Lê Thị Lan (Mã: HV022 - SĐT: 0987 654 321)");
+        lblTen = new JLabel("Đang tải dữ liệu hội viên...");
         lblTen.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblTen.setForeground(new Color(30, 41, 59));
         formPanel.add(lblTen, gbc);
 
         // Current status row
         r++; gbc.gridx = 0; gbc.gridy = r; gbc.weightx = 0.25;
-        JLabel lStatus = new JLabel("Gói Hiện Tại:"); lStatus.setFont(fontLabel);
+        JLabel lStatus = new JLabel("Hạn Thẻ Hiện Tại:"); lStatus.setFont(fontLabel);
         formPanel.add(lStatus, gbc);
 
         gbc.gridx = 1; gbc.weightx = 0.75;
-        lblCurrentStatus = new JLabel("Gói 1 Tháng Thử Nghiệm - Hết hạn vào ngày mai (01/10/2026)");
+        lblCurrentStatus = new JLabel("---");
         lblCurrentStatus.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        lblCurrentStatus.setForeground(new Color(239, 68, 68));
+        lblCurrentStatus.setForeground(new Color(100, 116, 139));
         formPanel.add(lblCurrentStatus, gbc);
 
         // New Package Selection
@@ -135,13 +147,7 @@ public class GiaHanGoiTapPanel extends JPanel {
         formPanel.add(l2, gbc);
 
         gbc.gridx = 1; gbc.weightx = 0.75;
-        cbGoi = new JComboBox<>(new String[]{
-                "Gói Sinh Viên (3 Tháng) - 1.100.000 đ",
-                "VIP Thể Lực (6 Tháng) - 2.500.000 đ",
-                "Gói 1 Năm Toàn Diện (Tặng 1 tháng) - 4.000.000 đ",
-                "Khóa Kèm Riêng PT 1-1 (20 Buổi) - 6.000.000 đ"
-        });
-        cbGoi.setSelectedIndex(1);
+        cbGoi = new JComboBox<>();
         cbGoi.setFont(fontInput);
         formPanel.add(cbGoi, gbc);
 
@@ -151,7 +157,7 @@ public class GiaHanGoiTapPanel extends JPanel {
         formPanel.add(l3, gbc);
 
         gbc.gridx = 1; gbc.weightx = 0.75;
-        txtNgay = new JTextField(new SimpleDateFormat("dd/MM/yyyy").format(new Date()));
+        txtNgay = new JTextField(sdf.format(new Date()));
         txtNgay.setFont(fontInput);
         formPanel.add(txtNgay, gbc);
 
@@ -219,6 +225,7 @@ public class GiaHanGoiTapPanel extends JPanel {
         this.add(centerPanel, BorderLayout.CENTER);
 
         // Action Listeners
+        loadPackageList();
         btnSearch.addActionListener(e -> actionSearch());
         txtSearch.addActionListener(e -> actionSearch());
         cbGoi.addActionListener(e -> updatePrice());
@@ -226,48 +233,105 @@ public class GiaHanGoiTapPanel extends JPanel {
         btnCancel.addActionListener(e -> resetForm());
         btnConfirm.addActionListener(e -> confirmRenewal());
 
+        GoiTapDAO.addChangeListener(this::loadPackageList);
+        loadInitialMember();
+    }
+
+    public void loadPackageList() {
+        danhSachGoiTap = goiTapDAO.layTatCa();
+        Object currentSelected = cbGoi.getSelectedItem();
+        cbGoi.removeAllItems();
+        if (danhSachGoiTap != null && !danhSachGoiTap.isEmpty()) {
+            for (GoiTap gt : danhSachGoiTap) {
+                cbGoi.addItem(gt.getTenGoiTap() + " (" + gt.getThoiHanThang() + " Tháng) - " + df.format(gt.getGiaTien()));
+            }
+            if (currentSelected != null) {
+                cbGoi.setSelectedItem(currentSelected);
+            }
+            if (cbGoi.getSelectedIndex() < 0) {
+                cbGoi.setSelectedIndex(0);
+            }
+        } else {
+            cbGoi.addItem("Gói 1 Tháng Tiêu Chuẩn (1 Tháng) - 500,000 đ");
+        }
         updatePrice();
+    }
+
+    private void loadInitialMember() {
+        List<HoiVien> list = hoiVienDAO.layTatCa();
+        if (list != null && !list.isEmpty()) {
+            displayMember(list.get(0));
+            txtSearch.setText(list.get(0).getMaTheQR() != null ? list.get(0).getMaTheQR() : String.valueOf(list.get(0).getMaHoiVien()));
+        } else {
+            lblTen.setText("Chưa có hội viên trong hệ thống");
+            lblCurrentStatus.setText("Vui lòng đăng ký hội viên mới trước.");
+        }
+    }
+
+    private void displayMember(HoiVien hv) {
+        if (hv == null) return;
+        this.currentHoiVien = hv;
+
+        String maHV = String.valueOf(hv.getMaHoiVien());
+        String maQR = hv.getMaTheQR() != null ? hv.getMaTheQR() : ("HV" + maHV);
+        String branch = hv.getChiNhanhDangKy() != null ? hv.getChiNhanhDangKy() : "CN01";
+
+        lblTen.setText(hv.getHoTen() + " — Mã HV: " + maHV + " • Mã Thẻ QR: " + maQR + " (" + branch + ")");
+
+        if (hv.getNgayHetHan() != null) {
+            String expStr = sdf.format(hv.getNgayHetHan());
+            boolean isExpired = hv.getNgayHetHan().before(new Date());
+            if (isExpired) {
+                long diff = (System.currentTimeMillis() - hv.getNgayHetHan().getTime()) / (1000 * 60 * 60 * 24);
+                lblCurrentStatus.setText("ĐÃ HẾT HẠN vào ngày " + expStr + " (Đã quá hạn " + diff + " ngày — Cần gia hạn ngay!)");
+                lblCurrentStatus.setForeground(new Color(239, 68, 68));
+            } else {
+                long diff = (hv.getNgayHetHan().getTime() - System.currentTimeMillis()) / (1000 * 60 * 60 * 24);
+                lblCurrentStatus.setText("Đang hoạt động — Hạn thẻ đến ngày: " + expStr + " (Còn " + diff + " ngày)");
+                lblCurrentStatus.setForeground(new Color(16, 185, 129));
+            }
+        } else {
+            lblCurrentStatus.setText("Chưa kích hoạt hạn thẻ");
+            lblCurrentStatus.setForeground(new Color(245, 158, 11));
+        }
     }
 
     private void actionSearch() {
         String keyword = txtSearch.getText().trim();
         if (keyword.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập Mã hội viên, SĐT hoặc Họ tên để tra cứu!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập Mã hội viên (ví dụ: 12), Mã QR (ví dụ: HV861, QR001) hoặc Họ tên để tra cứu!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        if (keyword.equalsIgnoreCase("HV015") || keyword.contains("Quang")) {
-            currentMemberName = "Trần Đại Quang";
-            currentMemberCode = "HV015";
-            lblTen.setText("Trần Đại Quang (Mã: HV015 - SĐT: 0901 234 567)");
-            lblCurrentStatus.setText("Gói 6 Tháng - Hết hạn 03/10/2026 (Còn 3 ngày)");
-        } else if (keyword.equalsIgnoreCase("HV041") || keyword.contains("Thủy")) {
-            currentMemberName = "Phạm Trọng Thủy";
-            currentMemberCode = "HV041";
-            lblTen.setText("Phạm Trọng Thủy (Mã: HV041 - SĐT: 0912 233 445)");
-            lblCurrentStatus.setText("Gói 3 Tháng - Hết hạn 05/10/2026 (Còn 5 ngày)");
-        } else if (keyword.equalsIgnoreCase("HV001") || keyword.contains("Tuấn")) {
-            currentMemberName = "Nguyễn Văn Tuấn";
-            currentMemberCode = "HV001";
-            lblTen.setText("Nguyễn Văn Tuấn (Mã: HV001 - SĐT: 0901 234 567)");
-            lblCurrentStatus.setText("VIP Thể Lực - Hết hạn 15/11/2026 (Còn 45 ngày)");
-        } else {
-            currentMemberName = keyword;
-            currentMemberCode = "HV" + (int)(Math.random() * 800 + 100);
-            lblTen.setText(keyword + " (Mã: " + currentMemberCode + " - SĐT: 0988 xxx xxx)");
-            lblCurrentStatus.setText("Gói Tiêu Chuẩn - Sắp hết hạn");
-        }
+        // Tra cứu thực tế từ CSDL / DAO
+        HoiVien found = hoiVienDAO.timKiemThongMinh(keyword);
 
-        JOptionPane.showMessageDialog(this, "Đã tìm thấy thông tin hội viên: " + currentMemberName, "Tra Cứu Thành Công", JOptionPane.INFORMATION_MESSAGE);
+        if (found != null) {
+            displayMember(found);
+            JOptionPane.showMessageDialog(this, 
+                    "Đã tìm thấy hội viên: " + found.getHoTen() 
+                    + "\nMã Hội Viên: " + found.getMaHoiVien() 
+                    + "\nMã Thẻ QR: " + found.getMaTheQR() 
+                    + "\nChi Nhánh: " + found.getChiNhanhDangKy(), 
+                    "Tra Cứu Thành Công", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, 
+                    "KHÔNG TÌM THẤY hội viên nào khớp với từ khóa: \"" + keyword + "\"!\n"
+                    + "Vui lòng kiểm tra lại:\n"
+                    + "• Mã Hội Viên (ví dụ: 1, 2, 12...)\n"
+                    + "• Mã Thẻ QR (ví dụ: QR001, HV861...)\n"
+                    + "• Hoặc Họ và Tên trong Danh Sách Hội Viên.", 
+                    "Không Tìm Thấy", JOptionPane.WARNING_MESSAGE);
+        }
     }
 
     private void updatePrice() {
         int idx = cbGoi.getSelectedIndex();
-        switch (idx) {
-            case 0: basePrice = 1100000; break;
-            case 1: basePrice = 2500000; break;
-            case 2: basePrice = 4000000; break;
-            case 3: basePrice = 6000000; break;
+        if (danhSachGoiTap != null && idx >= 0 && idx < danhSachGoiTap.size()) {
+            GoiTap selected = danhSachGoiTap.get(idx);
+            basePrice = (long) selected.getGiaTien();
+        } else {
+            basePrice = 500000;
         }
 
         long finalPrice = basePrice - (basePrice * discountPercent / 100);
@@ -293,34 +357,81 @@ public class GiaHanGoiTapPanel extends JPanel {
     }
 
     private void confirmRenewal() {
-        int months = 3;
-        int idx = cbGoi.getSelectedIndex();
-        if (idx == 0) months = 3;
-        else if (idx == 1) months = 6;
-        else if (idx == 2) months = 13;
-        else if (idx == 3) months = 2;
+        if (currentHoiVien == null) {
+            JOptionPane.showMessageDialog(this, "Vui lòng tra cứu và chọn một hội viên thực tế trước khi gia hạn!", "Chưa chọn hội viên", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
+        int months = 1;
+        String packageName = "Gói Tiêu Chuẩn";
+        int idx = cbGoi.getSelectedIndex();
+        if (danhSachGoiTap != null && idx >= 0 && idx < danhSachGoiTap.size()) {
+            GoiTap selected = danhSachGoiTap.get(idx);
+            months = selected.getThoiHanThang();
+            packageName = selected.getTenGoiTap();
+        } else {
+            months = 1;
+        }
+
+        // Tính ngày hết hạn mới: cộng dồn nếu còn hạn, hoặc từ hôm nay nếu đã quá hạn
         Calendar cal = Calendar.getInstance();
+        if (currentHoiVien.getNgayHetHan() != null && currentHoiVien.getNgayHetHan().after(new Date())) {
+            cal.setTime(currentHoiVien.getNgayHetHan());
+        } else {
+            cal.setTime(new Date());
+        }
         cal.add(Calendar.MONTH, months);
-        String newExpire = new SimpleDateFormat("dd/MM/yyyy").format(cal.getTime());
+        Date newExpireDate = cal.getTime();
+        String newExpire = sdf.format(newExpireDate);
+
+        // Cập nhật thực tế cho Hội Viên
+        currentHoiVien.setNgayHetHan(newExpireDate);
+        currentHoiVien.setTrangThai("Active");
+        hoiVienDAO.capNhat(currentHoiVien);
+
+        // Tạo hóa đơn tài chính thực tế
+        long finalPrice = basePrice - (basePrice * discountPercent / 100);
+        String maHD = "HD" + (System.currentTimeMillis() % 1000000);
+        String nguoiLap = (Auth.tenDangNhap != null && !Auth.tenDangNhap.isEmpty()) ? Auth.tenDangNhap : "letan1";
+        String branch = currentHoiVien.getChiNhanhDangKy() != null ? currentHoiVien.getChiNhanhDangKy() : "CN01 - Quận 1";
+
+        HoaDon hd = new HoaDon(
+                maHD,
+                currentHoiVien.getMaHoiVien(),
+                currentHoiVien.getHoTen(),
+                "Gia hạn " + cbGoi.getSelectedItem().toString(),
+                basePrice,
+                basePrice * discountPercent / 100,
+                finalPrice,
+                cbThanhToan.getSelectedItem().toString(),
+                nguoiLap,
+                branch,
+                new Date(),
+                "Đã thanh toán",
+                "Gia hạn thành công trên hệ thống FitLife"
+        );
+        hoaDonDAO.them(hd);
 
         String invoice = "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
                 + "            HÓA ĐƠN GIA HẠN GÓI TẬP\n"
                 + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-                + "Mã Hóa Đơn: HD" + System.currentTimeMillis() % 1000000 + "\n"
-                + "Hội Viên: " + currentMemberName + " (" + currentMemberCode + ")\n"
-                + "Gói Mới: " + cbGoi.getSelectedItem() + "\n"
+                + "Mã Hóa Đơn: " + maHD + "\n"
+                + "Mã Hội Viên: " + currentHoiVien.getMaHoiVien() + " (Mã Thẻ: " + currentHoiVien.getMaTheQR() + ")\n"
+                + "Hội Viên: " + currentHoiVien.getHoTen() + "\n"
+                + "Chi Nhánh: " + branch + "\n"
+                + "Gói Gia Hạn: " + cbGoi.getSelectedItem() + "\n"
                 + "Ngày Bắt Đầu: " + txtNgay.getText().trim() + "\n"
-                + "Hạn Mới Đến Ngày: " + newExpire + "\n"
+                + "HẠN MỚI ĐẾN NGÀY: " + newExpire + "\n"
                 + "Hình Thức Thanh Toán: " + cbThanhToan.getSelectedItem() + "\n"
-                + "Giảm Giá: " + discountPercent + "%\n"
-                + "TỔNG THANH TOÁN: " + lblThanhTien.getText() + "\n"
+                + "Ưu Đãi: " + discountPercent + "%\n"
+                + "TỔNG TIỀN THANH TOÁN: " + lblThanhTien.getText() + "\n"
                 + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-                + "Đã in hóa đơn và gia hạn thành công trên hệ thống!";
+                + "✓ Đã cập nhật ngày hết hạn mới vào hệ thống!\n"
+                + "✓ Đã lưu hóa đơn tài chính và in phiếu thu thành công!";
 
         JOptionPane.showMessageDialog(this, invoice, "Gia Hạn Thành Công", JOptionPane.INFORMATION_MESSAGE);
-        lblCurrentStatus.setText("Đang hoạt động - Hạn mới: " + newExpire);
-        lblCurrentStatus.setForeground(new Color(16, 185, 129));
+
+        displayMember(currentHoiVien);
     }
 
     private void resetForm() {
@@ -329,7 +440,8 @@ public class GiaHanGoiTapPanel extends JPanel {
         discountPercent = 0;
         cbGoi.setSelectedIndex(0);
         cbThanhToan.setSelectedIndex(0);
-        txtNgay.setText(new SimpleDateFormat("dd/MM/yyyy").format(new Date()));
+        txtNgay.setText(sdf.format(new Date()));
         updatePrice();
+        loadInitialMember();
     }
 }

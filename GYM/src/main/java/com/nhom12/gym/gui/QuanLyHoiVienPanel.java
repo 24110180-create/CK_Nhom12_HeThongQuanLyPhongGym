@@ -274,34 +274,48 @@ public class QuanLyHoiVienPanel extends JPanel {
             String branch = txtChiNhanh.getText().trim();
             String status = cbTrangThai.getSelectedItem().toString();
 
-            if (qr.isEmpty() || name.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ Mã QR và Họ Tên!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            if (name.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập Họ Tên hội viên!", "Thông báo", JOptionPane.WARNING_MESSAGE);
                 return;
+            }
+
+            // Tính mã ID tiếp theo
+            int nextId = 1;
+            for (int i = 0; i < tableModel.getRowCount(); i++) {
+                try {
+                    int idVal = Integer.parseInt(tableModel.getValueAt(i, 0).toString());
+                    if (idVal >= nextId) nextId = idVal + 1;
+                } catch (Exception ignored) {}
+            }
+
+            // Tự động đồng bộ mã QR chuẩn nếu chưa nhập
+            if (qr.isEmpty()) {
+                qr = String.format("HV%03d", nextId);
+                txtQR.setText(qr);
             }
 
             // Kiểm tra trùng mã QR trên bảng
             for (int i = 0; i < tableModel.getRowCount(); i++) {
                 if (tableModel.getValueAt(i, 1).toString().equalsIgnoreCase(qr)) {
-                    JOptionPane.showMessageDialog(this, "Mã thẻ QR '" + qr + "' đã tồn tại!", "Cảnh báo trùng lặp", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Mã thẻ QR '" + qr + "' đã tồn tại! Vui lòng chọn mã khác.", "Cảnh báo trùng lặp", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
             }
 
-            // Tạo mã ID tiếp theo
-            int nextId = tableModel.getRowCount() + 1;
-            tableModel.addRow(new Object[]{nextId, qr, name, branch.isEmpty() ? "CN01" : branch, "31/12/2026", status});
+            tableModel.insertRow(0, new Object[]{nextId, qr, name, branch.isEmpty() ? "CN01" : branch, "31/12/2026", status});
 
-            // Thử lưu vào DB nếu có kết nối
+            // Lưu vào CSDL và Fallback Cache
             try {
                 HoiVien hv = new HoiVien();
+                hv.setMaHoiVien(nextId);
                 hv.setMaTheQR(qr);
                 hv.setHoTen(name);
-                hv.setChiNhanhDangKy(branch);
+                hv.setChiNhanhDangKy(branch.isEmpty() ? "CN01" : branch);
                 hv.setTrangThai(status);
                 service.luuHoiVien(hv, false);
             } catch (Exception ignored) {}
 
-            JOptionPane.showMessageDialog(this, "Đã thêm mới hội viên '" + name + "' thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Đã thêm mới hội viên '" + name + "' [Mã HV: " + nextId + " • Mã QR: " + qr + "] thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
             btnLamMoi.doClick();
         });
 
@@ -318,6 +332,16 @@ public class QuanLyHoiVienPanel extends JPanel {
             String branch = txtChiNhanh.getText().trim();
             String status = cbTrangThai.getSelectedItem().toString();
 
+            if (name.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Họ Tên không được để trống!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            if (qr.isEmpty() && !txtMaHV.getText().isEmpty()) {
+                qr = String.format("HV%03d", Integer.parseInt(txtMaHV.getText()));
+                txtQR.setText(qr);
+            }
+
             if (row >= 0) {
                 tableModel.setValueAt(qr, row, 1);
                 tableModel.setValueAt(name, row, 2);
@@ -325,7 +349,7 @@ public class QuanLyHoiVienPanel extends JPanel {
                 tableModel.setValueAt(status, row, 5);
             }
 
-            // Cập nhật DB nếu có kết nối
+            // Cập nhật CSDL và Cache
             try {
                 if (!txtMaHV.getText().isEmpty()) {
                     HoiVien hv = new HoiVien();
@@ -366,10 +390,17 @@ public class QuanLyHoiVienPanel extends JPanel {
             }
         });
 
-        // 4. NÚT LÀM MỚI FORM
+        // 4. NÚT LÀM MỚI FORM (ĐỒNG BỘ MÃ TIẾP THEO)
         btnLamMoi.addActionListener(e -> {
-            txtMaHV.setText("");
-            txtQR.setText("");
+            int nextId = 1;
+            for (int i = 0; i < tableModel.getRowCount(); i++) {
+                try {
+                    int idVal = Integer.parseInt(tableModel.getValueAt(i, 0).toString());
+                    if (idVal >= nextId) nextId = idVal + 1;
+                } catch (Exception ignored) {}
+            }
+            txtMaHV.setText(String.valueOf(nextId));
+            txtQR.setText(String.format("HV%03d", nextId));
             txtHoTen.setText("");
             txtChiNhanh.setText("CN01");
             cbTrangThai.setSelectedIndex(0);

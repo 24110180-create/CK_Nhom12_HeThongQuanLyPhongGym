@@ -141,34 +141,6 @@ public class LoginForm extends JFrame {
         btnLogin.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
         btnLogin.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Hộp hướng dẫn 5 phân quyền hệ thống (chỉ hiển thị thông tin, không tự động điền)
-        JPanel infoBox = new JPanel();
-        infoBox.setLayout(new BoxLayout(infoBox, BoxLayout.Y_AXIS));
-        infoBox.setBackground(new Color(241, 245, 249));
-        infoBox.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
-                new EmptyBorder(10, 14, 10, 14)
-        ));
-        infoBox.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JLabel lblInfoTitle = new JLabel("HỆ THỐNG HỖ TRỢ 5 VAI TRÒ (MẬT KHẨU: 123456):");
-        lblInfoTitle.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        lblInfoTitle.setForeground(new Color(71, 85, 105));
-
-        JLabel lblInfo1 = new JLabel("• Chủ phòng: admin  |  Lễ tân: letan1  |  HLV: hlv1");
-        lblInfo1.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        lblInfo1.setForeground(new Color(100, 116, 139));
-
-        JLabel lblInfo2 = new JLabel("• Quản lý: quanly1  |  Hội viên VIP: hoivien1");
-        lblInfo2.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        lblInfo2.setForeground(new Color(37, 99, 235));
-
-        infoBox.add(lblInfoTitle);
-        infoBox.add(Box.createRigidArea(new Dimension(0, 4)));
-        infoBox.add(lblInfo1);
-        infoBox.add(Box.createRigidArea(new Dimension(0, 3)));
-        infoBox.add(lblInfo2);
-
         rightPanel.add(lblFormTitle);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 4)));
         rightPanel.add(lblFormSub);
@@ -182,10 +154,10 @@ public class LoginForm extends JFrame {
         rightPanel.add(txtPass);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 22)));
         rightPanel.add(btnLogin);
-        rightPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 12)));
 
         // Nút liên kết Đăng ký App dành riêng cho Hội Viên
-        JButton btnRegisterApp = new JButton("Bạn là Hội viên mới? Đăng ký tài khoản App tại đây ➔");
+        JButton btnRegisterApp = new JButton("Bạn là Hội viên mới? Đăng ký tài khoản App tại đây");
         btnRegisterApp.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnRegisterApp.setForeground(new Color(2, 132, 199));
         btnRegisterApp.setBorderPainted(false);
@@ -195,9 +167,6 @@ public class LoginForm extends JFrame {
         btnRegisterApp.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnRegisterApp.addActionListener(e -> moDialogDangKyAppHoiVien());
         rightPanel.add(btnRegisterApp);
-
-        rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        rightPanel.add(infoBox);
 
         mainContainer.add(leftPanel);
         mainContainer.add(rightPanel);

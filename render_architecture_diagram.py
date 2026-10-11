@@ -68,17 +68,17 @@ def render_diagram():
                     fontsize=10.5, fontweight='bold', color=text_color, fontname=font_main, zorder=5)
 
     # -------------------------------------------------------------
-    # 1. TẦNG GIAO DIỆN (UI LAYER - PRESENTATION)
+    # 1. TẦNG GIAO DIỆN (GUI LAYER - PRESENTATION)
     # -------------------------------------------------------------
     draw_container(4, 76.5, 92, 16.0, '#F0F9FF', '#7DD3FC', 
-                   "TẦNG GIAO DIỆN NGƯỜI DÙNG (UI LAYER - PRESENTATION)", 
-                   "Java Swing • FlatLaf 3.4 Modern Look & Feel • Tương thích Honeywell Barcode/QR Scanner",
+                   "TẦNG GIAO DIỆN NGƯỜI DÙNG (GUI LAYER - PRESENTATION)", 
+                   "Java Swing • FlatLaf 3.4 • com.nhom12.gym.gui (MainForm, CheckInForm) & gui.panels (31 Panels)",
                    title_color='#0369A1')
 
     ui_cards = [
-        ("Giao diện chính", "(MainDashboard)", 5.8, 16.5),
+        ("Giao diện chính", "(MainDashboard / MainForm)", 5.8, 16.5),
         ("Trạm Check-in", "(CheckInForm)", 24.3, 16.5),
-        ("Quản lý Gói tập & Lớp", "(QuanLyGoiTapPanel)", 42.8, 16.5),
+        ("31 Panels Nghiệp Vụ", "(gui.panels.*)", 42.8, 16.5),
         ("Biểu đồ & Thống kê", "(BaoCaoThongKePanel)", 61.3, 16.5),
         ("Phân quyền 5 vai trò", "(Chủ / Lễ tân / HLV / QL / HV)", 79.8, 16.5)
     ]
@@ -86,7 +86,7 @@ def render_diagram():
         draw_card(cx, 78.5, cw, 8.5, '#0284C7', title, sub)
 
     # -------------------------------------------------------------
-    # Mũi tên UI <--> BLL (4 mũi tên đối xứng)
+    # Mũi tên UI <--> BLL (5 mũi tên đối xứng)
     # -------------------------------------------------------------
     for arrow_x in [14.0, 32.5, 51.0, 69.5, 88.0]:
         ax.annotate('', xy=(arrow_x, 69.5), xytext=(arrow_x, 76.5),
@@ -94,18 +94,18 @@ def render_diagram():
                     zorder=10)
 
     # -------------------------------------------------------------
-    # 2. TẦNG NGHIỆP VỤ (BUSINESS LOGIC LAYER - BLL)
+    # 2. TẦNG ĐIỀU PHỐI & NGHIỆP VỤ (CONTROLLER & SERVICE LAYER - BLL)
     # -------------------------------------------------------------
     draw_container(4, 53.5, 92, 16.0, '#ECFDF5', '#6EE7B7', 
-                   "TẦNG XỬ LÝ NGHIỆP VỤ (BUSINESS LOGIC LAYER - BLL)", 
-                   "Đóng gói 100% quy tắc kinh doanh (Business Rules) • Phân quyền RBAC • Quản lý phiên Auth",
+                   "TẦNG ĐIỀU PHỐI & NGHIỆP VỤ (CONTROLLER & SERVICE LAYER - BLL)", 
+                   "Controller điều phối MVC • Service đóng gói 100% Business Rules • Phân quyền RBAC • Auth Session",
                    title_color='#047857')
 
     bll_cards = [
-        ("Xử lý Check-in Lõi", "(CheckInService • 5 Rules • VIP Secret)", 6.0, 20.5),
-        ("Quản lý Hội viên & Thẻ", "(HoiVienService • Gia hạn • Tính hạn)", 28.5, 20.5),
-        ("Báo cáo & Giờ cao điểm", "(BaoCaoService • 2 Chi nhánh • Heatmap)", 51.0, 20.5),
-        ("Xác thực & Phân quyền", "(AuthService • RBAC 5 Roles • Fallback)", 73.5, 20.5)
+        ("CheckIn Controller/Service", "(5 Rules • VIP Secret • Flap Barrier)", 6.0, 20.5),
+        ("HoiVien Controller/Service", "(Hồ sơ hội viên • Gia hạn • Cấp QR)", 28.5, 20.5),
+        ("BaoCao & Product Controller", "(Doanh thu 2 CN • POS • Heatmap)", 51.0, 20.5),
+        ("Auth Controller/Service", "(RBAC 5 Roles • Băm Mật Khẩu SHA-256)", 73.5, 20.5)
     ]
     for title, sub, cx, cw in bll_cards:
         draw_card(cx, 55.5, cw, 8.5, '#0D9488', title, sub)
@@ -184,8 +184,8 @@ def render_diagram():
     draw_container(51.0, 1.2, 45.0, 8.8, '#1E293B', '#F59E0B', 
                    "TẦNG TIỆN ÍCH DÙNG CHUNG (CROSS-CUTTING UTILITIES)", 
                    title_color='#F59E0B')
-    ax.text(73.5, 4.2, "SoundHelper (Sóng âm PCM 1200Hz/420Hz) • ExcelExportHelper (BOM UTF-8)\nImageHelper (Sinh QR Card) • Auth Context • ValidationHelper", 
-            ha='center', va='center', fontsize=10.0, fontweight='bold', color='#F8FAFC', fontname=font_main, zorder=5)
+    ax.text(73.5, 4.2, "PasswordUtil (Băm Mật Khẩu SHA-256) • SoundHelper (Sóng âm PCM)\nImageHelper (Sinh QR Card) • ExcelExportHelper • ValidationHelper", 
+            ha='center', va='center', fontsize=9.8, fontweight='bold', color='#F8FAFC', fontname=font_main, zorder=5)
 
     # Đường kết nối Cross-cutting phía bên phải
     ax.annotate('', xy=(97.2, 85.0), xytext=(97.2, 6.0),

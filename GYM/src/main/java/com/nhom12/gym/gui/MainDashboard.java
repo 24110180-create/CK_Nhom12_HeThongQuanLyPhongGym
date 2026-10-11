@@ -1,5 +1,7 @@
 package com.nhom12.gym.gui;
 
+import com.nhom12.gym.gui.panels.*;
+
 import com.formdev.flatlaf.FlatLightLaf;
 import com.nhom12.gym.util.Auth;
 import java.awt.BorderLayout;

@@ -2,6 +2,7 @@ package com.nhom12.gym.dao;
 
 import com.nhom12.gym.entity.TaiKhoan;
 import com.nhom12.gym.util.HibernateUtil;
+import com.nhom12.gym.util.PasswordUtil;
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -28,13 +29,22 @@ public class TaiKhoanDAO {
     }
 
     public TaiKhoan dangNhap(String tenDangNhap, String matKhau) {
+        if (tenDangNhap == null || matKhau == null) return null;
+        String hashed = PasswordUtil.hashPassword(matKhau);
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Query<TaiKhoan> query = session.createQuery(
-                "FROM TaiKhoan WHERE tenDangNhap = :user AND matKhau = :pass", TaiKhoan.class
+                "FROM TaiKhoan WHERE tenDangNhap = :user AND (matKhau = :hashed OR matKhau = :pass)", TaiKhoan.class
             );
             query.setParameter("user", tenDangNhap);
+            query.setParameter("hashed", hashed);
             query.setParameter("pass", matKhau);
-            return query.uniqueResult();
+            TaiKhoan tk = query.uniqueResult();
+            if (tk != null && !PasswordUtil.isHashed(tk.getMatKhau())) {
+                // Tự động nâng cấp băm mật khẩu cho tài khoản cũ trong CSDL
+                tk.setMatKhau(hashed);
+                capNhat(tk);
+            }
+            return tk;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -42,6 +52,10 @@ public class TaiKhoanDAO {
     }
 
     public boolean them(TaiKhoan tk) {
+        if (tk == null) return false;
+        if (tk.getMatKhau() != null && !PasswordUtil.isHashed(tk.getMatKhau())) {
+            tk.setMatKhau(PasswordUtil.hashPassword(tk.getMatKhau()));
+        }
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
@@ -56,6 +70,10 @@ public class TaiKhoanDAO {
     }
 
     public boolean capNhat(TaiKhoan tk) {
+        if (tk == null) return false;
+        if (tk.getMatKhau() != null && !PasswordUtil.isHashed(tk.getMatKhau())) {
+            tk.setMatKhau(PasswordUtil.hashPassword(tk.getMatKhau()));
+        }
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();

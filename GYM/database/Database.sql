@@ -26,21 +26,22 @@ DROP TABLE IF EXISTS HoiVien;
 DROP TABLE IF EXISTS TaiKhoan;
 GO
 
--- 2. BẢNG TÀI KHOẢN HỆ THỐNG (PHÂN QUYỀN 5 VAI TRÒ CHUẨN)
+-- 2. BẢNG TÀI KHOẢN HỆ THỐNG (PHÂN QUYỀN 5 VAI TRÒ CHUẨN - MẬT KHẨU BĂM SHA-256)
 CREATE TABLE TaiKhoan (
     TenDangNhap VARCHAR(50) PRIMARY KEY,
-    MatKhau VARCHAR(50) NOT NULL,
+    MatKhau VARCHAR(255) NOT NULL, -- Mật khẩu băm chuẩn an toàn SHA-256 (64 hex characters)
     VaiTro NVARCHAR(50) NOT NULL, -- 'Chủ', 'Lễ tân', 'HLV', 'Quản lý', 'Hội viên'
     HoTen NVARCHAR(100) NOT NULL
 );
 GO
 
+-- Mật khẩu ban đầu mặc định cho 5 vai trò là '123456' (Đã băm SHA-256: 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92)
 INSERT INTO TaiKhoan (TenDangNhap, MatKhau, VaiTro, HoTen) VALUES 
-('admin',    '123456', N'Chủ',      N'Võ Anh Đức (Chủ Hệ Thống)'),
-('letan1',   '123456', N'Lễ tân',   N'Nguyễn Thị Linh (Lễ Tân CN01)'),
-('hlv1',     '123456', N'HLV',      N'Trần Tuấn Kiệt (HLV Trưởng)'),
-('quanly1',  '123456', N'Quản lý',  N'Lê Thanh Sơn (Quản Lý Chi Nhánh)'),
-('hoivien1', '123456', N'Hội viên', N'Lê Anh Duy (Hội Viên VIP Diamond)');
+('admin',    '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Chủ',      N'Võ Anh Đức (Chủ Hệ Thống)'),
+('letan1',   '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Lễ tân',   N'Nguyễn Thị Linh (Lễ Tân CN01)'),
+('hlv1',     '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'HLV',      N'Trần Tuấn Kiệt (HLV Trưởng)'),
+('quanly1',  '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Quản lý',  N'Lê Thanh Sơn (Quản Lý Chi Nhánh)'),
+('hoivien1', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Hội viên', N'Lê Anh Duy (Hội Viên VIP Diamond)');
 GO
 
 -- 3. BẢNG HỘI VIÊN (HỖ TRỢ MÃ QR/BARCODE VÀ QUẢN LÝ GÓI TẬP)

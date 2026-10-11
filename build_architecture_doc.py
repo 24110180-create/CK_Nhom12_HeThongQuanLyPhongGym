@@ -113,16 +113,16 @@ def build_architecture_doc():
     headers_tiers = ["Tầng Kiến Trúc", "Package Java / Thành Phần", "Công Nghệ & Thư Viện", "Trách Nhiệm Cốt Lõi"]
     rows_tiers = [
         [
-            "1. Presentation\n(Giao diện UI)",
-            "com.nhom12.gym.gui",
+            "1. Presentation / GUI\n(Giao diện UI)",
+            "com.nhom12.gym.gui\ncom.nhom12.gym.gui.panels",
             "Java Swing\nFlatLaf 3.4 Look & Feel\nCardLayout, GridBagLayout",
-            "Thu nhận tương tác chuột/phím, lắng nghe máy quét USB Honeywell, hiển thị đồ họa trực quan (cổng Flap Barrier, heatmap, phôi thẻ)."
+            "Phân tách rõ ràng giữa Màn hình chính (LoginForm, MainForm, CheckInForm, GuiMaQRDialog) và 31 Panel nghiệp vụ (trong gui.panels). Thu nhận tương tác chuột/phím, lắng nghe máy quét USB Honeywell, hiển thị đồ họa trực quan."
         ],
         [
-            "2. Business Logic\n(Dịch vụ Service)",
-            "com.nhom12.gym.service",
-            "Java Standard Edition\nBusiness Rule Engine\nTimer Millisecond API",
-            "Đóng gói 100% quy tắc kinh doanh: 5 rules check-in, anti-passback 2 phút, phân quyền 5 vai trò, tính hạn thẻ, chính sách VIP ẩn."
+            "2. Controller & Service\n(Điều phối & Nghiệp vụ)",
+            "com.nhom12.gym.controller\ncom.nhom12.gym.service",
+            "Java SE • MVC Architecture\nBusiness Rule Engine\nTimer Millisecond API",
+            "Tầng Controller điều phối luồng giao diện; Tầng Service đóng gói 100% quy tắc kinh doanh: 5 rules check-in, anti-passback 2 phút, phân quyền 5 vai trò, tính hạn thẻ, chính sách VIP ẩn, băm mật khẩu SHA-256."
         ],
         [
             "3. Data Access\n(Truy xuất DAO)",
@@ -143,16 +143,16 @@ def build_architecture_doc():
             "Đại diện cho các đối tượng kinh doanh xuyên suốt: HoiVien, TaiKhoan, GoiTap, LopHoc, HuanLuyenVien, HoaDon,..."
         ],
         [
-            "6. Cross-Cutting\n(Tiện ích dùng chung)",
+            "6. Cross-Cutting\n(Tiện ích & Bảo mật)",
             "com.nhom12.gym.util",
-            "javax.sound.sampled (PCM)\nUTF-8 BOM File IO\nRegex Validation",
-            "Sinh sóng âm 1200Hz/420Hz, xuất file Excel tiếng Việt không lỗi font, sinh mã QR định danh, lưu giữ context phiên làm việc."
+            "SHA-256 MessageDigest\njavax.sound.sampled (PCM)\nUTF-8 BOM File IO",
+            "PasswordUtil băm mật khẩu chuẩn SHA-256 (64 hex characters), sinh sóng âm 1200Hz/420Hz, xuất file Excel tiếng Việt không lỗi font, sinh mã QR định danh, lưu giữ context phiên làm việc."
         ],
         [
             "7. Data Storage\n(Lưu trữ CSDL)",
             "Database: FitLifeGym\nMS SQL Server 2019/2022",
             "T-SQL, JDBC Driver\nTCP/IP Port 1433",
-            "Lưu trữ dữ liệu quan hệ bền vững, thực thi ràng buộc toàn vẹn khóa chính, khóa ngoại và chỉ mục tìm kiếm."
+            "Lưu trữ dữ liệu quan hệ bền vững, thực thi ràng buộc toàn vẹn khóa chính, khóa ngoại, cột MatKhau VARCHAR(255) băm SHA-256 và chỉ mục tìm kiếm."
         ]
     ]
     create_table(doc, headers_tiers, rows_tiers, [1.4, 1.8, 1.8, 2.5])
@@ -163,10 +163,10 @@ def build_architecture_doc():
     add_heading_1(doc, "2. Phân Tích Chuyên Sâu Từng Tầng Trong Hệ Thống")
 
     # 2.1 Presentation
-    add_heading_2(doc, "2.1. Presentation Layer (Tầng Giao Diện Người Dùng - com.nhom12.gym.gui)")
+    add_heading_2(doc, "2.1. Presentation Layer (Tầng Giao Diện Người Dùng - com.nhom12.gym.gui & gui.panels)")
     add_paragraph(
         doc,
-        "Tầng Presentation đóng vai trò là cầu nối giao tiếp trực tiếp giữa người dùng và hệ thống. Được xây dựng trên nền tảng Java Swing kết hợp bộ giao diện hiện đại FlatLaf Look & Feel (phiên bản 3.4), tầng này đem đến trải nghiệm thẩm mỹ chuyên nghiệp chuẩn Windows 11 / macOS, loại bỏ hoàn toàn giao diện xám thô cũ kỹ của Swing truyền thống."
+        "Tầng Presentation đóng vai trò là cầu nối giao tiếp trực tiếp giữa người dùng và hệ thống. Nhóm đã tái cấu trúc và phân bổ cây thư mục chuyên nghiệp theo chuẩn MVC: tổ chức gọn gàng các màn hình chính (Forms / Dialogs: LoginForm, MainDashboard/MainForm, CheckInForm) tại package com.nhom12.gym.gui và gom toàn bộ 31 Panel chức năng chuyên biệt vào package con com.nhom12.gym.gui.panels. Nhờ đó, cây thư mục mạch lạc, chuyên nghiệp mà mã nguồn khởi chạy vẫn bám sát 100% vào package gui."
     )
     add_heading_3(doc, "A. Kiến trúc điều phối giao diện phân quyền 5 vai trò:")
     add_paragraph(
@@ -174,23 +174,23 @@ def build_architecture_doc():
         "Giao diện được phân bổ thành 5 không gian làm việc (Workstations) riêng biệt tùy thuộc vào vai trò tài khoản đăng nhập:"
     )
     add_bullet(doc, "Màn hình tiếp nhận tên đăng nhập và mật khẩu, kiểm tra quyền và tự động kích hoạt chế độ đệm Offline Fallback nếu mất mạng CSDL.", "1. LoginForm: ")
-    add_bullet(doc, "Trung tâm điều hành tối cao với thanh Ribbon 2 tầng hiện đại bao gồm 5 Trụ Cột Chiến Lược (Báo Cáo & Thống Kê, Vận Hành Phòng Tập, Kinh Doanh & Dịch Vụ, Huấn Luyện Viên, Quản Trị Hệ Thống) và dải thẻ Live KPI tài chính/hội viên thời gian thực.", "2. MainDashboard (Chủ phòng): ")
+    add_bullet(doc, "Trung tâm điều hành tối cao với thanh Ribbon 2 tầng hiện đại bao gồm 5 Trụ Cột Chiến Lược (Báo Cáo & Thống Kê, Vận Hành Phòng Tập, Kinh Doanh & Dịch Vụ, Huấn Luyện Viên, Quản Trị Hệ Thống) và dải thẻ Live KPI tài chính/hội viên thời gian thực. Hỗ trợ alias MainForm.", "2. MainDashboard / MainForm (Chủ phòng): ")
     add_bullet(doc, "Trạm vận hành trọng yếu với cơ chế tự động focus ô quét thẻ, bắt phím Enter từ súng quét USB Honeywell, giả lập cổng an ninh Flap Barrier đóng/mở trực quan bằng màu sắc và kích hoạt âm thanh phản hồi tức thì.", "3. CheckInForm (Lễ tân): ")
-    add_bullet(doc, "Quản lý danh mục gói tập (1 Tháng, 3 Tháng, 6 Tháng, VIP Diamond, Kèm PT), chính sách giá, thời hạn và phân quyền theo từng cơ sở.", "4. QuanLyGoiTapPanel (Quản lý gói tập): ")
+    add_bullet(doc, "Quản lý danh mục gói tập (1 Tháng, 3 Tháng, 6 Tháng, VIP Diamond, Kèm PT), chính sách giá, thời hạn và phân quyền theo từng cơ sở (nằm trong package con gui.panels).", "4. QuanLyGoiTapPanel (Quản lý gói tập): ")
     add_bullet(doc, "Không gian học tập, xem lịch lớp, theo dõi hồ sơ InBody và phôi thẻ VIP định danh QR cá nhân.", "5. Member Portal (Hội viên VIP): ")
 
     add_heading_3(doc, "B. Nguyên tắc thiết kế bất biến của tầng Presentation:")
     add_callout(
         doc,
-        "Tầng GUI TUYỆT ĐỐI KHÔNG chứa bất kỳ dòng lệnh SQL nào (SELECT, INSERT, UPDATE) và không được phép can thiệp trực tiếp vào Hibernate Session. Mọi yêu cầu xử lý dữ liệu đều phải gọi thông qua tầng Service tương ứng (ví dụ: CheckInService, AuthService, BaoCaoService). Điều này đảm bảo giao diện chỉ chịu trách nhiệm hiển thị và bắt sự kiện (Event Handling).",
+        "Tầng View/GUI TUYỆT ĐỐI KHÔNG chứa bất kỳ dòng lệnh SQL nào (SELECT, INSERT, UPDATE) và không được phép can thiệp trực tiếp vào Hibernate Session. Mọi yêu cầu xử lý dữ liệu đều phải gọi thông qua tầng Controller / Service tương ứng (ví dụ: CheckInController, AuthController, BaoCaoService). Điều này đảm bảo giao diện chỉ chịu trách nhiệm hiển thị và bắt sự kiện (Event Handling).",
         title="NGUYÊN TẮC VÀNG VỀ TÁCH BIỆT GIAO DIỆN"
     )
 
-    # 2.2 Service
-    add_heading_2(doc, "2.2. Business Logic Layer / Service Layer (Tầng Nghiệp Vụ - com.nhom12.gym.service)")
+    # 2.2 Controller & Service
+    add_heading_2(doc, "2.2. Controller & Business Logic Layer (Tầng Điều Phối & Nghiệp Vụ - com.nhom12.gym.controller & service)")
     add_paragraph(
         doc,
-        "Tầng Service là 'bộ não' trung tâm của toàn bộ hệ thống, nơi tập trung toàn bộ các quy tắc kinh doanh (Business Rules), thuật toán thẩm định điều kiện, kiểm soát tính toán và điều phối luồng xử lý dữ liệu trước khi gửi sang DAO hoặc trả về giao diện."
+        "Hệ thống ứng dụng mô hình kết hợp MVC Controller & Service Layer: Tầng Controller (com.nhom12.gym.controller) bao gồm AuthController, ProductController, HoiVienController, CheckInController, GoiTapController đóng vai trò điều phối luồng dữ liệu từ View sang Service. Tầng Service (com.nhom12.gym.service) là 'bộ não' trung tâm của toàn bộ hệ thống, nơi tập trung toàn bộ các quy tắc kinh doanh (Business Rules), thuật toán thẩm định điều kiện, kiểm soát tính toán và điều phối luồng xử lý dữ liệu trước khi gửi sang DAO hoặc trả về giao diện."
     )
 
     add_heading_3(doc, "A. Xử lý nghiệp vụ lõi: CheckInService (Use Case Cốt Lõi)")
@@ -311,11 +311,12 @@ def build_architecture_doc():
         doc,
         "Tầng Tiện Ích cung cấp các dịch vụ kỹ thuật dùng chung cho nhiều tầng mà không làm phá vỡ ranh giới phân tầng. Các tiện ích nổi bật bao gồm:"
     )
-    add_bullet(doc, "Sử dụng javax.sound.sampled tổng hợp trực tiếp sóng âm hình sin PCM. Tần số 1200Hz (Bíp cao 80ms) mô phỏng âm thanh check-in thành công; tần số 420Hz (Bíp trầm 220ms) mô phỏng âm thanh cảnh báo lỗi từ chối vào cửa. Thuật toán tự trị 100%, không cần file media bên ngoài.", "1. SoundHelper (Bộ Tổng Hợp Sóng Âm PCM): ")
-    add_bullet(doc, "Cơ chế xuất bảng dữ liệu JTable sang file CSV/Excel UTF-8 có chèn tiền tố Byte Order Mark (BOM \\uFEFF) ở đầu file stream. Giúp Microsoft Excel mở trực tiếp file hiển thị chuẩn 100% tiếng Việt có dấu mà không cần người dùng thao tác chuyển bảng mã thủ công.", "2. ExcelExportHelper (Xuất Báo Cáo UTF-8 BOM): ")
-    add_bullet(doc, "Sinh mã ma trận điểm ảnh QR Code định danh hội viên và kết xuất đồ họa phôi thẻ VIP sắc nét định dạng PNG để in thẻ nhựa hoặc gửi qua Zalo/Email cho khách.", "3. ImageHelper & GuiMaQRDialog (Xử Lý Mã QR & Ảnh Thẻ): ")
-    add_bullet(doc, "Xác thực biểu thức chính quy (Regex) cho số điện thoại Việt Nam (10 chữ số đầu 03, 05, 07, 08, 09), định dạng ngày sinh dd/MM/yyyy và số CCCD.", "4. ValidationHelper (Xác Thực Dữ Liệu Đầu Vào): ")
-    add_bullet(doc, "Lưu giữ ngữ cảnh phiên làm việc của người dùng hiện tại (tenDangNhap, vaiTro, hoTen) đóng vai trò làm Security Context trong suốt phiên chạy của ứng dụng.", "5. Auth (Quản Lý Phiên Đăng Nhập): ")
+    add_bullet(doc, "Cài đặt thuật toán băm một chiều chuẩn công nghiệp SHA-256 (MessageDigest), sinh chuỗi băm 64 ký tự hex (ví dụ '123456' -> '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92'). Kết hợp kiểm tra tự động isHashed() và so khớp an toàn checkPassword(). CSDL SQL Server lưu trữ tại cột MatKhau VARCHAR(255) NOT NULL, loại bỏ hoàn toàn nguy cơ rò rỉ mật khẩu gốc.", "1. PasswordUtil (Bảo Mật Băm Mật Khẩu Chuẩn SHA-256): ")
+    add_bullet(doc, "Sử dụng javax.sound.sampled tổng hợp trực tiếp sóng âm hình sin PCM. Tần số 1200Hz (Bíp cao 80ms) mô phỏng âm thanh check-in thành công; tần số 420Hz (Bíp trầm 220ms) mô phỏng âm thanh cảnh báo lỗi từ chối vào cửa. Thuật toán tự trị 100%, không cần file media bên ngoài.", "2. SoundHelper (Bộ Tổng Hợp Sóng Âm PCM): ")
+    add_bullet(doc, "Cơ chế xuất bảng dữ liệu JTable sang file CSV/Excel UTF-8 có chèn tiền tố Byte Order Mark (BOM \\uFEFF) ở đầu file stream. Giúp Microsoft Excel mở trực tiếp file hiển thị chuẩn 100% tiếng Việt có dấu mà không cần người dùng thao tác chuyển bảng mã thủ công.", "3. ExcelExportHelper (Xuất Báo Cáo UTF-8 BOM): ")
+    add_bullet(doc, "Sinh mã ma trận điểm ảnh QR Code định danh hội viên và kết xuất đồ họa phôi thẻ VIP sắc nét định dạng PNG để in thẻ nhựa hoặc gửi qua Zalo/Email cho khách.", "4. ImageHelper & GuiMaQRDialog (Xử Lý Mã QR & Ảnh Thẻ): ")
+    add_bullet(doc, "Xác thực biểu thức chính quy (Regex) cho số điện thoại Việt Nam (10 chữ số đầu 03, 05, 07, 08, 09), định dạng ngày sinh dd/MM/yyyy và số CCCD.", "5. ValidationHelper (Xác Thực Dữ Liệu Đầu Vào): ")
+    add_bullet(doc, "Lưu giữ ngữ cảnh phiên làm việc của người dùng hiện tại (tenDangNhap, vaiTro, hoTen) đóng vai trò làm Security Context trong suốt phiên chạy của ứng dụng.", "6. Auth (Quản Lý Phiên Đăng Nhập): ")
 
     # 2.7 Database
     add_heading_2(doc, "2.7. Database Storage Tier (Tầng Lưu Trữ Cơ Sở Dữ Liệu - MS SQL Server)")
@@ -323,9 +324,9 @@ def build_architecture_doc():
         doc,
         "Cơ sở dữ liệu FitLifeGym được thiết kế trên hệ quản trị Microsoft SQL Server 2019/2022, đạt chuẩn hóa dạng chuẩn 3 (3NF):"
     )
-    add_bullet(doc, "8 bảng quan hệ với đầy đủ khóa chính (PRIMARY KEY IDENTITY), khóa ngoại (FOREIGN KEY) với thứ tự xóa an toàn, đảm bảo tính toàn vẹn tham chiếu.", "• Ràng buộc toàn vẹn: ")
+    add_bullet(doc, "8 bảng quan hệ với đầy đủ khóa chính (PRIMARY KEY IDENTITY), khóa ngoại (FOREIGN KEY) với thứ tự xóa an toàn, đảm bảo tính toàn vẹn tham chiếu. Cột MatKhau được mở rộng VARCHAR(255) lưu trữ mã băm an toàn SHA-256.", "• Ràng buộc toàn vẹn & Bảo mật: ")
     add_bullet(doc, "Tạo chỉ mục (Index) trên các cột truy vấn tần suất cao: maTheQR trong bảng HoiVien và tenDangNhap trong bảng TaiKhoan giúp tốc độ tìm kiếm đạt dưới 5ms.", "• Tối ưu hóa truy vấn: ")
-    add_bullet(doc, "File script Database.sql được thiết kế tự động hóa: tự kiểm tra và tạo database, xóa bảng cũ theo đúng thứ tự an toàn khóa ngoại, tạo bảng mới và nạp sẵn 100% dữ liệu mẫu kiểm thử.", "• Tự động hóa triển khai: ")
+    add_bullet(doc, "File script Database.sql được thiết kế tự động hóa: tự kiểm tra và tạo database, xóa bảng cũ theo đúng thứ tự an toàn khóa ngoại, tạo bảng mới và nạp sẵn 100% dữ liệu mẫu kiểm thử đã băm SHA-256.", "• Tự động hóa triển khai: ")
 
     # =========================================================================
     # CHƯƠNG 3
@@ -337,7 +338,8 @@ def build_architecture_doc():
         doc,
         "Luồng đăng nhập kiểm soát quyền truy cập hệ thống theo mô hình RBAC (Role-Based Access Control) qua các bước:"
     )
-    add_bullet(doc, "Người dùng nhập Tên đăng nhập và Mật khẩu tại LoginForm và nhấn Enter.", "Bước 1 (GUI): ")
+    add_bullet(doc, "Người dùng nhập Tên đăng nhập và Mật khẩu tại LoginForm (trong package gui) và nhấn Enter.", "Bước 1 (GUI): ")
+    add_bullet(doc, "LoginForm gọi AuthController / AuthService thực hiện băm mật khẩu qua PasswordUtil.hashPassword() sang mã SHA-256 (64 hex) trước khi gửi truy vấn.", "Bước 2 (Security & Controller): ")
     add_bullet(doc, "LoginForm gọi phương thức authService.dangNhap(user, pass).", "Bước 2 (Service): ")
     add_bullet(doc, "AuthService ủy quyền cho TaiKhoanDAO.dangNhap(user, pass) để mở Session Hibernate và thực thi truy vấn HQL.", "Bước 3 (DAO & ORM): ")
     add_bullet(doc, "Nếu kết nối thành công, TaiKhoan trả về và thông tin được lưu vào Auth context.", "Bước 4 (Context): ")
@@ -521,13 +523,13 @@ def build_project_report_doc():
         r_cap.font.italic = True
         r_cap.font.color.rgb = docx.shared.RGBColor(100, 116, 139)
 
-    add_bullet(doc, "Giao diện Swing FlatLaf 3.4 đa vai trò (MainDashboard 5 Trụ cột, CheckInForm, QuanLyGoiTapPanel, ChiTietHoiVienPanel, MemberPortal). Tuyệt đối không chứa câu lệnh SQL.", "1. Presentation Layer (GUI): ")
-    add_bullet(doc, "CheckInService (5 Business Rules + Anti-Passback 2 phút + VIP Secret + đo ms), AuthService (xác thực & RBAC), BaoCaoService (doanh thu đa chi nhánh CN01 & CN02, heatmap), HoiVienService.", "2. Business Logic Layer (Service): ")
+    add_bullet(doc, "Giao diện Swing FlatLaf 3.4 đa vai trò phân tầng chuẩn mực: com.nhom12.gym.gui (MainDashboard / MainForm, CheckInForm) và package con gui.panels (31 Panels nghiệp vụ). Tuyệt đối không chứa câu lệnh SQL.", "1. Presentation Layer (GUI): ")
+    add_bullet(doc, "Tầng Controller (com.nhom12.gym.controller) điều phối MVC; Tầng Service đóng gói 100% Business Rules (CheckInService 5 Rules + Anti-Passback, AuthService băm mật khẩu SHA-256, BaoCaoService, HoiVienService).", "2. Controller & Service Layer: ")
     add_bullet(doc, "HoiVienDAO, TaiKhoanDAO, GoiTapDAO, LopHocDAO, HuanLuyenVienDAO, LichSuCheckInDAO, HoaDonDAO. Tích hợp cơ chế Bộ Nhớ Đệm Kép (Dual Memory Fallback Cache với CopyOnWriteArrayList) duy trì hoạt động không gián đoạn khi offline.", "3. Data Access Object Layer (DAO): ")
     add_bullet(doc, "Hibernate ORM 6.4.4.Final với Singleton SessionFactory trong HibernateUtil, file cấu hình hibernate.cfg.xml, SQLServerDialect và quản lý Transaction an toàn.", "4. Persistence / ORM Layer: ")
     add_bullet(doc, "8 Entity JPA chuẩn làm Mô Hình Miền Xuyên Suốt (Cross-cutting Domain Model): HoiVien, TaiKhoan, GoiTap, HuanLuyenVien, LopHoc, DangKyLop, LichSuCheckIn, HoaDon.", "5. Domain Entity Layer: ")
-    add_bullet(doc, "SoundHelper (sóng âm PCM 1200Hz/420Hz), ExcelExportHelper (BOM UTF-8 chuẩn tiếng Việt), ImageHelper (mã QR & ảnh thẻ), ValidationHelper, Auth context.", "6. Cross-Cutting Utilities: ")
-    add_bullet(doc, "Cơ sở dữ liệu quan hệ FitLifeGym trên MS SQL Server 2019/2022 với 8 bảng chuẩn hóa 3NF và chỉ mục tối ưu tìm kiếm.", "7. Database Storage Tier: ")
+    add_bullet(doc, "PasswordUtil (Băm mật khẩu SHA-256 một chiều 64 hex), SoundHelper (sóng âm PCM 1200Hz/420Hz), ExcelExportHelper (BOM UTF-8 chuẩn tiếng Việt), ImageHelper (mã QR & ảnh thẻ), ValidationHelper, Auth context.", "6. Cross-Cutting Utilities & Security: ")
+    add_bullet(doc, "Cơ sở dữ liệu quan hệ FitLifeGym trên MS SQL Server 2019/2022 với 8 bảng chuẩn hóa 3NF, bảo mật mật khẩu băm tại cột MatKhau VARCHAR(255) và chỉ mục tối ưu tìm kiếm.", "7. Database Storage Tier: ")
 
     # 3. Core Use Case
     add_heading_1(doc, "3. Use Case Cốt Lõi (Core Use Case): Check-In Hội Viên Tự Động")

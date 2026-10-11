@@ -41,19 +41,20 @@ public class AuthService {
         } catch (Exception ignored) {
         }
 
-        // 2. Fallback offline cho cả 5 vai trò để kiểm thử
+        // 2. Fallback offline cho cả 5 vai trò để kiểm thử (Mật khẩu '123456' băm chuẩn SHA-256)
         if ("123456".equals(pass)) {
+            String hashedDefault = com.nhom12.gym.util.PasswordUtil.hashPassword("123456");
             TaiKhoan offlineTK = null;
             if ("admin".equalsIgnoreCase(user)) {
-                offlineTK = new TaiKhoan("admin", "123456", "Chủ", "Võ Anh Đức");
+                offlineTK = new TaiKhoan("admin", hashedDefault, "Chủ", "Võ Anh Đức");
             } else if ("letan1".equalsIgnoreCase(user)) {
-                offlineTK = new TaiKhoan("letan1", "123456", "Lễ tân", "Chị Linh (Lễ Tân)");
+                offlineTK = new TaiKhoan("letan1", hashedDefault, "Lễ tân", "Chị Linh (Lễ Tân)");
             } else if ("hlv1".equalsIgnoreCase(user)) {
-                offlineTK = new TaiKhoan("hlv1", "123456", "HLV", "John Smith (HLV)");
+                offlineTK = new TaiKhoan("hlv1", hashedDefault, "HLV", "John Smith (HLV)");
             } else if ("quanly1".equalsIgnoreCase(user)) {
-                offlineTK = new TaiKhoan("quanly1", "123456", "Quản lý", "Lê Thanh Sơn (Quản Lý)");
+                offlineTK = new TaiKhoan("quanly1", hashedDefault, "Quản lý", "Lê Thanh Sơn (Quản Lý)");
             } else if ("hoivien1".equalsIgnoreCase(user) || "hoivien".equalsIgnoreCase(user)) {
-                offlineTK = new TaiKhoan("hoivien1", "123456", "Hội viên", "Nguyễn Văn An (Hội Viên VIP)");
+                offlineTK = new TaiKhoan("hoivien1", hashedDefault, "Hội viên", "Nguyễn Văn An (Hội Viên VIP)");
             }
 
             if (offlineTK != null) {

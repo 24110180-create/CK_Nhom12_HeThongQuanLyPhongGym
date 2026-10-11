@@ -16,7 +16,8 @@ public class TaiKhoan {
    )
    private String tenDangNhap;
    @Column(
-      name = "MatKhau"
+      name = "MatKhau",
+      length = 255
    )
    private String matKhau;
    @Column(

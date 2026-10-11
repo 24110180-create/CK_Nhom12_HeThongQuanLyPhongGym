@@ -340,7 +340,7 @@ def build_task_assignment():
     add_heading_2(doc, "2.1. Lê Anh Duy — Nhóm Trưởng (Đóng góp: 100%)")
     add_bullet(doc, "Lập kế hoạch phân bổ công việc, điều phối tiến độ, kiểm soát chất lượng mã nguồn.", "• Quản lý tiến độ: ")
     add_bullet(doc, "Xây dựng Database.sql (8 bảng chuẩn quan hệ), cấu hình Hibernate ORM 6.4.4 (hibernate.cfg.xml, HibernateUtil).", "• Thiết kế CSDL & ORM: ")
-    add_bullet(doc, "Màn hình LoginForm, dịch vụ AuthService phân quyền 5 vai trò (Chủ, Lễ tân, HLV, Quản lý, Hội viên), cơ chế Offline Fallback Buffer.", "• Xác thực & Phân quyền: ")
+    add_bullet(doc, "Màn hình LoginForm, dịch vụ AuthService phân quyền 5 vai trò (Chủ, Lễ tân, HLV, Quản lý, Hội viên), cơ chế Offline Fallback Buffer, bảo mật băm mật khẩu chuẩn SHA-256 (PasswordUtil) và tái cấu trúc cây thư mục chuẩn MVC (gui, gui.panels, controller).", "• Xác thực, Bảo mật & Phân quyền: ")
     add_bullet(doc, "Khung MainDashboard với thanh menu 2 tầng Ribbon 5 Trụ cột chiến lược và không gian nhúng đa vai trò.", "• Khung điều hành: ")
     add_bullet(doc, "Use case lõi CheckInForm & CheckInService: kiểm tra 5 Business Rules, âm thanh PCM 1200Hz/420Hz, cổng Flap Barrier, tối ưu hiệu năng 15-35ms, chính sách ẩn giá VIP Anh Đức, Audit Log thời gian thực.", "• Use Case Check-in: ")
     

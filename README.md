@@ -86,13 +86,13 @@
 Dự án áp dụng kiến trúc phân tầng 3-Tier chuẩn mực:
 
 ```text
-[ GUI / Presentation Layer ]   (MainDashboard, CheckInForm, 35 Panel giao diện FlatLaf)
+[ GUI / Presentation Layer ]    (LoginForm, MainDashboard / MainForm, CheckInForm và 31 Panels trong gui.panels)
              |
-[ Service / Business Layer ]   (AuthService, CheckInService, HoiVienService, BaoCaoService)
+[ Controller / Service Layer ]  (AuthController, ProductController, CheckInController, AuthService, CheckInService)
              |
-[ DAO / Data Access Layer ]    (HoiVienDAO, GoiTapDAO, HoaDonDAO - Dual Cache Buffer)
+[ DAO / Data Access Layer ]     (HoiVienDAO, GoiTapDAO, HoaDonDAO - Dual Cache Buffer)
              |
-[ Database Layer ]             (MS SQL Server: FitLifeGym - 8 Quan hệ thực thể)
+[ Database Layer ]              (MS SQL Server: FitLifeGym - 8 Quan hệ thực thể)
 ```
 
 ---
@@ -137,7 +137,7 @@ Chọn 1 trong 3 cách:
   mvn clean compile
   mvn exec:java -Dexec.mainClass="com.nhom12.gym.gui.LoginForm"
   ```
-- **Cách 3 (IntelliJ IDEA):** Mở thư mục `GYM` bằng IntelliJ IDEA -> Tìm file `LoginForm.java` -> Chuột phải chọn **Run 'LoginForm.main()'**.
+- **Cách 3 (IntelliJ IDEA):** Mở thư mục `GYM` bằng IntelliJ IDEA -> Tìm file `LoginForm.java` (trong package `com.nhom12.gym.gui`) -> Chuột phải chọn **Run 'LoginForm.main()'**.
 
 ---
 

@@ -74,7 +74,7 @@
    - Xây dựng [HoaDonDAO.java](file:///c:/Users/Anh%20Duy/Desktop/Đồ%20án%20cuối%20kì/GYM/src/main/java/com/nhom12/gym/dao/HoaDonDAO.java) và [LichSuGiaoDichPanel.java](file:///c:/Users/Anh%20Duy/Desktop/Đồ%20án%20cuối%20kì/GYM/src/main/java/com/nhom12/gym/gui/LichSuGiaoDichPanel.java): Quản lý lịch sử hóa đơn tài chính.
 2. **Module Báo cáo Doanh thu & Biểu đồ nhiệt (Heatmap):**
    - Xây dựng [BaoCaoThongKePanel.java](file:///c:/Users/Anh%20Duy/Desktop/Đồ%20án%20cuối%20kì/GYM/src/main/java/com/nhom12/gym/gui/BaoCaoThongKePanel.java) và [BaoCaoService.java](file:///c:/Users/Anh%20Duy/Desktop/Đồ%20án%20cuối%20kì/GYM/src/main/java/com/nhom12/gym/service/BaoCaoService.java):
-     - **Báo cáo Doanh thu:** Tổng hợp doanh thu 3 cơ sở (CN01 Quận 1, CN02 Tân Bình, CN03 Quận 7) kèm biểu đồ so sánh.
+     - **Báo cáo Doanh thu:** Tổng hợp doanh thu 2 cơ sở (CN01 Quận 1, CN02 Tân Bình) kèm biểu đồ so sánh.
      - **Báo cáo Hội viên sắp hết hạn:** Cảnh báo các cấp độ 7 ngày, 3 ngày, quá hạn kèm chức năng gửi SMS/Zalo.
    - Xây dựng [HeatmapGioCaoDiemPanel.java](file:///c:/Users/Anh%20Duy/Desktop/Đồ%20án%20cuối%20kì/GYM/src/main/java/com/nhom12/gym/gui/HeatmapGioCaoDiemPanel.java): Phân tích mật độ lưu lượng khách tập luyện theo khung giờ từ **06:00 đến 22:00**, nhận diện 2 khung giờ vàng sáng và tối.
 3. **Tích hợp Bộ Tiện ích Công Nghệ Cao (Utilities):**
@@ -97,7 +97,7 @@
 | **Lịch lớp học & Điểm danh học viên** | Consulted (C) | **Responsible (R)** | Consulted (C) |
 | **Sổ tay tiến độ PT 1:1 & Theo dõi chỉ số InBody** | Consulted (C) | **Responsible (R)** | Support (S) |
 | **Quầy bán hàng POS & Quản lý Kho hàng** | Consulted (C) | Support (S) | **Responsible (R)** |
-| **Báo cáo Doanh thu 3 chi nhánh & Hội viên hết hạn** | Consulted (C) | Consulted (C) | **Responsible (R)** |
+| **Báo cáo Doanh thu đa chi nhánh & Hội viên hết hạn** | Consulted (C) | Consulted (C) | **Responsible (R)** |
 | **Bản đồ nhiệt giờ cao điểm (Hourly Heatmap)** | Consulted (C) | Consulted (C) | **Responsible (R)** |
 | **Tiện ích: Xuất Excel UTF-8, Tạo mã QR, Âm thanh PCM** | Support (S) | Consulted (C) | **Responsible (R)** |
 

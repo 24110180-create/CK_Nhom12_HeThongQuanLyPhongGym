@@ -22,12 +22,49 @@ public class GoiTapDAO {
         memoryList.add(new GoiTap("GT06", "Gói Sinh Viên Siêu Rẻ", 1, 350000, "Toàn hệ thống", "Khung giờ vàng 08:00 - 16:00 hằng ngày cho HSSV có thẻ", "Đang mở"));
     }
 
+    public interface GoiTapChangeListener {
+        void onGoiTapChanged();
+    }
+
+    private static final List<GoiTapChangeListener> changeListeners = new CopyOnWriteArrayList<>();
+
+    public static void addChangeListener(GoiTapChangeListener listener) {
+        if (listener != null && !changeListeners.contains(listener)) {
+            changeListeners.add(listener);
+        }
+    }
+
+    public static void removeChangeListener(GoiTapChangeListener listener) {
+        changeListeners.remove(listener);
+    }
+
+    private static void notifyChange() {
+        for (GoiTapChangeListener l : changeListeners) {
+            try {
+                l.onGoiTapChanged();
+            } catch (Throwable ignored) {}
+        }
+    }
+
     public List<GoiTap> layTatCa() {
         try {
             Session session = HibernateUtil.getSessionFactory().openSession();
             try {
                 List<GoiTap> list = session.createQuery("FROM GoiTap ORDER BY giaTien ASC", GoiTap.class).list();
                 if (list != null && !list.isEmpty()) {
+                    for (GoiTap dbGt : list) {
+                        boolean exists = false;
+                        for (int i = 0; i < memoryList.size(); i++) {
+                            if (memoryList.get(i).getMaGoiTap().equalsIgnoreCase(dbGt.getMaGoiTap())) {
+                                memoryList.set(i, dbGt);
+                                exists = true;
+                                break;
+                            }
+                        }
+                        if (!exists) {
+                            memoryList.add(dbGt);
+                        }
+                    }
                     session.close();
                     return list;
                 }
@@ -65,6 +102,18 @@ public class GoiTapDAO {
         return null;
     }
 
+    public GoiTap timTheoTen(String tenGoiTap) {
+        if (tenGoiTap == null || tenGoiTap.trim().isEmpty()) return null;
+        String t = tenGoiTap.trim().toLowerCase();
+        List<GoiTap> all = layTatCa();
+        for (GoiTap gt : all) {
+            if (gt.getTenGoiTap() != null && gt.getTenGoiTap().toLowerCase().contains(t)) {
+                return gt;
+            }
+        }
+        return null;
+    }
+
     public boolean them(GoiTap gt) {
         if (gt == null) return false;
         // Luôn cập nhật memory trước
@@ -79,7 +128,6 @@ public class GoiTapDAO {
                 session.persist(gt);
                 tx.commit();
                 session.close();
-                return true;
             } catch (Throwable t) {
                 if (tx != null) tx.rollback();
                 if (session != null) {
@@ -87,17 +135,24 @@ public class GoiTapDAO {
                 }
             }
         } catch (Exception ignored) {}
+
+        notifyChange();
         return true;
     }
 
     public boolean capNhat(GoiTap gt) {
         if (gt == null) return false;
         // Cập nhật memory
+        boolean found = false;
         for (int i = 0; i < memoryList.size(); i++) {
             if (memoryList.get(i).getMaGoiTap().equalsIgnoreCase(gt.getMaGoiTap())) {
                 memoryList.set(i, gt);
+                found = true;
                 break;
             }
+        }
+        if (!found) {
+            memoryList.add(gt);
         }
 
         Transaction tx = null;
@@ -108,7 +163,6 @@ public class GoiTapDAO {
                 session.merge(gt);
                 tx.commit();
                 session.close();
-                return true;
             } catch (Throwable t) {
                 if (tx != null) tx.rollback();
                 if (session != null) {
@@ -116,6 +170,8 @@ public class GoiTapDAO {
                 }
             }
         } catch (Exception ignored) {}
+
+        notifyChange();
         return true;
     }
 
@@ -133,7 +189,6 @@ public class GoiTapDAO {
                     tx.commit();
                 }
                 session.close();
-                return true;
             } catch (Throwable t) {
                 if (tx != null) tx.rollback();
                 if (session != null) {
@@ -141,6 +196,8 @@ public class GoiTapDAO {
                 }
             }
         } catch (Exception ignored) {}
+
+        notifyChange();
         return true;
     }
 }

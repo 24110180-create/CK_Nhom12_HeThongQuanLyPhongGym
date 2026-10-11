@@ -26,7 +26,7 @@ public class HoaDonDAO {
         memoryInvoices.add(new HoaDon("HD2026-004", 5, "Hoàng Thùy Linh", "Thuê tủ Locker 6 tháng", 600000, 0, 600000, "Tiền mặt", "letan1", "CN02 - Tân Bình", cal.getTime(), "Đã thanh toán", "Locker VIP A12"));
 
         cal.add(Calendar.DAY_OF_MONTH, 2);
-        memoryInvoices.add(new HoaDon("HD2026-005", 6, "Phạm Quốc Bảo", "Đăng ký gói 6 Tháng", 2500000, 200000, 2300000, "Chuyển khoản VietQR", "admin", "CN03 - Quận 7", cal.getTime(), "Đã thanh toán", "Mở mới thẻ"));
+        memoryInvoices.add(new HoaDon("HD2026-005", 6, "Phạm Quốc Bảo", "Đăng ký gói 6 Tháng", 2500000, 200000, 2300000, "Chuyển khoản VietQR", "admin", "CN02 - Tân Bình", cal.getTime(), "Đã thanh toán", "Mở mới thẻ"));
     }
 
     public boolean them(HoaDon hd) {
@@ -72,22 +72,20 @@ public class HoaDonDAO {
     }
 
     /**
-     * Báo cáo Doanh thu tổng hợp theo chi nhánh
+     * Báo cáo Doanh thu tổng hợp theo chi nhánh (2 Cơ sở: CN01 Quận 1 & CN02 Tân Bình)
      */
     public Map<String, Double> layDoanhThuTheoChiNhanh() {
         Map<String, Double> map = new LinkedHashMap<>();
         map.put("CN01 - Quận 1", 0.0);
         map.put("CN02 - Tân Bình", 0.0);
-        map.put("CN03 - Quận 7", 0.0);
 
         for (HoaDon hd : layTatCa()) {
             if ("Đã thanh toán".equalsIgnoreCase(hd.getTrangThai())) {
                 String branch = hd.getChiNhanh();
                 if (branch == null || branch.isEmpty()) branch = "CN01 - Quận 1";
-                // Chuẩn hóa tên chi nhánh
+                // Chuẩn hóa tên chi nhánh (2 Cơ sở)
                 if (branch.contains("CN01") || branch.contains("Quận 1")) branch = "CN01 - Quận 1";
-                else if (branch.contains("CN02") || branch.contains("Tân Bình")) branch = "CN02 - Tân Bình";
-                else if (branch.contains("CN03") || branch.contains("Quận 7")) branch = "CN03 - Quận 7";
+                else branch = "CN02 - Tân Bình";
 
                 map.put(branch, map.getOrDefault(branch, 0.0) + hd.getThanhTien());
             }

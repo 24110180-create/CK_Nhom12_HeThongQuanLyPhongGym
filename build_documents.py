@@ -3,7 +3,7 @@ import shutil
 import docx
 from generate_docx_helpers import (
     add_header_footer, format_doc_title, add_heading_1, add_heading_2,
-    add_paragraph, add_bullet, add_code_block, add_callout, create_table
+    add_paragraph, add_bullet, add_code_block, add_callout, create_table, safe_save
 )
 
 def build_installation_guide():
@@ -165,9 +165,8 @@ def build_installation_guide():
     create_table(doc, headers_faq, rows_faq, [2.0, 2.0, 2.7])
     
     output_path = r"c:\Users\Anh Duy\Desktop\Đồ án cuối kì\HUONG_DAN_CAI_DAT.docx"
-    doc.save(output_path)
-    shutil.copyfile(output_path, r"c:\Users\Anh Duy\Desktop\Đồ án cuối kì\GYM\docs\HUONG_DAN_CAI_DAT.docx")
-    print(f"Saved: {output_path}")
+    copy_path = r"c:\Users\Anh Duy\Desktop\Đồ án cuối kì\GYM\docs\HUONG_DAN_CAI_DAT.docx"
+    safe_save(doc, output_path, copy_path)
 
 def build_user_manual():
     doc = docx.Document()
@@ -197,16 +196,16 @@ def build_user_manual():
     add_paragraph(doc, "Chủ phòng tập (tài khoản: admin) sở hữu giao diện điều hành toàn cảnh với thanh menu Ribbon 2 tầng hiện đại:")
     
     add_heading_2(doc, "2.1. Năm Trụ Cột Chiến Lược (Strategic Pillars)")
-    add_bullet(doc, "Báo cáo Doanh thu 3 chi nhánh, Phân tích Giờ cao điểm Heatmap, Tổng quan sức chứa mặt sàn, Lịch sử hóa đơn.", "Trụ Cột 1 - Báo Cáo & Thống Kê: ")
+    add_bullet(doc, "Báo cáo Doanh thu đa chi nhánh (2 cơ sở), Phân tích Giờ cao điểm Heatmap, Tổng quan sức chứa mặt sàn, Lịch sử hóa đơn.", "Trụ Cột 1 - Báo Cáo & Thống Kê: ")
     add_bullet(doc, "Trạm quét Check-in, Quản lý hồ sơ hội viên, Đăng ký hội viên mới, Gia hạn thẻ, Quản lý gói tập, Lịch lớp học.", "Trụ Cột 2 - Vận Hành Phòng Tập: ")
     add_bullet(doc, "Quầy bán hàng POS, Quản lý kho hàng xuất nhập tồn, Sơ đồ tủ Locker, Quản lý khuyến mãi, CSKH Zalo/SMS.", "Trụ Cột 3 - Kinh Doanh & Dịch Vụ: ")
     add_bullet(doc, "Theo dõi chỉ số sinh học InBody, Lịch phân ca dạy HLV, Sổ tay giáo án PT 1:1, Hồ sơ học viên cá nhân.", "Trụ Cột 4 - Huấn Luyện Viên: ")
     add_bullet(doc, "Quản lý nhân sự, Cấp tài khoản ứng dụng hội viên, Quản lý thiết bị máy tập, Xếp ca làm việc, Phân quyền 5 vai trò.", "Trụ Cột 5 - Quản Trị Hệ Thống: ")
     
-    add_heading_2(doc, "2.2. Trung Tâm Báo Cáo Doanh Thu 3 Chi Nhánh")
+    add_heading_2(doc, "2.2. Trung Tâm Báo Cáo Doanh Thu Đa Chi Nhánh (2 Cơ Sở)")
     add_paragraph(doc, "Cho phép Chủ phòng theo dõi dòng tiền minh bạch:")
     add_bullet(doc, "Lọc doanh thu theo ngày, tuần, tháng, quý hoặc cả năm.", "• Bộ lọc linh hoạt: ")
-    add_bullet(doc, "Xem doanh thu độc lập của CN01 - Quận 1, CN02 - Tân Bình, CN03 - Quận 7 kèm biểu đồ tỷ trọng phần trăm.", "• So sánh đa cơ sở: ")
+    add_bullet(doc, "Xem doanh thu độc lập của CN01 - Quận 1 và CN02 - Tân Bình kèm biểu đồ tỷ trọng phần trăm.", "• So sánh đa cơ sở: ")
     add_bullet(doc, "Click nút '[ Xuất Excel UTF-8 ]' để xuất file bảng tính mở trực tiếp bằng Excel với 100% tiếng Việt có dấu.", "• Xuất báo cáo: ")
     
     add_heading_2(doc, "2.3. Bản Đồ Nhiệt Lưu Lượng (Hourly Traffic Heatmap 06:00 - 22:00)")
@@ -291,9 +290,8 @@ def build_user_manual():
     create_table(doc, headers_keys, rows_keys, [1.3, 1.8, 1.8, 2.3])
     
     output_path = r"c:\Users\Anh Duy\Desktop\Đồ án cuối kì\USER_MANUAL.docx"
-    doc.save(output_path)
-    shutil.copyfile(output_path, r"c:\Users\Anh Duy\Desktop\Đồ án cuối kì\GYM\docs\USER_MANUAL.docx")
-    print(f"Saved: {output_path}")
+    copy_path = r"c:\Users\Anh Duy\Desktop\Đồ án cuối kì\GYM\docs\USER_MANUAL.docx"
+    safe_save(doc, output_path, copy_path)
 
 def build_task_assignment():
     doc = docx.Document()
@@ -352,8 +350,8 @@ def build_task_assignment():
     add_bullet(doc, "Xây dựng LichLopHocPanel, LichDayHLVPanel, Hệ thống Điểm Danh Lớp Học (Có mặt / Vắng mặt), DangKyLopDAO, GhiChuTienDoPTPanel (sổ tay PT 1:1, kỷ lục tạ cá nhân Squat/Bench/Deadlift PR).", "• Lớp học & Huấn luyện PT: ")
     
     add_heading_2(doc, "2.3. Võ Tấn Phát — Thành Viên (Đóng góp: 100%)")
-    add_bullet(doc, "Xây dựng BanHangPOSPanel (kệ hàng trực quan ảnh thật, giỏ hàng, thanh toán tiền mặt / VietQR), QuanLyKhoHangPanel (tồn kho), HoaDonDAO và LichSuGiaoDichPanel (quản lý hóa đơn).", "• Bán hàng POS & Kho hàng: ")
-    add_bullet(doc, "Xây dựng BaoCaoThongKePanel & BaoCaoService (Doanh thu 3 chi nhánh CN01, CN02, CN03; Cảnh báo hội viên sắp hết hạn kèm SMS/Zalo), HeatmapGioCaoDiemPanel (biểu đồ nhiệt lưu lượng 06:00 - 22:00, 2 khung giờ vàng).", "• Báo cáo & Heatmap: ")
+    add_bullet(doc, "Xây dựng QuanLyGoiTapPanel (danh mục gói tập, chính sách giá, thời hạn), HoaDonDAO và LichSuGiaoDichPanel (quản lý giao dịch thu ngân, VietQR).", "• Gói tập & Hóa đơn: ")
+    add_bullet(doc, "Xây dựng BaoCaoThongKePanel & BaoCaoService (Doanh thu 2 chi nhánh CN01, CN02; Cảnh báo hội viên sắp hết hạn kèm SMS/Zalo), HeatmapGioCaoDiemPanel (biểu đồ nhiệt lưu lượng 06:00 - 22:00, 2 khung giờ vàng).", "• Báo cáo & Heatmap: ")
     add_bullet(doc, "Xây dựng ExcelExportHelper (xuất Excel/CSV UTF-8 BOM chuẩn tiếng Việt 100%), SoundHelper (sóng âm PCM 1200Hz/420Hz mô phỏng máy quét Honeywell), ImageHelper & GuiMaQRDialog (sinh mã QR định danh và xuất ảnh thẻ PNG).", "• Bộ tiện ích hệ thống: ")
     
     # 3. RACI Matrix
@@ -368,7 +366,7 @@ def build_task_assignment():
         ["Quản lý Huấn luyện viên & Phân ca trực", "Consulted (C)", "Responsible (R)", "Consulted (C)"],
         ["Lịch lớp học & Hệ thống Điểm danh lớp", "Consulted (C)", "Responsible (R)", "Consulted (C)"],
         ["Sổ tay PT 1:1 & Theo dõi chỉ số InBody", "Consulted (C)", "Responsible (R)", "Support (S)"],
-        ["Quầy bán hàng POS & Quản lý Kho hàng", "Consulted (C)", "Support (S)", "Responsible (R)"],
+        ["Quản lý Gói tập & Hóa đơn giao dịch", "Consulted (C)", "Support (S)", "Responsible (R)"],
         ["Báo cáo Doanh thu & Cảnh báo hết hạn", "Consulted (C)", "Consulted (C)", "Responsible (R)"],
         ["Biểu đồ nhiệt Giờ cao điểm (Heatmap)", "Consulted (C)", "Consulted (C)", "Responsible (R)"],
         ["Tiện ích: Xuất Excel UTF-8, Mã QR, Âm thanh", "Support (S)", "Consulted (C)", "Responsible (R)"]
@@ -386,13 +384,17 @@ def build_task_assignment():
     create_table(doc, headers_sign, rows_sign, [2.4, 2.5, 2.5])
     
     output_path = r"c:\Users\Anh Duy\Desktop\Đồ án cuối kì\PHAN_CONG_NHIEM_VU.docx"
-    doc.save(output_path)
-    shutil.copyfile(output_path, r"c:\Users\Anh Duy\Desktop\Đồ án cuối kì\GYM\docs\PHAN_CONG_NHIEM_VU.docx")
-    print(f"Saved: {output_path}")
+    copy_path = r"c:\Users\Anh Duy\Desktop\Đồ án cuối kì\GYM\docs\PHAN_CONG_NHIEM_VU.docx"
+    safe_save(doc, output_path, copy_path)
+
+from build_architecture_doc import build_architecture_doc, build_project_report_doc
 
 if __name__ == "__main__":
     build_installation_guide()
     build_user_manual()
     build_task_assignment()
+    build_architecture_doc()
+    build_project_report_doc()
     print("ALL DOCUMENTS GENERATED SUCCESSFULLY!")
+
 

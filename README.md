@@ -19,7 +19,7 @@
 - **Use Case Lõi - Trạm Quét Check-In Tốc Độ Cao:** Kiểm tra tự động **5 Business Rules**, mô phỏng âm thanh bíp tần số PCM 1200Hz / 420Hz máy quét Honeywell, mô phỏng cổng an ninh Flap Barrier đóng/mở tự động với độ trễ siêu thấp **15ms - 35ms**.
 - **Cơ Chế Offline Fallback Buffer:** Tự động đệm dữ liệu vào bộ nhớ cục bộ khi mạng Wifi chi nhánh suy yếu hoặc mất kết nối SQL Server, đảm bảo hoạt động không bị gián đoạn.
 - **Phân Quyền Đa Không Gian (Role-Based Access Control):** 5 vai trò độc lập với giao diện làm việc tối ưu chuyên biệt: **Chủ Hệ Thống (Executive Cockpit 5 Trụ Cột)**, **Lễ Tân (Front-Desk)**, **Huấn Luyện Viên (Trainer Studio)**, **Quản Lý Chi Nhánh (Operations Center)**, **Hội Viên VIP (Member Portal)**.
-- **Báo Cáo Đa Chi Nhánh Chuyên Sâu:** Biểu đồ doanh thu 3 cơ sở (Quận 1, Tân Bình, Quận 7), cảnh báo hội viên sắp hết hạn tích hợp gửi SMS/Zalo, Bản đồ nhiệt mật độ phòng tập (Hourly Heatmap 06:00 - 22:00).
+- **Báo Cáo Đa Chi Nhánh Chuyên Sâu:** Biểu đồ doanh thu 2 cơ sở (Quận 1, Tân Bình), cảnh báo hội viên sắp hết hạn tích hợp gửi SMS/Zalo, Bản đồ nhiệt mật độ phòng tập (Hourly Heatmap 06:00 - 22:00).
 - **Xuất Báo Cáo UTF-8 BOM Chuẩn:** Tích hợp bộ xử lý xuất bảng dữ liệu ra file Excel/CSV tiếng Việt 100% không bao giờ lỗi font ký tự.
 
 ---
@@ -36,10 +36,9 @@
 +---------------------------------------------------------------------------------------------------+
 |  DOANH SỐ HÔM NAY: 18,500,000 đ | HỘI VIÊN ĐANG TẬP: 142/200 | LƯỢT CHECK-IN: 328 | TỶ LỆ: 71%   |
 | +---------------------------------------------------+ +-----------------------------------------+ |
-| |  BIỂU ĐỒ DOANH THU 3 CHI NHÁNH (THÁNG HIỆN TẠI)  | |  HOURLY TRAFFIC HEATMAP (06:00 - 22:00) | |
-| |  - Cơ Sở 1 (Quận 1):    ████████████ 145.2M (48%) | |  06:00 - 08:00: [██████████] Đỉnh Sáng  | |
-| |  - Cơ Sở 2 (Tân Bình):  ████████     98.5M (33%)  | |  11:00 - 13:00: [████░░░░░░] Bình Thường| |
-| |  - Cơ Sở 3 (Quận 7):    █████        58.3M (19%)  | |  17:30 - 20:30: [██████████] Đỉnh Tối   | |
+| |  BIỂU ĐỒ DOANH THU ĐA CHI NHÁNH (THÁNG HIỆN TẠI)  | |  HOURLY TRAFFIC HEATMAP (06:00 - 22:00) | |
+| |  - Cơ Sở 1 (Quận 1):    ████████████ 175.2M (62%) | |  06:00 - 08:00: [██████████] Đỉnh Sáng  | |
+| |  - Cơ Sở 2 (Tân Bình):  ████████     108.5M (38%)  | |  11:00 - 13:00: [████░░░░░░] Bình Thường| |
 | +---------------------------------------------------+ +-----------------------------------------+ |
 | [ Bảng Thống Kê Chi Tiết ] [ Cảnh Báo 12 HV Sắp Hết Hạn ] [ Xuất Báo Cáo Excel UTF-8 BOM ]        |
 +---------------------------------------------------------------------------------------------------+

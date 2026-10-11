@@ -1,19 +1,27 @@
 package com.nhom12.gym.gui;
 
+import com.nhom12.gym.dao.GoiTapDAO;
 import com.nhom12.gym.dao.HoiVienDAO;
+import com.nhom12.gym.entity.GoiTap;
 import com.nhom12.gym.entity.HoiVien;
 import com.nhom12.gym.entity.TaiKhoan;
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import javax.swing.*;
 
 public class DangKyHoiVienPanel extends JPanel {
     private final HoiVienDAO hoiVienDAO = new HoiVienDAO();
+    private final GoiTapDAO goiTapDAO = new GoiTapDAO();
     private final com.nhom12.gym.dao.TaiKhoanDAO taiKhoanDAO = new com.nhom12.gym.dao.TaiKhoanDAO();
     private final DecimalFormat df = new DecimalFormat("#,### đ");
+
+    private List<GoiTap> danhSachGoiTap = new ArrayList<>();
+    private int currentMonths = 1;
 
     private JTextField txtFullName;
     private JTextField txtPhone;
@@ -30,7 +38,7 @@ public class DangKyHoiVienPanel extends JPanel {
     private JCheckBox chkCreateAppAccount;
 
     private JLabel lblTotalCost;
-    private long currentPrice = 1100000;
+    private long currentPrice = 500000;
     private int discountPercent = 0;
 
     // Card Preview Components
@@ -119,7 +127,7 @@ public class DangKyHoiVienPanel extends JPanel {
         rowBranchBirth.setOpaque(false);
         JPanel pBranch = new JPanel(new BorderLayout(0, 3)); pBranch.setOpaque(false);
         JLabel lBranch = new JLabel("Chi Nhánh:"); lBranch.setFont(fontLabel);
-        cbBranch = new JComboBox<>(new String[]{"Cơ sở 1 - Gò Vấp", "Cơ sở 2 - Quận 7", "Cơ sở 3 - Bình Thạnh"}); cbBranch.setFont(fontInput);
+        cbBranch = new JComboBox<>(new String[]{"CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)"}); cbBranch.setFont(fontInput);
         pBranch.add(lBranch, BorderLayout.NORTH); pBranch.add(cbBranch, BorderLayout.CENTER);
 
         JPanel pBirth = new JPanel(new BorderLayout(0, 3)); pBirth.setOpaque(false);
@@ -136,14 +144,7 @@ public class DangKyHoiVienPanel extends JPanel {
         JLabel lPkg = new JLabel("Chọn Gói Tập (*):"); lPkg.setFont(fontLabel);
         formGrid.add(lPkg, gbc);
         gbc.gridy = r++;
-        cbPackage = new JComboBox<>(new String[]{
-                "Gói 1 Tháng Thử Nghiệm - 400.000 đ",
-                "Gói Sinh Viên 3 Tháng - 1.100.000 đ",
-                "Gói Thể Lực 6 Tháng - 2.000.000 đ",
-                "Gói VIP Toàn Diện 1 Năm - 3.600.000 đ",
-                "Khóa Huấn Luyện Viên 1-1 (20 Buổi) - 6.000.000 đ"
-        });
-        cbPackage.setSelectedIndex(1);
+        cbPackage = new JComboBox<>();
         cbPackage.setFont(fontInput);
         formGrid.add(cbPackage, gbc);
 
@@ -399,35 +400,67 @@ public class DangKyHoiVienPanel extends JPanel {
         this.add(splitPane, BorderLayout.CENTER);
 
         // Live calculation & card update listeners
+        loadPackageList();
         cbPackage.addActionListener(e -> updateCalculations());
         btnApplyVoucher.addActionListener(e -> applyVoucher());
         btnReset.addActionListener(e -> resetForm());
         btnSubmit.addActionListener(e -> submitRegistration());
         btnPrintCard.addActionListener(e -> printCard());
 
+        GoiTapDAO.addChangeListener(this::loadPackageList);
+    }
+
+    public void loadPackageList() {
+        danhSachGoiTap = goiTapDAO.layTatCa();
+        Object currentSelected = cbPackage.getSelectedItem();
+        cbPackage.removeAllItems();
+        if (danhSachGoiTap != null && !danhSachGoiTap.isEmpty()) {
+            for (GoiTap gt : danhSachGoiTap) {
+                cbPackage.addItem(gt.getTenGoiTap() + " (" + gt.getThoiHanThang() + " Tháng) - " + df.format(gt.getGiaTien()));
+            }
+            if (currentSelected != null) {
+                cbPackage.setSelectedItem(currentSelected);
+            }
+            if (cbPackage.getSelectedIndex() < 0) {
+                cbPackage.setSelectedIndex(0);
+            }
+        } else {
+            cbPackage.addItem("Gói 1 Tháng Tiêu Chuẩn (1 Tháng) - 500,000 đ");
+        }
         updateCalculations();
     }
 
     private void updateCalculations() {
         int idx = cbPackage.getSelectedIndex();
-        int months = 1;
-        switch (idx) {
-            case 0: currentPrice = 400000; months = 1; break;
-            case 1: currentPrice = 1100000; months = 3; break;
-            case 2: currentPrice = 2000000; months = 6; break;
-            case 3: currentPrice = 3600000; months = 12; break;
-            case 4: currentPrice = 6000000; months = 2; break;
+        String pkgTitle = "Gói Tiêu Chuẩn";
+        if (danhSachGoiTap != null && idx >= 0 && idx < danhSachGoiTap.size()) {
+            GoiTap selected = danhSachGoiTap.get(idx);
+            currentPrice = (long) selected.getGiaTien();
+            currentMonths = selected.getThoiHanThang();
+            pkgTitle = selected.getTenGoiTap();
+        } else {
+            currentPrice = 500000;
+            currentMonths = 1;
         }
 
         long finalPrice = currentPrice - (currentPrice * discountPercent / 100);
         lblTotalCost.setText(df.format(finalPrice));
 
         // Update card preview
-        lblCardPackage.setText("Gói: " + cbPackage.getSelectedItem().toString().split(" - ")[0]);
+        lblCardPackage.setText("Gói: " + pkgTitle);
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.MONTH, months);
+        try {
+            if (txtStartDate != null && txtStartDate.getText() != null && !txtStartDate.getText().trim().isEmpty()) {
+                cal.setTime(new SimpleDateFormat("dd/MM/yyyy").parse(txtStartDate.getText().trim()));
+            }
+        } catch (Exception ex) {
+            cal.setTime(new Date());
+        }
+        cal.add(Calendar.MONTH, currentMonths);
         lblCardExpire.setText("Hạn sử dụng: " + new SimpleDateFormat("dd/MM/yyyy").format(cal.getTime()));
-        lblCardBranch.setText(cbBranch.getSelectedItem().toString());
+        if (cbBranch != null && cbBranch.getSelectedItem() != null) {
+            lblCardBranch.setText(cbBranch.getSelectedItem().toString());
+        }
     }
 
     private void applyVoucher() {
@@ -460,20 +493,43 @@ public class DangKyHoiVienPanel extends JPanel {
             return;
         }
 
-        String code = "HV" + (int)(Math.random() * 900 + 100);
+        // Tự động tính số thứ tự ID kế tiếp và sinh mã định danh đồng bộ (ví dụ: HV007, HV013...)
+        List<HoiVien> allMembers = hoiVienDAO.layTatCa();
+        int maxId = 0;
+        if (allMembers != null) {
+            for (HoiVien m : allMembers) {
+                if (m.getMaHoiVien() > maxId) maxId = m.getMaHoiVien();
+            }
+        }
+        int nextId = maxId + 1;
+        String code = String.format("HV%03d", nextId);
+        int counter = nextId;
+        while (hoiVienDAO.timTheoMaQR(code) != null) {
+            counter++;
+            code = String.format("HV%03d", counter);
+        }
+
         lblCardName.setText(name.toUpperCase());
         lblCardCode.setText(code);
         lblCardPhone.setText("SĐT: " + phone);
 
-        // Try saving to DB if online
+        // Lưu vào CSDL và Fallback Cache
         try {
             HoiVien hv = new HoiVien();
+            hv.setMaHoiVien(nextId);
             hv.setHoTen(name);
             hv.setMaTheQR(code);
             hv.setChiNhanhDangKy(cbBranch.getSelectedItem().toString());
             hv.setTrangThai("Hoạt động");
             Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.MONTH, 3);
+            try {
+                if (txtStartDate != null && !txtStartDate.getText().trim().isEmpty()) {
+                    cal.setTime(new SimpleDateFormat("dd/MM/yyyy").parse(txtStartDate.getText().trim()));
+                }
+            } catch (Exception ex) {
+                cal.setTime(new Date());
+            }
+            cal.add(Calendar.MONTH, currentMonths);
             hv.setNgayHetHan(cal.getTime());
             hoiVienDAO.them(hv);
         } catch (Exception ignored) {

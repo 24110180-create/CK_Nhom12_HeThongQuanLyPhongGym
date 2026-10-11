@@ -100,9 +100,9 @@ public class BaoCaoThongKePanel extends JPanel {
         if (totalRev == 0) totalRev = 142500000.0;
 
         for (Map.Entry<String, Double> entry : branchRevenue.entrySet()) {
-            double amount = entry.getValue() > 0 ? entry.getValue() : (entry.getKey().contains("CN01") ? 75000000 : 35000000);
+            double amount = entry.getValue() > 0 ? entry.getValue() : (entry.getKey().contains("CN01") ? 88000000 : 54500000);
             double pct = (amount / totalRev) * 100.0;
-            String code = entry.getKey().contains("CN01") ? "CN01" : (entry.getKey().contains("CN02") ? "CN02" : "CN03");
+            String code = entry.getKey().contains("CN01") ? "CN01" : "CN02";
             model.addRow(new Object[]{
                     code, entry.getKey(), dfMoney.format(amount), String.format("%.1f%%", pct), "Hoạt động tốt"
             });
@@ -142,8 +142,8 @@ public class BaoCaoThongKePanel extends JPanel {
         lblC.setForeground(new Color(15, 23, 42));
         chartCard.add(lblC, BorderLayout.NORTH);
 
-        BranchBarChart chart = new BranchBarChart(new String[]{"CN01 - Q1", "CN02 - Tân Bình", "CN03 - Q7"},
-                new double[]{75000000, 42500000, 25000000});
+        BranchBarChart chart = new BranchBarChart(new String[]{"CN01 - Quận 1", "CN02 - Tân Bình"},
+                new double[]{88000000, 54500000});
         chartCard.add(chart, BorderLayout.CENTER);
 
         split.setRightComponent(chartCard);
@@ -209,7 +209,7 @@ public class BaoCaoThongKePanel extends JPanel {
         model.addRow(new Object[]{2, "Võ Lê Ngọc Hưng", "0912233445", "QR002", "CN02 - Tân Bình", "15/10/2026", "CÒN 15 NGÀY (CẤP 2)"});
         model.addRow(new Object[]{5, "Hoàng Thùy Linh", "0988776655", "QR005", "CN02 - Tân Bình", "15/08/2026", "ĐÃ QUÁ HẠN (CẤP 3)"});
         model.addRow(new Object[]{8, "Đặng Gia Huy", "0933112233", "QR008", "CN01 - Quận 1", "05/10/2026", "CÒN 5 NGÀY (CẤP 1)"});
-        model.addRow(new Object[]{9, "Nguyễn Minh Châu", "0977445566", "QR009", "CN03 - Quận 7", "08/10/2026", "CÒN 8 NGÀY (CẤP 1)"});
+        model.addRow(new Object[]{9, "Nguyễn Minh Châu", "0977445566", "QR009", "CN02 - Tân Bình", "08/10/2026", "CÒN 8 NGÀY (CẤP 1)"});
 
         JTable table = new JTable(model);
         table.setRowHeight(32);

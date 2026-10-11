@@ -17,7 +17,7 @@ public class HuanLuyenVienDAO {
         memoryList.add(new HuanLuyenVien("HLV02", "Nguyễn Thu Thảo", "0987654321", "Yoga Thảo dược / Pilates", 5, "CN01 - Quận 1", "Ca sáng (06:00 - 14:00)", 5.0, "Đang làm việc"));
         memoryList.add(new HuanLuyenVien("HLV03", "Phan Thanh Sơn", "0903112233", "Kickboxing & HIIT Cardio", 4, "CN02 - Tân Bình", "Ca chiều (14:00 - 22:00)", 4.8, "Đang làm việc"));
         memoryList.add(new HuanLuyenVien("HLV04", "Lê Mai Hương", "0934556677", "Zumba Dance & Aerobic", 3, "CN02 - Tân Bình", "Ca sáng (06:00 - 14:00)", 4.9, "Đang làm việc"));
-        memoryList.add(new HuanLuyenVien("HLV05", "Đặng Minh Trí", "0977889900", "CrossFit & Phục hồi chức năng", 7, "CN03 - Quận 7", "Ca sáng (06:00 - 14:00)", 4.9, "Đang làm việc"));
+        memoryList.add(new HuanLuyenVien("HLV05", "Đặng Minh Trí", "0977889900", "CrossFit & Phục hồi chức năng", 7, "CN02 - Tân Bình", "Ca sáng (06:00 - 14:00)", 4.9, "Đang làm việc"));
     }
 
     public List<HuanLuyenVien> layTatCa() {

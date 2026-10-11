@@ -1,5 +1,8 @@
 package com.nhom12.gym.gui;
 
+import com.nhom12.gym.dao.HoiVienDAO;
+import com.nhom12.gym.entity.HoiVien;
+import java.text.SimpleDateFormat;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -19,6 +22,7 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 public class ChiTietHoiVienPanel extends JPanel {
+    private final HoiVienDAO hoiVienDAO = new HoiVienDAO();
     private JTextField txtSearch;
     private JButton btnSearch;
     private JLabel lblName;
@@ -132,10 +136,10 @@ public class ChiTietHoiVienPanel extends JPanel {
         infoPanel.add(lblName, gbc);
 
         gbc.gridx = 1; gbc.gridy = 1;
-        JLabel lPhone = new JLabel("Số Điện Thoại:"); lPhone.setFont(fLabel);
+        JLabel lPhone = new JLabel("Mã Thẻ & Cơ Sở:"); lPhone.setFont(fLabel);
         infoPanel.add(lPhone, gbc);
         gbc.gridx = 2;
-        lblPhone = new JLabel("0901 234 567");
+        lblPhone = new JLabel("HV001 (Toàn hệ thống)");
         lblPhone.setFont(fValue);
         infoPanel.add(lblPhone, gbc);
 
@@ -171,10 +175,10 @@ public class ChiTietHoiVienPanel extends JPanel {
 
         String[] cols = new String[]{"Ngày", "Giờ Check-in", "Chi Nhánh", "Lớp Học (Nếu Có)", "Thiết Bị Quét"};
         Object[][] data = new Object[][]{
-                {"30/09/2026", "18:15:22", "Cơ sở 1 - Gò Vấp", "Yoga Cơ Bản", "Máy quét Lễ tân 1"},
-                {"28/09/2026", "17:45:10", "Cơ sở 1 - Gò Vấp", "---", "Máy quét Lễ tân 1"},
-                {"26/09/2026", "18:00:05", "Cơ sở 1 - Gò Vấp", "---", "Máy quét Lễ tân 2"},
-                {"24/09/2026", "06:30:12", "Cơ sở 2 - Quận 7", "---", "Quét mã FaceID Cổng"}
+                {"30/09/2026", "18:15:22", "CN01 - Quận 1", "Yoga Cơ Bản", "Máy quét Lễ tân 1"},
+                {"28/09/2026", "17:45:10", "CN01 - Quận 1", "---", "Máy quét Lễ tân 1"},
+                {"26/09/2026", "18:00:05", "CN01 - Quận 1", "---", "Máy quét Lễ tân 2"},
+                {"24/09/2026", "06:30:12", "CN02 - Tân Bình", "---", "Quét mã FaceID Cổng"}
         };
         model = new DefaultTableModel(data, cols) {
             @Override
@@ -199,23 +203,53 @@ public class ChiTietHoiVienPanel extends JPanel {
         this.add(centerPanel, BorderLayout.CENTER);
 
         // Action Listeners
-        btnSearch.addActionListener(e -> {
+        java.awt.event.ActionListener searchAction = e -> {
             String q = txtSearch.getText().trim();
-            if (q.equalsIgnoreCase("HV022") || q.contains("Lan")) {
-                lblName.setText("Lê Thị Lan");
-                lblPhone.setText("0987 654 321");
-                lblGoi.setText("Gói 1 Tháng Thử Nghiệm - Hạn: 01/10/2026");
-                lblStatus.setText("Sắp hết hạn (Còn 1 ngày)");
-                lblStatus.setForeground(new Color(239, 68, 68));
-            } else {
-                lblName.setText("Nguyễn Văn Tuấn");
-                lblPhone.setText("0901 234 567");
-                lblGoi.setText("VIP Thể Lực (6 Tháng) - Hạn: 15/11/2026");
-                lblStatus.setText("Đang hoạt động (Còn 45 ngày)");
-                lblStatus.setForeground(new Color(16, 185, 129));
+            if (q.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập Mã HV, Mã Thẻ QR hoặc Tên hội viên để tra cứu!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
             }
-            JOptionPane.showMessageDialog(this, "Đã tải xong hồ sơ hội viên: " + lblName.getText(), "Tra Cứu", JOptionPane.INFORMATION_MESSAGE);
-        });
+            HoiVien hv = hoiVienDAO.timKiemThongMinh(q);
+            if (hv != null) {
+                lblName.setText(hv.getHoTen());
+                lblPhone.setText((hv.getMaTheQR() != null ? hv.getMaTheQR() : "HV" + hv.getMaHoiVien()) + " (" + (hv.getChiNhanhDangKy() != null ? hv.getChiNhanhDangKy() : "Toàn hệ thống") + ")");
+                
+                String goiText = "Hội Viên Gym";
+                if (hv.getChiNhanhDangKy() != null && !hv.getChiNhanhDangKy().isEmpty()) {
+                    goiText += " - Cơ sở: " + hv.getChiNhanhDangKy();
+                }
+                if (hv.getNgayHetHan() != null) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                    goiText += " - Hạn: " + sdf.format(hv.getNgayHetHan());
+                }
+                lblGoi.setText(goiText);
+
+                if (hv.getNgayHetHan() != null) {
+                    long diffMs = hv.getNgayHetHan().getTime() - System.currentTimeMillis();
+                    long days = diffMs / (1000L * 60 * 60 * 24);
+                    if (days < 0) {
+                        lblStatus.setText("ĐÃ HẾT HẠN (Quá hạn " + Math.abs(days) + " ngày)");
+                        lblStatus.setForeground(new Color(239, 68, 68));
+                    } else if (days <= 7) {
+                        lblStatus.setText("Sắp hết hạn (Còn " + days + " ngày)");
+                        lblStatus.setForeground(new Color(245, 158, 11));
+                    } else {
+                        lblStatus.setText("Đang hoạt động (Còn " + days + " ngày)");
+                        lblStatus.setForeground(new Color(16, 185, 129));
+                    }
+                } else {
+                    lblStatus.setText(hv.getTrangThai() != null ? hv.getTrangThai() : "Đang hoạt động");
+                    lblStatus.setForeground(new Color(16, 185, 129));
+                }
+
+                JOptionPane.showMessageDialog(this, "Đã tìm thấy hồ sơ hội viên: " + hv.getHoTen() + " [Mã: " + hv.getMaHoiVien() + " | Thẻ QR: " + hv.getMaTheQR() + "]", "Tra Cứu", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Không tìm thấy hội viên nào khớp với từ khóa: \"" + q + "\"!\nVui lòng kiểm tra lại danh sách hội viên.", "Không tìm thấy", JOptionPane.WARNING_MESSAGE);
+            }
+        };
+
+        btnSearch.addActionListener(searchAction);
+        txtSearch.addActionListener(searchAction);
 
         btnRenew.addActionListener(e -> {
             JOptionPane.showMessageDialog(this, "Đã chuyển yêu cầu gia hạn của hội viên [" + lblName.getText() + "] sang màn hình Gia Hạn Gói Tập!", "Chuyển Tiếp", JOptionPane.INFORMATION_MESSAGE);

@@ -192,9 +192,15 @@ public class CheckInService {
         }
 
         // RULE 4: ĐÚNG CHI NHÁNH ĐƯỢC PHÉP TẬP KHÔNG?
-        if (currentBranch != null && !currentBranch.isEmpty() && !"Tất cả cơ sở".equalsIgnoreCase(currentBranch)) {
-            boolean isAllBranch = isVip || "Toàn hệ thống (VIP Diamond)".equalsIgnoreCase(memberBranch);
-            if (!isAllBranch && !memberBranch.toLowerCase().contains(currentBranch.toLowerCase())) {
+        if (currentBranch != null && !currentBranch.trim().isEmpty() && !"Tất cả cơ sở".equalsIgnoreCase(currentBranch.trim())) {
+            boolean isAllBranch = isVip || "Toàn hệ thống (VIP Diamond)".equalsIgnoreCase(memberBranch)
+                    || (memberBranch != null && memberBranch.toLowerCase().contains("toàn hệ thống"));
+            boolean branchMatch = memberBranch != null && (
+                    memberBranch.equalsIgnoreCase(currentBranch) ||
+                    memberBranch.toLowerCase().contains(currentBranch.toLowerCase()) ||
+                    currentBranch.toLowerCase().contains(memberBranch.toLowerCase())
+            );
+            if (!isAllBranch && !branchMatch) {
                 String note = "Sai chi nhánh: Thẻ chỉ áp dụng tại " + memberBranch;
                 todayLogs.add(0, new CheckInLogEntry(timeNowStr, code, memberName, currentBranch, false, note));
                 try {

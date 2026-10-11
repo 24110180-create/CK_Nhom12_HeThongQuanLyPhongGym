@@ -2,7 +2,7 @@
 ## BỘ SƠ ĐỒ THIẾT KẾ KIẾN TRÚC & USE CASE LÕI CHECK-IN (PHỤC VỤ BÁO CÁO & SLIDE BẢO VỆ)
 
 > **Tài liệu học thuật & kỹ thuật chuyên sâu** dành cho buổi bảo vệ đồ án trước Hội đồng chấm thi.
-> Toàn bộ sơ đồ được thiết kế bằng chuẩn **Mermaid Diagram** trực quan, có thể chèn trực tiếp vào Slide PowerPoint/Canva hoặc xuất ảnh chất lượng cao.
+> Toàn bộ sơ đồ được thiết kế bằng chuẩn **Mermaid Diagram** trực quan, tương thích 100% với trình xem Markdown của VS Code, GitHub, Notion và Canva.
 
 ---
 
@@ -13,101 +13,101 @@ Sơ đồ mô tả cấu trúc 8 bảng chuẩn hóa của CSDL `FitLifeGym`, gi
 ```mermaid
 erDiagram
     TaiKhoan {
-        VARCHAR(50) TenDangNhap PK "Tên đăng nhập hệ thống"
-        VARCHAR(255) MatKhau "Mật khẩu mã hóa BCrypt / SHA-256"
-        NVARCHAR(50) VaiTro "Chủ / Lễ tân / HLV / Quản lý / Hội viên"
-        NVARCHAR(100) HoTen "Họ và tên người dùng"
+        string TenDangNhap PK "Tên đăng nhập hệ thống"
+        string MatKhau "Mật khẩu mã hóa BCrypt / SHA-256 (255 ký tự)"
+        string VaiTro "Chủ / Lễ tân / HLV / Quản lý / Hội viên"
+        string HoTen "Họ và tên người dùng"
     }
 
     HoiVien {
-        INT MaHoiVien PK "Khóa chính tự tăng (Identity)"
-        VARCHAR(50) MaTheQR UK "Mã thẻ quét QR / Barcode duy nhất"
-        NVARCHAR(100) HoTen "Họ tên hội viên"
-        NVARCHAR(100) ChiNhanhDangKy "CN01 - Q1 / CN02 - Tân Bình / VIP"
-        DATE NgayHetHan "Ngày hết hạn thẻ tập"
-        NVARCHAR(30) TrangThai "Active / Tạm khóa / Hết hạn"
+        int MaHoiVien PK "Khóa chính tự tăng (Identity)"
+        string MaTheQR UK "Mã thẻ quét QR hoặc Barcode duy nhất"
+        string HoTen "Họ tên hội viên"
+        string ChiNhanhDangKy "CN01 - Q1 / CN02 - Tân Bình / VIP"
+        date NgayHetHan "Ngày hết hạn thẻ tập"
+        string TrangThai "Active / Tạm khóa / Hết hạn"
     }
 
     GoiTap {
-        VARCHAR(30) MaGoiTap PK "Mã gói tập (GT01, GT02...)"
-        NVARCHAR(100) TenGoiTap "Tên gói tập"
-        INT ThoiHanThang "Thời hạn hiệu lực (tháng)"
-        DECIMAL(18_2) GiaTien "Giá niêm yết (Chuẩn kế toán)"
-        NVARCHAR(100) PhamVi "Toàn hệ thống / Chi nhánh"
-        NVARCHAR(255) MoTa "Quyền lợi gói tập"
-        NVARCHAR(50) TrangThai "Đang mở / Tạm ngưng"
+        string MaGoiTap PK "Mã gói tập (GT01, GT02...)"
+        string TenGoiTap "Tên gói tập"
+        int ThoiHanThang "Thời hạn hiệu lực (tháng)"
+        decimal GiaTien "Giá niêm yết (DECIMAL chuẩn kế toán)"
+        string PhamVi "Toàn hệ thống / Chi nhánh"
+        string MoTa "Quyền lợi gói tập"
+        string TrangThai "Đang mở / Tạm ngưng"
     }
 
     HuanLuyenVien {
-        VARCHAR(30) MaHLV PK "Mã huấn luyện viên"
-        NVARCHAR(100) HoTen "Họ tên HLV"
-        VARCHAR(20) SoDienThoai "Số điện thoại liên lạc"
-        NVARCHAR(100) ChuyenMon "Bodybuilding, Yoga, Boxing, Pilates"
-        INT KinhNghiemNam "Số năm kinh nghiệm"
-        NVARCHAR(50) ChiNhanh "Chi nhánh phụ trách"
-        NVARCHAR(50) CaLamViec "Ca sáng / Ca chiều"
-        FLOAT DanhGiaSao "Đánh giá xếp hạng (Sao)"
-        NVARCHAR(30) TrangThai "Đang làm việc"
+        string MaHLV PK "Mã huấn luyện viên"
+        string HoTen "Họ tên HLV"
+        string SoDienThoai "Số điện thoại liên lạc"
+        string ChuyenMon "Bodybuilding, Yoga, Boxing, Pilates"
+        int KinhNghiemNam "Số năm kinh nghiệm"
+        string ChiNhanh "Chi nhánh phụ trách"
+        string CaLamViec "Ca sáng / Ca chiều"
+        float DanhGiaSao "Đánh giá xếp hạng (Sao)"
+        string TrangThai "Đang làm việc"
     }
 
     LopHoc {
-        VARCHAR(30) MaLop PK "Mã lớp nhóm (LH01, LH02...)"
-        NVARCHAR(100) TenLop "Tên lớp học"
-        NVARCHAR(50) BoMon "Yoga, Zumba, Kickboxing, Pilates"
-        NVARCHAR(100) HuanLuyenVien "HLV giảng dạy"
-        NVARCHAR(100) ThoiGian "Khung giờ và thứ trong tuần"
-        NVARCHAR(100) PhongTap "Studio 1, Studio 2, Ring A"
-        INT SiSoToiDa "Sĩ số giới hạn"
-        INT SiSoHienTai "Số học viên đã đăng ký"
+        string MaLop PK "Mã lớp nhóm (LH01, LH02...)"
+        string TenLop "Tên lớp học"
+        string BoMon "Yoga, Zumba, Kickboxing, Pilates"
+        string HuanLuyenVien "HLV giảng dạy"
+        string ThoiGian "Khung giờ và thứ trong tuần"
+        string PhongTap "Studio 1, Studio 2, Ring A"
+        int SiSoToiDa "Sĩ số giới hạn"
+        int SiSoHienTai "Số học viên đã đăng ký"
     }
 
     DangKyLop {
-        INT Id PK "Khóa chính tự tăng"
-        VARCHAR(30) MaLop FK "Liên kết lớp học"
-        INT MaHoiVien FK "Liên kết hội viên"
-        NVARCHAR(100) TenHoiVien "Tên học viên"
-        VARCHAR(20) SoDienThoai "SĐT học viên"
-        DATETIME NgayDangKy "Thời điểm ghi danh"
-        NVARCHAR(50) TrangThaiDiemDanh "Đã điểm danh / Chưa điểm danh / Vắng"
-        NVARCHAR(255) GhiChu "Ghi chú đặc biệt"
+        int Id PK "Khóa chính tự tăng"
+        string MaLop FK "Liên kết lớp học"
+        int MaHoiVien FK "Liên kết hội viên"
+        string TenHoiVien "Tên học viên"
+        string SoDienThoai "SĐT học viên"
+        datetime NgayDangKy "Thời điểm ghi danh"
+        string TrangThaiDiemDanh "Đã điểm danh / Chưa điểm danh / Vắng"
+        string GhiChu "Ghi chú đặc biệt"
     }
 
     LichSuCheckIn {
-        INT Id PK "Audit Log ID tự tăng"
-        INT MaHoiVien "ID hội viên quét thẻ"
-        NVARCHAR(100) TenHoiVien "Họ tên hội viên"
-        VARCHAR(50) MaTheQR "Mã thẻ quét thực tế"
-        DATETIME ThoiGian "Thời điểm quẹt thẻ chính xác"
-        NVARCHAR(50) ChiNhanh "Trạm kiểm soát quẹt thẻ"
-        NVARCHAR(50) CuaRaVao "Cổng Flap Barrier A1/B1/VIP Gate"
-        NVARCHAR(30) PhuongThuc "Mã QR App / Mã Barcode Thẻ"
-        NVARCHAR(30) TrangThai "Hợp lệ / Từ chối"
-        NVARCHAR(255) GhiChu "Lý do từ chối hoặc xác nhận"
-        BIGINT ThoiGianPhanHoiMs "Độ trễ xử lý (Latency < 50ms)"
+        int Id PK "Audit Log ID tự tăng"
+        int MaHoiVien "ID hội viên quét thẻ"
+        string TenHoiVien "Họ tên hội viên"
+        string MaTheQR "Mã thẻ quét thực tế"
+        datetime ThoiGian "Thời điểm quẹt thẻ chính xác"
+        string ChiNhanh "Trạm kiểm soát quẹt thẻ"
+        string CuaRaVao "Cổng Flap Barrier A1 / B1 / VIP Gate"
+        string PhuongThuc "Mã QR App / Mã Barcode Thẻ"
+        string TrangThai "Hợp lệ / Từ chối"
+        string GhiChu "Lý do từ chối hoặc xác nhận"
+        long ThoiGianPhanHoiMs "Độ trễ xử lý (Latency duoi 50ms)"
     }
 
     HoaDon {
-        VARCHAR(30) MaHoaDon PK "Mã giao dịch tài chính"
-        INT MaHoiVien "ID khách hàng thanh toán"
-        NVARCHAR(100) TenHoiVien "Tên khách hàng"
-        NVARCHAR(50) LoaiGiaoDich "Đăng ký gói / Gia hạn / POS / Locker"
-        DECIMAL(18_2) TongTien "Tổng tiền trước giảm giá"
-        DECIMAL(18_2) GiamGia "Chiết khấu khuyến mãi"
-        DECIMAL(18_2) ThanhTien "Thực thu chuẩn DECIMAL"
-        NVARCHAR(50) HinhThucThanhToan "Tiền mặt / VietQR Chuyển khoản"
-        VARCHAR(50) NguoiLap "Nhân viên lập phiếu"
-        NVARCHAR(50) ChiNhanh "Chi nhánh phát sinh"
-        DATETIME NgayLap "Ngày lập hóa đơn"
-        NVARCHAR(30) TrangThai "Đã thanh toán"
-        NVARCHAR(255) GhiChu "Chi tiết giao dịch"
+        string MaHoaDon PK "Mã giao dịch tài chính"
+        int MaHoiVien "ID khách hàng thanh toán"
+        string TenHoiVien "Tên khách hàng"
+        string LoaiGiaoDich "Đăng ký gói / Gia hạn / POS / Locker"
+        decimal TongTien "Tổng tiền trước giảm giá"
+        decimal GiamGia "Chiết khấu khuyến mãi"
+        decimal ThanhTien "Thực thu chuẩn DECIMAL"
+        string HinhThucThanhToan "Tiền mặt / VietQR Chuyển khoản"
+        string NguoiLap "Nhân viên lập phiếu"
+        string ChiNhanh "Chi nhánh phát sinh"
+        datetime NgayLap "Ngày lập hóa đơn"
+        string TrangThai "Đã thanh toán"
+        string GhiChu "Chi tiết giao dịch"
     }
 
-    HoiVien ||--o{ DangKyLop : "đăng ký & điểm danh"
-    LopHoc ||--o{ DangKyLop : "chứa danh sách học viên"
-    HoiVien ||--o{ LichSuCheckIn : "ghi nhận nhật ký quét thẻ"
-    HoiVien ||--o{ HoaDon : "phát sinh giao dịch"
-    GoiTap ||--o{ HoaDon : "sản phẩm giao dịch"
-    HuanLuyenVien ||--o{ LopHoc : "phụ trách giảng dạy"
+    HoiVien ||--o{ DangKyLop : "dang ky va diem danh"
+    LopHoc ||--o{ DangKyLop : "danh sach lop"
+    HoiVien ||--o{ LichSuCheckIn : "lich su check-in"
+    HoiVien ||--o{ HoaDon : "hoa don thanh toan"
+    GoiTap ||--o{ HoaDon : "chi tiet goi"
+    HuanLuyenVien ||--o{ LopHoc : "giang day"
 ```
 
 ---
@@ -117,28 +117,28 @@ erDiagram
 Mô tả phân quyền Role-Based Access Control (RBAC) 5 cấp bậc cùng tương tác phần cứng:
 
 ```mermaid
-graph TD
-    subgraph Actors [Tác nhân người dùng & Thiết bị]
-        Member((Hội viên VIP))
-        Receptionist((Lễ tân))
-        Trainer((Huấn luyện viên))
-        Manager((Quản lý chi nhánh))
-        Owner((Chủ hệ thống))
-        FlapBarrier[[Cổng Flap Barrier & Máy Quét]]
+flowchart TD
+    subgraph Actors [Tác nhân Người Dùng và Thiết Bị]
+        Member["Hội viên VIP"]
+        Receptionist["Lễ tân"]
+        Trainer["Huấn luyện viên"]
+        Manager["Quản lý chi nhánh"]
+        Owner["Chủ hệ thống"]
+        FlapBarrier["Cổng Flap Barrier & Máy Quét"]
     end
 
     subgraph System [Hệ Thống Quản Lý FitLife Gym]
-        UC_Login(Đăng nhập an toàn BCrypt / Offline Fallback)
-        UC_CheckIn(Quét thẻ QR & Tự động mở cổng Check-in)
-        UC_RegisterMember(Đăng ký & Cấp thẻ hội viên mới)
-        UC_RenewPackage(Gia hạn & Nâng cấp gói tập)
-        UC_POS(Bán hàng POS nước uống / phụ kiện)
-        UC_Locker(Quản lý 20 tủ đồ Locker thông minh)
-        UC_AttendanceClass(Đăng ký & Điểm danh lớp học)
-        UC_InBody(Theo dõi chỉ số InBody & Tiến độ PT)
-        UC_RevenueReport(Báo cáo doanh thu & Dòng tiền chi nhánh)
-        UC_Heatmap(Phân tích Heatmap mật độ giờ cao điểm)
-        UC_EmployeeMgmt(Quản lý tài khoản & Phân quyền nhân viên)
+        UC_Login["Đăng nhập an toàn BCrypt / Offline Fallback"]
+        UC_CheckIn["Quét thẻ QR & Tự động mở cổng Check-in"]
+        UC_RegisterMember["Đăng ký & Cấp thẻ hội viên mới"]
+        UC_RenewPackage["Gia hạn & Nâng cấp gói tập"]
+        UC_POS["Bán hàng POS nước uống & phụ kiện"]
+        UC_Locker["Quản lý 20 tủ đồ Locker thông minh"]
+        UC_AttendanceClass["Đăng ký & Điểm danh lớp học"]
+        UC_InBody["Theo dõi chỉ số InBody & Tiến độ PT"]
+        UC_RevenueReport["Báo cáo doanh thu & Dòng tiền chi nhánh"]
+        UC_Heatmap["Phân tích Heatmap mật độ giờ cao điểm"]
+        UC_EmployeeMgmt["Quản lý tài khoản & Phân quyền nhân viên"]
     end
 
     %% Hội viên
@@ -147,7 +147,7 @@ graph TD
     Member --> UC_AttendanceClass
 
     %% Cổng phần cứng
-    FlapBarrier -.->|Tín hiệu quét mã QR/Barcode| UC_CheckIn
+    FlapBarrier --> UC_CheckIn
 
     %% Lễ tân
     Receptionist --> UC_Login
@@ -174,7 +174,6 @@ graph TD
     Owner --> UC_RevenueReport
     Owner --> UC_Heatmap
     Owner --> UC_EmployeeMgmt
-    Owner -.->|Bao gồm quyền| Manager
 ```
 
 ---
@@ -196,53 +195,53 @@ sequenceDiagram
     participant Sound as SoundHelper (Âm Thanh)
 
     HV->>HW: Đưa thẻ Barcode / Mã QR App vào camera quét
-    HW->>UI: Truyền chuỗi mã thẻ (VD: "QR001" hoặc "VIP007")
+    HW->>UI: Truyền chuỗi mã thẻ (VD: QR001 hoặc VIP007)
     UI->>Svc: thucHienCheckIn(maQR, currentBranch)
     Note over Svc: Bắt đầu đo thời gian phản hồi (Latency Timer)
 
     %% Bước 1: Tra cứu hồ sơ
     Svc->>HvDAO: timKiemThongMinh(maQR)
     alt CSDL Online
-        HvDAO->>DB: SELECT * FROM HoiVien WHERE MaTheQR = :code
+        HvDAO->>DB: Truy vấn SELECT từ bảng HoiVien
         DB-->>HvDAO: Trả về Entity HoiVien
-    else CSDL Offline (Mất mạng)
+    else CSDL Offline
         HvDAO-->>Svc: Lấy từ Memory Fallback Cache
     end
     HvDAO-->>Svc: Trả về đối tượng HoiVien (hoặc null)
 
     %% Bước 2: Kiểm tra 5 Business Rules
-    alt Rule 1: Thẻ không tồn tại (hv == null)
-        Svc->>LogDAO: luuCheckIn(status: 'Từ chối', note: 'Không tồn tại')
-        Svc-->>UI: CheckInResult(success: false, gateStatus: 'LOCKED')
+    alt Rule 1: Thẻ không tồn tại
+        Svc->>LogDAO: luuCheckIn(Từ chối - Không tồn tại)
+        Svc-->>UI: CheckInResult(success: false, gateStatus: LOCKED)
         UI->>Sound: phatAmThanhTuChoi()
-        UI->>HV: Hiển thị cảnh báo đỏ: "MÃ THẺ KHÔNG TỒN TẠI"
-    else Rule 2: Thẻ đang bị Tạm Khóa (trangThai == 'Tạm khóa')
-        Svc->>LogDAO: luuCheckIn(status: 'Từ chối', note: 'Thẻ bị khóa')
-        Svc-->>UI: CheckInResult(success: false, gateStatus: 'LOCKED')
+        UI->>HV: Cảnh báo: MÃ THẺ KHÔNG TỒN TẠI
+    else Rule 2: Thẻ đang bị Tạm Khóa
+        Svc->>LogDAO: luuCheckIn(Từ chối - Thẻ bị tạm khóa)
+        Svc-->>UI: CheckInResult(success: false, gateStatus: LOCKED)
         UI->>Sound: phatAmThanhTuChoi()
-        UI->>HV: Hiển thị cảnh báo đỏ: "THẺ ĐANG BỊ TẠM KHÓA"
-    else Rule 3: Gói tập Hết Hạn (ngayHetHan < Ngày hiện tại)
-        Svc->>LogDAO: luuCheckIn(status: 'Từ chối', note: 'Thẻ hết hạn')
-        Svc-->>UI: CheckInResult(success: false, gateStatus: 'LOCKED', canRenew: true)
+        UI->>HV: Cảnh báo: THẺ ĐANG BỊ TẠM KHÓA
+    else Rule 3: Gói tập Hết Hạn
+        Svc->>LogDAO: luuCheckIn(Từ chối - Gói tập hết hạn)
+        Svc-->>UI: CheckInResult(success: false, gateStatus: LOCKED)
         UI->>Sound: phatAmThanhTuChoi()
-        UI->>HV: Hiển thị cảnh báo: "GÓI TẬP HẾT HẠN - GỢI Ý GIA HẠN"
-    else Rule 4: Sai Chi Nhánh (Thẻ đơn cơ sở != Chi nhánh hiện tại)
-        Svc->>LogDAO: luuCheckIn(status: 'Từ chối', note: 'Sai cơ sở đăng ký')
-        Svc-->>UI: CheckInResult(success: false, gateStatus: 'LOCKED')
+        UI->>HV: Cảnh báo: GÓI TẬP ĐÃ HẾT HẠN - GỢI Ý GIA HẠN
+    else Rule 4: Sai Chi Nhánh
+        Svc->>LogDAO: luuCheckIn(Từ chối - Sai chi nhánh đăng ký)
+        Svc-->>UI: CheckInResult(success: false, gateStatus: LOCKED)
         UI->>Sound: phatAmThanhTuChoi()
-        UI->>HV: Hiển thị cảnh báo: "SAI CHI NHÁNH ĐĂNG KÝ"
-    else Rule 5: Chống quét trùng lặp (< 2 phút từ lần quét trước)
-        Svc->>LogDAO: luuCheckIn(status: 'Từ chối', note: 'Quét trùng lặp')
-        Svc-->>UI: CheckInResult(success: false, gateStatus: 'LOCKED')
+        UI->>HV: Cảnh báo: SAI CHI NHÁNH ĐĂNG KÝ
+    else Rule 5: Chống quét trùng lặp
+        Svc->>LogDAO: luuCheckIn(Từ chối - Quét trùng lặp)
+        Svc-->>UI: CheckInResult(success: false, gateStatus: LOCKED)
         UI->>Sound: phatAmThanhTuChoi()
-        UI->>HV: Cảnh báo: "THẺ VỪA QUÉT TRƯỚC ĐÓ - VUI LÒNG KHÔNG QUÉT TRÙNG"
-    else HỢP LỆ TOÀN BỘ (ĐẠT 5 QUY TẮC)
-        Svc->>LogDAO: luuCheckIn(status: 'Hợp lệ', gate: 'Flap Barrier A1', latency: <50ms)
-        LogDAO->>DB: INSERT INTO LichSuCheckIn (...)
-        Svc-->>UI: CheckInResult(success: true, gateStatus: 'OPEN', memberName, isVip)
+        UI->>HV: Cảnh báo: THẺ VỪA QUÉT - VUI LÒNG KHÔNG QUÉT TRÙNG
+    else Hợp lệ toàn bộ (Đạt 5 quy tắc)
+        Svc->>LogDAO: luuCheckIn(Hợp lệ - Cổng mở)
+        LogDAO->>DB: INSERT vào LichSuCheckIn
+        Svc-->>UI: CheckInResult(success: true, gateStatus: OPEN)
         UI->>Sound: phatAmThanhThanhCong()
-        UI->>HW: Gửi tín hiệu mở cổng tự động (Flap Barrier OPEN)
-        UI->>HV: Hiển thị bảng chào mừng xanh: "CHECK-IN THÀNH CÔNG - MỜI VÀO"
+        UI->>HW: Gửi tín hiệu mở cổng tự động Barrier
+        UI->>HV: Thông báo xanh: CHECK-IN THÀNH CÔNG - MỜI VÀO
     end
 ```
 

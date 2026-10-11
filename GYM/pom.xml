@@ -30,18 +30,6 @@
             <version>6.4.4.Final</version>
         </dependency>
 
-        <!-- Thư viện Connection Pool HikariCP -->
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>5.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-hikaricp</artifactId>
-            <version>6.4.4.Final</version>
-        </dependency>
-
         <!-- Thư viện giao diện hiện đại FlatLaf -->
         <dependency>
             <groupId>com.formdev</groupId>
@@ -81,6 +69,12 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
             <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>1.10.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

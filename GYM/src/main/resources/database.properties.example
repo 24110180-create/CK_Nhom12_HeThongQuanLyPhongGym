@@ -9,11 +9,5 @@ db.url=jdbc:sqlserver://localhost;databaseName=FitLifeGym;encrypt=true;trustServ
 db.username=YOUR_SQL_USERNAME
 db.password=YOUR_SQL_PASSWORD
 
-# Cấu hình Connection Pool HikariCP
-hibernate.connection.provider_class=org.hibernate.hikaricp.internal.HikariCPConnectionProvider
-hibernate.hikari.minimumIdle=3
-hibernate.hikari.maximumPoolSize=10
-hibernate.hikari.idleTimeout=30000
-hibernate.hikari.maxLifetime=1800000
-hibernate.hikari.connectionTimeout=20000
+# Cấu hình Connection Pool
 hibernate.connection.pool_size=10

@@ -313,9 +313,11 @@ public class LoginForm extends JFrame {
         if (res.success) {
             String msg = "Xin chào " + Auth.vaiTro + " - " + Auth.hoTen + "!";
             if (res.isOffline) {
-                msg += "\n(Đang chạy chế độ Offline)";
+                msg += "\n\n⚠️ ĐANG CHẠY CHẾ ĐỘ OFFLINE – DỮ LIỆU ĐỆM GIẢ LẬP\n(Không có kết nối máy chủ SQL Server, hệ thống kích hoạt đệm ngoại tuyến).";
+                JOptionPane.showMessageDialog(this, msg, "Cảnh Báo Chế Độ Ngoại Tuyến", JOptionPane.WARNING_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, msg, "Đăng Nhập Thành Công", JOptionPane.INFORMATION_MESSAGE);
             }
-            JOptionPane.showMessageDialog(this, msg, "Đăng Nhập Thành Công", JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             new MainDashboard().setVisible(true);
         } else {

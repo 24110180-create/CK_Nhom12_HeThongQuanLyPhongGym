@@ -6,7 +6,10 @@ import com.nhom12.gym.util.HibernateUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 /**
@@ -14,6 +17,7 @@ import org.hibernate.Transaction;
  * Quản lý thời khóa biểu các lớp nhóm: Yoga, Zumba, Kickboxing, Pilates, HIIT Cardio
  */
 public class LopHocDAO {
+    private static final Logger LOGGER = Logger.getLogger(LopHocDAO.class.getName());
     private static final List<LopHoc> memoryClasses = new CopyOnWriteArrayList<>();
     private final DangKyLopDAO dangKyLopDAO = new DangKyLopDAO();
 
@@ -31,15 +35,18 @@ public class LopHocDAO {
     }
 
     public List<LopHoc> layTatCa() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            List<LopHoc> list = session.createQuery("FROM LopHoc ORDER BY maLop ASC", LopHoc.class).list();
-            if (list != null && !list.isEmpty()) {
-                memoryClasses.clear();
-                memoryClasses.addAll(list);
-                return list;
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf != null) {
+            try (Session session = sf.openSession()) {
+                List<LopHoc> list = session.createQuery("FROM LopHoc ORDER BY maLop ASC", LopHoc.class).list();
+                if (list != null && !list.isEmpty()) {
+                    memoryClasses.clear();
+                    memoryClasses.addAll(list);
+                    return list;
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Lỗi truy vấn danh sách lớp từ CSDL, dùng cache: {0}", e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("[LopHocDAO] Lỗi truy vấn danh sách lớp từ CSDL, dùng cache: " + e.getMessage());
         }
         return new ArrayList<>(memoryClasses);
     }
@@ -48,11 +55,14 @@ public class LopHocDAO {
         if (maLop == null || maLop.trim().isEmpty()) return null;
         String code = maLop.trim();
 
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            LopHoc lh = session.get(LopHoc.class, code);
-            if (lh != null) return lh;
-        } catch (Exception e) {
-            System.err.println("[LopHocDAO] Lỗi tìm lớp theo mã '" + code + "': " + e.getMessage());
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf != null) {
+            try (Session session = sf.openSession()) {
+                LopHoc lh = session.get(LopHoc.class, code);
+                if (lh != null) return lh;
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Lỗi tìm lớp theo mã ''{0}'': {1}", new Object[]{code, e.getMessage()});
+            }
         }
 
         for (LopHoc lh : memoryClasses) {
@@ -64,8 +74,16 @@ public class LopHocDAO {
     public boolean them(LopHoc lop) {
         if (lop == null) return false;
 
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf == null) {
+            LOGGER.log(Level.WARNING, "CSDL offline - lưu lớp học vào bộ nhớ tạm");
+            memoryClasses.removeIf(item -> item.getMaLop().equalsIgnoreCase(lop.getMaLop()));
+            memoryClasses.add(lop);
+            return true;
+        }
+
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sf.openSession()) {
             tx = session.beginTransaction();
             session.persist(lop);
             tx.commit();
@@ -75,7 +93,7 @@ public class LopHocDAO {
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            System.err.println("[LopHocDAO] Lỗi thêm lớp học vào CSDL: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Lỗi thêm lớp học vào CSDL: " + lop.getMaLop(), e);
             return false;
         }
     }
@@ -83,8 +101,20 @@ public class LopHocDAO {
     public boolean capNhat(LopHoc lop) {
         if (lop == null) return false;
 
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf == null) {
+            LOGGER.log(Level.WARNING, "CSDL offline - cập nhật lớp học trong bộ nhớ tạm");
+            for (int i = 0; i < memoryClasses.size(); i++) {
+                if (memoryClasses.get(i).getMaLop().equalsIgnoreCase(lop.getMaLop())) {
+                    memoryClasses.set(i, lop);
+                    break;
+                }
+            }
+            return true;
+        }
+
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sf.openSession()) {
             tx = session.beginTransaction();
             session.merge(lop);
             tx.commit();
@@ -98,7 +128,7 @@ public class LopHocDAO {
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            System.err.println("[LopHocDAO] Lỗi cập nhật lớp học: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Lỗi cập nhật lớp học: " + lop.getMaLop(), e);
             return false;
         }
     }
@@ -106,8 +136,15 @@ public class LopHocDAO {
     public boolean xoa(String maLop) {
         if (maLop == null || maLop.trim().isEmpty()) return false;
 
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf == null) {
+            LOGGER.log(Level.WARNING, "CSDL offline - xóa lớp học khỏi bộ nhớ tạm");
+            memoryClasses.removeIf(item -> item.getMaLop().equalsIgnoreCase(maLop.trim()));
+            return true;
+        }
+
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sf.openSession()) {
             tx = session.beginTransaction();
             LopHoc lh = session.get(LopHoc.class, maLop.trim());
             if (lh != null) {
@@ -119,7 +156,7 @@ public class LopHocDAO {
             return false;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            System.err.println("[LopHocDAO] Lỗi xóa lớp học: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Lỗi xóa lớp học: " + maLop, e);
             return false;
         }
     }

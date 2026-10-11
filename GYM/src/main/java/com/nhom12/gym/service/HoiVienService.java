@@ -25,6 +25,9 @@ public class HoiVienService {
     }
 
     public String luuHoiVien(HoiVien hv, boolean isUpdate) {
+        if (hv == null) {
+            return "LỖI: Dữ liệu hội viên không được để trống!";
+        }
         if (hv.getHoTen() == null || hv.getHoTen().trim().isEmpty()) {
             return "LỖI: Tên không được để trống!";
         } else if (hv.getMaTheQR() == null || hv.getMaTheQR().trim().isEmpty()) {

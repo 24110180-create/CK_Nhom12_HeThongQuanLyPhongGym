@@ -5,13 +5,17 @@ import com.nhom12.gym.util.HibernateUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 /**
  * Data Access Object cho Thực thể Huấn Luyện Viên (HuanLuyenVien)
  */
 public class HuanLuyenVienDAO {
+    private static final Logger LOGGER = Logger.getLogger(HuanLuyenVienDAO.class.getName());
     private static final List<HuanLuyenVien> memoryList = new CopyOnWriteArrayList<>();
 
     static {
@@ -28,15 +32,18 @@ public class HuanLuyenVienDAO {
     }
 
     public List<HuanLuyenVien> layTatCa() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            List<HuanLuyenVien> list = session.createQuery("FROM HuanLuyenVien ORDER BY maHLV ASC", HuanLuyenVien.class).list();
-            if (list != null && !list.isEmpty()) {
-                memoryList.clear();
-                memoryList.addAll(list);
-                return list;
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf != null) {
+            try (Session session = sf.openSession()) {
+                List<HuanLuyenVien> list = session.createQuery("FROM HuanLuyenVien ORDER BY maHLV ASC", HuanLuyenVien.class).list();
+                if (list != null && !list.isEmpty()) {
+                    memoryList.clear();
+                    memoryList.addAll(list);
+                    return list;
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Lỗi tải danh sách HLV từ CSDL: {0}", e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("[HuanLuyenVienDAO] Lỗi tải danh sách HLV từ CSDL: " + e.getMessage());
         }
         return new ArrayList<>(memoryList);
     }
@@ -45,11 +52,14 @@ public class HuanLuyenVienDAO {
         if (maHLV == null || maHLV.trim().isEmpty()) return null;
         String code = maHLV.trim();
 
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            HuanLuyenVien h = session.get(HuanLuyenVien.class, code);
-            if (h != null) return h;
-        } catch (Exception e) {
-            System.err.println("[HuanLuyenVienDAO] Lỗi tìm HLV theo mã: " + e.getMessage());
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf != null) {
+            try (Session session = sf.openSession()) {
+                HuanLuyenVien h = session.get(HuanLuyenVien.class, code);
+                if (h != null) return h;
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Lỗi tìm HLV theo mã ''{0}'': {1}", new Object[]{code, e.getMessage()});
+            }
         }
 
         for (HuanLuyenVien h : memoryList) {
@@ -61,8 +71,16 @@ public class HuanLuyenVienDAO {
     public boolean them(HuanLuyenVien hlv) {
         if (hlv == null) return false;
 
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf == null) {
+            LOGGER.log(Level.WARNING, "CSDL offline - lưu HLV vào bộ nhớ tạm");
+            memoryList.removeIf(item -> item.getMaHLV().equalsIgnoreCase(hlv.getMaHLV()));
+            memoryList.add(hlv);
+            return true;
+        }
+
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sf.openSession()) {
             tx = session.beginTransaction();
             session.persist(hlv);
             tx.commit();
@@ -72,7 +90,7 @@ public class HuanLuyenVienDAO {
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            System.err.println("[HuanLuyenVienDAO] Lỗi thêm HLV vào CSDL: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Lỗi thêm HLV vào CSDL: " + hlv.getMaHLV(), e);
             return false;
         }
     }
@@ -80,8 +98,20 @@ public class HuanLuyenVienDAO {
     public boolean capNhat(HuanLuyenVien hlv) {
         if (hlv == null) return false;
 
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf == null) {
+            LOGGER.log(Level.WARNING, "CSDL offline - cập nhật HLV trong bộ nhớ tạm");
+            for (int i = 0; i < memoryList.size(); i++) {
+                if (memoryList.get(i).getMaHLV().equalsIgnoreCase(hlv.getMaHLV())) {
+                    memoryList.set(i, hlv);
+                    break;
+                }
+            }
+            return true;
+        }
+
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sf.openSession()) {
             tx = session.beginTransaction();
             session.merge(hlv);
             tx.commit();
@@ -95,7 +125,7 @@ public class HuanLuyenVienDAO {
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            System.err.println("[HuanLuyenVienDAO] Lỗi cập nhật HLV: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Lỗi cập nhật HLV trong CSDL: " + hlv.getMaHLV(), e);
             return false;
         }
     }
@@ -103,8 +133,15 @@ public class HuanLuyenVienDAO {
     public boolean xoa(String maHLV) {
         if (maHLV == null || maHLV.trim().isEmpty()) return false;
 
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf == null) {
+            LOGGER.log(Level.WARNING, "CSDL offline - xóa HLV khỏi bộ nhớ tạm");
+            memoryList.removeIf(item -> item.getMaHLV().equalsIgnoreCase(maHLV.trim()));
+            return true;
+        }
+
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sf.openSession()) {
             tx = session.beginTransaction();
             HuanLuyenVien hlv = session.get(HuanLuyenVien.class, maHLV.trim());
             if (hlv != null) {
@@ -116,7 +153,7 @@ public class HuanLuyenVienDAO {
             return false;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            System.err.println("[HuanLuyenVienDAO] Lỗi xóa HLV: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Lỗi xóa HLV khỏi CSDL: " + maHLV, e);
             return false;
         }
     }

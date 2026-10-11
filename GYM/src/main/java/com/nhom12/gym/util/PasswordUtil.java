@@ -2,20 +2,33 @@ package com.nhom12.gym.util;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import org.mindrot.jbcrypt.BCrypt;
 
 /**
- * Tiện ích Băm và Mã hóa Mật khẩu Chuẩn An Toàn SHA-256 cho Hệ Thống FitLife Gym
+ * Tiện ích Băm và Mã hóa Mật khẩu Chuẩn An Toàn BCrypt & SHA-256 cho Hệ Thống FitLife Gym
  */
 public class PasswordUtil {
 
     /**
-     * Băm mật khẩu chuỗi thuần sang mã băm SHA-256 (64 ký tự hex)
-     * Ví dụ: "123456" -> "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92"
+     * Băm mật khẩu sang chuỗi BCrypt chuẩn công nghiệp (độ dài ~60 ký tự, Work factor = 12)
      */
     public static String hashPassword(String plainPassword) {
         if (plainPassword == null) {
             return null;
         }
+        try {
+            return BCrypt.hashpw(plainPassword, BCrypt.gensalt(12));
+        } catch (Throwable t) {
+            // Fallback an toàn sang SHA-256
+            return hashSha256(plainPassword);
+        }
+    }
+
+    /**
+     * Băm mật khẩu theo chuẩn SHA-256 (64 hex characters)
+     */
+    public static String hashSha256(String plainPassword) {
+        if (plainPassword == null) return null;
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] encodedHash = digest.digest(plainPassword.getBytes(StandardCharsets.UTF_8));
@@ -29,44 +42,51 @@ public class PasswordUtil {
             }
             return hexString.toString().toLowerCase();
         } catch (Exception e) {
-            throw new RuntimeException("Lỗi khi băm mật khẩu bằng thuật toán SHA-256", e);
+            throw new RuntimeException("Lỗi băm SHA-256: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Kiểm tra một chuỗi đã là mã băm SHA-256 chuẩn (64 ký tự hex) hay chưa
+     * Kiểm tra một chuỗi đã là mã băm (BCrypt hoặc SHA-256) hay chưa
      */
     public static boolean isHashed(String password) {
-        if (password == null || password.length() != 64) {
+        if (password == null) {
             return false;
         }
-        return password.matches("^[0-9a-fA-F]{64}$");
+        // BCrypt định dạng $2a$ / $2b$ / $2y$ độ dài 60
+        if (password.startsWith("$2a$") || password.startsWith("$2b$") || password.startsWith("$2y$")) {
+            return password.length() == 60;
+        }
+        // SHA-256 độ dài 64 hex
+        return password.length() == 64 && password.matches("^[0-9a-fA-F]{64}$");
     }
 
     /**
-     * Kiểm tra tính hợp lệ của mật khẩu:
-     * 1. So khớp mã băm SHA-256
-     * 2. Tương thích ngược nếu cơ sở dữ liệu cũ chưa kịp băm
+     * Xác thực mật khẩu:
+     * 1. Đối soát mã băm BCrypt
+     * 2. Đối soát mã băm SHA-256 (nếu tài khoản dùng SHA-256 cũ)
+     * 3. Đối soát mật khẩu thô (nếu tài khoản chưa kịp băm)
      */
     public static boolean checkPassword(String plainPassword, String storedPassword) {
         if (plainPassword == null || storedPassword == null) {
             return false;
         }
-        String hashedInput = hashPassword(plainPassword);
-        if (hashedInput.equalsIgnoreCase(storedPassword)) {
+
+        // 1. Kiểm tra khớp BCrypt
+        if (storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2y$")) {
+            try {
+                return BCrypt.checkpw(plainPassword, storedPassword);
+            } catch (Throwable ignored) {
+            }
+        }
+
+        // 2. Kiểm tra khớp SHA-256
+        String sha = hashSha256(plainPassword);
+        if (sha.equalsIgnoreCase(storedPassword)) {
             return true;
         }
-        // Fallback tương thích dữ liệu cũ
-        return plainPassword.equals(storedPassword);
-    }
 
-    public static void main(String[] args) {
-        String raw = "123456";
-        String hash = hashPassword(raw);
-        System.out.println("=== KIEM TRA BAM MAT KHAU SHA-256 ===");
-        System.out.println("Mat khau goc: " + raw);
-        System.out.println("Ma bam SHA-256: " + hash);
-        System.out.println("Kiem tra do dai & hop le: " + isHashed(hash));
-        System.out.println("Xac thuc dang nhap: " + checkPassword(raw, hash));
+        // 3. Khớp chuỗi thô (tương thích ngược)
+        return plainPassword.equals(storedPassword);
     }
 }

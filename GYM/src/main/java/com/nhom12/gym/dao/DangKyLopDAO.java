@@ -6,15 +6,20 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 /**
  * Data Access Object cho Thực thể Đăng Ký & Điểm Danh Lớp Học (DangKyLop)
- * Quản lý danh sách học viên đăng ký lớp yoga, zumba, boxing và trạng thái điểm danh
+ * Sử dụng Hibernate ORM lưu trữ bền vững xuống bảng DangKyLop trong CSDL
  */
 public class DangKyLopDAO {
+
+    private static final Logger LOGGER = Logger.getLogger(DangKyLopDAO.class.getName());
 
     // Bộ nhớ đệm dự phòng cho chức năng ngoại tuyến
     private static final List<DangKyLop> memoryCache = new CopyOnWriteArrayList<>();
@@ -32,11 +37,13 @@ public class DangKyLopDAO {
         memoryCache.add(new DangKyLop(5, "LH03", 4, "Trần Minh Quân", "0904567890", new Date(), "Đã điểm danh", "Đầy đủ găng tập"));
     }
 
-    /**
-     * Lấy toàn bộ danh sách đăng ký lớp học
-     */
     public List<DangKyLop> layTatCa() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf == null) {
+            return new ArrayList<>(memoryCache);
+        }
+
+        try (Session session = sf.openSession()) {
             List<DangKyLop> list = session.createQuery("FROM DangKyLop ORDER BY id DESC", DangKyLop.class).list();
             if (list != null && !list.isEmpty()) {
                 memoryCache.clear();
@@ -44,29 +51,29 @@ public class DangKyLopDAO {
                 return list;
             }
         } catch (Exception e) {
-            System.err.println("[DangKyLopDAO] Lỗi tải danh sách từ CSDL, dùng cache: " + e.getMessage());
+            LOGGER.log(Level.WARNING, "Không thể tải danh sách đăng ký lớp từ CSDL, dùng cache: {0}", e.getMessage());
         }
         return new ArrayList<>(memoryCache);
     }
 
-    /**
-     * Lấy danh sách học viên của một lớp học cụ thể theo mã lớp
-     */
     public List<DangKyLop> layDanhSachTheoLop(String maLop) {
         if (maLop == null || maLop.trim().isEmpty()) return new ArrayList<>();
         String code = maLop.trim();
 
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Query<DangKyLop> query = session.createQuery(
-                "FROM DangKyLop WHERE UPPER(maLop) = UPPER(:ma) ORDER BY id ASC", DangKyLop.class
-            );
-            query.setParameter("ma", code);
-            List<DangKyLop> list = query.list();
-            if (list != null && !list.isEmpty()) {
-                return list;
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf != null) {
+            try (Session session = sf.openSession()) {
+                Query<DangKyLop> query = session.createQuery(
+                    "FROM DangKyLop WHERE UPPER(maLop) = UPPER(:ma) ORDER BY id ASC", DangKyLop.class
+                );
+                query.setParameter("ma", code);
+                List<DangKyLop> list = query.list();
+                if (list != null && !list.isEmpty()) {
+                    return list;
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.FINE, "Lỗi lấy danh sách học viên lớp từ CSDL: {0}", e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("[DangKyLopDAO] Lỗi lấy danh sách học viên theo lớp: " + e.getMessage());
         }
 
         // Fallback bộ nhớ đệm
@@ -79,9 +86,6 @@ public class DangKyLopDAO {
         return result;
     }
 
-    /**
-     * Kiểm tra xem hội viên đã đăng ký vào lớp này chưa
-     */
     public boolean daDangKy(String maLop, int maHoiVien) {
         List<DangKyLop> list = layDanhSachTheoLop(maLop);
         for (DangKyLop dk : list) {
@@ -92,15 +96,18 @@ public class DangKyLopDAO {
         return false;
     }
 
-    /**
-     * Đăng ký hội viên vào lớp học
-     * @return true nếu lưu thành công, false nếu thất bại
-     */
     public boolean them(DangKyLop dk) {
         if (dk == null) return false;
 
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf == null) {
+            if (dk.getId() <= 0) dk.setId(memoryCache.size() + 1);
+            memoryCache.add(dk);
+            return true;
+        }
+
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sf.openSession()) {
             tx = session.beginTransaction();
             session.persist(dk);
             tx.commit();
@@ -109,21 +116,30 @@ public class DangKyLopDAO {
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            System.err.println("[DangKyLopDAO] Lỗi thêm đăng ký lớp: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Lỗi thêm đăng ký lớp vào CSDL", e);
             return false;
         }
     }
 
-    /**
-     * Cập nhật trạng thái điểm danh cho một lượt đăng ký
-     */
     public boolean capNhatDiemDanh(int id, String trangThai) {
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf == null) {
+            for (DangKyLop item : memoryCache) {
+                if (item.getId() == id) {
+                    item.setTrangThaiDiemDanh(trangThai);
+                    return true;
+                }
+            }
+            return false;
+        }
+
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sf.openSession()) {
             tx = session.beginTransaction();
             DangKyLop dk = session.get(DangKyLop.class, id);
             if (dk != null) {
                 dk.setTrangThaiDiemDanh(trangThai);
+                session.merge(dk);
                 tx.commit();
 
                 // Cập nhật memory cache
@@ -138,9 +154,8 @@ public class DangKyLopDAO {
             return false;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            System.err.println("[DangKyLopDAO] Lỗi cập nhật điểm danh ID " + id + ": " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Lỗi cập nhật điểm danh vào CSDL", e);
 
-            // Fallback memory cache khi CSDL offline
             for (DangKyLop item : memoryCache) {
                 if (item.getId() == id) {
                     item.setTrangThaiDiemDanh(trangThai);
@@ -151,12 +166,14 @@ public class DangKyLopDAO {
         }
     }
 
-    /**
-     * Xóa lượt đăng ký
-     */
     public boolean xoa(int id) {
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf == null) {
+            return memoryCache.removeIf(item -> item.getId() == id);
+        }
+
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sf.openSession()) {
             tx = session.beginTransaction();
             DangKyLop dk = session.get(DangKyLop.class, id);
             if (dk != null) {
@@ -168,7 +185,7 @@ public class DangKyLopDAO {
             return false;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            System.err.println("[DangKyLopDAO] Lỗi xóa đăng ký lớp: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Lỗi xóa đăng ký lớp khỏi CSDL", e);
             return false;
         }
     }

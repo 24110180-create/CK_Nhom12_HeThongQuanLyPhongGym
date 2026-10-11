@@ -4,6 +4,7 @@ import com.nhom12.gym.gui.panels.*;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import com.nhom12.gym.util.Auth;
+import com.nhom12.gym.util.HibernateUtil;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -170,6 +171,29 @@ public class MainDashboard extends JFrame {
         repaint();
     }
 
+    private JPanel taoBannerCanhBaoOffline() {
+        if (!Auth.isOffline && HibernateUtil.isConnected()) {
+            return null;
+        }
+        JPanel banner = new JPanel(new BorderLayout(15, 0));
+        banner.setBackground(new Color(220, 38, 38)); // Đỏ cảnh báo #DC2626
+        banner.setBorder(new EmptyBorder(7, 20, 7, 20));
+        banner.setPreferredSize(new Dimension(0, 36));
+        banner.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+
+        JLabel lblMsg = new JLabel("⚠️  CẢNH BÁO: ĐANG CHẠY CHẾ ĐỘ OFFLINE – DỮ LIỆU ĐANG ĐƯỢC ĐỆM TẠM THỜI (MÁY CHỦ SQL SERVER MẤT KẾT NỐI)");
+        lblMsg.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblMsg.setForeground(Color.WHITE);
+
+        JLabel lblBadge = new JLabel("● OFFLINE BUFFER ACTIVE");
+        lblBadge.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        lblBadge.setForeground(new Color(254, 226, 226));
+
+        banner.add(lblMsg, BorderLayout.CENTER);
+        banner.add(lblBadge, BorderLayout.EAST);
+        return banner;
+    }
+
     // =========================================================================
     // 1. GIAO DIỆN CHỦ: EXECUTIVE DUAL-TIER NAVIGATION & EMBEDDED WORKSPACE
     // =========================================================================
@@ -180,6 +204,11 @@ public class MainDashboard extends JFrame {
         JPanel topHeader = new JPanel();
         topHeader.setLayout(new BoxLayout(topHeader, BoxLayout.Y_AXIS));
         topHeader.setOpaque(false);
+
+        JPanel offlineBanner = taoBannerCanhBaoOffline();
+        if (offlineBanner != null) {
+            topHeader.add(offlineBanner);
+        }
 
         // --- A. THANH ĐIỀU HÀNH CẤP CAO (TOP NAVBAR - TẦNG 1) ---
         JPanel navBar = new JPanel(new BorderLayout(15, 0));
@@ -658,6 +687,11 @@ public class MainDashboard extends JFrame {
         mainArea.add(workspaceContainer, BorderLayout.CENTER);
 
         rootPanel.add(mainArea, BorderLayout.CENTER);
+
+        JPanel offlineBanner = taoBannerCanhBaoOffline();
+        if (offlineBanner != null) {
+            rootPanel.add(offlineBanner, BorderLayout.NORTH);
+        }
 
         // --- C. THIẾT LẬP MENU ĐẶC THÙ CHO TỪNG ROLE ---
         if ("Lễ tân".equalsIgnoreCase(role)) {

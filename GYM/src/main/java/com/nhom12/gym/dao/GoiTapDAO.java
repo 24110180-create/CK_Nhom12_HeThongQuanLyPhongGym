@@ -5,7 +5,10 @@ import com.nhom12.gym.util.HibernateUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 /**
@@ -13,6 +16,8 @@ import org.hibernate.Transaction;
  * Hỗ trợ Observer Pattern tự động cập nhật danh sách gói tập sang các Panel liên quan
  */
 public class GoiTapDAO {
+    private static final Logger LOGGER = Logger.getLogger(GoiTapDAO.class.getName());
+
     // Bộ nhớ đệm offline fallback thread-safe
     private static final List<GoiTap> memoryList = new CopyOnWriteArrayList<>();
 
@@ -51,21 +56,24 @@ public class GoiTapDAO {
             try {
                 l.onGoiTapChanged();
             } catch (Exception e) {
-                System.err.println("[GoiTapDAO] Lỗi thông báo thay đổi gói tập: " + e.getMessage());
+                LOGGER.log(Level.WARNING, "Lỗi thông báo thay đổi gói tập", e);
             }
         }
     }
 
     public List<GoiTap> layTatCa() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            List<GoiTap> list = session.createQuery("FROM GoiTap ORDER BY giaTien ASC", GoiTap.class).list();
-            if (list != null && !list.isEmpty()) {
-                memoryList.clear();
-                memoryList.addAll(list);
-                return list;
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf != null) {
+            try (Session session = sf.openSession()) {
+                List<GoiTap> list = session.createQuery("FROM GoiTap ORDER BY giaTien ASC", GoiTap.class).list();
+                if (list != null && !list.isEmpty()) {
+                    memoryList.clear();
+                    memoryList.addAll(list);
+                    return list;
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Lỗi truy vấn CSDL, sử dụng danh sách bộ nhớ đệm: {0}", e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("[GoiTapDAO] Lỗi truy vấn CSDL, sử dụng danh sách bộ nhớ đệm: " + e.getMessage());
         }
         return new ArrayList<>(memoryList);
     }
@@ -74,11 +82,14 @@ public class GoiTapDAO {
         if (maGoiTap == null || maGoiTap.trim().isEmpty()) return null;
         String code = maGoiTap.trim();
 
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            GoiTap gt = session.get(GoiTap.class, code);
-            if (gt != null) return gt;
-        } catch (Exception e) {
-            System.err.println("[GoiTapDAO] Lỗi tìm gói tập theo mã '" + code + "': " + e.getMessage());
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf != null) {
+            try (Session session = sf.openSession()) {
+                GoiTap gt = session.get(GoiTap.class, code);
+                if (gt != null) return gt;
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Lỗi tìm gói tập theo mã ''{0}'': {1}", new Object[]{code, e.getMessage()});
+            }
         }
 
         for (GoiTap gt : memoryList) {
@@ -104,8 +115,17 @@ public class GoiTapDAO {
     public boolean them(GoiTap gt) {
         if (gt == null) return false;
 
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf == null) {
+            LOGGER.log(Level.WARNING, "CSDL offline - lưu gói tập vào bộ nhớ tạm");
+            memoryList.removeIf(item -> item.getMaGoiTap().equalsIgnoreCase(gt.getMaGoiTap()));
+            memoryList.add(gt);
+            notifyChange();
+            return true;
+        }
+
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sf.openSession()) {
             tx = session.beginTransaction();
             session.persist(gt);
             tx.commit();
@@ -116,7 +136,7 @@ public class GoiTapDAO {
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            System.err.println("[GoiTapDAO] Lỗi thêm gói tập: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Lỗi thêm gói tập vào CSDL: " + gt.getMaGoiTap(), e);
             return false;
         }
     }
@@ -124,8 +144,21 @@ public class GoiTapDAO {
     public boolean capNhat(GoiTap gt) {
         if (gt == null) return false;
 
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf == null) {
+            LOGGER.log(Level.WARNING, "CSDL offline - cập nhật gói tập trong bộ nhớ tạm");
+            for (int i = 0; i < memoryList.size(); i++) {
+                if (memoryList.get(i).getMaGoiTap().equalsIgnoreCase(gt.getMaGoiTap())) {
+                    memoryList.set(i, gt);
+                    break;
+                }
+            }
+            notifyChange();
+            return true;
+        }
+
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sf.openSession()) {
             tx = session.beginTransaction();
             session.merge(gt);
             tx.commit();
@@ -140,7 +173,7 @@ public class GoiTapDAO {
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            System.err.println("[GoiTapDAO] Lỗi cập nhật gói tập: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Lỗi cập nhật gói tập trong CSDL: " + gt.getMaGoiTap(), e);
             return false;
         }
     }
@@ -148,8 +181,16 @@ public class GoiTapDAO {
     public boolean xoa(String maGoiTap) {
         if (maGoiTap == null || maGoiTap.trim().isEmpty()) return false;
 
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf == null) {
+            LOGGER.log(Level.WARNING, "CSDL offline - xóa gói tập khỏi bộ nhớ tạm");
+            memoryList.removeIf(item -> item.getMaGoiTap().equalsIgnoreCase(maGoiTap.trim()));
+            notifyChange();
+            return true;
+        }
+
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sf.openSession()) {
             tx = session.beginTransaction();
             GoiTap gt = session.get(GoiTap.class, maGoiTap.trim());
             if (gt != null) {
@@ -162,7 +203,7 @@ public class GoiTapDAO {
             return false;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            System.err.println("[GoiTapDAO] Lỗi xóa gói tập: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Lỗi xóa gói tập khỏi CSDL: " + maGoiTap, e);
             return false;
         }
     }

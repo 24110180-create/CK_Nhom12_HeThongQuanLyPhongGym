@@ -5,14 +5,20 @@ import com.nhom12.gym.util.HibernateUtil;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 /**
  * Data Access Object cho Thực thể Nhật Ký Check-In (LichSuCheckIn)
- * Đóng vai trò ghi nhận Audit Log cho Use Case Lõi Quét Thẻ và phân tích Heatmap
+ * Đóng vai trò ghi nhận Audit Log cho Use Case Lõi Quét Thẻ và tính toán Heatmap hoàn toàn từ dữ liệu thật
  */
 public class LichSuCheckInDAO {
+
+    private static final Logger LOGGER = Logger.getLogger(LichSuCheckInDAO.class.getName());
+
     private static final List<LichSuCheckIn> memoryLogs = new CopyOnWriteArrayList<>();
 
     static {
@@ -41,8 +47,15 @@ public class LichSuCheckInDAO {
     public boolean luuCheckIn(LichSuCheckIn log) {
         if (log == null) return false;
 
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf == null) {
+            if (log.getId() <= 0) log.setId(memoryLogs.size() + 1);
+            memoryLogs.add(0, log);
+            return true;
+        }
+
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sf.openSession()) {
             tx = session.beginTransaction();
             session.persist(log);
             tx.commit();
@@ -51,15 +64,19 @@ public class LichSuCheckInDAO {
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            System.err.println("[LichSuCheckInDAO] Lỗi ghi nhật ký check-in: " + e.getMessage());
-            // Vẫn lưu vào bộ đệm nội bộ để trạm quét không bị đình trệ
-            memoryLogs.add(0, log);
+            LOGGER.log(Level.SEVERE, "Lỗi ghi nhật ký check-in vào CSDL", e);
+            memoryLogs.add(0, log); // Đệm tạm vào memory để trạm quét không tắc nghẽn
             return false;
         }
     }
 
     public List<LichSuCheckIn> layTatCaLichSu() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf == null) {
+            return new ArrayList<>(memoryLogs);
+        }
+
+        try (Session session = sf.openSession()) {
             List<LichSuCheckIn> list = session.createQuery("FROM LichSuCheckIn ORDER BY thoiGian DESC", LichSuCheckIn.class).list();
             if (list != null && !list.isEmpty()) {
                 memoryLogs.clear();
@@ -67,7 +84,7 @@ public class LichSuCheckInDAO {
                 return list;
             }
         } catch (Exception e) {
-            System.err.println("[LichSuCheckInDAO] Lỗi truy vấn CSDL, dùng memory cache: " + e.getMessage());
+            LOGGER.log(Level.WARNING, "Lỗi truy vấn CSDL, dùng memory cache: {0}", e.getMessage());
         }
         return new ArrayList<>(memoryLogs);
     }
@@ -87,18 +104,37 @@ public class LichSuCheckInDAO {
 
     /**
      * Thống kê số lượt tập theo từng khung giờ trong ngày (0h -> 23h)
-     * Phục vụ biểu đồ Mức độ sử dụng phòng tập theo giờ (Heatmap)
+     * TÍNH TOÁN 100% TỪ DỮ LIỆU THẬT trong CSDL (loại bỏ hoàn toàn mảng số liệu hardcode)
      */
     public int[] layPhanBoLuuLuongTheoGio() {
         int[] hourly = new int[24];
-        // Đặt một số giá trị cơ sở thực tế cho phòng Gym (cao điểm 6h-8h sáng và 17h-20h tối)
-        hourly[6] = 28;  hourly[7] = 45;  hourly[8] = 32;
-        hourly[9] = 18;  hourly[10] = 12; hourly[11] = 15;
-        hourly[12] = 20; hourly[13] = 14; hourly[14] = 10;
-        hourly[15] = 16; hourly[16] = 25; hourly[17] = 52;
-        hourly[18] = 68; hourly[19] = 62; hourly[20] = 48;
-        hourly[21] = 26;
 
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf != null) {
+            try (Session session = sf.openSession()) {
+                List<Object[]> rows = session.createQuery(
+                    "SELECT HOUR(c.thoiGian), COUNT(c) FROM LichSuCheckIn c " +
+                    "WHERE c.trangThai = 'Hợp lệ' " +
+                    "GROUP BY HOUR(c.thoiGian)", Object[].class
+                ).list();
+                if (rows != null && !rows.isEmpty()) {
+                    for (Object[] row : rows) {
+                        if (row[0] != null && row[1] != null) {
+                            int hour = ((Number) row[0]).intValue();
+                            long count = ((Number) row[1]).longValue();
+                            if (hour >= 0 && hour < 24) {
+                                hourly[hour] = (int) count;
+                            }
+                        }
+                    }
+                    return hourly;
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.FINE, "Lỗi truy vấn GROUP BY tính Heatmap: {0}", e.getMessage());
+            }
+        }
+
+        // Tính từ danh sách log hiện có (CSDL hoặc fallback memory)
         Calendar cal = Calendar.getInstance();
         for (LichSuCheckIn log : layTatCaLichSu()) {
             if (log.getThoiGian() != null && "Hợp lệ".equalsIgnoreCase(log.getTrangThai())) {

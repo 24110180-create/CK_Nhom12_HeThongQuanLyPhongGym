@@ -6,6 +6,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Service Xử Lý Nghiệp Vụ Check-In Hội Viên (Use Case Cốt Lõi Của Đồ Án)
  * Tuân thủ đầy đủ 5 quy tắc nghiệp vụ kinh doanh (Business Rules):
@@ -18,6 +21,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class CheckInService {
 
+    private static final Logger LOGGER = Logger.getLogger(CheckInService.class.getName());
     private final HoiVienDAO hoiVienDAO = new HoiVienDAO();
     private final com.nhom12.gym.dao.LichSuCheckInDAO checkInDAO = new com.nhom12.gym.dao.LichSuCheckInDAO();
     private static final List<CheckInLogEntry> todayLogs = new CopyOnWriteArrayList<>();
@@ -83,7 +87,8 @@ public class CheckInService {
         // 1. Tra cứu Database / Bộ nhớ cache (Hỗ trợ cả Mã QR và Mã Hội Viên ID)
         try {
             hv = this.hoiVienDAO.timKiemThongMinh(code);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Lỗi tìm kiếm hội viên theo mã {0}: {1}", new Object[]{code, e.getMessage()});
         }
 
         // Dữ liệu Offline Fallback chuẩn kiểm thử đồ án
@@ -141,7 +146,9 @@ public class CheckInService {
                 checkInDAO.luuCheckIn(new com.nhom12.gym.entity.LichSuCheckIn(
                         0, 0, "Chưa rõ", code, new Date(), currentBranch, "Cổng Flap A1",
                         code.startsWith("QR") ? "Mã QR" : "Mã Thẻ Barcode", "Từ chối", note, System.currentTimeMillis() - startTime));
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Không thể lưu log check-in từ chối: {0}", e.getMessage());
+            }
             return new CheckInResult(false, "TỪ CHỐI: Mã thẻ '" + code + "' không tồn tại trong hệ thống!", null,
                     note, false, false, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, "---");
         }
@@ -158,7 +165,9 @@ public class CheckInService {
                 checkInDAO.luuCheckIn(new com.nhom12.gym.entity.LichSuCheckIn(
                         0, hv.getMaHoiVien(), memberName, code, new Date(), currentBranch, "Cổng Flap A1",
                         code.startsWith("QR") ? "Mã QR" : "Mã Thẻ Barcode", "Từ chối", note, System.currentTimeMillis() - startTime));
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Không thể lưu log check-in tạm khóa: {0}", e.getMessage());
+            }
             return new CheckInResult(false, "TỪ CHỐI: Thẻ hội viên đang bị TẠM KHÓA!", hv,
                     note, false, isVip, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, "Đang khóa");
         }
@@ -174,7 +183,9 @@ public class CheckInService {
                     checkInDAO.luuCheckIn(new com.nhom12.gym.entity.LichSuCheckIn(
                             0, hv.getMaHoiVien(), memberName, code, new Date(), currentBranch, "Cổng Flap A1",
                             code.startsWith("QR") ? "Mã QR" : "Mã Thẻ Barcode", "Từ chối", note, System.currentTimeMillis() - startTime));
-                } catch (Exception ignored) {}
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING, "Không thể lưu log check-in hết hạn: {0}", e.getMessage());
+                }
                 return new CheckInResult(false, "TỪ CHỐI: Gói tập đã HẾT HẠN từ ngày " + expDate + "!", hv,
                         note, true, isVip, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, "Hết hạn (" + expDate + ")");
             }
@@ -190,7 +201,9 @@ public class CheckInService {
                     checkInDAO.luuCheckIn(new com.nhom12.gym.entity.LichSuCheckIn(
                             0, hv.getMaHoiVien(), memberName, code, new Date(), currentBranch, "Cổng Flap A1",
                             code.startsWith("QR") ? "Mã QR" : "Mã Thẻ Barcode", "Từ chối", note, System.currentTimeMillis() - startTime));
-                } catch (Exception ignored) {}
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING, "Không thể lưu log check-in sai chi nhánh: {0}", e.getMessage());
+                }
                 return new CheckInResult(false, "TỪ CHỐI: Thẻ cơ sở đơn lẻ! Hội viên đăng ký tại '" + memberBranch + "', không thể vào trạm '" + currentBranch + "'!", hv,
                         note, true, isVip, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, "Sai chi nhánh");
             }
@@ -207,7 +220,9 @@ public class CheckInService {
                 checkInDAO.luuCheckIn(new com.nhom12.gym.entity.LichSuCheckIn(
                         0, hv.getMaHoiVien(), memberName, code, new Date(), currentBranch, "Cổng Flap A1",
                         code.startsWith("QR") ? "Mã QR" : "Mã Thẻ Barcode", "Từ chối", note, System.currentTimeMillis() - startTime));
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Không thể lưu log check-in trùng: {0}", e.getMessage());
+            }
             return new CheckInResult(false, "CẢNH BÁO: Thẻ vừa quét check-in trước đó! Vui lòng không quét trùng (chờ " + secLeft + "s).", hv,
                     note, false, isVip, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, "Quét trùng");
         }
@@ -224,7 +239,9 @@ public class CheckInService {
             checkInDAO.luuCheckIn(new com.nhom12.gym.entity.LichSuCheckIn(
                     0, hv.getMaHoiVien(), memberName, code, new Date(), currentBranch, "Cổng Flap A1",
                     code.startsWith("QR") ? "Mã QR" : "Mã Thẻ Barcode", "Hợp lệ", note, elapsed));
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Không thể lưu log check-in hợp lệ: {0}", e.getMessage());
+        }
 
         return new CheckInResult(true, "CHECK-IN THÀNH CÔNG: Xin chào " + memberName + "!", hv,
                 "Đạt tất cả 5 điều kiện hợp lệ", false, isVip, elapsed, "OPEN", timeNowStr, goiTap);

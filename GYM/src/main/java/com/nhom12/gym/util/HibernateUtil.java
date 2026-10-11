@@ -5,31 +5,39 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 /**
- * Quản lý khởi tạo duy nhất SessionFactory (Singleton Pattern)
- * Đăng ký đầy đủ 8 thực thể JPA đảm bảo không gặp lỗi 'Unable to locate persister'
+ * Quản lý khởi tạo SessionFactory (Lazy Singleton Pattern với Thread-Safe)
+ * Khi CSDL lỗi, trả về null an toàn mà không ném ExceptionInInitializerError,
+ * cho phép các DAO kích hoạt cơ chế Offline Fallback Buffer trơn tru.
  */
 public class HibernateUtil {
-    private static final SessionFactory sessionFactory = buildSessionFactory();
+    private static volatile SessionFactory sessionFactory;
 
-    private static SessionFactory buildSessionFactory() {
-        try {
-            Configuration cfg = new Configuration().configure();
-            cfg.addAnnotatedClass(TaiKhoan.class);
-            cfg.addAnnotatedClass(HoiVien.class);
-            cfg.addAnnotatedClass(GoiTap.class);
-            cfg.addAnnotatedClass(LopHoc.class);
-            cfg.addAnnotatedClass(LichSuCheckIn.class);
-            cfg.addAnnotatedClass(HoaDon.class);
-            cfg.addAnnotatedClass(HuanLuyenVien.class);
-            cfg.addAnnotatedClass(DangKyLop.class);
-            return cfg.buildSessionFactory();
-        } catch (Throwable ex) {
-            System.err.println("[HibernateUtil] Lỗi khởi tạo SessionFactory: " + ex.getMessage());
-            return null; // Trả về null an toàn để các DAO tự động kích hoạt bộ đệm dự phòng
+    public static synchronized SessionFactory getSessionFactory() {
+        if (sessionFactory == null) {
+            try {
+                Configuration cfg = new Configuration().configure();
+                cfg.addAnnotatedClass(TaiKhoan.class);
+                cfg.addAnnotatedClass(HoiVien.class);
+                cfg.addAnnotatedClass(GoiTap.class);
+                cfg.addAnnotatedClass(LopHoc.class);
+                cfg.addAnnotatedClass(LichSuCheckIn.class);
+                cfg.addAnnotatedClass(HoaDon.class);
+                cfg.addAnnotatedClass(HuanLuyenVien.class);
+                cfg.addAnnotatedClass(DangKyLop.class);
+
+                sessionFactory = cfg.buildSessionFactory();
+            } catch (Throwable ex) {
+                System.err.println("[HibernateUtil] Không thể kết nối CSDL SQL Server: " + ex.getMessage());
+                return null; // Để DAO tự kiểm tra null và fallback sang bộ nhớ đệm, không ném Error phá vỡ JVM
+            }
         }
+        return sessionFactory;
     }
 
-    public static SessionFactory getSessionFactory() {
-        return sessionFactory;
+    /**
+     * Kiểm tra trạng thái kết nối tới máy chủ CSDL
+     */
+    public static boolean isConnected() {
+        return getSessionFactory() != null;
     }
 }

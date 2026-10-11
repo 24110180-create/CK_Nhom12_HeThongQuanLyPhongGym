@@ -4,148 +4,93 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.io.Serializable;
+import java.util.Objects;
 
+/**
+ * Thực thể Tài khoản hệ thống (Phân quyền 5 vai trò: Chủ, Lễ tân, HLV, Quản lý, Hội viên)
+ */
 @Entity
-@Table(
-   name = "TaiKhoan"
-)
-public class TaiKhoan {
-   @Id
-   @Column(
-      name = "TenDangNhap"
-   )
-   private String tenDangNhap;
-   @Column(
-      name = "MatKhau",
-      length = 255
-   )
-   private String matKhau;
-   @Column(
-      name = "VaiTro"
-   )
-   private String vaiTro;
-   @Column(
-      name = "HoTen"
-   )
-   private String hoTen;
+@Table(name = "TaiKhoan")
+public class TaiKhoan implements Serializable {
 
-   public TaiKhoan() {
-   }
+    private static final long serialVersionUID = 1L;
 
-   public TaiKhoan(String tenDangNhap, String matKhau, String vaiTro, String hoTen) {
-      this.tenDangNhap = tenDangNhap;
-      this.matKhau = matKhau;
-      this.vaiTro = vaiTro;
-      this.hoTen = hoTen;
-   }
+    @Id
+    @Column(name = "TenDangNhap", length = 50, nullable = false)
+    private String tenDangNhap;
 
-   public String getTenDangNhap() {
-      return this.tenDangNhap;
-   }
+    @Column(name = "MatKhau", length = 255, nullable = false)
+    private String matKhau;
 
-   public void setTenDangNhap(String tenDangNhap) {
-      this.tenDangNhap = tenDangNhap;
-   }
+    @Column(name = "VaiTro", length = 50, nullable = false)
+    private String vaiTro;
 
-   public String getMatKhau() {
-      return this.matKhau;
-   }
+    @Column(name = "HoTen", length = 100, nullable = false)
+    private String hoTen;
 
-   public void setMatKhau(String matKhau) {
-      this.matKhau = matKhau;
-   }
+    public TaiKhoan() {
+    }
 
-   public String getVaiTro() {
-      return this.vaiTro;
-   }
+    public TaiKhoan(String tenDangNhap, String matKhau, String vaiTro, String hoTen) {
+        this.tenDangNhap = tenDangNhap;
+        this.matKhau = matKhau;
+        this.vaiTro = vaiTro;
+        this.hoTen = hoTen;
+    }
 
-   public void setVaiTro(String vaiTro) {
-      this.vaiTro = vaiTro;
-   }
+    public String getTenDangNhap() {
+        return tenDangNhap;
+    }
 
-   public String getHoTen() {
-      return this.hoTen;
-   }
+    public void setTenDangNhap(String tenDangNhap) {
+        this.tenDangNhap = tenDangNhap;
+    }
 
-   public void setHoTen(String hoTen) {
-      this.hoTen = hoTen;
-   }
+    public String getMatKhau() {
+        return matKhau;
+    }
 
-   public boolean equals(Object o) {
-      if (o == this) {
-         return true;
-      } else if (!(o instanceof TaiKhoan)) {
-         return false;
-      } else {
-         TaiKhoan other = (TaiKhoan)o;
-         if (!other.canEqual(this)) {
-            return false;
-         } else {
-            Object this$tenDangNhap = this.getTenDangNhap();
-            Object other$tenDangNhap = other.getTenDangNhap();
-            if (this$tenDangNhap == null) {
-               if (other$tenDangNhap != null) {
-                  return false;
-               }
-            } else if (!this$tenDangNhap.equals(other$tenDangNhap)) {
-               return false;
-            }
+    public void setMatKhau(String matKhau) {
+        this.matKhau = matKhau;
+    }
 
-            Object this$matKhau = this.getMatKhau();
-            Object other$matKhau = other.getMatKhau();
-            if (this$matKhau == null) {
-               if (other$matKhau != null) {
-                  return false;
-               }
-            } else if (!this$matKhau.equals(other$matKhau)) {
-               return false;
-            }
+    public String getVaiTro() {
+        return vaiTro;
+    }
 
-            Object this$vaiTro = this.getVaiTro();
-            Object other$vaiTro = other.getVaiTro();
-            if (this$vaiTro == null) {
-               if (other$vaiTro != null) {
-                  return false;
-               }
-            } else if (!this$vaiTro.equals(other$vaiTro)) {
-               return false;
-            }
+    public void setVaiTro(String vaiTro) {
+        this.vaiTro = vaiTro;
+    }
 
-            Object this$hoTen = this.getHoTen();
-            Object other$hoTen = other.getHoTen();
-            if (this$hoTen == null) {
-               if (other$hoTen != null) {
-                  return false;
-               }
-            } else if (!this$hoTen.equals(other$hoTen)) {
-               return false;
-            }
+    public String getHoTen() {
+        return hoTen;
+    }
 
-            return true;
-         }
-      }
-   }
+    public void setHoTen(String hoTen) {
+        this.hoTen = hoTen;
+    }
 
-   protected boolean canEqual(Object other) {
-      return other instanceof TaiKhoan;
-   }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TaiKhoan taiKhoan = (TaiKhoan) o;
+        return Objects.equals(tenDangNhap, taiKhoan.tenDangNhap);
+    }
 
-   public int hashCode() {
-      int PRIME = 59;
-      int result = 1;
-      Object $tenDangNhap = this.getTenDangNhap();
-      result = result * 59 + ($tenDangNhap == null ? 43 : $tenDangNhap.hashCode());
-      Object $matKhau = this.getMatKhau();
-      result = result * 59 + ($matKhau == null ? 43 : $matKhau.hashCode());
-      Object $vaiTro = this.getVaiTro();
-      result = result * 59 + ($vaiTro == null ? 43 : $vaiTro.hashCode());
-      Object $hoTen = this.getHoTen();
-      result = result * 59 + ($hoTen == null ? 43 : $hoTen.hashCode());
-      return result;
-   }
+    @Override
+    public int hashCode() {
+        return Objects.hash(tenDangNhap);
+    }
 
-   public String toString() {
-      String var10000 = this.getTenDangNhap();
-      return "TaiKhoan(tenDangNhap=" + var10000 + ", matKhau=" + this.getMatKhau() + ", vaiTro=" + this.getVaiTro() + ", hoTen=" + this.getHoTen() + ")";
-   }
+    @Override
+    public String toString() {
+        // Bảo mật: Không in chuỗi mật khẩu ra log/toString
+        return "TaiKhoan{" +
+                "tenDangNhap='" + tenDangNhap + '\'' +
+                ", vaiTro='" + vaiTro + '\'' +
+                ", hoTen='" + hoTen + '\'' +
+                '}';
+    }
 }

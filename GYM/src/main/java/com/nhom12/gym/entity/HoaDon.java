@@ -20,13 +20,13 @@ public class HoaDon {
     @Column(name = "LoaiGiaoDich", length = 50)
     private String loaiGiaoDich;
 
-    @Column(name = "TongTien")
+    @Column(name = "TongTien", columnDefinition = "DECIMAL(18,2)")
     private double tongTien;
 
-    @Column(name = "GiamGia")
+    @Column(name = "GiamGia", columnDefinition = "DECIMAL(18,2)")
     private double giamGia;
 
-    @Column(name = "ThanhTien")
+    @Column(name = "ThanhTien", columnDefinition = "DECIMAL(18,2)")
     private double thanhTien;
 
     @Column(name = "HinhThucThanhToan", length = 50)

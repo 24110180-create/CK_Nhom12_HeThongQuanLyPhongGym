@@ -1,6 +1,6 @@
 -- ==============================================================================
 -- DATABASE: FitLifeGym - HỆ THỐNG QUẢN TRỊ PHÒNG TẬP THỂ HÌNH TOÀN DIỆN
--- ĐỒ ÁN TỐT NGHIỆP / CUỐI KỲ - NHÓM 12
+-- ĐỒ ÁN CHUYÊN NGÀNH / CUỐI KỲ - NHÓM 12
 -- ==============================================================================
 
 USE master;
@@ -26,10 +26,11 @@ DROP TABLE IF EXISTS HoiVien;
 DROP TABLE IF EXISTS TaiKhoan;
 GO
 
--- 2. BẢNG TÀI KHOẢN HỆ THỐNG (PHÂN QUYỀN 5 VAI TRÒ CHUẨN - MẬT KHẨU BĂM SHA-256)
+-- 2. BẢNG TÀI KHOẢN HỆ THỐNG (PHÂN QUYỀN 5 VAI TRÒ CHUẨN - MẬT KHẨU BĂM SHA-256 / BCRYPT)
+-- Mật khẩu sử dụng VARCHAR(255) để lưu trữ an toàn các định dạng mã băm mật khẩu
 CREATE TABLE TaiKhoan (
     TenDangNhap VARCHAR(50) PRIMARY KEY,
-    MatKhau VARCHAR(255) NOT NULL, -- Mật khẩu băm chuẩn an toàn SHA-256 (64 hex characters)
+    MatKhau VARCHAR(255) NOT NULL, -- Mật khẩu băm chuẩn an toàn SHA-256 (64 hex characters) / BCrypt (60 chars)
     VaiTro NVARCHAR(50) NOT NULL, -- 'Chủ', 'Lễ tân', 'HLV', 'Quản lý', 'Hội viên'
     HoTen NVARCHAR(100) NOT NULL
 );
@@ -64,12 +65,12 @@ INSERT INTO HoiVien (MaTheQR, HoTen, ChiNhanhDangKy, NgayHetHan, TrangThai) VALU
 ('VIP007',N'Đỗ Minh Trí',      N'Toàn hệ thống (VIP)',    '2027-12-31', N'Active');
 GO
 
--- 4. BẢNG GÓI TẬP (NHIỀU LOẠI: THÁNG / QUÝ / NĂM / PT)
+-- 4. BẢNG GÓI TẬP (CỘT TIỀN DÙNG DECIMAL(18, 2) ĐỂ CHỐNG SAI SỐ LÀM TRÒN)
 CREATE TABLE GoiTap (
     MaGoiTap VARCHAR(30) PRIMARY KEY,
     TenGoiTap NVARCHAR(100) NOT NULL,
     ThoiHanThang INT DEFAULT 1,
-    GiaTien FLOAT NOT NULL,
+    GiaTien DECIMAL(18, 2) NOT NULL,
     PhamVi NVARCHAR(100) DEFAULT N'Toàn hệ thống',
     MoTa NVARCHAR(255),
     TrangThai NVARCHAR(50) DEFAULT N'Đang mở'
@@ -77,12 +78,12 @@ CREATE TABLE GoiTap (
 GO
 
 INSERT INTO GoiTap (MaGoiTap, TenGoiTap, ThoiHanThang, GiaTien, PhamVi, MoTa, TrangThai) VALUES
-('GT01', N'Gói 1 Tháng Tiêu Chuẩn', 1, 500000, N'Toàn hệ thống', N'Tập không giới hạn khung giờ, tặng 1 buổi PT', N'Đang mở'),
-('GT02', N'Gói 3 Tháng Siêu Tiết Kiệm', 3, 1350000, N'Toàn hệ thống', N'Tặng bình lắc FitLife + Miễn phí đo InBody', N'Đang mở'),
-('GT03', N'Gói 6 Tháng Bứt Phá', 6, 2500000, N'Toàn hệ thống', N'Tặng áo tập FitLife + Tủ Locker cá nhân', N'Đang mở'),
-('GT04', N'Gói 12 Tháng VIP Diamond', 12, 4500000, N'Toàn hệ thống', N'Full dịch vụ: Bể bơi, Xông hơi, Khăn & nước uống', N'Đang mở'),
-('GT05', N'Gói PT Cá Nhân 1:1 (30 Buổi)', 3, 7500000, N'Chi nhánh đăng ký', N'Huấn luyện viên riêng thiết kế giáo án chuyên sâu', N'Đang mở'),
-('GT06', N'Gói Sinh Viên Siêu Rẻ', 1, 350000, N'Toàn hệ thống', N'Khung giờ vàng 08:00 - 16:00 cho HSSV có thẻ', N'Đang mở');
+('GT01', N'Gói 1 Tháng Tiêu Chuẩn', 1, 500000.00, N'Toàn hệ thống', N'Tập không giới hạn khung giờ, tặng 1 buổi PT', N'Đang mở'),
+('GT02', N'Gói 3 Tháng Siêu Tiết Kiệm', 3, 1350000.00, N'Toàn hệ thống', N'Tặng bình lắc FitLife + Miễn phí đo InBody', N'Đang mở'),
+('GT03', N'Gói 6 Tháng Bứt Phá', 6, 2500000.00, N'Toàn hệ thống', N'Tặng áo tập FitLife + Tủ Locker cá nhân', N'Đang mở'),
+('GT04', N'Gói 12 Tháng VIP Diamond', 12, 4500000.00, N'Toàn hệ thống', N'Full dịch vụ: Bể bơi, Xông hơi, Khăn & nước uống', N'Đang mở'),
+('GT05', N'Gói PT Cá Nhân 1:1 (30 Buổi)', 3, 7500000.00, N'Chi nhánh đăng ký', N'Huấn luyện viên riêng thiết kế giáo án chuyên sâu', N'Đang mở'),
+('GT06', N'Gói Sinh Viên Siêu Rẻ', 1, 350000.00, N'Toàn hệ thống', N'Khung giờ vàng 08:00 - 16:00 cho HSSV có thẻ', N'Đang mở');
 GO
 
 -- 5. BẢNG HUẤN LUYỆN VIÊN (HLV & LỊCH LÀM VIỆC)
@@ -128,7 +129,7 @@ INSERT INTO LopHoc (MaLop, TenLop, BoMon, HuanLuyenVien, ThoiGian, PhongTap, SiS
 ('LH05', N'Pilates Dẻo Dai & Thon Gọn', N'Pilates', N'Nguyễn Thu Thảo', N'17:30 - 18:30 (T2-T4-T6)', N'Studio 1 (Tầng 2)', 18, 15);
 GO
 
--- 7. BẢNG ĐĂNG KÝ VÀ ĐIỂM DANH LỚP HỌC
+-- 7. BẢNG ĐĂNG KÝ VÀ ĐIỂM DANH LỚP HỌC (QUẢN LÝ BỞI DangKyLopDAO)
 CREATE TABLE DangKyLop (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     MaLop VARCHAR(30) FOREIGN KEY REFERENCES LopHoc(MaLop),
@@ -173,15 +174,15 @@ INSERT INTO LichSuCheckIn (MaHoiVien, TenHoiVien, MaTheQR, ThoiGian, ChiNhanh, C
 (6, N'Đỗ Minh Trí', 'VIP007', DATEADD(MINUTE, -10, GETDATE()), N'CN01 - Quận 1', N'Cổng VIP Gate', N'Mã QR VIP Pass', N'Hợp lệ', N'VIP President - Miễn phí trọn đời', 16);
 GO
 
--- 9. BẢNG HÓA ĐƠN & GIAO DỊCH TÀI CHÍNH
+-- 9. BẢNG HÓA ĐƠN & GIAO DỊCH TÀI CHÍNH (CỘT TIỀN DECIMAL(18, 2) CHUẨN KẾ TOÁN)
 CREATE TABLE HoaDon (
     MaHoaDon VARCHAR(30) PRIMARY KEY,
     MaHoiVien INT,
     TenHoiVien NVARCHAR(100),
     LoaiGiaoDich NVARCHAR(50), -- 'Đăng ký gói tập', 'Gia hạn gói tập', 'Bán hàng POS', 'Thuê tủ Locker'
-    TongTien FLOAT NOT NULL,
-    GiamGia FLOAT DEFAULT 0,
-    ThanhTien FLOAT NOT NULL,
+    TongTien DECIMAL(18, 2) NOT NULL,
+    GiamGia DECIMAL(18, 2) DEFAULT 0,
+    ThanhTien DECIMAL(18, 2) NOT NULL,
     HinhThucThanhToan NVARCHAR(50), -- 'Tiền mặt', 'Chuyển khoản VietQR'
     NguoiLap VARCHAR(50),
     ChiNhanh NVARCHAR(50),
@@ -192,9 +193,9 @@ CREATE TABLE HoaDon (
 GO
 
 INSERT INTO HoaDon (MaHoaDon, MaHoiVien, TenHoiVien, LoaiGiaoDich, TongTien, GiamGia, ThanhTien, HinhThucThanhToan, NguoiLap, ChiNhanh, NgayLap, TrangThai, GhiChu) VALUES
-('HD2026-001', 1, N'Lê Anh Duy', N'Đăng ký gói tập VIP Năm', 4500000, 0, 4500000, N'Chuyển khoản VietQR', 'letan1', N'CN01 - Quận 1', DATEADD(DAY, -10, GETDATE()), N'Đã thanh toán', N'Gói VIP Diamond toàn hệ thống'),
-('HD2026-002', 2, N'Võ Lê Ngọc Hưng', N'Gia hạn gói 3 Tháng', 1350000, 100000, 1250000, N'Tiền mặt', 'letan1', N'CN02 - Tân Bình', DATEADD(DAY, -5, GETDATE()), N'Đã thanh toán', N'Khuyến mãi voucher 100k'),
-('HD2026-003', 4, N'Trần Minh Quân', N'Đăng ký Gói PT 1:1', 7500000, 500000, 7000000, N'Chuyển khoản VietQR', 'letan1', N'CN01 - Quận 1', DATEADD(DAY, -3, GETDATE()), N'Đã thanh toán', N'30 buổi cùng HLV Trần Tuấn Kiệt'),
-('HD2026-004', 5, N'Hoàng Thùy Linh', N'Thuê tủ Locker 6 tháng', 600000, 0, 600000, N'Tiền mặt', 'letan1', N'CN02 - Tân Bình', DATEADD(DAY, -2, GETDATE()), N'Đã thanh toán', N'Locker VIP A12'),
-('HD2026-005', 6, N'Đỗ Minh Trí', N'Đăng ký gói 6 Tháng', 2500000, 200000, 2300000, N'Chuyển khoản VietQR', 'admin', N'CN02 - Tân Bình', DATEADD(DAY, -1, GETDATE()), N'Đã thanh toán', N'Khách VIP hệ thống');
+('HD2026-001', 1, N'Lê Anh Duy', N'Đăng ký gói tập VIP Năm', 4500000.00, 0.00, 4500000.00, N'Chuyển khoản VietQR', 'letan1', N'CN01 - Quận 1', DATEADD(DAY, -10, GETDATE()), N'Đã thanh toán', N'Gói VIP Diamond toàn hệ thống'),
+('HD2026-002', 2, N'Võ Lê Ngọc Hưng', N'Gia hạn gói 3 Tháng', 1350000.00, 100000.00, 1250000.00, N'Tiền mặt', 'letan1', N'CN02 - Tân Bình', DATEADD(DAY, -5, GETDATE()), N'Đã thanh toán', N'Khuyến mãi voucher 100k'),
+('HD2026-003', 4, N'Trần Minh Quân', N'Đăng ký Gói PT 1:1', 7500000.00, 500000.00, 7000000.00, N'Chuyển khoản VietQR', 'letan1', N'CN01 - Quận 1', DATEADD(DAY, -3, GETDATE()), N'Đã thanh toán', N'30 buổi cùng HLV Trần Tuấn Kiệt'),
+('HD2026-004', 5, N'Hoàng Thùy Linh', N'Thuê tủ Locker 6 tháng', 600000.00, 0.00, 600000.00, N'Tiền mặt', 'letan1', N'CN02 - Tân Bình', DATEADD(DAY, -2, GETDATE()), N'Đã thanh toán', N'Locker VIP A12'),
+('HD2026-005', 6, N'Đỗ Minh Trí', N'Đăng ký gói 6 Tháng', 2500000.00, 200000.00, 2300000.00, N'Chuyển khoản VietQR', 'admin', N'CN02 - Tân Bình', DATEADD(DAY, -1, GETDATE()), N'Đã thanh toán', N'Khách VIP hệ thống');
 GO

@@ -8,194 +8,125 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
+/**
+ * Thực thể Hội viên phòng tập (Hỗ trợ mã thẻ QR định danh và phân quyền chi nhánh)
+ */
 @Entity
-@Table(
-   name = "HoiVien"
-)
-public class HoiVien {
-   @Id
-   @GeneratedValue(
-      strategy = GenerationType.IDENTITY
-   )
-   @Column(
-      name = "MaHoiVien"
-   )
-   private int maHoiVien;
-   @Column(
-      name = "MaTheQR",
-      unique = true
-   )
-   private String maTheQR;
-   @Column(
-      name = "HoTen"
-   )
-   private String hoTen;
-   @Column(
-      name = "ChiNhanhDangKy"
-   )
-   private String chiNhanhDangKy;
-   @Column(
-      name = "NgayHetHan"
-   )
-   @Temporal(TemporalType.DATE)
-   private Date ngayHetHan;
-   @Column(
-      name = "TrangThai"
-   )
-   private String trangThai;
+@Table(name = "HoiVien")
+public class HoiVien implements Serializable {
 
-   public HoiVien() {
-   }
+    private static final long serialVersionUID = 1L;
 
-   public HoiVien(int maHoiVien, String maTheQR, String hoTen, String chiNhanhDangKy, Date ngayHetHan, String trangThai) {
-      this.maHoiVien = maHoiVien;
-      this.maTheQR = maTheQR;
-      this.hoTen = hoTen;
-      this.chiNhanhDangKy = chiNhanhDangKy;
-      this.ngayHetHan = ngayHetHan;
-      this.trangThai = trangThai;
-   }
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "MaHoiVien")
+    private int maHoiVien;
 
-   public int getMaHoiVien() {
-      return this.maHoiVien;
-   }
+    @Column(name = "MaTheQR", unique = true, nullable = false, length = 50)
+    private String maTheQR;
 
-   public void setMaHoiVien(int maHoiVien) {
-      this.maHoiVien = maHoiVien;
-   }
+    @Column(name = "HoTen", nullable = false, length = 100)
+    private String hoTen;
 
-   public String getMaTheQR() {
-      return this.maTheQR;
-   }
+    @Column(name = "ChiNhanhDangKy", length = 100)
+    private String chiNhanhDangKy;
 
-   public void setMaTheQR(String maTheQR) {
-      this.maTheQR = maTheQR;
-   }
+    @Column(name = "NgayHetHan", nullable = false)
+    @Temporal(TemporalType.DATE)
+    private Date ngayHetHan;
 
-   public String getHoTen() {
-      return this.hoTen;
-   }
+    @Column(name = "TrangThai", length = 30)
+    private String trangThai;
 
-   public void setHoTen(String hoTen) {
-      this.hoTen = hoTen;
-   }
+    public HoiVien() {
+    }
 
-   public String getChiNhanhDangKy() {
-      return this.chiNhanhDangKy;
-   }
+    public HoiVien(int maHoiVien, String maTheQR, String hoTen, String chiNhanhDangKy, Date ngayHetHan, String trangThai) {
+        this.maHoiVien = maHoiVien;
+        this.maTheQR = maTheQR;
+        this.hoTen = hoTen;
+        this.chiNhanhDangKy = chiNhanhDangKy;
+        this.ngayHetHan = ngayHetHan;
+        this.trangThai = trangThai;
+    }
 
-   public void setChiNhanhDangKy(String chiNhanhDangKy) {
-      this.chiNhanhDangKy = chiNhanhDangKy;
-   }
+    public int getMaHoiVien() {
+        return maHoiVien;
+    }
 
-   public Date getNgayHetHan() {
-      return this.ngayHetHan;
-   }
+    public void setMaHoiVien(int maHoiVien) {
+        this.maHoiVien = maHoiVien;
+    }
 
-   public void setNgayHetHan(Date ngayHetHan) {
-      this.ngayHetHan = ngayHetHan;
-   }
+    public String getMaTheQR() {
+        return maTheQR;
+    }
 
-   public String getTrangThai() {
-      return this.trangThai;
-   }
+    public void setMaTheQR(String maTheQR) {
+        this.maTheQR = maTheQR;
+    }
 
-   public void setTrangThai(String trangThai) {
-      this.trangThai = trangThai;
-   }
+    public String getHoTen() {
+        return hoTen;
+    }
 
-   public boolean equals(Object o) {
-      if (o == this) {
-         return true;
-      } else if (!(o instanceof HoiVien)) {
-         return false;
-      } else {
-         HoiVien other = (HoiVien)o;
-         if (!other.canEqual(this)) {
-            return false;
-         } else if (this.getMaHoiVien() != other.getMaHoiVien()) {
-            return false;
-         } else {
-            Object this$maTheQR = this.getMaTheQR();
-            Object other$maTheQR = other.getMaTheQR();
-            if (this$maTheQR == null) {
-               if (other$maTheQR != null) {
-                  return false;
-               }
-            } else if (!this$maTheQR.equals(other$maTheQR)) {
-               return false;
-            }
+    public void setHoTen(String hoTen) {
+        this.hoTen = hoTen;
+    }
 
-            Object this$hoTen = this.getHoTen();
-            Object other$hoTen = other.getHoTen();
-            if (this$hoTen == null) {
-               if (other$hoTen != null) {
-                  return false;
-               }
-            } else if (!this$hoTen.equals(other$hoTen)) {
-               return false;
-            }
+    public String getChiNhanhDangKy() {
+        return chiNhanhDangKy;
+    }
 
-            Object this$chiNhanhDangKy = this.getChiNhanhDangKy();
-            Object other$chiNhanhDangKy = other.getChiNhanhDangKy();
-            if (this$chiNhanhDangKy == null) {
-               if (other$chiNhanhDangKy != null) {
-                  return false;
-               }
-            } else if (!this$chiNhanhDangKy.equals(other$chiNhanhDangKy)) {
-               return false;
-            }
+    public void setChiNhanhDangKy(String chiNhanhDangKy) {
+        this.chiNhanhDangKy = chiNhanhDangKy;
+    }
 
-            Object this$ngayHetHan = this.getNgayHetHan();
-            Object other$ngayHetHan = other.getNgayHetHan();
-            if (this$ngayHetHan == null) {
-               if (other$ngayHetHan != null) {
-                  return false;
-               }
-            } else if (!this$ngayHetHan.equals(other$ngayHetHan)) {
-               return false;
-            }
+    public Date getNgayHetHan() {
+        return ngayHetHan;
+    }
 
-            Object this$trangThai = this.getTrangThai();
-            Object other$trangThai = other.getTrangThai();
-            if (this$trangThai == null) {
-               if (other$trangThai != null) {
-                  return false;
-               }
-            } else if (!this$trangThai.equals(other$trangThai)) {
-               return false;
-            }
+    public void setNgayHetHan(Date ngayHetHan) {
+        this.ngayHetHan = ngayHetHan;
+    }
 
-            return true;
-         }
-      }
-   }
+    public String getTrangThai() {
+        return trangThai;
+    }
 
-   protected boolean canEqual(Object other) {
-      return other instanceof HoiVien;
-   }
+    public void setTrangThai(String trangThai) {
+        this.trangThai = trangThai;
+    }
 
-   public int hashCode() {
-      int PRIME = 59;
-      int result = 1;
-      result = result * 59 + this.getMaHoiVien();
-      Object $maTheQR = this.getMaTheQR();
-      result = result * 59 + ($maTheQR == null ? 43 : $maTheQR.hashCode());
-      Object $hoTen = this.getHoTen();
-      result = result * 59 + ($hoTen == null ? 43 : $hoTen.hashCode());
-      Object $chiNhanhDangKy = this.getChiNhanhDangKy();
-      result = result * 59 + ($chiNhanhDangKy == null ? 43 : $chiNhanhDangKy.hashCode());
-      Object $ngayHetHan = this.getNgayHetHan();
-      result = result * 59 + ($ngayHetHan == null ? 43 : $ngayHetHan.hashCode());
-      Object $trangThai = this.getTrangThai();
-      result = result * 59 + ($trangThai == null ? 43 : $trangThai.hashCode());
-      return result;
-   }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        HoiVien hoiVien = (HoiVien) o;
+        if (maHoiVien > 0 && hoiVien.maHoiVien > 0) {
+            return maHoiVien == hoiVien.maHoiVien;
+        }
+        return Objects.equals(maTheQR, hoiVien.maTheQR);
+    }
 
-   public String toString() {
-      int var10000 = this.getMaHoiVien();
-      return "HoiVien(maHoiVien=" + var10000 + ", maTheQR=" + this.getMaTheQR() + ", hoTen=" + this.getHoTen() + ", chiNhanhDangKy=" + this.getChiNhanhDangKy() + ", ngayHetHan=" + String.valueOf(this.getNgayHetHan()) + ", trangThai=" + this.getTrangThai() + ")";
-   }
+    @Override
+    public int hashCode() {
+        return maHoiVien > 0 ? Objects.hash(maHoiVien) : Objects.hash(maTheQR);
+    }
+
+    @Override
+    public String toString() {
+        return "HoiVien{" +
+                "maHoiVien=" + maHoiVien +
+                ", maTheQR='" + maTheQR + '\'' +
+                ", hoTen='" + hoTen + '\'' +
+                ", chiNhanhDangKy='" + chiNhanhDangKy + '\'' +
+                ", ngayHetHan=" + ngayHetHan +
+                ", trangThai='" + trangThai + '\'' +
+                '}';
+    }
 }

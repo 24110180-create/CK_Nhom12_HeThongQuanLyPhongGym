@@ -19,7 +19,7 @@ public class GoiTap {
     @Column(name = "ThoiHanThang")
     private int thoiHanThang;
 
-    @Column(name = "GiaTien")
+    @Column(name = "GiaTien", columnDefinition = "DECIMAL(18,2)")
     private double giaTien;
 
     @Column(name = "PhamVi", length = 100)

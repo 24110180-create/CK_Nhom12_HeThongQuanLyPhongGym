@@ -221,18 +221,18 @@ public class MainDashboard extends JFrame {
         ));
 
         // Trái: Tên thương hiệu & phân hệ
-        JPanel brandGroup = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
+        JPanel brandGroup = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         brandGroup.setOpaque(false);
 
         JLabel lblLogo = new JLabel("FITLIFE GYM");
-        lblLogo.setFont(new Font("Segoe UI", Font.BOLD, 17));
+        lblLogo.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblLogo.setForeground(Color.WHITE);
 
         JLabel lblDivider = new JLabel("|");
-        lblDivider.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblDivider.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         lblDivider.setForeground(new Color(71, 85, 105));
 
-        JLabel lblSubBrand = new JLabel("Quản Trị Chủ Hệ Thống");
+        JLabel lblSubBrand = new JLabel("Chủ Hệ Thống");
         lblSubBrand.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblSubBrand.setForeground(new Color(148, 163, 184));
 
@@ -241,54 +241,31 @@ public class MainDashboard extends JFrame {
         brandGroup.add(lblSubBrand);
         navBar.add(brandGroup, BorderLayout.WEST);
 
-        // Giữa: 5 Trụ Cột Điều Hành (Pillar Tabs)
-        pnlOwnerPillarsBar = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 0));
+        // Giữa: 5 Trụ Cột Điều Hành (Pillar Tabs) - Hiển thị đầy đủ tất cả các tab
+        pnlOwnerPillarsBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
         pnlOwnerPillarsBar.setOpaque(false);
         rebuildPillarsBar();
         navBar.add(pnlOwnerPillarsBar, BorderLayout.CENTER);
 
         // Phải: Chuyển vai trò, thông tin người dùng và nút đăng xuất
-        JPanel userGroup = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        JPanel userGroup = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         userGroup.setOpaque(false);
 
-        JLabel lblBranchSwitch = new JLabel("Cơ sở:");
-        lblBranchSwitch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        lblBranchSwitch.setForeground(new Color(148, 163, 184));
-
-        JComboBox<String> cbBranchScope = new JComboBox<>(new String[]{
-                "🏢 Toàn hệ thống (2 cơ sở)",
-                "📍 CN01 - Quận 1 (Flagship)",
-                "📍 CN02 - Tân Bình (Premium)"
-        });
-        cbBranchScope.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        cbBranchScope.setBackground(new Color(30, 41, 59));
-        cbBranchScope.setForeground(Color.WHITE);
-        cbBranchScope.setPreferredSize(new Dimension(195, 32));
-        cbBranchScope.addActionListener(e -> {
-            int idx = cbBranchScope.getSelectedIndex();
-            if (idx == 1) Auth.chiNhanhDangChon = "CN01 - Quận 1";
-            else if (idx == 2) Auth.chiNhanhDangChon = "CN02 - Tân Bình";
-            else Auth.chiNhanhDangChon = "Toàn hệ thống";
-            if (activeOwnerModule != null) {
-                loadOwnerModule(activeOwnerModule);
-            }
-        });
-
         JLabel lblSwitch = new JLabel("Góc nhìn:");
-        lblSwitch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblSwitch.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblSwitch.setForeground(new Color(148, 163, 184));
 
         JComboBox<String> cbViewMode = new JComboBox<>(new String[]{
                 "Chủ Phòng",
                 "Trạm Lễ Tân",
-                "Trạm Huấn Luyện Viên",
+                "Trạm HLV",
                 "Trạm Quản Lý",
-                "Giao Diện Hội Viên"
+                "Hội Viên VIP"
         });
-        cbViewMode.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        cbViewMode.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         cbViewMode.setBackground(new Color(30, 41, 59));
         cbViewMode.setForeground(Color.WHITE);
-        cbViewMode.setPreferredSize(new Dimension(160, 32));
+        cbViewMode.setPreferredSize(new Dimension(120, 30));
         cbViewMode.addActionListener(e -> {
             int sel = cbViewMode.getSelectedIndex();
             if (sel == 1) buildStaffWorkstationLayout("Lễ tân");
@@ -306,8 +283,6 @@ public class MainDashboard extends JFrame {
 
         JButton btnLogout = createLogoutButton();
 
-        userGroup.add(lblBranchSwitch);
-        userGroup.add(cbBranchScope);
         userGroup.add(lblSwitch);
         userGroup.add(cbViewMode);
         userGroup.add(lblUser);
@@ -362,11 +337,11 @@ public class MainDashboard extends JFrame {
                 }
             };
             btnPillar.setText(p.name);
-            btnPillar.setFont(new Font("Segoe UI", isActive ? Font.BOLD : Font.PLAIN, 13));
+            btnPillar.setFont(new Font("Segoe UI", isActive ? Font.BOLD : Font.PLAIN, 12));
             btnPillar.setForeground(isActive ? Color.WHITE : new Color(148, 163, 184));
             btnPillar.setBackground(isActive ? new Color(30, 41, 59) : new Color(15, 23, 42));
             btnPillar.setFocusPainted(false);
-            btnPillar.setBorder(new EmptyBorder(0, 14, 0, 14));
+            btnPillar.setBorder(new EmptyBorder(0, 10, 0, 10));
             btnPillar.setPreferredSize(new Dimension(btnPillar.getPreferredSize().width, 52));
             btnPillar.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
@@ -509,6 +484,36 @@ public class MainDashboard extends JFrame {
         ));
         btnRefresh.addActionListener(e -> loadOwnerModule(activeOwnerModule));
 
+        JLabel lblBranch = new JLabel("Chi nhánh:");
+        lblBranch.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        lblBranch.setForeground(new Color(71, 85, 105));
+
+        JComboBox<String> cbBranchScope = new JComboBox<>(new String[]{
+                "Toàn hệ thống (2 cơ sở)",
+                "CN01 - Quận 1 (Flagship)",
+                "CN02 - Tân Bình (Premium)"
+        });
+        cbBranchScope.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        cbBranchScope.setPreferredSize(new Dimension(175, 28));
+        if ("CN01 - Quận 1".equals(Auth.chiNhanhDangChon)) {
+            cbBranchScope.setSelectedIndex(1);
+        } else if ("CN02 - Tân Bình".equals(Auth.chiNhanhDangChon)) {
+            cbBranchScope.setSelectedIndex(2);
+        } else {
+            cbBranchScope.setSelectedIndex(0);
+        }
+        cbBranchScope.addActionListener(e -> {
+            int idx = cbBranchScope.getSelectedIndex();
+            if (idx == 1) Auth.chiNhanhDangChon = "CN01 - Quận 1";
+            else if (idx == 2) Auth.chiNhanhDangChon = "CN02 - Tân Bình";
+            else Auth.chiNhanhDangChon = "Toàn hệ thống";
+            if (activeOwnerModule != null) {
+                loadOwnerModule(activeOwnerModule);
+            }
+        });
+
+        pnlRightActions.add(lblBranch);
+        pnlRightActions.add(cbBranchScope);
         pnlRightActions.add(btnPopout);
         pnlRightActions.add(btnRefresh);
         pnlOwnerSubRibbon.add(pnlRightActions, BorderLayout.EAST);

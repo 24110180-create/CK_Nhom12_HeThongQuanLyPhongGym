@@ -251,6 +251,29 @@ public class MainDashboard extends JFrame {
         JPanel userGroup = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         userGroup.setOpaque(false);
 
+        JLabel lblBranchSwitch = new JLabel("Cơ sở:");
+        lblBranchSwitch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblBranchSwitch.setForeground(new Color(148, 163, 184));
+
+        JComboBox<String> cbBranchScope = new JComboBox<>(new String[]{
+                "🏢 Toàn hệ thống (2 cơ sở)",
+                "📍 CN01 - Quận 1 (Flagship)",
+                "📍 CN02 - Tân Bình (Premium)"
+        });
+        cbBranchScope.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        cbBranchScope.setBackground(new Color(30, 41, 59));
+        cbBranchScope.setForeground(Color.WHITE);
+        cbBranchScope.setPreferredSize(new Dimension(195, 32));
+        cbBranchScope.addActionListener(e -> {
+            int idx = cbBranchScope.getSelectedIndex();
+            if (idx == 1) Auth.chiNhanhDangChon = "CN01 - Quận 1";
+            else if (idx == 2) Auth.chiNhanhDangChon = "CN02 - Tân Bình";
+            else Auth.chiNhanhDangChon = "Toàn hệ thống";
+            if (activeOwnerModule != null) {
+                loadOwnerModule(activeOwnerModule);
+            }
+        });
+
         JLabel lblSwitch = new JLabel("Góc nhìn:");
         lblSwitch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblSwitch.setForeground(new Color(148, 163, 184));
@@ -283,6 +306,8 @@ public class MainDashboard extends JFrame {
 
         JButton btnLogout = createLogoutButton();
 
+        userGroup.add(lblBranchSwitch);
+        userGroup.add(cbBranchScope);
         userGroup.add(lblSwitch);
         userGroup.add(cbViewMode);
         userGroup.add(lblUser);
@@ -582,7 +607,7 @@ public class MainDashboard extends JFrame {
         lblAvatar.setOpaque(true);
         lblAvatar.setPreferredSize(new Dimension(38, 38));
 
-        JPanel profileText = new JPanel(new GridLayout(2, 1, 0, 2));
+        JPanel profileText = new JPanel(new GridLayout(3, 1, 0, 2));
         profileText.setOpaque(false);
         JLabel lblStaff = new JLabel(staffName);
         lblStaff.setFont(new Font("Segoe UI", Font.BOLD, 13));
@@ -592,8 +617,14 @@ public class MainDashboard extends JFrame {
         lblShift.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblShift.setForeground(new Color(52, 211, 153));
 
+        String staffBranch = (Auth.chiNhanh != null && !Auth.chiNhanh.isEmpty()) ? Auth.chiNhanh : "CN01 - Quận 1";
+        JLabel lblBranch = new JLabel("📍 " + staffBranch);
+        lblBranch.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        lblBranch.setForeground(new Color(148, 163, 184));
+
         profileText.add(lblStaff);
         profileText.add(lblShift);
+        profileText.add(lblBranch);
         profileBox.add(lblAvatar, BorderLayout.WEST);
         profileBox.add(profileText, BorderLayout.CENTER);
 

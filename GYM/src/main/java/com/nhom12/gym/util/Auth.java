@@ -10,6 +10,8 @@ public class Auth {
     public static volatile String tenDangNhap = null;
     public static volatile String vaiTro = null;
     public static volatile String hoTen = null;
+    public static volatile String chiNhanh = "Toàn hệ thống";
+    public static volatile String chiNhanhDangChon = "Toàn hệ thống";
     public static volatile boolean isOffline = false;
     private static volatile TaiKhoan currentUser = null;
 
@@ -23,6 +25,8 @@ public class Auth {
             tenDangNhap = tk.getTenDangNhap();
             vaiTro = tk.getVaiTro();
             hoTen = tk.getHoTen();
+            chiNhanh = tk.getChiNhanh() != null ? tk.getChiNhanh() : "Toàn hệ thống";
+            chiNhanhDangChon = chiNhanh;
             isOffline = offline;
         } else {
             clear();
@@ -31,6 +35,18 @@ public class Auth {
 
     public static TaiKhoan getCurrentUser() {
         return currentUser;
+    }
+
+    public static String getChiNhanhHienTai() {
+        if (chiNhanhDangChon != null && !chiNhanhDangChon.trim().isEmpty()) {
+            return chiNhanhDangChon;
+        }
+        return chiNhanh != null ? chiNhanh : "Toàn hệ thống";
+    }
+
+    public static boolean isToanHeThong() {
+        String curr = getChiNhanhHienTai();
+        return curr == null || curr.toLowerCase().contains("toàn hệ thống") || curr.toLowerCase().contains("tất cả");
     }
 
     public static boolean isLogin() {
@@ -62,6 +78,8 @@ public class Auth {
         tenDangNhap = null;
         vaiTro = null;
         hoTen = null;
+        chiNhanh = "Toàn hệ thống";
+        chiNhanhDangChon = "Toàn hệ thống";
         isOffline = false;
     }
 }

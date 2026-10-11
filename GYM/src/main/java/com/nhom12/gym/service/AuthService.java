@@ -74,15 +74,15 @@ public class AuthService {
         if (PasswordUtil.checkPassword(pass, hashedDefault)) {
             TaiKhoan offlineTK = null;
             if ("admin".equalsIgnoreCase(user)) {
-                offlineTK = new TaiKhoan("admin", hashedDefault, "Chủ", "Võ Anh Đức (Chủ Hệ Thống)");
+                offlineTK = new TaiKhoan("admin", hashedDefault, "Chủ", "Võ Anh Đức (Chủ Hệ Thống)", "Toàn hệ thống");
             } else if ("letan1".equalsIgnoreCase(user)) {
-                offlineTK = new TaiKhoan("letan1", hashedDefault, "Lễ tân", "Nguyễn Thị Linh (Lễ Tân CN01)");
+                offlineTK = new TaiKhoan("letan1", hashedDefault, "Lễ tân", "Nguyễn Thị Linh (Lễ Tân CN01)", "CN01 - Quận 1");
             } else if ("hlv1".equalsIgnoreCase(user)) {
-                offlineTK = new TaiKhoan("hlv1", hashedDefault, "HLV", "Trần Tuấn Kiệt (HLV Trưởng)");
+                offlineTK = new TaiKhoan("hlv1", hashedDefault, "HLV", "Trần Tuấn Kiệt (HLV Trưởng)", "CN01 - Quận 1");
             } else if ("quanly1".equalsIgnoreCase(user)) {
-                offlineTK = new TaiKhoan("quanly1", hashedDefault, "Quản lý", "Lê Thanh Sơn (Quản Lý)");
+                offlineTK = new TaiKhoan("quanly1", hashedDefault, "Quản lý", "Lê Thanh Sơn (Quản Lý Chi Nhánh)", "CN02 - Tân Bình");
             } else if ("hoivien1".equalsIgnoreCase(user)) {
-                offlineTK = new TaiKhoan("hoivien1", hashedDefault, "Hội viên", "Lê Anh Duy (Hội Viên VIP)");
+                offlineTK = new TaiKhoan("hoivien1", hashedDefault, "Hội viên", "Lê Anh Duy (Hội Viên VIP)", "CN01 - Quận 1");
             }
 
             if (offlineTK != null) {

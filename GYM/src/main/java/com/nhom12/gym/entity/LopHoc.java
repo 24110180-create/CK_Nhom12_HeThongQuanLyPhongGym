@@ -28,6 +28,9 @@ public class LopHoc {
     @Column(name = "PhongTap", length = 50)
     private String phongTap;
 
+    @Column(name = "ChiNhanh", length = 50)
+    private String chiNhanh = "CN01 - Quận 1";
+
     @Column(name = "SiSoToiDa")
     private int siSoToiDa;
 
@@ -38,12 +41,17 @@ public class LopHoc {
     }
 
     public LopHoc(String maLop, String tenLop, String boMon, String huanLuyenVien, String thoiGian, String phongTap, int siSoToiDa, int siSoHienTai) {
+        this(maLop, tenLop, boMon, huanLuyenVien, thoiGian, phongTap, "CN01 - Quận 1", siSoToiDa, siSoHienTai);
+    }
+
+    public LopHoc(String maLop, String tenLop, String boMon, String huanLuyenVien, String thoiGian, String phongTap, String chiNhanh, int siSoToiDa, int siSoHienTai) {
         this.maLop = maLop;
         this.tenLop = tenLop;
         this.boMon = boMon;
         this.huanLuyenVien = huanLuyenVien;
         this.thoiGian = thoiGian;
         this.phongTap = phongTap;
+        this.chiNhanh = chiNhanh != null ? chiNhanh : "CN01 - Quận 1";
         this.siSoToiDa = siSoToiDa;
         this.siSoHienTai = siSoHienTai;
     }
@@ -110,5 +118,13 @@ public class LopHoc {
 
     public void setSiSoHienTai(int siSoHienTai) {
         this.siSoHienTai = siSoHienTai;
+    }
+
+    public String getChiNhanh() {
+        return chiNhanh;
+    }
+
+    public void setChiNhanh(String chiNhanh) {
+        this.chiNhanh = chiNhanh != null ? chiNhanh : "CN01 - Quận 1";
     }
 }

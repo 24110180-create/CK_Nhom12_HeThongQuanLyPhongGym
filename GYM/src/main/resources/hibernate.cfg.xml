@@ -19,6 +19,7 @@
         <property name="hibernate.hbm2ddl.auto">update</property>
 
         <!-- Khai báo đầy đủ các class Entity -->
+        <mapping class="com.nhom12.gym.entity.ChiNhanh"/>
         <mapping class="com.nhom12.gym.entity.HoiVien"/>
         <mapping class="com.nhom12.gym.entity.TaiKhoan"/>
         <mapping class="com.nhom12.gym.entity.GoiTap"/>

@@ -47,6 +47,7 @@ public class HibernateUtil {
         if (sessionFactory == null) {
             try {
                 Configuration cfg = new Configuration().configure();
+                cfg.addAnnotatedClass(ChiNhanh.class);
                 cfg.addAnnotatedClass(TaiKhoan.class);
                 cfg.addAnnotatedClass(HoiVien.class);
                 cfg.addAnnotatedClass(GoiTap.class);

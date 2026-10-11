@@ -24,28 +24,46 @@ DROP TABLE IF EXISTS HuanLuyenVien;
 DROP TABLE IF EXISTS GoiTap;
 DROP TABLE IF EXISTS HoiVien;
 DROP TABLE IF EXISTS TaiKhoan;
+DROP TABLE IF EXISTS ChiNhanh;
 GO
 
--- 2. BẢNG TÀI KHOẢN HỆ THỐNG (PHÂN QUYỀN 5 VAI TRÒ CHUẨN - MẬT KHẨU BĂM SHA-256 / BCRYPT)
--- Mật khẩu sử dụng VARCHAR(255) để lưu trữ an toàn các định dạng mã băm mật khẩu
+-- 2. BẢNG CHI NHÁNH CƠ SỞ (CORE DOMAIN - MÔ HÌNH CHUỖI ĐA CHI NHÁNH FITLIFE GYM)
+CREATE TABLE ChiNhanh (
+    MaChiNhanh VARCHAR(30) PRIMARY KEY, -- 'CN01', 'CN02'
+    TenChiNhanh NVARCHAR(100) NOT NULL,
+    DiaChi NVARCHAR(255) NOT NULL,
+    SoDienThoai VARCHAR(20),
+    QuanLyPhuTrach NVARCHAR(100),
+    SucChuaToiDa INT DEFAULT 150,
+    TrangThai NVARCHAR(30) DEFAULT N'Đang hoạt động'
+);
+GO
+
+INSERT INTO ChiNhanh (MaChiNhanh, TenChiNhanh, DiaChi, SoDienThoai, QuanLyPhuTrach, SucChuaToiDa, TrangThai) VALUES
+('CN01', N'FitLife Flagship - Quận 1', N'123 Nguyễn Thị Minh Khai, P. Bến Thành, Quận 1, TP.HCM', '028 3822 1234', N'Lê Thanh Sơn', 180, N'Đang hoạt động'),
+('CN02', N'FitLife Premium - Tân Bình', N'45 Hoàng Hoa Thám, Phường 13, Quận Tân Bình, TP.HCM', '028 3810 5678', N'Phan Hoàng Long', 120, N'Đang hoạt động');
+GO
+
+-- 3. BẢNG TÀI KHOẢN HỆ THỐNG (PHÂN QUYỀN 5 VAI TRÒ CHUẨN - MẬT KHẨU BĂM SHA-256 / BCRYPT)
 CREATE TABLE TaiKhoan (
     TenDangNhap VARCHAR(50) PRIMARY KEY,
-    MatKhau VARCHAR(255) NOT NULL, -- Mật khẩu băm chuẩn an toàn SHA-256 (64 hex characters) / BCrypt (60 chars)
-    VaiTro NVARCHAR(50) NOT NULL, -- 'Chủ', 'Lễ tân', 'HLV', 'Quản lý', 'Hội viên'
-    HoTen NVARCHAR(100) NOT NULL
+    MatKhau VARCHAR(255) NOT NULL, -- Mật khẩu băm chuẩn an toàn SHA-256 / BCrypt
+    VaiTro NVARCHAR(50) NOT NULL,  -- 'Chủ', 'Lễ tân', 'HLV', 'Quản lý', 'Hội viên'
+    HoTen NVARCHAR(100) NOT NULL,
+    ChiNhanh NVARCHAR(100) DEFAULT N'Toàn hệ thống' -- Chi nhánh phân công công tác
 );
 GO
 
 -- Mật khẩu ban đầu mặc định cho 5 vai trò là '123456' (Đã băm SHA-256: 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92)
-INSERT INTO TaiKhoan (TenDangNhap, MatKhau, VaiTro, HoTen) VALUES 
-('admin',    '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Chủ',      N'Võ Anh Đức (Chủ Hệ Thống)'),
-('letan1',   '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Lễ tân',   N'Nguyễn Thị Linh (Lễ Tân CN01)'),
-('hlv1',     '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'HLV',      N'Trần Tuấn Kiệt (HLV Trưởng)'),
-('quanly1',  '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Quản lý',  N'Lê Thanh Sơn (Quản Lý Chi Nhánh)'),
-('hoivien1', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Hội viên', N'Lê Anh Duy (Hội Viên VIP Diamond)');
+INSERT INTO TaiKhoan (TenDangNhap, MatKhau, VaiTro, HoTen, ChiNhanh) VALUES 
+('admin',    '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Chủ',      N'Võ Anh Đức (Chủ Hệ Thống)', N'Toàn hệ thống'),
+('letan1',   '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Lễ tân',   N'Nguyễn Thị Linh (Lễ Tân CN01)', N'CN01 - Quận 1'),
+('hlv1',     '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'HLV',      N'Trần Tuấn Kiệt (HLV Trưởng)', N'CN01 - Quận 1'),
+('quanly1',  '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Quản lý',  N'Lê Thanh Sơn (Quản Lý Chi Nhánh)', N'CN02 - Tân Bình'),
+('hoivien1', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Hội viên', N'Lê Anh Duy (Hội Viên VIP Diamond)', N'CN01 - Quận 1');
 GO
 
--- 3. BẢNG HỘI VIÊN (HỖ TRỢ MÃ QR/BARCODE VÀ QUẢN LÝ GÓI TẬP)
+-- 4. BẢNG HỘI VIÊN (HỖ TRỢ MÃ QR/BARCODE VÀ QUẢN LÝ GÓI TẬP)
 CREATE TABLE HoiVien (
     MaHoiVien INT IDENTITY(1,1) PRIMARY KEY,
     MaTheQR VARCHAR(50) UNIQUE NOT NULL,
@@ -108,7 +126,7 @@ INSERT INTO HuanLuyenVien (MaHLV, HoTen, SoDienThoai, ChuyenMon, KinhNghiemNam, 
 ('HLV05', N'Đặng Minh Trí', '0977889900', N'CrossFit & Phục hồi cơ', 7, N'CN02 - Tân Bình', N'Ca sáng (06:00 - 14:00)', 4.9, N'Đang làm việc');
 GO
 
--- 6. BẢNG LỚP HỌC THEO LỊCH (YOGA, ZUMBA, PILATES, CARDIO)
+-- 7. BẢNG LỚP HỌC THEO LỊCH (YOGA, ZUMBA, PILATES, CARDIO)
 CREATE TABLE LopHoc (
     MaLop VARCHAR(30) PRIMARY KEY,
     TenLop NVARCHAR(100) NOT NULL,
@@ -116,17 +134,18 @@ CREATE TABLE LopHoc (
     HuanLuyenVien NVARCHAR(100),
     ThoiGian NVARCHAR(100),
     PhongTap NVARCHAR(100),
+    ChiNhanh NVARCHAR(50) DEFAULT N'CN01 - Quận 1',
     SiSoToiDa INT DEFAULT 20,
     SiSoHienTai INT DEFAULT 0
 );
 GO
 
-INSERT INTO LopHoc (MaLop, TenLop, BoMon, HuanLuyenVien, ThoiGian, PhongTap, SiSoToiDa, SiSoHienTai) VALUES
-('LH01', N'Yoga Trị Liệu Cột Sống', N'Yoga', N'Nguyễn Thu Thảo', N'06:30 - 07:30 (T2-T4-T6)', N'Studio 1 (Tầng 2)', 20, 18),
-('LH02', N'Zumba Cardio Đốt Mỡ', N'Zumba', N'Lê Mai Hương', N'18:00 - 19:00 (T3-T5-T7)', N'Studio 2 (Tầng 2)', 25, 22),
-('LH03', N'Kickboxing Tự Vệ Nâng Cao', N'Boxing', N'Phan Thanh Sơn', N'19:15 - 20:15 (T2-T4-T6)', N'Khu Võ Thuật Ring A', 15, 12),
-('LH04', N'HIIT Cardio Kháng Lực', N'Cardio', N'Trần Tuấn Kiệt', N'07:00 - 08:00 (T3-T5)', N'Khu Functional', 15, 10),
-('LH05', N'Pilates Dẻo Dai & Thon Gọn', N'Pilates', N'Nguyễn Thu Thảo', N'17:30 - 18:30 (T2-T4-T6)', N'Studio 1 (Tầng 2)', 18, 15);
+INSERT INTO LopHoc (MaLop, TenLop, BoMon, HuanLuyenVien, ThoiGian, PhongTap, ChiNhanh, SiSoToiDa, SiSoHienTai) VALUES
+('LH01', N'Yoga Trị Liệu Cột Sống', N'Yoga', N'Nguyễn Thu Thảo', N'06:30 - 07:30 (T2-T4-T6)', N'Studio 1 (Tầng 2)', N'CN01 - Quận 1', 20, 18),
+('LH02', N'Zumba Cardio Đốt Mỡ', N'Zumba', N'Lê Mai Hương', N'18:00 - 19:00 (T3-T5-T7)', N'Studio 2 (Tầng 2)', N'CN01 - Quận 1', 25, 22),
+('LH03', N'Kickboxing Tự Vệ Nâng Cao', N'Boxing', N'Phan Thanh Sơn', N'19:15 - 20:15 (T2-T4-T6)', N'Khu Võ Thuật Ring A', N'CN02 - Tân Bình', 15, 12),
+('LH04', N'HIIT Cardio Kháng Lực', N'Cardio', N'Trần Tuấn Kiệt', N'07:00 - 08:00 (T3-T5)', N'Khu Functional', N'CN02 - Tân Bình', 15, 10),
+('LH05', N'Pilates Dẻo Dai & Thon Gọn', N'Pilates', N'Nguyễn Thu Thảo', N'17:30 - 18:30 (T2-T4-T6)', N'Studio 1 (Tầng 2)', N'CN01 - Quận 1', 18, 15);
 GO
 
 -- 7. BẢNG ĐĂNG KÝ VÀ ĐIỂM DANH LỚP HỌC (QUẢN LÝ BỞI DangKyLopDAO)

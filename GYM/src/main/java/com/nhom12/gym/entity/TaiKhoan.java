@@ -29,14 +29,22 @@ public class TaiKhoan implements Serializable {
     @Column(name = "HoTen", length = 100, nullable = false)
     private String hoTen;
 
+    @Column(name = "ChiNhanh", length = 100)
+    private String chiNhanh = "Toàn hệ thống";
+
     public TaiKhoan() {
     }
 
     public TaiKhoan(String tenDangNhap, String matKhau, String vaiTro, String hoTen) {
+        this(tenDangNhap, matKhau, vaiTro, hoTen, "Toàn hệ thống");
+    }
+
+    public TaiKhoan(String tenDangNhap, String matKhau, String vaiTro, String hoTen, String chiNhanh) {
         this.tenDangNhap = tenDangNhap;
         this.matKhau = matKhau;
         this.vaiTro = vaiTro;
         this.hoTen = hoTen;
+        this.chiNhanh = chiNhanh != null ? chiNhanh : "Toàn hệ thống";
     }
 
     public String getTenDangNhap() {
@@ -69,6 +77,14 @@ public class TaiKhoan implements Serializable {
 
     public void setHoTen(String hoTen) {
         this.hoTen = hoTen;
+    }
+
+    public String getChiNhanh() {
+        return chiNhanh;
+    }
+
+    public void setChiNhanh(String chiNhanh) {
+        this.chiNhanh = chiNhanh != null ? chiNhanh : "Toàn hệ thống";
     }
 
     @Override

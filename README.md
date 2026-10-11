@@ -58,7 +58,7 @@ Yêu cầu trước khi chạy:
 
 Bước 1: Cài đặt cơ sở dữ liệu
 1. Mở SQL Server Management Studio (SSMS).
-2. Mở file Database.sql tại thư mục gốc của dự án.
+2. Mở file Database.sql trong thư mục GYM/database/ của dự án.
 3. Chọn Execute (F5) để tạo Database 'FitLifeGym' và nạp dữ liệu mẫu.
 
 Bước 2: Cấu hình kết nối
@@ -69,7 +69,7 @@ Kiểm tra và sửa username/password phù hợp với tài khoản SQL Server 
 
 Bước 3: Khởi chạy ứng dụng
 Chọn 1 trong 3 cách:
-- Cách 1: Click đúp vào file run.bat tại thư mục gốc để chạy nhanh.
+- Cách 1: Click đúp vào file run.bat trong thư mục GYM để chạy nhanh.
 - Cách 2: Sử dụng lệnh Maven qua terminal:
   cd GYM
   mvn clean compile

@@ -1,4 +1,8 @@
-﻿oracleJdk-27/
+target/
 .idea/
+*.iml
+.vscode/
 __pycache__/
 *.pyc
+.DS_Store
+oracleJdk-27/

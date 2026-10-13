@@ -207,6 +207,23 @@ public class ValidationHelper {
         return true;
     }
 
+    public static boolean checkSoDuong(Component parent, JTextField field, String tenTruong) {
+        if (!checkRong(parent, field, tenTruong)) return false;
+        try {
+            double val = Double.parseDouble(field.getText().trim());
+            if (val <= 0) {
+                JOptionPane.showMessageDialog(parent, tenTruong + " phải lớn hơn 0!", "Lỗi Nhập Liệu", JOptionPane.WARNING_MESSAGE);
+                field.requestFocus();
+                return false;
+            }
+            return true;
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(parent, tenTruong + " phải là giá trị số hợp lệ!", "Lỗi Định Dạng Số", JOptionPane.WARNING_MESSAGE);
+            field.requestFocus();
+            return false;
+        }
+    }
+
     public static boolean checkNgaySinh(Component parent, JTextField field, int doTuoiToiThieu) {
         if (field == null) return false;
         String birthStr = field.getText().trim();

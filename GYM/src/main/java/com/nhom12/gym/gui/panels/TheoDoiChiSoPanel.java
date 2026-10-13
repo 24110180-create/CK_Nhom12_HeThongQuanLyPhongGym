@@ -351,8 +351,11 @@ public class TheoDoiChiSoPanel extends JPanel {
         if (cur != null) cbHoiVien.setSelectedItem(cur);
     }
 
-    private void calculateBMI() {
+    private boolean calculateBMI() {
         try {
+            if (!com.nhom12.gym.util.ValidationHelper.checkSoDuong(this, txtChieuCao, "Chiều cao (cm)")) return false;
+            if (!com.nhom12.gym.util.ValidationHelper.checkSoDuong(this, txtCanNang, "Cân nặng (kg)")) return false;
+
             double h = Double.parseDouble(txtChieuCao.getText().trim()) / 100.0;
             double w = Double.parseDouble(txtCanNang.getText().trim());
             double bmi = w / (h * h);
@@ -376,18 +379,32 @@ public class TheoDoiChiSoPanel extends JPanel {
             lblBMI.setText("Chỉ số BMI: " + df.format(bmi));
             lblDanhGia.setText("Thể trạng: " + status);
             lblDanhGia.setForeground(col);
+            return true;
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập Chiều cao (cm) và Cân nặng (kg) hợp lệ!", "Lỗi nhập liệu", JOptionPane.WARNING_MESSAGE);
+            return false;
         }
     }
 
     private void actionThem() {
-        String code = txtMaDo.getText().trim().toUpperCase();
-        if (code.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập Mã Đo InBody!", "Thiếu thông tin", JOptionPane.WARNING_MESSAGE);
+        if (!com.nhom12.gym.util.ValidationHelper.checkRong(this, txtMaDo, "Mã Đo InBody")) {
+            return;
+        }
+        if (cbHoiVien.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn hội viên cần đo InBody!", "Thiếu thông tin", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (!com.nhom12.gym.util.ValidationHelper.checkSoDuong(this, txtCo, "Khối lượng cơ (kg)")) {
+            return;
+        }
+        if (!com.nhom12.gym.util.ValidationHelper.checkSoDuong(this, txtMo, "Tỷ lệ mỡ (%)")) {
+            return;
+        }
+        if (!calculateBMI()) {
             return;
         }
 
+        String code = txtMaDo.getText().trim().toUpperCase();
         for (int i = 0; i < model.getRowCount(); i++) {
             if (model.getValueAt(i, 0).toString().equalsIgnoreCase(code)) {
                 JOptionPane.showMessageDialog(this, "Mã đo '" + code + "' đã tồn tại!", "Trùng mã", JOptionPane.ERROR_MESSAGE);
@@ -395,7 +412,6 @@ public class TheoDoiChiSoPanel extends JPanel {
             }
         }
 
-        calculateBMI();
         String dateStr = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
         String member = cbHoiVien.getSelectedItem().toString().split(" \\(")[0];
         String bmiStr = lblBMI.getText().replace("Chỉ số BMI: ", "");
@@ -423,9 +439,21 @@ public class TheoDoiChiSoPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn bản đo trong bảng để cập nhật!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int mr = table.convertRowIndexToModel(sel);
+        if (cbHoiVien.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn hội viên!", "Thiếu thông tin", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (!com.nhom12.gym.util.ValidationHelper.checkSoDuong(this, txtCo, "Khối lượng cơ (kg)")) {
+            return;
+        }
+        if (!com.nhom12.gym.util.ValidationHelper.checkSoDuong(this, txtMo, "Tỷ lệ mỡ (%)")) {
+            return;
+        }
+        if (!calculateBMI()) {
+            return;
+        }
 
-        calculateBMI();
+        int mr = table.convertRowIndexToModel(sel);
         String member = cbHoiVien.getSelectedItem().toString().split(" \\(")[0];
         String bmiStr = lblBMI.getText().replace("Chỉ số BMI: ", "");
         String statusStr = lblDanhGia.getText().replace("Thể trạng: ", "").split(" \\(")[0];

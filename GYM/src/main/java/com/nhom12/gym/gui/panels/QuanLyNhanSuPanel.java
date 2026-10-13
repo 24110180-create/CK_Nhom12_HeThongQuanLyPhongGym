@@ -698,7 +698,10 @@ public class QuanLyNhanSuPanel extends JPanel {
                         String fn = (tk.getHoTen() != null && !tk.getHoTen().trim().isEmpty()) ? tk.getHoTen() : tk.getTenDangNhap();
                         double base = "HLV".equalsIgnoreCase(r) ? 14000000 : ("Quản lý".equalsIgnoreCase(r) ? 18000000 : 7500000);
                         double bonus = "HLV".equalsIgnoreCase(r) ? 3500000 : 1500000;
-                        staffList.add(new StaffDetail(tk.getTenDangNhap(), fn, r, b, "Ca xoay linh hoạt", "0909112233", base, bonus, "5.0 ⭐ (Xuất sắc)", "Đang làm việc"));
+                        String phoneVal = tk.getTenDangNhap().matches("^0[35789][0-9]{8}$")
+                                ? tk.getTenDangNhap()
+                                : String.format("09%08d", Math.abs(tk.getTenDangNhap().hashCode()) % 100000000);
+                        staffList.add(new StaffDetail(tk.getTenDangNhap(), fn, r, b, "Ca xoay linh hoạt", phoneVal, base, bonus, "5.0 ⭐ (Xuất sắc)", "Đang làm việc"));
                     }
                 }
             }
@@ -803,8 +806,16 @@ public class QuanLyNhanSuPanel extends JPanel {
         String rating = (String) cbRating.getSelectedItem();
         String status = (String) cbStatus.getSelectedItem();
 
-        if (username.isEmpty() || fullName.isEmpty() || phone.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ Tên đăng nhập, Họ tên và Số điện thoại!", "Thiếu Thông Tin", JOptionPane.WARNING_MESSAGE);
+        if (!com.nhom12.gym.util.ValidationHelper.checkRong(this, txtUsername, "Tên Đăng Nhập")) {
+            return;
+        }
+        if (!com.nhom12.gym.util.ValidationHelper.checkRong(this, txtFullName, "Họ và Tên")) {
+            return;
+        }
+        if (!com.nhom12.gym.util.ValidationHelper.checkSoDienThoai(this, txtPhone)) {
+            return;
+        }
+        if (!com.nhom12.gym.util.ValidationHelper.checkSoDuong(this, txtBaseSalary, "Lương Cơ Bản")) {
             return;
         }
 
@@ -820,7 +831,7 @@ public class QuanLyNhanSuPanel extends JPanel {
             }
         }
 
-        double baseSalary = salaryStr.isEmpty() ? 7500000 : Double.parseDouble(salaryStr);
+        double baseSalary = Double.parseDouble(salaryStr);
         double kpiBonus = kpiStr.isEmpty() ? 1500000 : Double.parseDouble(kpiStr);
 
         StaffDetail newStaff = new StaffDetail(username, fullName, role, branch, shift, phone, baseSalary, kpiBonus, rating, status);
@@ -854,6 +865,16 @@ public class QuanLyNhanSuPanel extends JPanel {
         int modelRow = table.convertRowIndexToModel(selected);
         String username = (String) model.getValueAt(modelRow, 0);
 
+        if (!com.nhom12.gym.util.ValidationHelper.checkRong(this, txtFullName, "Họ và Tên")) {
+            return;
+        }
+        if (!com.nhom12.gym.util.ValidationHelper.checkSoDienThoai(this, txtPhone)) {
+            return;
+        }
+        if (!com.nhom12.gym.util.ValidationHelper.checkSoDuong(this, txtBaseSalary, "Lương Cơ Bản")) {
+            return;
+        }
+
         String fullName = txtFullName.getText().trim();
         String phone = txtPhone.getText().trim();
         String role = (String) cbRole.getSelectedItem();
@@ -864,12 +885,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         String rating = (String) cbRating.getSelectedItem();
         String status = (String) cbStatus.getSelectedItem();
 
-        if (fullName.isEmpty() || phone.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Họ tên và số điện thoại không được để trống!", "Cảnh Báo", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        double baseSalary = salaryStr.isEmpty() ? 7500000 : Double.parseDouble(salaryStr);
+        double baseSalary = Double.parseDouble(salaryStr);
         double kpiBonus = kpiStr.isEmpty() ? 1500000 : Double.parseDouble(kpiStr);
 
         for (StaffDetail s : staffList) {
@@ -1099,25 +1115,26 @@ public class QuanLyNhanSuPanel extends JPanel {
     }
 
     private void moDialogDieuDongChiNhanh() {
-        int selected = table.getSelectedRow();
-        if (selected == -1) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn một nhân sự cần điều động chi nhánh!", "Chưa chọn nhân sự", JOptionPane.WARNING_MESSAGE);
+        if (staffList.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Danh sách nhân sự hiện đang trống!", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        int modelRow = table.convertRowIndexToModel(selected);
-        String username = (String) model.getValueAt(modelRow, 0);
 
-        StaffDetail staff = null;
-        for (StaffDetail s : staffList) {
-            if (s.username.equalsIgnoreCase(username)) {
-                staff = s;
-                break;
+        int selected = table.getSelectedRow();
+        int initialIndex = 0;
+        if (selected != -1) {
+            int modelRow = table.convertRowIndexToModel(selected);
+            String u = (String) model.getValueAt(modelRow, 0);
+            for (int i = 0; i < staffList.size(); i++) {
+                if (staffList.get(i).username.equalsIgnoreCase(u)) {
+                    initialIndex = i;
+                    break;
+                }
             }
         }
-        if (staff == null) return;
 
         JDialog dlg = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "ĐIỀU ĐỘNG & BIỆT PHÁI NHÂN SỰ LIÊN CHI NHÁNH (ANH ĐỨC)", true);
-        dlg.setSize(520, 420);
+        dlg.setSize(580, 480);
         dlg.setLocationRelativeTo(this);
         dlg.setLayout(new BorderLayout(15, 15));
         ((JPanel) dlg.getContentPane()).setBorder(new EmptyBorder(20, 24, 20, 24));
@@ -1139,17 +1156,24 @@ public class QuanLyNhanSuPanel extends JPanel {
         pForm.setOpaque(false);
 
         pForm.add(new JLabel("Nhân sự điều động:"));
-        JLabel lblStaffName = new JLabel("<html><b>" + staff.fullName + "</b> (" + staff.username + " - " + staff.role + ")</html>");
-        pForm.add(lblStaffName);
+        String[] staffNames = new String[staffList.size()];
+        for (int i = 0; i < staffList.size(); i++) {
+            StaffDetail s = staffList.get(i);
+            staffNames[i] = s.fullName + " (" + s.username + " - " + s.role + ")";
+        }
+        JComboBox<String> cbStaffPicker = new JComboBox<>(staffNames);
+        cbStaffPicker.setSelectedIndex(initialIndex);
+        pForm.add(cbStaffPicker);
 
         pForm.add(new JLabel("Cơ sở hiện tại:"));
-        JLabel lblCurrentBranch = new JLabel("<html><font color='#0284c7'><b>" + staff.branch + "</b></font> (" + staff.shift + ")</html>");
+        StaffDetail curStaff = staffList.get(initialIndex);
+        JLabel lblCurrentBranch = new JLabel("<html><font color='#0284c7'><b>" + curStaff.branch + "</b></font> (" + curStaff.shift + ")</html>");
         pForm.add(lblCurrentBranch);
 
         pForm.add(new JLabel("Cơ sở điều động đến (*):"));
         JComboBox<String> cbNewBranch = new JComboBox<>(new String[]{"CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)", "Toàn hệ thống"});
-        if (staff.branch.contains("CN01")) cbNewBranch.setSelectedIndex(1);
-        else if (staff.branch.contains("CN02")) cbNewBranch.setSelectedIndex(0);
+        if (curStaff.branch.contains("CN01")) cbNewBranch.setSelectedIndex(1);
+        else if (curStaff.branch.contains("CN02")) cbNewBranch.setSelectedIndex(0);
         else cbNewBranch.setSelectedIndex(0);
         pForm.add(cbNewBranch);
 
@@ -1160,12 +1184,24 @@ public class QuanLyNhanSuPanel extends JPanel {
                 "Ca hành chính (08:00 - 17:00)",
                 "Ca xoay linh hoạt"
         });
-        cbNewShift.setSelectedItem(staff.shift);
+        cbNewShift.setSelectedItem(curStaff.shift);
         pForm.add(cbNewShift);
 
-        pForm.add(new JLabel("Lý do điều động / Ghi chú:"));
+        pForm.add(new JLabel("Lý do điều động / Ghi chú (*):"));
         JTextField txtReason = new JTextField("Điều phối tăng cường nhân lực theo kế hoạch chuỗi của Anh Đức");
         pForm.add(txtReason);
+
+        // Lắng nghe đổi nhân sự trong danh sách
+        cbStaffPicker.addActionListener(e -> {
+            int idx = cbStaffPicker.getSelectedIndex();
+            if (idx >= 0 && idx < staffList.size()) {
+                StaffDetail s = staffList.get(idx);
+                lblCurrentBranch.setText("<html><font color='#0284c7'><b>" + s.branch + "</b></font> (" + s.shift + ")</html>");
+                if (s.branch.contains("CN01")) cbNewBranch.setSelectedIndex(1);
+                else if (s.branch.contains("CN02")) cbNewBranch.setSelectedIndex(0);
+                cbNewShift.setSelectedItem(s.shift);
+            }
+        });
 
         dlg.add(pForm, BorderLayout.CENTER);
 
@@ -1176,17 +1212,26 @@ public class QuanLyNhanSuPanel extends JPanel {
         btnConfirm.setBackground(new Color(16, 185, 129));
         btnConfirm.setForeground(Color.WHITE);
 
-        StaffDetail finalStaff = staff;
         btnConfirm.addActionListener(e -> {
+            int staffIdx = cbStaffPicker.getSelectedIndex();
+            if (staffIdx < 0 || staffIdx >= staffList.size()) return;
+            StaffDetail targetStaff = staffList.get(staffIdx);
+
+            String reason = txtReason.getText().trim();
+            if (reason.isEmpty()) {
+                JOptionPane.showMessageDialog(dlg, "Vui lòng nhập lý do điều động / ghi chú!", "Thiếu thông tin", JOptionPane.WARNING_MESSAGE);
+                txtReason.requestFocus();
+                return;
+            }
+
             String newBranch = (String) cbNewBranch.getSelectedItem();
             String newShift = (String) cbNewShift.getSelectedItem();
-            String reason = txtReason.getText().trim();
 
-            finalStaff.branch = newBranch;
-            finalStaff.shift = newShift;
+            targetStaff.branch = newBranch;
+            targetStaff.shift = newShift;
 
             // Cập nhật CSDL
-            TaiKhoan tk = taiKhoanDAO.timTheoTenDangNhap(finalStaff.username);
+            TaiKhoan tk = taiKhoanDAO.timTheoTenDangNhap(targetStaff.username);
             if (tk != null) {
                 tk.setChiNhanh(newBranch);
                 taiKhoanDAO.capNhat(tk);
@@ -1194,11 +1239,12 @@ public class QuanLyNhanSuPanel extends JPanel {
 
             loadTableData();
             updateKpiMetrics();
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
             dlg.dispose();
             JOptionPane.showMessageDialog(this,
                     "<html><body>" +
                             "<h3 style='color: #10B981;'>ĐIỀU ĐỘNG NHÂN SỰ THÀNH CÔNG!</h3>" +
-                            "<p>Nhân sự: <b>" + finalStaff.fullName + "</b> (" + finalStaff.username + ")</p>" +
+                            "<p>Nhân sự: <b>" + targetStaff.fullName + "</b> (" + targetStaff.username + ")</p>" +
                             "<p>Cơ sở mới: <b>" + newBranch + "</b></p>" +
                             "<p>Ca trực: <b>" + newShift + "</b></p>" +
                             "<p>Lý do: <i>" + reason + "</i></p>" +
@@ -1217,62 +1263,75 @@ public class QuanLyNhanSuPanel extends JPanel {
     }
 
     private void moDialogHoSoChiTiet() {
-        int selected = table.getSelectedRow();
-        if (selected == -1) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn nhân sự trong danh sách để xem hồ sơ chi tiết!", "Chưa chọn nhân sự", JOptionPane.WARNING_MESSAGE);
+        if (staffList.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Danh sách nhân sự hiện đang trống!", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        int modelRow = table.convertRowIndexToModel(selected);
-        String username = (String) model.getValueAt(modelRow, 0);
 
-        StaffDetail staff = null;
-        for (StaffDetail s : staffList) {
-            if (s.username.equalsIgnoreCase(username)) {
-                staff = s;
-                break;
+        int selected = table.getSelectedRow();
+        int initialIndex = 0;
+        if (selected != -1) {
+            int modelRow = table.convertRowIndexToModel(selected);
+            String u = (String) model.getValueAt(modelRow, 0);
+            for (int i = 0; i < staffList.size(); i++) {
+                if (staffList.get(i).username.equalsIgnoreCase(u)) {
+                    initialIndex = i;
+                    break;
+                }
             }
         }
-        if (staff == null) return;
 
-        JDialog dlg = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "HỒ SƠ NHÂN SỰ CHI TIẾT - " + staff.fullName, true);
-        dlg.setSize(580, 520);
+        JDialog dlg = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "HỒ SƠ NHÂN SỰ CHI TIẾT", true);
+        dlg.setSize(620, 560);
         dlg.setLocationRelativeTo(this);
         dlg.setLayout(new BorderLayout(15, 15));
-        ((JPanel) dlg.getContentPane()).setBorder(new EmptyBorder(20, 24, 20, 24));
+        ((JPanel) dlg.getContentPane()).setBorder(new EmptyBorder(18, 22, 18, 22));
         dlg.getContentPane().setBackground(Color.WHITE);
 
-        // Header Avatar & Badge
+        // Header Panel: Selector + Avatar + Name
+        JPanel pHeaderContainer = new JPanel(new BorderLayout(0, 12));
+        pHeaderContainer.setOpaque(false);
+
+        // Thanh chọn nhân sự nhanh
+        JPanel pSelectRow = new JPanel(new BorderLayout(8, 0));
+        pSelectRow.setOpaque(false);
+        JLabel lSelect = new JLabel("Xem hồ sơ nhân sự:");
+        lSelect.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lSelect.setForeground(new Color(71, 85, 105));
+        pSelectRow.add(lSelect, BorderLayout.WEST);
+
+        String[] staffNames = new String[staffList.size()];
+        for (int i = 0; i < staffList.size(); i++) {
+            StaffDetail s = staffList.get(i);
+            staffNames[i] = s.fullName + " (" + s.username + " - " + s.role + ")";
+        }
+        JComboBox<String> cbChooser = new JComboBox<>(staffNames);
+        cbChooser.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        cbChooser.setSelectedIndex(initialIndex);
+        pSelectRow.add(cbChooser, BorderLayout.CENTER);
+        pHeaderContainer.add(pSelectRow, BorderLayout.NORTH);
+
+        // Avatar + Name
         JPanel pTop = new JPanel(new BorderLayout(15, 0));
         pTop.setOpaque(false);
         pTop.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(226, 232, 240)),
-                new EmptyBorder(0, 0, 14, 0)
+                new EmptyBorder(0, 0, 12, 0)
         ));
 
-        String initials = "AD";
-        if (staff.fullName != null && !staff.fullName.trim().isEmpty()) {
-            String[] parts = staff.fullName.trim().split("\\s+");
-            if (parts.length == 1) initials = parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
-            else initials = parts[0].substring(0, 1).toUpperCase() + parts[parts.length - 1].substring(0, 1).toUpperCase();
-        }
-
-        JLabel lblAv = new JLabel(initials, SwingConstants.CENTER);
+        JLabel lblAv = new JLabel("", SwingConstants.CENTER);
         lblAv.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblAv.setForeground(Color.WHITE);
         lblAv.setOpaque(true);
-        Color avBg = "Chủ".equalsIgnoreCase(staff.role) ? new Color(99, 102, 241) :
-                     ("Lễ tân".equalsIgnoreCase(staff.role) ? new Color(16, 185, 129) :
-                     ("HLV".equalsIgnoreCase(staff.role) ? new Color(245, 158, 11) : new Color(14, 165, 233)));
-        lblAv.setBackground(avBg);
-        lblAv.setPreferredSize(new Dimension(50, 50));
+        lblAv.setPreferredSize(new Dimension(52, 52));
 
         JPanel pName = new JPanel(new GridLayout(2, 1, 0, 3));
         pName.setOpaque(false);
-        JLabel lName = new JLabel(staff.fullName);
+        JLabel lName = new JLabel("");
         lName.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lName.setForeground(new Color(15, 23, 42));
 
-        JLabel lRoleSub = new JLabel("Vai trò: " + staff.role + " • Tài khoản: @" + staff.username + " • Trạng thái: " + staff.status);
+        JLabel lRoleSub = new JLabel("");
         lRoleSub.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lRoleSub.setForeground(new Color(100, 116, 139));
         pName.add(lName);
@@ -1280,21 +1339,65 @@ public class QuanLyNhanSuPanel extends JPanel {
 
         pTop.add(lblAv, BorderLayout.WEST);
         pTop.add(pName, BorderLayout.CENTER);
-        dlg.add(pTop, BorderLayout.NORTH);
+        pHeaderContainer.add(pTop, BorderLayout.SOUTH);
+        dlg.add(pHeaderContainer, BorderLayout.NORTH);
 
         // Center Details Grid
         JPanel pCenter = new JPanel(new GridLayout(7, 2, 10, 8));
         pCenter.setOpaque(false);
 
-        addProfileField(pCenter, "Cơ Sở Công Tác:", staff.branch);
-        addProfileField(pCenter, "Ca Trực Phân Công:", staff.shift);
-        addProfileField(pCenter, "Số Điện Thoại Liên Hệ:", staff.phone);
-        addProfileField(pCenter, "Đánh Giá Hiệu Suất:", staff.rating);
-        addProfileField(pCenter, "Lương Cứng Định Mức:", df.format(staff.baseSalary));
-        addProfileField(pCenter, "Thưởng KPI / Hoa Hồng:", df.format(staff.kpiBonus));
-        addProfileField(pCenter, "Tổng Thu Nhập Tháng:", df.format(staff.getTotalIncome()));
+        JLabel vBranch = new JLabel(); vBranch.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        JLabel vShift = new JLabel(); vShift.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        JLabel vPhone = new JLabel(); vPhone.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        JLabel vRating = new JLabel(); vRating.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        JLabel vBaseSalary = new JLabel(); vBaseSalary.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        JLabel vKpiBonus = new JLabel(); vKpiBonus.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        JLabel vTotalIncome = new JLabel(); vTotalIncome.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        vTotalIncome.setForeground(new Color(16, 185, 129));
+
+        addProfileFieldWithComponent(pCenter, "Cơ Sở Công Tác:", vBranch);
+        addProfileFieldWithComponent(pCenter, "Ca Trực Phân Công:", vShift);
+        addProfileFieldWithComponent(pCenter, "Số Điện Thoại Liên Hệ:", vPhone);
+        addProfileFieldWithComponent(pCenter, "Đánh Giá Hiệu Suất:", vRating);
+        addProfileFieldWithComponent(pCenter, "Lương Cứng Định Mức:", vBaseSalary);
+        addProfileFieldWithComponent(pCenter, "Thưởng KPI / Hoa Hồng:", vKpiBonus);
+        addProfileFieldWithComponent(pCenter, "Tổng Thu Nhập Tháng:", vTotalIncome);
 
         dlg.add(pCenter, BorderLayout.CENTER);
+
+        // Cập nhật nội dung hiển thị theo nhân sự
+        java.util.function.Consumer<StaffDetail> renderStaff = staff -> {
+            String initials = "NV";
+            if (staff.fullName != null && !staff.fullName.trim().isEmpty()) {
+                String[] parts = staff.fullName.trim().split("\\s+");
+                if (parts.length == 1) initials = parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
+                else initials = parts[0].substring(0, 1).toUpperCase() + parts[parts.length - 1].substring(0, 1).toUpperCase();
+            }
+            lblAv.setText(initials);
+            Color avBg = "Chủ".equalsIgnoreCase(staff.role) ? new Color(99, 102, 241) :
+                    ("Lễ tân".equalsIgnoreCase(staff.role) ? new Color(16, 185, 129) :
+                    ("HLV".equalsIgnoreCase(staff.role) ? new Color(245, 158, 11) : new Color(14, 165, 233)));
+            lblAv.setBackground(avBg);
+
+            lName.setText(staff.fullName);
+            lRoleSub.setText("Vai trò: " + staff.role + " • Tài khoản: @" + staff.username + " • Trạng thái: " + staff.status);
+            vBranch.setText(staff.branch);
+            vShift.setText(staff.shift);
+            vPhone.setText(staff.phone);
+            vRating.setText(staff.rating);
+            vBaseSalary.setText(df.format(staff.baseSalary));
+            vKpiBonus.setText(df.format(staff.kpiBonus));
+            vTotalIncome.setText(df.format(staff.getTotalIncome()));
+        };
+
+        renderStaff.accept(staffList.get(initialIndex));
+
+        cbChooser.addActionListener(e -> {
+            int idx = cbChooser.getSelectedIndex();
+            if (idx >= 0 && idx < staffList.size()) {
+                renderStaff.accept(staffList.get(idx));
+            }
+        });
 
         JPanel pBot = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         pBot.setOpaque(false);
@@ -1306,6 +1409,14 @@ public class QuanLyNhanSuPanel extends JPanel {
         dlg.add(pBot, BorderLayout.SOUTH);
 
         dlg.setVisible(true);
+    }
+
+    private void addProfileFieldWithComponent(JPanel parent, String label, JLabel valComponent) {
+        JLabel l = new JLabel(label);
+        l.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        l.setForeground(new Color(71, 85, 105));
+        parent.add(l);
+        parent.add(valComponent);
     }
 
     private void addProfileField(JPanel parent, String label, String value) {
@@ -1322,24 +1433,183 @@ public class QuanLyNhanSuPanel extends JPanel {
     }
 
     private void moDialogTinhThuongKPI() {
-        int count = 0;
-        double totalBonus = 0;
-        for (StaffDetail s : staffList) {
-            if (s.rating.contains("5.0") || s.rating.contains("4.9") || s.rating.contains("4.8")) {
-                s.kpiBonus += 500000;
-                totalBonus += 500000;
-                count++;
-            }
+        if (staffList.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Danh sách nhân sự hiện đang trống!", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+            return;
         }
-        loadTableData();
-        updateKpiMetrics();
 
-        JOptionPane.showMessageDialog(this,
-                "<html><body>" +
-                        "<h3 style='color: #10B981;'>HOÀN TẤT DUYỆT THƯỞNG KPI HIỆU SUẤT!</h3>" +
-                        "<p>Đã duyệt thưởng thêm <b>+500,000 VNĐ</b> cho <b>" + count + "</b> nhân sự đạt đánh giá xuất sắc (>= 4.8⭐).</p>" +
-                        "<p>Tổng ngân sách khen thưởng: <b>" + df.format(totalBonus) + "</b></p>" +
-                        "</body></html>",
-                "Khen Thưởng KPI", JOptionPane.INFORMATION_MESSAGE);
+        JDialog dlg = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "TÍNH TOÁN & PHÊ DUYỆT THƯỞNG KPI HIỆU SUẤT (ANH ĐỨC)", true);
+        dlg.setSize(860, 560);
+        dlg.setLocationRelativeTo(this);
+        dlg.setLayout(new BorderLayout(14, 14));
+        ((JPanel) dlg.getContentPane()).setBorder(new EmptyBorder(16, 20, 16, 20));
+        dlg.getContentPane().setBackground(Color.WHITE);
+
+        // Header Panel
+        JPanel pHead = new JPanel(new BorderLayout(0, 6));
+        pHead.setOpaque(false);
+        JLabel title = new JLabel("HỆ THỐNG XÉT DUYỆT & ĐỒNG BỘ THƯỞNG HIỆU SUẤT KPI");
+        title.setFont(new Font("Segoe UI", Font.BOLD, 17));
+        title.setForeground(new Color(15, 23, 42));
+
+        JLabel subtitle = new JLabel("Tự động phân bổ mức thưởng dựa trên Rating công việc & vai trò nhân sự trong toàn hệ thống");
+        subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        subtitle.setForeground(new Color(100, 116, 139));
+
+        pHead.add(title, BorderLayout.NORTH);
+        pHead.add(subtitle, BorderLayout.SOUTH);
+        dlg.add(pHead, BorderLayout.NORTH);
+
+        // Center Panel: Controls + Table Preview
+        JPanel pCenter = new JPanel(new BorderLayout(0, 10));
+        pCenter.setOpaque(false);
+
+        JPanel pFilterBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        pFilterBar.setOpaque(false);
+        JLabel lblPol = new JLabel("Chính sách khen thưởng:");
+        lblPol.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        JComboBox<String> cbPolicy = new JComboBox<>(new String[]{
+                "Chính sách 1: Bậc thang (+1,000,000đ cho 5.0⭐ | +500,000đ cho 4.8⭐-4.9⭐)",
+                "Chính sách 2: Đồng đều (+500,000đ cho toàn bộ nhân sự đạt từ 4.5⭐ trở lên)",
+                "Chính sách 3: Tỷ lệ (+10% Lương cơ bản cho nhân sự đạt từ 4.8⭐ trở lên)"
+        });
+        cbPolicy.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        pFilterBar.add(lblPol);
+        pFilterBar.add(cbPolicy);
+        pCenter.add(pFilterBar, BorderLayout.NORTH);
+
+        String[] cols = {"Tên Đăng Nhập", "Họ Và Tên", "Vai Trò", "Đánh Giá", "Lương Cứng", "KPI Hiện Tại", "Thưởng Thêm (+)", "Tổng Mới"};
+        DefaultTableModel previewModel = new DefaultTableModel(cols, 0) {
+            @Override
+            public boolean isCellEditable(int r, int c) { return false; }
+        };
+        JTable previewTable = new JTable(previewModel);
+        previewTable.setRowHeight(32);
+        previewTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        previewTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        previewTable.getTableHeader().setBackground(new Color(241, 245, 249));
+
+        pCenter.add(new JScrollPane(previewTable), BorderLayout.CENTER);
+        dlg.add(pCenter, BorderLayout.CENTER);
+
+        // Bottom Summary & Buttons
+        JPanel pBot = new JPanel(new BorderLayout(10, 8));
+        pBot.setOpaque(false);
+
+        JLabel lblSummary = new JLabel();
+        lblSummary.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblSummary.setForeground(new Color(16, 185, 129));
+        pBot.add(lblSummary, BorderLayout.WEST);
+
+        JPanel pActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        pActions.setOpaque(false);
+
+        JButton btnApply = new JButton("Áp Dụng Thưởng Vào Bảng Lương");
+        btnApply.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnApply.setBackground(new Color(16, 185, 129));
+        btnApply.setForeground(Color.WHITE);
+
+        JButton btnClose = new JButton("Đóng");
+        btnClose.addActionListener(e -> dlg.dispose());
+
+        pActions.add(btnApply);
+        pActions.add(btnClose);
+        pBot.add(pActions, BorderLayout.EAST);
+        dlg.add(pBot, BorderLayout.SOUTH);
+
+        // Hàm tính toán bảng preview
+        Runnable calculatePreview = () -> {
+            previewModel.setRowCount(0);
+            int policyIdx = cbPolicy.getSelectedIndex();
+            int eligibleCount = 0;
+            double totalBonusBudget = 0;
+
+            for (StaffDetail s : staffList) {
+                if ("Tạm khóa".equalsIgnoreCase(s.status)) {
+                    previewModel.addRow(new Object[]{
+                            s.username, s.fullName, s.role, s.rating,
+                            df.format(s.baseSalary), df.format(s.kpiBonus),
+                            "+0 VNĐ (Khóa)", df.format(s.getTotalIncome())
+                    });
+                    continue;
+                }
+
+                double addBonus = 0;
+                if (policyIdx == 0) { // Bậc thang
+                    if (s.rating.contains("5.0")) addBonus = 1000000;
+                    else if (s.rating.contains("4.8") || s.rating.contains("4.9")) addBonus = 500000;
+                } else if (policyIdx == 1) { // Đồng đều >= 4.5
+                    if (s.rating.contains("5.0") || s.rating.contains("4.9") || s.rating.contains("4.8") || s.rating.contains("4.5")) {
+                        addBonus = 500000;
+                    }
+                } else if (policyIdx == 2) { // 10% lương cơ bản >= 4.8
+                    if (s.rating.contains("5.0") || s.rating.contains("4.9") || s.rating.contains("4.8")) {
+                        addBonus = s.baseSalary * 0.10;
+                    }
+                }
+
+                if (addBonus > 0) {
+                    eligibleCount++;
+                    totalBonusBudget += addBonus;
+                }
+
+                double newTotal = s.baseSalary + s.kpiBonus + addBonus;
+                previewModel.addRow(new Object[]{
+                        s.username, s.fullName, s.role, s.rating,
+                        df.format(s.baseSalary), df.format(s.kpiBonus),
+                        "+" + df.format(addBonus), df.format(newTotal)
+                });
+            }
+
+            lblSummary.setText("<html>Đủ điều kiện thưởng: <b>" + eligibleCount + "/" + staffList.size() + " nhân sự</b> • Tổng ngân sách: <b>" + df.format(totalBonusBudget) + "</b></html>");
+        };
+
+        cbPolicy.addActionListener(e -> calculatePreview.run());
+        calculatePreview.run();
+
+        // Xử lý áp dụng thưởng
+        btnApply.addActionListener(e -> {
+            int policyIdx = cbPolicy.getSelectedIndex();
+            int count = 0;
+            double totalAdded = 0;
+
+            for (StaffDetail s : staffList) {
+                if ("Tạm khóa".equalsIgnoreCase(s.status)) continue;
+                double addBonus = 0;
+                if (policyIdx == 0) {
+                    if (s.rating.contains("5.0")) addBonus = 1000000;
+                    else if (s.rating.contains("4.8") || s.rating.contains("4.9")) addBonus = 500000;
+                } else if (policyIdx == 1) {
+                    if (s.rating.contains("5.0") || s.rating.contains("4.9") || s.rating.contains("4.8") || s.rating.contains("4.5")) {
+                        addBonus = 500000;
+                    }
+                } else if (policyIdx == 2) {
+                    if (s.rating.contains("5.0") || s.rating.contains("4.9") || s.rating.contains("4.8")) {
+                        addBonus = s.baseSalary * 0.10;
+                    }
+                }
+
+                if (addBonus > 0) {
+                    s.kpiBonus += addBonus;
+                    totalAdded += addBonus;
+                    count++;
+                }
+            }
+
+            loadTableData();
+            updateKpiMetrics();
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
+            dlg.dispose();
+
+            JOptionPane.showMessageDialog(this,
+                    "<html><body>" +
+                            "<h3 style='color: #10B981;'>HOÀN TẤT DUYỆT THƯỞNG KPI HIỆU SUẤT!</h3>" +
+                            "<p>Đã duyệt thưởng thành công cho <b>" + count + "</b> nhân sự đạt tiêu chuẩn.</p>" +
+                            "<p>Tổng ngân sách khen thưởng đã cộng vào bảng lương: <b>" + df.format(totalAdded) + "</b></p>" +
+                            "</body></html>",
+                    "Khen Thưởng KPI Thành Công", JOptionPane.INFORMATION_MESSAGE);
+        });
+
+        dlg.setVisible(true);
     }
 }

@@ -845,7 +845,7 @@ public class LichLopHocPanel extends JPanel {
         gbc.gridy = r++;
         JComboBox<String> cbHLV = new JComboBox<>(new String[]{
                 "Nguyễn Thu Thảo", "Lê Mai Hương", "Phan Thanh Sơn",
-                "Trần Tuấn Kiệt", "HLV John Smith", "HLV Phạm Quốc Bảo"
+                "Trần Tuấn Kiệt", "Phạm Quốc Bảo"
         });
         cbHLV.setFont(fontI);
         if (isEdit && lopCanSua.getHuanLuyenVien() != null) {

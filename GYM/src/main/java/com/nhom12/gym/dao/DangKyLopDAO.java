@@ -30,11 +30,22 @@ public class DangKyLopDAO {
 
     private static void khoiTaoDuLieuMauNeuTrong() {
         if (!memoryCache.isEmpty()) return;
-        memoryCache.add(new DangKyLop(1, "LH01", 1, "Lê Anh Duy", "0901234567", new Date(), "Đã điểm danh", "Đi học đúng giờ"));
-        memoryCache.add(new DangKyLop(2, "LH01", 2, "Võ Lê Ngọc Hưng", "0902345678", new Date(), "Đã điểm danh", "Mang thảm riêng"));
-        memoryCache.add(new DangKyLop(3, "LH01", 5, "Hoàng Thùy Linh", "0905678901", new Date(), "Chưa điểm danh", ""));
-        memoryCache.add(new DangKyLop(4, "LH02", 1, "Lê Anh Duy", "0901234567", new Date(), "Chưa điểm danh", ""));
-        memoryCache.add(new DangKyLop(5, "LH03", 4, "Trần Minh Quân", "0904567890", new Date(), "Đã điểm danh", "Đầy đủ găng tập"));
+        memoryCache.add(new DangKyLop(1, "LH01", 1, "Lê Anh Duy", "0974482749", new Date(), "Đã điểm danh", "Đi học đúng giờ"));
+        memoryCache.add(new DangKyLop(2, "LH01", 2, "Võ Lê Ngọc Hưng", "0912345678", new Date(), "Đã điểm danh", "Mang thảm riêng"));
+        memoryCache.add(new DangKyLop(3, "LH01", 5, "Hoàng Thùy Linh", "0977112233", new Date(), "Chưa điểm danh", ""));
+        memoryCache.add(new DangKyLop(4, "LH02", 1, "Lê Anh Duy", "0974482749", new Date(), "Chưa điểm danh", ""));
+        memoryCache.add(new DangKyLop(5, "LH03", 4, "Trần Minh Quân", "0933221100", new Date(), "Đã điểm danh", "Đầy đủ găng tập"));
+    }
+
+    public List<DangKyLop> layDanhSachTheoHoiVien(int maHoiVien) {
+        List<DangKyLop> all = layTatCa();
+        List<DangKyLop> res = new ArrayList<>();
+        for (DangKyLop dk : all) {
+            if (dk.getMaHoiVien() == maHoiVien) {
+                res.add(dk);
+            }
+        }
+        return res;
     }
 
     public List<DangKyLop> layTatCa() {
@@ -163,6 +174,52 @@ public class DangKyLopDAO {
             for (DangKyLop item : memoryCache) {
                 if (item.getId() == id) {
                     item.setTrangThaiDiemDanh(trangThai);
+                    com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public boolean capNhatGhiChu(int id, String ghiChu) {
+        SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf == null) {
+            for (DangKyLop item : memoryCache) {
+                if (item.getId() == id) {
+                    item.setGhiChu(ghiChu);
+                    com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        Transaction tx = null;
+        try (Session session = sf.openSession()) {
+            tx = session.beginTransaction();
+            DangKyLop dk = session.get(DangKyLop.class, id);
+            if (dk != null) {
+                dk.setGhiChu(ghiChu);
+                session.merge(dk);
+                tx.commit();
+
+                for (DangKyLop item : memoryCache) {
+                    if (item.getId() == id) {
+                        item.setGhiChu(ghiChu);
+                        break;
+                    }
+                }
+                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            LOGGER.log(Level.SEVERE, "Lỗi cập nhật ghi chú đăng ký lớp", e);
+            for (DangKyLop item : memoryCache) {
+                if (item.getId() == id) {
+                    item.setGhiChu(ghiChu);
                     com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
                     return true;
                 }

@@ -339,15 +339,41 @@ public class DangKyTaiKhoanDialog extends JDialog {
     }
 
     private void xuLyDangKy() {
+        if (!com.nhom12.gym.util.ValidationHelper.checkRong(this, txtFullName, "Họ và Tên")) {
+            return;
+        }
+        if (!com.nhom12.gym.util.ValidationHelper.checkRong(this, txtUsername, "Tên Đăng Nhập / Số Điện Thoại")) {
+            return;
+        }
+
         String fullName = txtFullName.getText().trim();
         String username = txtUsername.getText().trim();
         String pass = new String(txtPassword.getPassword()).trim();
         String confirmPass = new String(txtConfirmPassword.getPassword()).trim();
         String branch = (String) cbBranch.getSelectedItem();
 
-        if (fullName.isEmpty() || username.isEmpty() || pass.isEmpty() || confirmPass.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng điền đầy đủ các thông tin bắt buộc (*)", "Thiếu Thông Tin", JOptionPane.WARNING_MESSAGE);
+        if (pass.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập mật khẩu!", "Thiếu Mật Khẩu", JOptionPane.WARNING_MESSAGE);
+            txtPassword.requestFocus();
             return;
+        }
+
+        if (confirmPass.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập xác nhận mật khẩu!", "Thiếu Xác Nhận Mật Khẩu", JOptionPane.WARNING_MESSAGE);
+            txtConfirmPassword.requestFocus();
+            return;
+        }
+
+        // Kiểm tra quy chuẩn số điện thoại Việt Nam khi là Hội viên hoặc nhập dạng số
+        if ("Hội viên".equalsIgnoreCase(selectedRole.roleKey) || username.matches("^0[0-9]+$")) {
+            if (!com.nhom12.gym.util.ValidationHelper.isSoDienThoaiHopLe(username)) {
+                JOptionPane.showMessageDialog(this,
+                        "Số điện thoại không đúng quy chuẩn Việt Nam!\n" +
+                        "Vui lòng nhập đúng 10 chữ số bắt đầu bằng đầu số hợp lệ (03, 05, 07, 08, 09).",
+                        "Lỗi Định Dạng Số Điện Thoại", JOptionPane.WARNING_MESSAGE);
+                txtUsername.requestFocus();
+                return;
+            }
         }
 
         if (!pass.equals(confirmPass)) {

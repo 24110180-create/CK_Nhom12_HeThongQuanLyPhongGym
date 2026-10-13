@@ -61,8 +61,8 @@ public class QuanLyHoiVienHubPanel extends JPanel {
         JPanel tabSwitcher = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
         tabSwitcher.setOpaque(false);
 
-        btnTabList = createTabButton("📋 Danh Sách & Tra Cứu Hội Viên", true);
-        btnTabRegister = createTabButton("➕ Tiếp Nhận & Đăng Ký Mới", false);
+        btnTabList = createTabButton("Danh Sách & Tra Cứu Hội Viên", true);
+        btnTabRegister = createTabButton("+ Tiếp Nhận & Đăng Ký Mới", false);
 
         btnTabList.addActionListener(e -> selectTab(0));
         btnTabRegister.addActionListener(e -> selectTab(1));

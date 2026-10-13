@@ -67,8 +67,8 @@ public class HoiVienAppFrame extends JFrame {
         root.setBackground(new Color(248, 250, 252));
 
         Color accentColor = new Color(234, 179, 8); // Vàng Gold
-        String memberName = (Auth.hoTen != null && !Auth.hoTen.isEmpty()) ? Auth.hoTen : "Nguyễn Văn An";
-        String memberPhone = (Auth.soDienThoai != null && !Auth.soDienThoai.isEmpty()) ? Auth.soDienThoai : "0901234567";
+        String memberName = (Auth.hoTen != null && !Auth.hoTen.isEmpty()) ? Auth.hoTen : "Lê Anh Duy";
+        String memberPhone = (Auth.soDienThoai != null && !Auth.soDienThoai.isEmpty()) ? Auth.soDienThoai : "0974482749";
 
         // --- A. SIDEBAR DỌC BÊN TRÁI (275px) ---
         JPanel sidebar = new JPanel(new BorderLayout());

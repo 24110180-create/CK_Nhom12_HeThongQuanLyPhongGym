@@ -275,7 +275,7 @@ public class MainDashboard extends JFrame {
         headerRight.setOpaque(false);
 
         // Nút Đăng ký hội viên nhanh
-        JButton btnQuickRegister = new JButton("➕ Đăng Ký Hội Viên");
+        JButton btnQuickRegister = new JButton("+ Đăng Ký Hội Viên");
         btnQuickRegister.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnQuickRegister.setBackground(new Color(37, 99, 235));
         btnQuickRegister.setForeground(Color.WHITE);
@@ -310,7 +310,11 @@ public class MainDashboard extends JFrame {
             new QRScannerSimulatorDialog(top).setVisible(true);
         });
 
-        if (!"HLV".equalsIgnoreCase(role)) {
+        // Bỏ nút đăng ký hội viên ở header đối với role Quản lý, Lễ tân và HLV
+        boolean hideQuickRegister = "HLV".equalsIgnoreCase(role)
+                || "Lễ tân".equalsIgnoreCase(role)
+                || "Quản lý".equalsIgnoreCase(role);
+        if (!hideQuickRegister) {
             headerRight.add(btnQuickRegister);
         }
 
@@ -439,7 +443,7 @@ public class MainDashboard extends JFrame {
 
         addSidebarCategoryHeader(menuContainer, "Khách Hàng & Hội Viên");
         addSidebarItem(menuContainer, "Đăng Ký Hội Viên Mới", "Tiếp nhận hội viên mới & biểu phí thu ngân", () -> new DangKyHoiVienPanel(), accent, false);
-        addSidebarItem(menuContainer, "Quản Lý & Hồ Sơ Hội Viên", "Danh bạ thẻ QR & kiểm toán hồ sơ hội viên", () -> new QuanLyHoiVienHubPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý Hội Viên & Lớp Học", "Danh bạ thẻ QR, gói tập & liên kết ghi danh lớp", () -> new QuanLyHoiVienHubPanel(), accent, false);
 
         addSidebarCategoryHeader(menuContainer, "Chiến Lược Kinh Doanh");
         addSidebarItem(menuContainer, "Quản Lý Gói Tập & Giá Tiền", "Quyết định chính sách giá & bảng giá dịch vụ", () -> new QuanLyGoiTapPanel(), accent, false);
@@ -460,7 +464,7 @@ public class MainDashboard extends JFrame {
         addSidebarCategoryHeader(menuContainer, "Nghiệp Vụ Hội Viên");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên & cửa flap barrier", () -> new CheckInForm(), accent, true);
         addSidebarItem(menuContainer, "Đăng Ký Hội Viên Mới", "Biểu mẫu phát hành thẻ & thu phí VietQR", () -> new DangKyHoiVienPanel(), accent, false);
-        addSidebarItem(menuContainer, "Quản Lý & Hồ Sơ Hội Viên", "Danh bạ thẻ QR & tiếp nhận đăng ký mới", () -> new QuanLyHoiVienHubPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý Hội Viên & Lớp Học", "Danh bạ thẻ QR & tiếp nhận đăng ký mới", () -> new QuanLyHoiVienHubPanel(), accent, false);
         addSidebarItem(menuContainer, "Gia Hạn Gói Tập", "Nâng cấp gói tập & gia hạn thẻ", () -> new GiaHanGoiTapPanel(), accent, false);
 
         addSidebarCategoryHeader(menuContainer, "Dịch Vụ & Lớp Học");
@@ -486,7 +490,7 @@ public class MainDashboard extends JFrame {
         addSidebarCategoryHeader(menuContainer, "Vận Hành Quầy & Dịch Vụ");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên tại quầy", () -> new CheckInForm(), accent, true);
         addSidebarItem(menuContainer, "Đăng Ký Hội Viên Mới", "Tiếp nhận & phát hành thẻ hội viên mới", () -> new DangKyHoiVienPanel(), accent, false);
-        addSidebarItem(menuContainer, "Quản Lý & Hồ Sơ Hội Viên", "Hồ sơ hội viên & tiếp nhận đăng ký", () -> new QuanLyHoiVienHubPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý Hội Viên & Lớp Học", "Hồ sơ hội viên & tiếp nhận đăng ký", () -> new QuanLyHoiVienHubPanel(), accent, false);
         addSidebarItem(menuContainer, "Gia Hạn Gói Tập", "Nâng cấp gói & gia hạn thẻ", () -> new GiaHanGoiTapPanel(), accent, false);
         addSidebarItem(menuContainer, "Lịch Lớp Học & Điểm Danh", "Điều phối lớp nhóm & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Thu ngân quầy bar & sản phẩm", () -> new BanHangPOSPanel(), accent, false);

@@ -173,9 +173,9 @@ public class GhiChuTienDoPTPanel extends JPanel {
 
         String[] colsLog = new String[]{"Ngày Tập", "Nhóm Cơ", "Mức Tạ PR", "Nhận Xét Của HLV", "HLV Ghi"};
         Object[][] dataLog = new Object[][]{
-                {"28/09/2026", "Lưng - Xô", "Pull-up 8 reps", "Form kéo xô cải thiện rõ rệt", "John Smith"},
-                {"26/09/2026", "Chân - Mông", "Squat 70kg", "Cơ đùi khỏe, cần giãn cơ sau buổi", "John Smith"},
-                {"24/09/2026", "Ngực - Tay sau", "Bench Press 60kg", "Buổi tập hoàn thành đúng giáo án", "John Smith"}
+                {"28/09/2026", "Lưng - Xô", "Pull-up 8 reps", "Form kéo xô cải thiện rõ rệt", "Trần Tuấn Kiệt"},
+                {"26/09/2026", "Chân - Mông", "Squat 70kg", "Cơ đùi khỏe, cần giãn cơ sau buổi", "Trần Tuấn Kiệt"},
+                {"24/09/2026", "Ngực - Tay sau", "Bench Press 60kg", "Buổi tập hoàn thành đúng giáo án", "Trần Tuấn Kiệt"}
         };
         modelLog = new DefaultTableModel(dataLog, colsLog) {
             @Override
@@ -206,33 +206,44 @@ public class GhiChuTienDoPTPanel extends JPanel {
         });
 
         btnSave.addActionListener(e -> {
+            int sel = tableHV.getSelectedRow();
+            if (sel == -1) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 học viên từ danh sách bên trái!", "Chưa Chọn Học Viên", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            if (!com.nhom12.gym.util.ValidationHelper.checkRong(this, txtNhomCo, "Nhóm Cơ Mục Tiêu")) {
+                return;
+            }
+            if (!com.nhom12.gym.util.ValidationHelper.checkRong(this, txtPR, "Mức Tạ Kỷ Lục (PR)")) {
+                return;
+            }
+            if (txtNhanXet.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập nhận xét / thể trạng buổi tập!", "Thiếu Nhận Xét", JOptionPane.WARNING_MESSAGE);
+                txtNhanXet.requestFocus();
+                return;
+            }
+
             String muscle = txtNhomCo.getText().trim();
             String pr = txtPR.getText().trim();
             String note = txtNhanXet.getText().trim();
 
-            if (muscle.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng nhập nhóm cơ mục tiêu!", "Thông báo", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
             String dateStr = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
-            String trainerName = (com.nhom12.gym.util.Auth.hoTen != null && !com.nhom12.gym.util.Auth.hoTen.isEmpty()) ? com.nhom12.gym.util.Auth.hoTen : "HLV Phụ Trách";
+            String trainerName = (com.nhom12.gym.util.Auth.hoTen != null && !com.nhom12.gym.util.Auth.hoTen.isEmpty())
+                    ? com.nhom12.gym.util.Auth.hoTen : "Trần Tuấn Kiệt";
             modelLog.insertRow(0, new Object[]{dateStr, muscle, pr, note, trainerName});
 
             // Deduct session if possible
-            int sel = tableHV.getSelectedRow();
-            if (sel != -1) {
-                String curRem = modelHV.getValueAt(sel, 2).toString();
-                if (curRem.contains("/")) {
-                    String[] parts = curRem.split("/");
-                    try {
-                        int rem = Integer.parseInt(parts[0]);
-                        int total = Integer.parseInt(parts[1]);
-                        if (rem > 0) rem--;
-                        modelHV.setValueAt(rem + "/" + total, sel, 2);
-                        lblTenHV.setText(modelHV.getValueAt(sel, 1).toString() + " (Còn " + rem + "/" + total + " buổi)");
-                    } catch (Exception ignored) {}
-                }
+            String curRem = modelHV.getValueAt(sel, 2).toString();
+            if (curRem.contains("/")) {
+                String[] parts = curRem.split("/");
+                try {
+                    int rem = Integer.parseInt(parts[0]);
+                    int total = Integer.parseInt(parts[1]);
+                    if (rem > 0) rem--;
+                    modelHV.setValueAt(rem + "/" + total, sel, 2);
+                    lblTenHV.setText(modelHV.getValueAt(sel, 1).toString() + " (Còn " + rem + "/" + total + " buổi)");
+                } catch (Exception ignored) {}
             }
 
             JOptionPane.showMessageDialog(this, "Đã lưu nhật ký buổi tập thành công và trừ 01 buổi tập của học viên!", "Ghi Nhận Thành Công", JOptionPane.INFORMATION_MESSAGE);
@@ -262,8 +273,11 @@ public class GhiChuTienDoPTPanel extends JPanel {
                 });
             }
         }
-        if (tableHV != null && modelHV.getRowCount() > 0 && tableHV.getSelectedRow() == -1) {
+        if (tableHV != null && modelHV.getRowCount() > 0) {
             tableHV.setRowSelectionInterval(0, 0);
+            if (lblTenHV != null) {
+                lblTenHV.setText(modelHV.getValueAt(0, 1).toString() + " (Còn " + modelHV.getValueAt(0, 2).toString() + " buổi)");
+            }
         }
     }
 }

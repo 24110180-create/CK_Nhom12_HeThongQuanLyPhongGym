@@ -199,7 +199,7 @@ public class HoiVienDatLopPanel extends JPanel {
         }
 
         String hoTen = Auth.hoTen != null ? Auth.hoTen : "Lê Anh Duy";
-        String sdt = Auth.soDienThoai != null ? Auth.soDienThoai : "0901234567";
+        String sdt = Auth.soDienThoai != null ? Auth.soDienThoai : "0974482749";
         int myId = 1;
 
         DangKyLop dk = new DangKyLop(0, classId, myId, hoTen, sdt, new Date(), "Chưa điểm danh", "Đặt chỗ qua App Hội Viên");

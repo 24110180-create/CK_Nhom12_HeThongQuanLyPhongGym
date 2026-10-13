@@ -24,8 +24,8 @@ public class HuanLuyenVienDAO {
 
     private static void khoiTaoDuLieuMauNeuTrong() {
         if (!memoryList.isEmpty()) return;
-        memoryList.add(new HuanLuyenVien("HLV01", "Trần Tuấn Kiệt", "0912345678", "Bodybuilding / PT Tăng cơ", 6, "CN01 - Cơ sở 1 (Quận 1)", "Ca chiều (14:00 - 22:00)", 4.9, "Đang làm việc"));
-        memoryList.add(new HuanLuyenVien("HLV02", "Nguyễn Thu Thảo", "0987654321", "Yoga Thảo dược / Pilates", 5, "CN01 - Cơ sở 1 (Quận 1)", "Ca sáng (06:00 - 14:00)", 5.0, "Đang làm việc"));
+        memoryList.add(new HuanLuyenVien("HLV01", "Trần Tuấn Kiệt", "0912345603", "Bodybuilding / PT Tăng cơ", 6, "CN01 - Cơ sở 1 (Quận 1)", "Ca chiều (14:00 - 22:00)", 4.9, "Đang làm việc"));
+        memoryList.add(new HuanLuyenVien("HLV02", "Nguyễn Thu Thảo", "0912345605", "Yoga Thảo dược / Pilates", 5, "CN01 - Cơ sở 1 (Quận 1)", "Ca sáng (06:00 - 14:00)", 5.0, "Đang làm việc"));
         memoryList.add(new HuanLuyenVien("HLV03", "Phan Thanh Sơn", "0903112233", "Kickboxing & HIIT Cardio", 4, "CN02 - Cơ sở 2 (Tân Bình)", "Ca chiều (14:00 - 22:00)", 4.8, "Đang làm việc"));
         memoryList.add(new HuanLuyenVien("HLV04", "Lê Mai Hương", "0934556677", "Zumba Dance & Aerobic", 3, "CN02 - Cơ sở 2 (Tân Bình)", "Ca sáng (06:00 - 14:00)", 4.9, "Đang làm việc"));
         memoryList.add(new HuanLuyenVien("HLV05", "Phạm Quốc Bảo", "0912345604", "CrossFit & Phục hồi chức năng", 7, "CN02 - Cơ sở 2 (Tân Bình)", "Ca sáng (06:00 - 14:00)", 4.9, "Đang làm việc"));

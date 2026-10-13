@@ -182,7 +182,14 @@ public class DangKyHoiVienPanel extends JPanel {
 
         JPanel pPT = new JPanel(new BorderLayout(0, 3)); pPT.setOpaque(false);
         JLabel lPT = new JLabel("HLV Kèm (Nếu có):"); lPT.setFont(fontLabel);
-        cbTrainer = new JComboBox<>(new String[]{"Không kèm HLV", "HLV John Smith", "HLV Phạm Quốc Bảo", "HLV Anh Tuấn"}); cbTrainer.setFont(fontInput);
+        cbTrainer = new JComboBox<>(new String[]{
+                "Không kèm HLV",
+                "HLV Trần Tuấn Kiệt",
+                "HLV Nguyễn Thu Thảo",
+                "HLV Phan Thanh Sơn",
+                "HLV Lê Mai Hương",
+                "HLV Phạm Quốc Bảo"
+        }); cbTrainer.setFont(fontInput);
         pPT.add(lPT, BorderLayout.NORTH); pPT.add(cbTrainer, BorderLayout.CENTER);
 
         rowDatePT.add(pDate); rowDatePT.add(pPT);
@@ -500,13 +507,22 @@ public class DangKyHoiVienPanel extends JPanel {
     }
 
     private void submitRegistration() {
-        String name = txtFullName.getText().trim();
-        String phone = txtPhone.getText().trim();
-
-        if (name.isEmpty() || phone.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập Họ Tên và Số Điện Thoại!", "Thiếu thông tin", JOptionPane.WARNING_MESSAGE);
+        if (!com.nhom12.gym.util.ValidationHelper.checkRong(this, txtFullName, "Họ và Tên")) {
             return;
         }
+        if (!com.nhom12.gym.util.ValidationHelper.checkSoDienThoai(this, txtPhone)) {
+            return;
+        }
+        if (!com.nhom12.gym.util.ValidationHelper.checkRong(this, txtStartDate, "Ngày Bắt Đầu")) {
+            return;
+        }
+        if (cbPackage.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một gói tập hợp lệ!", "Chưa Chọn Gói", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String name = txtFullName.getText().trim();
+        String phone = txtPhone.getText().trim();
 
         // Tự động tính số thứ tự ID kế tiếp và sinh mã định danh đồng bộ (ví dụ: HV007, HV013...)
         List<HoiVien> allMembers = hoiVienDAO.layTatCa();

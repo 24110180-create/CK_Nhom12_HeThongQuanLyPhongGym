@@ -34,6 +34,8 @@ public class MainDashboard extends JFrame {
     private JLabel lblWorkspaceTitle;
     private JLabel lblWorkspaceBreadcrumb;
     private final List<SidebarMenuItem> sidebarMenuItems = new ArrayList<>();
+    private SidebarMenuItem currentSelectedItem;
+    private JLabel lblSidebarBranch;
 
     public static class SidebarMenuItem {
         public JButton button;
@@ -201,13 +203,13 @@ public class MainDashboard extends JFrame {
         lblShift.setForeground(new Color(52, 211, 153));
 
         String staffBranch = Auth.getChiNhanhHienTai();
-        JLabel lblBranch = new JLabel("Cơ sở: " + staffBranch);
-        lblBranch.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        lblBranch.setForeground(new Color(148, 163, 184));
+        lblSidebarBranch = new JLabel("Cơ sở: " + staffBranch);
+        lblSidebarBranch.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        lblSidebarBranch.setForeground(new Color(148, 163, 184));
 
         profileText.add(lblStaff);
         profileText.add(lblShift);
-        profileText.add(lblBranch);
+        profileText.add(lblSidebarBranch);
         profileBox.add(lblAvatar, BorderLayout.WEST);
         profileBox.add(profileText, BorderLayout.CENTER);
 
@@ -336,9 +338,12 @@ public class MainDashboard extends JFrame {
             cbBranchSelector.addActionListener(e -> {
                 String selected = (String) cbBranchSelector.getSelectedItem();
                 Auth.chiNhanhDangChon = selected;
-                JOptionPane.showMessageDialog(this,
-                        "Đã chuyển phạm vi điều hành sang: " + selected + "\nCác mô-đun nghiệp vụ sẽ ưu tiên theo cơ sở này.",
-                        "Chuyển Đổi Chi Nhánh", JOptionPane.INFORMATION_MESSAGE);
+                if (lblSidebarBranch != null) {
+                    lblSidebarBranch.setText("Cơ sở: " + Auth.getChiNhanhHienTai());
+                }
+                if (currentSelectedItem != null) {
+                    selectSidebarItem(currentSelectedItem);
+                }
             });
 
             headerRight.add(btnQuickCheckIn);
@@ -553,6 +558,7 @@ public class MainDashboard extends JFrame {
     }
 
     private void selectSidebarItem(SidebarMenuItem selectedItem) {
+        this.currentSelectedItem = selectedItem;
         for (SidebarMenuItem item : sidebarMenuItems) {
             boolean isSel = (item == selectedItem);
             setButtonState(item.button, isSel, selectedItem.accent);

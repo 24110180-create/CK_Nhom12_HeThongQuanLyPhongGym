@@ -53,28 +53,33 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
     }
 
     private void initUI() {
-        // --- 1. TOP HEADER & ACTION TOOLBAR ---
-        JPanel pnlTop = new JPanel(new BorderLayout());
+        // --- 1. TOP HEADER & ACTION TOOLBAR (2 TẦNG CHỐNG ĐÈ GIAO DIỆN) ---
+        JPanel pnlTop = new JPanel();
+        pnlTop.setLayout(new BoxLayout(pnlTop, BoxLayout.Y_AXIS));
         pnlTop.setOpaque(false);
+        pnlTop.setBorder(new EmptyBorder(0, 0, 14, 0));
 
         JPanel titleBox = new JPanel(new GridLayout(2, 1, 0, 3));
         titleBox.setOpaque(false);
+        titleBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel lblTitle = new JLabel("TRUNG TÂM QUẢN TRỊ TÀI KHOẢN & PHÂN QUYỀN NHÂN SỰ CHUỖI (ANH ĐỨC)");
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        JLabel lblTitle = new JLabel("TRUNG TÂM QUẢN TRỊ TÀI KHOẢN & PHÂN QUYỀN NHÂN SỰ CHUỖI");
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 20));
         lblTitle.setForeground(new Color(15, 23, 42));
 
-        JLabel lblSub = new JLabel("Quản lý tài khoản đăng nhập của 4 lực lượng: Lễ Tân • HLV • Quản Lý • Hội Viên");
+        JLabel lblSub = new JLabel("Quản lý tài khoản đăng nhập của 4 lực lượng: Lễ Tân • HLV • Quản Lý • Hội Viên (Cơ sở 1 & Cơ sở 2)");
         lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         lblSub.setForeground(new Color(100, 116, 139));
 
         titleBox.add(lblTitle);
         titleBox.add(lblSub);
-        pnlTop.add(titleBox, BorderLayout.WEST);
+        pnlTop.add(titleBox);
+        pnlTop.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // Nút thêm tài khoản & Xuất Excel
-        JPanel pnlActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        // Hàng nút hành động căn trái thoáng đãng, không bao giờ bị đè
+        JPanel pnlActions = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         pnlActions.setOpaque(false);
+        pnlActions.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JButton btnAddNew = new JButton("+ Thêm Tài Khoản Mới");
         btnAddNew.setFont(new Font("Segoe UI", Font.BOLD, 13));
@@ -82,7 +87,7 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
         btnAddNew.setForeground(Color.WHITE);
         btnAddNew.setFocusPainted(false);
         btnAddNew.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnAddNew.setPreferredSize(new Dimension(190, 38));
+        btnAddNew.setPreferredSize(new Dimension(185, 36));
         btnAddNew.addActionListener(e -> moDialogThemTaiKhoan());
 
         JButton btnResetPass = new JButton("Đặt Lại MK (123456)");
@@ -91,7 +96,7 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
         btnResetPass.setForeground(Color.WHITE);
         btnResetPass.setFocusPainted(false);
         btnResetPass.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnResetPass.setPreferredSize(new Dimension(160, 38));
+        btnResetPass.setPreferredSize(new Dimension(155, 36));
         btnResetPass.addActionListener(e -> xuLyResetMatKhau());
 
         JButton btnDelete = new JButton("Xóa Tài Khoản");
@@ -100,19 +105,19 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
         btnDelete.setForeground(Color.WHITE);
         btnDelete.setFocusPainted(false);
         btnDelete.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnDelete.setPreferredSize(new Dimension(130, 38));
+        btnDelete.setPreferredSize(new Dimension(125, 36));
         btnDelete.addActionListener(e -> xuLyXoaTaiKhoan());
 
         JButton btnRefresh = new JButton("Làm Mới");
         btnRefresh.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        btnRefresh.setPreferredSize(new Dimension(90, 38));
+        btnRefresh.setPreferredSize(new Dimension(90, 36));
         btnRefresh.addActionListener(e -> loadAllData());
 
         pnlActions.add(btnAddNew);
         pnlActions.add(btnResetPass);
         pnlActions.add(btnDelete);
         pnlActions.add(btnRefresh);
-        pnlTop.add(pnlActions, BorderLayout.EAST);
+        pnlTop.add(pnlActions);
         add(pnlTop, BorderLayout.NORTH);
 
         // --- 2. TABBED PANE 4 VAI TRÒ ---

@@ -163,13 +163,15 @@ public class LichLopHocPanel extends JPanel {
                 new EmptyBorder(12, 14, 12, 14)
         ));
 
-        // Toolbar
-        JPanel pTool = new JPanel(new BorderLayout(10, 0));
+        // Toolbar 2 tầng (chống tràn và đè các nút trên màn hình nhỏ)
+        JPanel pTool = new JPanel();
+        pTool.setLayout(new BoxLayout(pTool, BoxLayout.Y_AXIS));
         pTool.setOpaque(false);
 
         // Trái: Tìm kiếm & Lọc
-        JPanel pFilter = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        JPanel pFilter = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
         pFilter.setOpaque(false);
+        pFilter.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel lSearch = new JLabel("Tìm kiếm lớp:");
         lSearch.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -195,11 +197,13 @@ public class LichLopHocPanel extends JPanel {
         pFilter.add(txtSearchLop);
         pFilter.add(lBoMon);
         pFilter.add(cbFilterBoMon);
-        pTool.add(pFilter, BorderLayout.WEST);
+        pTool.add(pFilter);
+        pTool.add(Box.createRigidArea(new Dimension(0, 6)));
 
-        // Phải: Nút Thêm, Sửa, Xóa, Làm mới, Xuất Excel
-        JPanel pBtns = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
+        // Hàng nút Thêm, Sửa, Xóa, Làm mới, Xuất Excel (căn trái thoáng đãng)
+        JPanel pBtns = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 4));
         pBtns.setOpaque(false);
+        pBtns.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JButton btnThemLop = taoButtonFlat("+ Thêm Lớp Mới", new Color(16, 185, 129), Color.WHITE);
         btnThemLop.addActionListener(e -> moDialogThemSuaLop(null));
@@ -237,7 +241,7 @@ public class LichLopHocPanel extends JPanel {
         pBtns.add(btnDiemDanh);
         pBtns.add(btnRefresh);
         pBtns.add(btnXuatExcelLop);
-        pTool.add(pBtns, BorderLayout.EAST);
+        pTool.add(pBtns);
 
         panel.add(pTool, BorderLayout.NORTH);
 
@@ -344,13 +348,16 @@ public class LichLopHocPanel extends JPanel {
         lblDetailTitle.setForeground(new Color(30, 41, 59));
         pTop.add(lblDetailTitle, BorderLayout.NORTH);
 
-        // Hàng điều khiển
-        JPanel pActions = new JPanel(new BorderLayout(10, 0));
+        // Hàng điều khiển 2 tầng chống đè
+        JPanel pActions = new JPanel();
+        pActions.setLayout(new BoxLayout(pActions, BoxLayout.Y_AXIS));
         pActions.setOpaque(false);
+        pActions.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Tìm kiếm học viên trong lớp
-        JPanel pSearchHV = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        JPanel pSearchHV = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
         pSearchHV.setOpaque(false);
+        pSearchHV.setAlignmentX(Component.LEFT_ALIGNMENT);
         JLabel lSearch = new JLabel("Lọc học viên:");
         lSearch.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lSearch.setForeground(new Color(51, 65, 85));
@@ -363,11 +370,13 @@ public class LichLopHocPanel extends JPanel {
         });
         pSearchHV.add(lSearch);
         pSearchHV.add(txtSearchHocVien);
-        pActions.add(pSearchHV, BorderLayout.WEST);
+        pActions.add(pSearchHV);
+        pActions.add(Box.createRigidArea(new Dimension(0, 6)));
 
-        // Bộ nút hành động học viên: Thêm, Hủy, Điểm danh, Báo vắng, Điểm danh tất cả, Xuất Excel
-        JPanel pBtns = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
+        // Bộ nút hành động học viên: Thêm, Hủy, Điểm danh, Báo vắng, Điểm danh tất cả, Xuất Excel (căn trái thoáng đãng)
+        JPanel pBtns = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 4));
         pBtns.setOpaque(false);
+        pBtns.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         btnThemHocVien = taoButtonFlat("+ Ghi Danh Học Viên", new Color(16, 185, 129), Color.WHITE);
         btnThemHocVien.addActionListener(e -> moDialogGhiDanhHocVien());
@@ -405,7 +414,7 @@ public class LichLopHocPanel extends JPanel {
         pBtns.add(btnBaoVang);
         pBtns.add(btnDiemDanhTatCa);
         pBtns.add(btnXuatExcelHocVien);
-        pActions.add(pBtns, BorderLayout.EAST);
+        pActions.add(pBtns);
 
         pTop.add(pActions, BorderLayout.SOUTH);
         panel.add(pTop, BorderLayout.NORTH);

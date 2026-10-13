@@ -204,7 +204,16 @@ public class MainDashboard extends JFrame {
         lblShift.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblShift.setForeground(new Color(52, 211, 153));
 
-        String staffBranch = (Auth.chiNhanh != null && !Auth.chiNhanh.isEmpty()) ? Auth.chiNhanh : "CN01 - Quận 1";
+        String staffBranch;
+        if ("Chủ".equalsIgnoreCase(role)) {
+            staffBranch = "Toàn hệ thống (Chuỗi 2 cơ sở)";
+        } else if ("Hội viên".equalsIgnoreCase(role)) {
+            staffBranch = (Auth.chiNhanh != null && !Auth.chiNhanh.isEmpty()) ? Auth.chiNhanh : "Toàn hệ thống (VIP)";
+        } else if ("Quản lý".equalsIgnoreCase(role)) {
+            staffBranch = (Auth.chiNhanh != null && !Auth.chiNhanh.isEmpty()) ? Auth.chiNhanh : "CN02 - Tân Bình";
+        } else {
+            staffBranch = (Auth.chiNhanh != null && !Auth.chiNhanh.isEmpty()) ? Auth.chiNhanh : "CN01 - Quận 1";
+        }
         JLabel lblBranch = new JLabel("Cơ sở: " + staffBranch);
         lblBranch.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblBranch.setForeground(new Color(148, 163, 184));
@@ -251,8 +260,8 @@ public class MainDashboard extends JFrame {
         JPanel mainArea = new JPanel(new BorderLayout());
         mainArea.setBackground(new Color(248, 250, 252));
 
-        // Workspace Top Header
-        JPanel workspaceHeader = new JPanel(new BorderLayout());
+        // Workspace Top Header: Gọn gàng, thoáng đãng, chống đè text
+        JPanel workspaceHeader = new JPanel(new BorderLayout(15, 0));
         workspaceHeader.setBackground(Color.WHITE);
         workspaceHeader.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(226, 232, 240)),
@@ -277,13 +286,13 @@ public class MainDashboard extends JFrame {
         headerRight.setOpaque(false);
 
         // Nút Quét mã check-in
-        JButton btnQuickCheckIn = new JButton("Quét Mã Check-in");
+        JButton btnQuickCheckIn = new JButton("Quét QR Check-in");
         btnQuickCheckIn.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnQuickCheckIn.setBackground(new Color(16, 185, 129));
         btnQuickCheckIn.setForeground(Color.WHITE);
         btnQuickCheckIn.setFocusPainted(false);
         btnQuickCheckIn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnQuickCheckIn.setPreferredSize(new Dimension(145, 32));
+        btnQuickCheckIn.setPreferredSize(new Dimension(140, 32));
         btnQuickCheckIn.addActionListener(e -> {
             Window top = SwingUtilities.getWindowAncestor(this);
             new QRScannerSimulatorDialog(top).setVisible(true);
@@ -302,7 +311,7 @@ public class MainDashboard extends JFrame {
                 "Hội Viên VIP"
         });
         cbStaffView.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        cbStaffView.setPreferredSize(new Dimension(120, 30));
+        cbStaffView.setPreferredSize(new Dimension(115, 30));
 
         if ("Lễ tân".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(1);
         else if ("HLV".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(2);
@@ -321,38 +330,14 @@ public class MainDashboard extends JFrame {
             repaint();
         });
 
-        // Dropdown chi nhánh
-        JLabel lblBranchScope = new JLabel("Chi nhánh:");
-        lblBranchScope.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        lblBranchScope.setForeground(new Color(71, 85, 105));
-
-        JComboBox<String> cbBranchScope;
-        if ("Quản lý".equalsIgnoreCase(role)) {
-            String myBranch = (Auth.chiNhanh != null && Auth.chiNhanh.contains("02"))
-                    ? "CN02 - Tân Bình (Premium)" : "CN01 - Quận 1 (Flagship)";
-            cbBranchScope = new JComboBox<>(new String[]{ myBranch });
-            cbBranchScope.setEnabled(false);
-            cbBranchScope.setToolTipText("Quản lý chỉ xem dữ liệu trong phạm vi chi nhánh phụ trách");
-        } else {
-            cbBranchScope = new JComboBox<>(new String[]{
-                    "Toàn hệ thống (2 cơ sở)",
-                    "CN01 - Quận 1 (Flagship)",
-                    "CN02 - Tân Bình (Premium)"
-            });
-        }
-        cbBranchScope.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        cbBranchScope.setPreferredSize(new Dimension(175, 30));
-
-        String today = new SimpleDateFormat("EEEE, dd/MM/yyyy").format(new Date());
-        JLabel lblDate = new JLabel("  " + today);
+        String today = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+        JLabel lblDate = new JLabel("Ngày: " + today);
         lblDate.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        lblDate.setForeground(new Color(71, 85, 105));
+        lblDate.setForeground(new Color(100, 116, 139));
 
         headerRight.add(btnQuickCheckIn);
         headerRight.add(lblGoc);
         headerRight.add(cbStaffView);
-        headerRight.add(lblBranchScope);
-        headerRight.add(cbBranchScope);
         headerRight.add(lblDate);
         workspaceHeader.add(headerRight, BorderLayout.EAST);
 
@@ -550,8 +535,15 @@ public class MainDashboard extends JFrame {
 
         try {
             JPanel panel = selectedItem.supplier.get();
+            JScrollPane workspaceScroll = new JScrollPane(panel);
+            workspaceScroll.setBorder(null);
+            workspaceScroll.setOpaque(false);
+            workspaceScroll.getViewport().setOpaque(false);
+            workspaceScroll.getVerticalScrollBar().setUnitIncrement(16);
+            workspaceScroll.getHorizontalScrollBar().setUnitIncrement(16);
+
             workspaceContainer.removeAll();
-            workspaceContainer.add(panel, BorderLayout.CENTER);
+            workspaceContainer.add(workspaceScroll, BorderLayout.CENTER);
             workspaceContainer.revalidate();
             workspaceContainer.repaint();
         } catch (Exception ex) {

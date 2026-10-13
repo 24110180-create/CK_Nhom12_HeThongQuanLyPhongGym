@@ -57,8 +57,9 @@ public class CheckInForm extends JPanel {
         setBackground(new Color(248, 250, 252));
         setBorder(new EmptyBorder(20, 25, 20, 25));
 
-        // 1. TOP HEADER TOOLBAR (Tiêu đề, Chọn chi nhánh trạm, Chỉ báo mạng Offline/Online, Đo hiệu năng)
-        JPanel topToolbar = new JPanel(new BorderLayout(15, 0));
+        // 1. TOP HEADER TOOLBAR 2 TẦNG (CHỐNG ĐÈ TIÊU ĐỀ VÀ CÁC NÚT ĐIỀU KHIỂN)
+        JPanel topToolbar = new JPanel();
+        topToolbar.setLayout(new BoxLayout(topToolbar, BoxLayout.Y_AXIS));
         topToolbar.setBackground(Color.WHITE);
         topToolbar.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
@@ -67,6 +68,8 @@ public class CheckInForm extends JPanel {
 
         JPanel titleGroup = new JPanel(new GridLayout(2, 1, 0, 2));
         titleGroup.setOpaque(false);
+        titleGroup.setAlignmentX(Component.LEFT_ALIGNMENT);
+
         JLabel lblTitle = new JLabel("TRẠM QUÉT CHECK-IN TỰ ĐỘNG (FLAP BARRIER & HONEYWELL SCANNER)");
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblTitle.setForeground(new Color(15, 23, 42));
@@ -76,10 +79,12 @@ public class CheckInForm extends JPanel {
         lblSub.setForeground(new Color(100, 116, 139));
         titleGroup.add(lblTitle);
         titleGroup.add(lblSub);
-        topToolbar.add(titleGroup, BorderLayout.WEST);
+        topToolbar.add(titleGroup);
+        topToolbar.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        JPanel rightControls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        JPanel rightControls = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         rightControls.setOpaque(false);
+        rightControls.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Yêu cầu ẩn 3: Nút Bán Vé Lẻ Ngày chống bán chui
         btnGuestPass = new JButton("Bán Vé Lẻ Ngày (80,000 đ)");
@@ -129,7 +134,7 @@ public class CheckInForm extends JPanel {
         rightControls.add(cbStationBranch);
         rightControls.add(lblNetworkStatus);
         rightControls.add(lblPerfMs);
-        topToolbar.add(rightControls, BorderLayout.EAST);
+        topToolbar.add(rightControls);
 
         add(topToolbar, BorderLayout.NORTH);
 
@@ -347,7 +352,7 @@ public class CheckInForm extends JPanel {
         // 3. BOTTOM PANEL: BẢNG NHẬT KÝ CHECK-IN REAL-TIME TRONG NGÀY
         JPanel bottomContainer = new JPanel(new BorderLayout(0, 8));
         bottomContainer.setOpaque(false);
-        bottomContainer.setPreferredSize(new Dimension(0, 230));
+        bottomContainer.setPreferredSize(new Dimension(0, 180));
 
         JPanel logHeader = new JPanel(new BorderLayout());
         logHeader.setOpaque(false);

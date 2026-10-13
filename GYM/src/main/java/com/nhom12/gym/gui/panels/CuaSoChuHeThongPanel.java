@@ -39,15 +39,18 @@ public class CuaSoChuHeThongPanel extends JPanel {
     }
 
     private void initUI() {
-        // --- 1. TOP HEADER BANNER ---
-        JPanel pnlHeader = new JPanel(new BorderLayout());
+        // --- 1. TOP HEADER BANNER (CHỐNG ĐÈ GIAO DIỆN) ---
+        JPanel pnlHeader = new JPanel();
+        pnlHeader.setLayout(new BoxLayout(pnlHeader, BoxLayout.Y_AXIS));
         pnlHeader.setOpaque(false);
+        pnlHeader.setBorder(new EmptyBorder(0, 0, 16, 0));
 
         JPanel titleBox = new JPanel(new GridLayout(2, 1, 0, 3));
         titleBox.setOpaque(false);
+        titleBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel lblTitle = new JLabel("TRUNG TÂM ĐIỀU HÀNH CHIẾN LƯỢC CHỦ PHÒNG (ANH ĐỨC)");
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 21));
         lblTitle.setForeground(new Color(15, 23, 42));
 
         String todayStr = new SimpleDateFormat("EEEE, 'ngày' dd/MM/yyyy - HH:mm").format(new Date());
@@ -57,26 +60,7 @@ public class CuaSoChuHeThongPanel extends JPanel {
 
         titleBox.add(lblTitle);
         titleBox.add(lblSub);
-        pnlHeader.add(titleBox, BorderLayout.WEST);
-
-        // Nút hành động nhanh của chủ
-        JPanel quickActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
-        quickActions.setOpaque(false);
-
-        JButton btnScanner = new JButton("Quét Mã Check-in (Mô Phỏng)");
-        btnScanner.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnScanner.setBackground(new Color(16, 185, 129));
-        btnScanner.setForeground(Color.WHITE);
-        btnScanner.setFocusPainted(false);
-        btnScanner.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnScanner.setPreferredSize(new Dimension(220, 38));
-        btnScanner.addActionListener(e -> {
-            Window top = SwingUtilities.getWindowAncestor(this);
-            new QRScannerSimulatorDialog(top).setVisible(true);
-        });
-
-        quickActions.add(btnScanner);
-        pnlHeader.add(quickActions, BorderLayout.EAST);
+        pnlHeader.add(titleBox);
         add(pnlHeader, BorderLayout.NORTH);
 
         // --- 2. VÙNG CUỘN NỘI DUNG CHÍNH ---

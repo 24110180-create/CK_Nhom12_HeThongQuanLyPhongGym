@@ -130,7 +130,9 @@ public class DangKyHoiVienPanel extends JPanel {
         rowBranchBirth.setOpaque(false);
         JPanel pBranch = new JPanel(new BorderLayout(0, 3)); pBranch.setOpaque(false);
         JLabel lBranch = new JLabel("Chi Nhánh:"); lBranch.setFont(fontLabel);
-        cbBranch = new JComboBox<>(new String[]{"CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)"}); cbBranch.setFont(fontInput);
+        cbBranch = new JComboBox<>(new String[]{"CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)", "Toàn hệ thống (Hội viên VIP)"});
+        cbBranch.setFont(fontInput);
+        cbBranch.addActionListener(e -> updateCalculations());
         pBranch.add(lBranch, BorderLayout.NORTH); pBranch.add(cbBranch, BorderLayout.CENTER);
 
         JPanel pBirth = new JPanel(new BorderLayout(0, 3)); pBirth.setOpaque(false);
@@ -347,7 +349,7 @@ public class DangKyHoiVienPanel extends JPanel {
         // Card Bottom: Branch & Status badge
         JPanel cardBottom = new JPanel(new BorderLayout());
         cardBottom.setOpaque(false);
-        lblCardBranch = new JLabel("Cơ sở 1 - Gò Vấp");
+        lblCardBranch = new JLabel("CN01 - Cơ sở 1 (Quận 1)");
         lblCardBranch.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         lblCardBranch.setForeground(new Color(148, 163, 184));
 

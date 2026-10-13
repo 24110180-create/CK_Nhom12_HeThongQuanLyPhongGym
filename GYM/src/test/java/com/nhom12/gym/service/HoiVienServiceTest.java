@@ -97,4 +97,25 @@ public class HoiVienServiceTest {
         assertNotNull(found, "Phải tìm thấy hội viên có mã QR001");
         assertTrue(found.getHoTen().contains("Duy") || found.getMaTheQR().equals("QR001"));
     }
+
+    @Test
+    @DisplayName("Kiểm tra đăng ký tài khoản hội viên mới và đăng nhập thành công vào App")
+    void testDangKyTaiKhoanHoiVienMoiVaDangNhap() {
+        String phone = "0989" + (System.currentTimeMillis() % 1000000);
+        String pass = "memberPass123";
+        String name = "Trần Hội Viên Mới";
+
+        com.nhom12.gym.dao.TaiKhoanDAO tkDAO = new com.nhom12.gym.dao.TaiKhoanDAO();
+        boolean saved = tkDAO.them(new com.nhom12.gym.entity.TaiKhoan(phone, pass, "Hội viên", name));
+        assertTrue(saved, "Tài khoản hội viên mới phải được lưu thành công");
+
+        AuthService authService = new AuthService();
+        AuthService.LoginResult res = authService.dangNhap(phone, pass);
+        assertTrue(res.success, "Hội viên mới tạo phải đăng nhập thành công");
+        assertEquals("Hội viên", res.taiKhoan.getVaiTro(), "Vai trò phải là Hội viên");
+
+        // Đăng nhập sai mật khẩu phải bị từ chối
+        AuthService.LoginResult failRes = authService.dangNhap(phone, "wrongPassword");
+        assertFalse(failRes.success, "Sai mật khẩu phải bị từ chối");
+    }
 }

@@ -62,7 +62,24 @@ public class HoiVienTheDienTuPanel extends JPanel {
         pnlCardContainer.setOpaque(false);
 
         // Component thẻ phong cách sang trọng VIP
-        String memberName = (Auth.hoTen != null && !Auth.hoTen.isEmpty()) ? Auth.hoTen : "Nguyễn Văn An";
+        com.nhom12.gym.dao.HoiVienDAO hvDAO = new com.nhom12.gym.dao.HoiVienDAO();
+        com.nhom12.gym.entity.HoiVien hv = null;
+        if (Auth.soDienThoai != null && !Auth.soDienThoai.trim().isEmpty()) {
+            hv = hvDAO.timKiemThongMinh(Auth.soDienThoai);
+        }
+        if (hv == null && Auth.tenDangNhap != null && !Auth.tenDangNhap.trim().isEmpty()) {
+            hv = hvDAO.timKiemThongMinh(Auth.tenDangNhap);
+        }
+        if (hv == null && Auth.hoTen != null && !Auth.hoTen.trim().isEmpty()) {
+            hv = hvDAO.timKiemThongMinh(Auth.hoTen);
+        }
+
+        String memberName = (hv != null && hv.getHoTen() != null) ? hv.getHoTen() : ((Auth.hoTen != null && !Auth.hoTen.isEmpty()) ? Auth.hoTen : "Nguyễn Văn An");
+        String memberCode = (hv != null && hv.getMaTheQR() != null) ? hv.getMaTheQR() : "QR001";
+        String memberPackage = (hv != null && hv.getGoiTapDangKy() != null) ? hv.getGoiTapDangKy() : "VIP Diamond Toàn Hệ Thống (12 Tháng)";
+        String memberBranch = (hv != null && hv.getChiNhanhDangKy() != null) ? hv.getChiNhanhDangKy() : "CN01 - Cơ sở 1 (Quận 1)";
+        String memberExpiry = (hv != null && hv.getNgayHetHan() != null) ? new SimpleDateFormat("dd/MM/yyyy").format(hv.getNgayHetHan()) : "31/12/2026";
+
         JPanel vipCard = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -119,7 +136,7 @@ public class HoiVienTheDienTuPanel extends JPanel {
         lblVipBadge.setBounds(340, 28, 120, 24);
         vipCard.add(lblVipBadge);
 
-        JLabel lblCardNumber = new JLabel("FL - 8899 - 2026 - VIP");
+        JLabel lblCardNumber = new JLabel("FL - " + memberCode);
         lblCardNumber.setFont(new Font("Consolas", Font.BOLD, 20));
         lblCardNumber.setForeground(new Color(241, 245, 249));
         lblCardNumber.setBounds(35, 130, 350, 30);
@@ -143,7 +160,7 @@ public class HoiVienTheDienTuPanel extends JPanel {
         lblExpiryTitle.setBounds(310, 180, 130, 16);
         vipCard.add(lblExpiryTitle);
 
-        JLabel lblExpiryDate = new JLabel("31/12/2026");
+        JLabel lblExpiryDate = new JLabel(memberExpiry);
         lblExpiryDate.setFont(new Font("Segoe UI", Font.BOLD, 15));
         lblExpiryDate.setForeground(new Color(254, 240, 138));
         lblExpiryDate.setBounds(310, 200, 130, 24);
@@ -160,8 +177,8 @@ public class HoiVienTheDienTuPanel extends JPanel {
                 new EmptyBorder(14, 18, 14, 18)
         ));
 
-        pnlBenefits.add(createBenefitRow("Gói tập hiện tại:", "VIP Diamond Toàn Hệ Thống (12 Tháng)", new Color(37, 99, 235)));
-        pnlBenefits.add(createBenefitRow("Chi nhánh đăng ký:", "FitLife Landmark 81 - Tầng 3", new Color(15, 23, 42)));
+        pnlBenefits.add(createBenefitRow("Gói tập hiện tại:", memberPackage, new Color(37, 99, 235)));
+        pnlBenefits.add(createBenefitRow("Chi nhánh đăng ký:", memberBranch, new Color(15, 23, 42)));
         pnlBenefits.add(createBenefitRow("Đặc quyền kèm theo:", "Xông hơi Sauna, Miễn phí Locker, Khăn tập", new Color(16, 185, 129)));
 
         pnlCardContainer.add(pnlBenefits);
@@ -306,10 +323,12 @@ public class HoiVienTheDienTuPanel extends JPanel {
             lblCheckInCount.setText(checkInCount + " buổi");
             pnlQRBox.repaint();
             JOptionPane.showMessageDialog(this,
-                    "<html><body style='width: 280px; padding: 5px;'>" +
+                    "<html><body style='width: 290px; padding: 5px;'>" +
                     "<h3 style='color: #10b981; margin: 0;'>CHECK-IN THÀNH CÔNG!</h3>" +
                     "<p>Xin chào: <b>" + memberName + "</b></p>" +
-                    "<p>Gói tập: <b>VIP Diamond</b> (Hạn: 31/12/2026)</p>" +
+                    "<p>Mã thẻ: <b>" + memberCode + "</b></p>" +
+                    "<p>Gói tập: <b>" + memberPackage + "</b></p>" +
+                    "<p>Hạn sử dụng: <b>" + memberExpiry + "</b></p>" +
                     "<p>Cửa tự động Flap Barrier đã mở. Chúc bạn có một buổi tập tràn đầy năng lượng!</p>" +
                     "</body></html>",
                     "Cửa Vào FitLife Đã Mở", JOptionPane.INFORMATION_MESSAGE);

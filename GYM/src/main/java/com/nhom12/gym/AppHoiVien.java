@@ -109,7 +109,18 @@ public class AppHoiVien extends JFrame {
             xuLyDangNhapHoiVien();
         });
 
-        JLabel lblNote = new JLabel("<html><center style='color:#94a3b8; font-size:11px;'>Tài khoản mặc định: <b>hoivien1</b> • Mật khẩu: <b>123456</b><br>Hỗ trợ đầy đủ Thẻ QR, Đặt lớp, Lịch PT & InBody</center></html>");
+        // Nút Đăng ký tài khoản Hội viên mới
+        JButton btnRegisterNew = new JButton("Đăng Ký Thành Viên Mới (Kích Hoạt Ngay)");
+        btnRegisterNew.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnRegisterNew.setBackground(new Color(30, 41, 59));
+        btnRegisterNew.setForeground(new Color(241, 245, 249));
+        btnRegisterNew.setFocusPainted(false);
+        btnRegisterNew.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnRegisterNew.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        btnRegisterNew.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnRegisterNew.addActionListener(e -> moDialogDangKyApp());
+
+        JLabel lblNote = new JLabel("<html><center style='color:#94a3b8; font-size:11px;'>Tài khoản mặc định: <b>hoivien1</b> • Mật khẩu: <b>123456</b><br>Hội viên mới có thể tự đăng ký hoặc dùng SĐT được cấp</center></html>");
         lblNote.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         pnlBody.add(lblPhoneTitle);
@@ -119,11 +130,13 @@ public class AppHoiVien extends JFrame {
         pnlBody.add(lblPassTitle);
         pnlBody.add(Box.createRigidArea(new Dimension(0, 6)));
         pnlBody.add(txtPass);
-        pnlBody.add(Box.createRigidArea(new Dimension(0, 24)));
+        pnlBody.add(Box.createRigidArea(new Dimension(0, 20)));
         pnlBody.add(btnLogin);
         pnlBody.add(Box.createRigidArea(new Dimension(0, 10)));
         pnlBody.add(btnQuickLogin);
-        pnlBody.add(Box.createRigidArea(new Dimension(0, 20)));
+        pnlBody.add(Box.createRigidArea(new Dimension(0, 10)));
+        pnlBody.add(btnRegisterNew);
+        pnlBody.add(Box.createRigidArea(new Dimension(0, 18)));
         pnlBody.add(lblNote);
 
         root.add(pnlBody, BorderLayout.CENTER);
@@ -132,6 +145,103 @@ public class AppHoiVien extends JFrame {
 
         txtPass.addActionListener(e -> xuLyDangNhapHoiVien());
         txtPhone.addActionListener(e -> xuLyDangNhapHoiVien());
+    }
+
+    private void moDialogDangKyApp() {
+        JDialog dlg = new JDialog(this, "Đăng Ký Thành Viên FitLife App Mới", true);
+        dlg.setSize(480, 440);
+        dlg.setLocationRelativeTo(this);
+        dlg.setLayout(new BorderLayout());
+
+        JPanel form = new JPanel(new GridLayout(4, 2, 10, 14));
+        form.setBackground(Color.WHITE);
+        form.setBorder(new EmptyBorder(25, 25, 20, 25));
+
+        JTextField tfName = new JTextField();
+        JTextField tfPhone = new JTextField();
+        JPasswordField tfPass = new JPasswordField();
+        JComboBox<String> cbBr = new JComboBox<>(new String[]{
+                "CN01 - Cơ sở 1 (Quận 1)",
+                "CN02 - Cơ sở 2 (Tân Bình)"
+        });
+
+        form.add(new JLabel("Họ Và Tên (*):"));
+        form.add(tfName);
+        form.add(new JLabel("Số Điện Thoại (*):"));
+        form.add(tfPhone);
+        form.add(new JLabel("Mật Khẩu Đăng Nhập (*):"));
+        form.add(tfPass);
+        form.add(new JLabel("Chi Nhánh Đăng Ký:"));
+        form.add(cbBr);
+
+        JPanel bottomDlg = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 15));
+        bottomDlg.setBackground(Color.WHITE);
+
+        JButton btnSubmit = new JButton("Hoàn Tất Đăng Ký");
+        btnSubmit.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnSubmit.setBackground(new Color(37, 99, 235));
+        btnSubmit.setForeground(Color.WHITE);
+
+        JButton btnCancel = new JButton("Hủy");
+        btnCancel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+
+        bottomDlg.add(btnCancel);
+        bottomDlg.add(btnSubmit);
+
+        btnCancel.addActionListener(ev -> dlg.dispose());
+        btnSubmit.addActionListener(ev -> {
+            String name = tfName.getText().trim();
+            String phone = tfPhone.getText().trim();
+            String pass = new String(tfPass.getPassword()).trim();
+            if (name.isEmpty() || phone.isEmpty() || pass.isEmpty()) {
+                JOptionPane.showMessageDialog(dlg, "Vui lòng nhập đầy đủ thông tin để đăng ký tài khoản!", "Thiếu thông tin", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            if (!phone.matches("^0(3|5|7|8|9)[0-9]{8}$")) {
+                JOptionPane.showMessageDialog(dlg, "Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 chữ số thuộc các đầu số nhà mạng Việt Nam.", "Lỗi Định Dạng", JOptionPane.WARNING_MESSAGE);
+                tfPhone.requestFocus();
+                return;
+            }
+
+            String code = "HV" + (System.currentTimeMillis() % 1000);
+
+            // Lưu tài khoản & hồ sơ hội viên
+            try {
+                com.nhom12.gym.dao.TaiKhoanDAO dao = new com.nhom12.gym.dao.TaiKhoanDAO();
+                dao.them(new com.nhom12.gym.entity.TaiKhoan(phone, pass, "Hội viên", name));
+            } catch (Exception ignored) {}
+
+            try {
+                com.nhom12.gym.dao.HoiVienDAO hvDAO = new com.nhom12.gym.dao.HoiVienDAO();
+                com.nhom12.gym.entity.HoiVien hv = new com.nhom12.gym.entity.HoiVien();
+                hv.setHoTen(name);
+                hv.setSoDienThoai(phone);
+                hv.setMaTheQR(code);
+                hv.setChiNhanhDangKy((String) cbBr.getSelectedItem());
+                hv.setGoiTapDangKy("Gói Trải Nghiệm 1 Tháng");
+                hv.setNgayDangKy(new java.util.Date());
+                hv.setSoTienDaThanhToan(500000.0);
+                hv.setHinhThucThanhToan("Chuyển khoản (VietQR)");
+                hv.setTrangThai("Hoạt động");
+                java.util.Calendar c = java.util.Calendar.getInstance();
+                c.add(java.util.Calendar.MONTH, 1);
+                hv.setNgayHetHan(c.getTime());
+                hvDAO.them(hv);
+            } catch (Exception ignored) {}
+
+            txtPhone.setText(phone);
+            txtPass.setText(pass);
+            dlg.dispose();
+
+            new com.nhom12.gym.gui.GuiMaQRDialog(this, code, name, phone, "Gói Đăng Ký Trực Tuyến", (String) cbBr.getSelectedItem(), phone, pass).setVisible(true);
+
+            // Tự động kích hoạt đăng nhập
+            xuLyDangNhapHoiVien();
+        });
+
+        dlg.add(form, BorderLayout.CENTER);
+        dlg.add(bottomDlg, BorderLayout.SOUTH);
+        dlg.setVisible(true);
     }
 
     private void xuLyDangNhapHoiVien() {
@@ -148,6 +258,9 @@ public class AppHoiVien extends JFrame {
             // Đảm bảo vai trò là Hội viên
             if (Auth.vaiTro == null || Auth.vaiTro.trim().isEmpty() || !Auth.vaiTro.equalsIgnoreCase("Hội viên")) {
                 Auth.vaiTro = "Hội viên";
+            }
+            if (Auth.soDienThoai == null || Auth.soDienThoai.isEmpty()) {
+                Auth.soDienThoai = phone;
             }
             dispose();
             new HoiVienAppFrame().setVisible(true);

@@ -260,8 +260,13 @@ public class LoginForm extends JFrame {
                 com.nhom12.gym.dao.HoiVienDAO hvDAO = new com.nhom12.gym.dao.HoiVienDAO();
                 com.nhom12.gym.entity.HoiVien hv = new com.nhom12.gym.entity.HoiVien();
                 hv.setHoTen(name);
+                hv.setSoDienThoai(phone);
                 hv.setMaTheQR(code);
                 hv.setChiNhanhDangKy((String) cbBr.getSelectedItem());
+                hv.setGoiTapDangKy("Gói Trải Nghiệm 1 Tháng");
+                hv.setNgayDangKy(new java.util.Date());
+                hv.setSoTienDaThanhToan(500000.0);
+                hv.setHinhThucThanhToan("Chuyển khoản (VietQR)");
                 hv.setTrangThai("Hoạt động");
                 java.util.Calendar c = java.util.Calendar.getInstance();
                 c.add(java.util.Calendar.MONTH, 1);

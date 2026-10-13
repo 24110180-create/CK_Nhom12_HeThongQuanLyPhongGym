@@ -69,8 +69,15 @@ public class AuthService {
 
         // 3. CHỈ KHI CSDL MẤT KẾT NỐI (OFFLINE DEMO / EMERGENCY BUFFER)
         LOGGER.log(Level.INFO, "Kích hoạt cơ chế xác thực ngoại tuyến do mất kết nối CSDL...");
-        String hashedDefault = PasswordUtil.hashPassword("123456");
 
+        // Kiểm tra trong bộ nhớ đệm tài khoản (hỗ trợ cả các tài khoản hội viên mới đăng ký)
+        TaiKhoan cachedTK = taiKhoanDAO.timTheoTenDangNhap(user);
+        if (cachedTK != null && PasswordUtil.checkPassword(pass, cachedTK.getMatKhau())) {
+            Auth.setSession(cachedTK, true);
+            return new LoginResult(true, "Đăng nhập thành công (Bộ nhớ đệm ngoại tuyến)!", true, cachedTK);
+        }
+
+        String hashedDefault = PasswordUtil.hashPassword("123456");
         if (PasswordUtil.checkPassword(pass, hashedDefault)) {
             TaiKhoan offlineTK = null;
             if ("admin".equalsIgnoreCase(user)) {

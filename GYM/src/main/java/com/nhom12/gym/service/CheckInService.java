@@ -187,16 +187,18 @@ public class CheckInService {
                 hv.setMaHoiVien(1);
                 hv.setHoTen("Nguyễn Văn Tuấn");
                 hv.setMaTheQR(code);
-                hv.setChiNhanhDangKy("Toàn hệ thống (VIP Diamond)");
-                hv.setTrangThai("Hoạt động");
+                hv.setChiNhanhDangKy("Toàn hệ thống (VIP)");
+                hv.setGoiTapDangKy("Gói VIP Diamond 12 Tháng");
+                hv.setTrangThai("Active");
                 hv.setNgayHetHan(new Date(System.currentTimeMillis() + 86400000L * 90)); // Còn 90 ngày
             } else if ("QR002".equals(code) || "HV002".equals(code) || "LAN".equals(code)) {
                 hv = new HoiVien();
                 hv.setMaHoiVien(2);
                 hv.setHoTen("Lê Thị Lan");
                 hv.setMaTheQR(code);
-                hv.setChiNhanhDangKy("Cơ sở 1 - Gò Vấp");
-                hv.setTrangThai("Hoạt động");
+                hv.setChiNhanhDangKy("CN01 - Cơ sở 1 (Quận 1)");
+                hv.setGoiTapDangKy("Gói Standard 3 Tháng");
+                hv.setTrangThai("Active");
                 hv.setNgayHetHan(new Date(System.currentTimeMillis() - 86400000L * 5)); // Đã hết hạn 5 ngày
             } else if ("QR003".equals(code) || "HV003".equals(code) || "KHOA".equals(code)) {
                 hv = new HoiVien();
@@ -204,7 +206,8 @@ public class CheckInService {
                 hv.setHoTen("Trần Văn Khóa");
                 hv.setMaTheQR(code);
                 hv.setChiNhanhDangKy("CN02 - Cơ sở 2 (Tân Bình)");
-                hv.setTrangThai("Tạm khóa");
+                hv.setGoiTapDangKy("Gói Tiêu Chuẩn 1 Tháng");
+                hv.setTrangThai("Locked");
                 hv.setNgayHetHan(new Date(System.currentTimeMillis() + 86400000L * 60));
             } else if ("VIP007".equals(code) || "VIP-DUC".equals(code)) {
                 // Yêu cầu ẩn của anh Đức: Hội viên VIP giảm 50% đặc biệt
@@ -212,8 +215,9 @@ public class CheckInService {
                 hv.setMaHoiVien(7);
                 hv.setHoTen("Đỗ Minh Trí (Khách VIP Anh Đức)");
                 hv.setMaTheQR(code);
-                hv.setChiNhanhDangKy("Toàn hệ thống (VIP Diamond)");
-                hv.setTrangThai("Hoạt động");
+                hv.setChiNhanhDangKy("Toàn hệ thống (VIP)");
+                hv.setGoiTapDangKy("Gói VIP Trọn Đời");
+                hv.setTrangThai("Active");
                 hv.setNgayHetHan(new Date(System.currentTimeMillis() + 86400000L * 300));
             } else if ("QR004".equals(code) || "HV004".equals(code)) {
                 // Hội viên đăng ký Cơ sở 2 - Tân Bình (Thẻ cơ sở)
@@ -222,7 +226,8 @@ public class CheckInService {
                 hv.setHoTen("Phạm Trọng Thủy");
                 hv.setMaTheQR(code);
                 hv.setChiNhanhDangKy("CN02 - Cơ sở 2 (Tân Bình)");
-                hv.setTrangThai("Hoạt động");
+                hv.setGoiTapDangKy("Gói Standard 3 Tháng");
+                hv.setTrangThai("Active");
                 hv.setNgayHetHan(new Date(System.currentTimeMillis() + 86400000L * 45));
             }
         }
@@ -235,16 +240,27 @@ public class CheckInService {
                     note, false, false, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, "---");
         }
 
+        // Chuẩn hóa và làm sạch dữ liệu hội viên (chống lỗi font '?')
+        hv.setHoTen(com.nhom12.gym.util.TextSanitizer.sanitize(hv.getHoTen()));
+        hv.setChiNhanhDangKy(com.nhom12.gym.util.TextSanitizer.normalizeBranch(hv.getChiNhanhDangKy()));
+        if (hv.getTrangThai() != null) {
+            hv.setTrangThai(com.nhom12.gym.util.TextSanitizer.sanitize(hv.getTrangThai()));
+        }
+
         String memberName = hv.getHoTen();
         String memberBranch = hv.getChiNhanhDangKy();
-        boolean isVip = code.contains("VIP") || memberName.contains("VIP") || "Toàn hệ thống (VIP Diamond)".equalsIgnoreCase(memberBranch);
+        String memberPackage = (hv.getGoiTapDangKy() != null && !hv.getGoiTapDangKy().trim().isEmpty())
+                ? hv.getGoiTapDangKy().trim() : "Gói Standard 3 Tháng";
+
+        boolean isVip = code.contains("VIP") || memberName.contains("VIP") || memberBranch.contains("VIP");
 
         // RULE 2: TÀI KHOẢN CÓ BỊ TẠM KHÓA KHÔNG?
-        if ("Locked".equalsIgnoreCase(hv.getTrangThai()) || "Tạm khóa".equalsIgnoreCase(hv.getTrangThai())) {
+        if ("Locked".equalsIgnoreCase(hv.getTrangThai()) || "Tạm khóa".equalsIgnoreCase(hv.getTrangThai()) ||
+            hv.getTrangThai().toLowerCase().contains("locked") || hv.getTrangThai().toLowerCase().contains("khóa")) {
             String note = "Thẻ đang bị tạm khóa (chưa đóng phí phạt hoặc vi phạm nội quy)";
             ghiNhanLog(timeNowStr, code, memberName, currentBranch, false, note, startTime);
             return new CheckInResult(false, "TỪ CHỐI: Thẻ hội viên đang bị TẠM KHÓA!", hv,
-                    note, false, isVip, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, "Đang khóa");
+                    note, false, isVip, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, memberPackage);
         }
 
         // RULE 3: GÓI CÒN HẠN KHÔNG?
@@ -255,24 +271,23 @@ public class CheckInService {
                 String note = "Gói tập đã hết hạn từ ngày " + expDate;
                 ghiNhanLog(timeNowStr, code, memberName, currentBranch, false, note, startTime);
                 return new CheckInResult(false, "TỪ CHỐI: Gói tập đã HẾT HẠN từ ngày " + expDate + "!", hv,
-                        note, true, isVip, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, "Hết hạn (" + expDate + ")");
+                        note, true, isVip, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, memberPackage);
             }
         }
 
-        // RULE 4: ĐÚNG CHI NHÁNH ĐƯỢC PHÉP TẬP KHÔNG?
-        if (currentBranch != null && !currentBranch.trim().isEmpty() && !"Tất cả cơ sở".equalsIgnoreCase(currentBranch.trim())) {
-            boolean isAllBranch = isVip || "Toàn hệ thống (VIP Diamond)".equalsIgnoreCase(memberBranch)
-                    || (memberBranch != null && memberBranch.toLowerCase().contains("toàn hệ thống"));
-            boolean branchMatch = memberBranch != null && (
-                    memberBranch.equalsIgnoreCase(currentBranch) ||
-                    memberBranch.toLowerCase().contains(currentBranch.toLowerCase()) ||
-                    currentBranch.toLowerCase().contains(memberBranch.toLowerCase())
-            );
-            if (!isAllBranch && !branchMatch) {
-                String note = "Sai chi nhánh: Thẻ chỉ áp dụng tại " + memberBranch;
+        // RULE 4: ĐÚNG CHI NHÁNH ĐƯỢC PHÉP TẬP KHÔNG? (SO KHỚP THÔNG MINH QUA TextSanitizer)
+        if (currentBranch != null && !currentBranch.trim().isEmpty() &&
+            !"Tất cả cơ sở".equalsIgnoreCase(currentBranch.trim()) &&
+            !"Toàn hệ thống (Tất cả trạm)".equalsIgnoreCase(currentBranch.trim())) {
+
+            boolean branchMatch = com.nhom12.gym.util.TextSanitizer.isBranchMatching(memberBranch, currentBranch);
+            if (!branchMatch) {
+                String cleanMB = com.nhom12.gym.util.TextSanitizer.normalizeBranch(memberBranch);
+                String cleanCB = com.nhom12.gym.util.TextSanitizer.normalizeBranch(currentBranch);
+                String note = "Sai chi nhánh: Thẻ chỉ áp dụng tại " + cleanMB;
                 ghiNhanLog(timeNowStr, code, memberName, currentBranch, false, note, startTime);
-                return new CheckInResult(false, "TỪ CHỐI: Thẻ cơ sở đơn lẻ! Hội viên đăng ký tại '" + memberBranch + "', không thể vào trạm '" + currentBranch + "'!", hv,
-                        note, true, isVip, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, "Sai chi nhánh");
+                return new CheckInResult(false, "TỪ CHỐI: Thẻ cơ sở đơn lẻ! Hội viên đăng ký tại '" + cleanMB + "', không thể vào trạm '" + cleanCB + "'!", hv,
+                        note, true, isVip, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, memberPackage);
             }
         }
 
@@ -284,7 +299,7 @@ public class CheckInService {
             String note = "Cảnh báo quét trùng thẻ (vừa check-in cách đây " + (120 - secLeft) + "s)";
             ghiNhanLog(timeNowStr, code, memberName, currentBranch, false, note, startTime);
             return new CheckInResult(false, "CẢNH BÁO: Thẻ vừa quét check-in trước đó! Vui lòng không quét trùng (chờ " + secLeft + "s).", hv,
-                    note, false, isVip, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, "Quét trùng");
+                    note, false, isVip, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, memberPackage);
         }
 
         // HỢP LỆ TOÀN BỘ: GHI NHẬN CHECK-IN THÀNH CÔNG!
@@ -294,10 +309,8 @@ public class CheckInService {
         ghiNhanLog(timeNowStr, code, memberName, currentBranch, true, note, startTime);
 
         long elapsed = System.currentTimeMillis() - startTime;
-        String goiTap = isVip ? "VIP Diamond Toàn Hệ Thống" : "Gói Thể Lực Tiêu Chuẩn";
-
         return new CheckInResult(true, "CHECK-IN THÀNH CÔNG: Xin chào " + memberName + "!", hv,
-                "Đạt tất cả 5 điều kiện hợp lệ", false, isVip, elapsed, "OPEN", timeNowStr, goiTap);
+                "Đạt tất cả 5 điều kiện hợp lệ", false, isVip, elapsed, "OPEN", timeNowStr, memberPackage);
     }
 
     public GuestPassTicket banVeLeNgay(String customerName, String customerPhone, String branch, double price) {

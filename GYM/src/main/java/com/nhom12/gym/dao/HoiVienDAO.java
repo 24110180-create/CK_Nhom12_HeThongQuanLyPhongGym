@@ -57,22 +57,27 @@ public class HoiVienDAO {
     }
 
     public List<HoiVien> layTatCa() {
+        List<HoiVien> result = new ArrayList<>();
         SessionFactory sf = HibernateUtil.getSessionFactory();
-        if (sf == null) {
-            return new ArrayList<>(memoryCache);
-        }
-
-        try (Session session = sf.openSession()) {
-            List<HoiVien> list = session.createQuery("FROM HoiVien ORDER BY maHoiVien DESC", HoiVien.class).list();
-            if (list != null && !list.isEmpty()) {
-                memoryCache.clear();
-                memoryCache.addAll(list);
-                return list;
+        if (sf != null) {
+            try (Session session = sf.openSession()) {
+                List<HoiVien> list = session.createQuery("FROM HoiVien ORDER BY maHoiVien DESC", HoiVien.class).list();
+                if (list != null && !list.isEmpty()) {
+                    memoryCache.clear();
+                    memoryCache.addAll(list);
+                    for (HoiVien item : list) {
+                        result.add(sanitizeHoiVien(item));
+                    }
+                    return result;
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "CSDL chưa sẵn sàng, sử dụng bộ nhớ đệm: {0}", e.getMessage());
             }
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "CSDL chưa sẵn sàng, sử dụng bộ nhớ đệm: {0}", e.getMessage());
         }
-        return new ArrayList<>(memoryCache);
+        for (HoiVien item : memoryCache) {
+            result.add(sanitizeHoiVien(item));
+        }
+        return result;
     }
 
     public boolean them(HoiVien hv) {
@@ -159,19 +164,29 @@ public class HoiVienDAO {
         }
     }
 
+    private HoiVien sanitizeHoiVien(HoiVien hv) {
+        if (hv == null) return null;
+        hv.setHoTen(com.nhom12.gym.util.TextSanitizer.sanitize(hv.getHoTen()));
+        hv.setChiNhanhDangKy(com.nhom12.gym.util.TextSanitizer.normalizeBranch(hv.getChiNhanhDangKy()));
+        if (hv.getTrangThai() != null) {
+            hv.setTrangThai(com.nhom12.gym.util.TextSanitizer.sanitize(hv.getTrangThai()));
+        }
+        return hv;
+    }
+
     public HoiVien timTheoId(int maHoiVien) {
         SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf != null) {
             try (Session session = sf.openSession()) {
                 HoiVien hv = session.get(HoiVien.class, maHoiVien);
-                if (hv != null) return hv;
+                if (hv != null) return sanitizeHoiVien(hv);
             } catch (Exception e) {
                 LOGGER.log(Level.FINE, "Lỗi tìm hội viên theo ID: {0}", e.getMessage());
             }
         }
 
         for (HoiVien hv : memoryCache) {
-            if (hv.getMaHoiVien() == maHoiVien) return hv;
+            if (hv.getMaHoiVien() == maHoiVien) return sanitizeHoiVien(hv);
         }
         return null;
     }
@@ -188,7 +203,7 @@ public class HoiVienDAO {
                 );
                 query.setParameter("ma", q);
                 HoiVien hv = query.uniqueResult();
-                if (hv != null) return hv;
+                if (hv != null) return sanitizeHoiVien(hv);
             } catch (Exception e) {
                 LOGGER.log(Level.FINE, "Lỗi tìm theo mã QR: {0}", e.getMessage());
             }
@@ -196,7 +211,7 @@ public class HoiVienDAO {
 
         for (HoiVien hv : memoryCache) {
             if (hv.getMaTheQR() != null && hv.getMaTheQR().equalsIgnoreCase(q)) {
-                return hv;
+                return sanitizeHoiVien(hv);
             }
         }
         return null;
@@ -206,38 +221,43 @@ public class HoiVienDAO {
         if (keyword == null || keyword.trim().isEmpty()) return null;
         String kw = keyword.trim();
 
-        // 1. Khớp mã QR
+        // 1. Khớp mã QR chính xác
         HoiVien hv = timTheoMaQR(kw);
-        if (hv != null) return hv;
+        if (hv != null) return sanitizeHoiVien(hv);
 
         // 2. Khớp ID số nguyên
         try {
             int id = Integer.parseInt(kw);
             hv = timTheoId(id);
-            if (hv != null) return hv;
+            if (hv != null) return sanitizeHoiVien(hv);
         } catch (NumberFormatException ignored) {}
 
-        // 3. Khớp số bóc tách từ mã
+        // 3. Khớp số bóc tách từ mã dạng HV01, HV386
         String digits = kw.replaceAll("\\D+", "");
         if (!digits.isEmpty()) {
             try {
                 int id = Integer.parseInt(digits);
                 hv = timTheoId(id);
-                if (hv != null) return hv;
+                if (hv != null) return sanitizeHoiVien(hv);
             } catch (NumberFormatException ignored) {}
         }
 
-        // 4. Tìm kiếm họ tên
+        // 4. Tìm kiếm theo Số Điện Thoại, Mã QR chứa, hoặc Họ Tên
         List<HoiVien> all = layTatCa();
         if (all != null) {
             for (HoiVien m : all) {
+                if (m.getSoDienThoai() != null && m.getSoDienThoai().replaceAll("\\s+", "").contains(kw)) {
+                    return sanitizeHoiVien(m);
+                }
+            }
+            for (HoiVien m : all) {
                 if (m.getMaTheQR() != null && m.getMaTheQR().equalsIgnoreCase(kw)) {
-                    return m;
+                    return sanitizeHoiVien(m);
                 }
             }
             for (HoiVien m : all) {
                 if (m.getHoTen() != null && m.getHoTen().toLowerCase().contains(kw.toLowerCase())) {
-                    return m;
+                    return sanitizeHoiVien(m);
                 }
             }
         }

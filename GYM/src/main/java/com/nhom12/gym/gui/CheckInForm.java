@@ -66,7 +66,7 @@ public class CheckInForm extends JPanel {
 
         JPanel titleGroup = new JPanel(new GridLayout(2, 1, 0, 2));
         titleGroup.setOpaque(false);
-        JLabel lblTitle = new JLabel("TRẠM QUÉT CHECK-IN TỰ ĐỘNG (USE CASE LÕI CỦA ĐỒ ÁN)");
+        JLabel lblTitle = new JLabel("TRẠM QUÉT CHECK-IN TỰ ĐỘNG (FLAP BARRIER & HONEYWELL SCANNER)");
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblTitle.setForeground(new Color(15, 23, 42));
 
@@ -109,9 +109,9 @@ public class CheckInForm extends JPanel {
 
         JLabel lblBr = new JLabel("Trạm:");
         lblBr.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        cbStationBranch = new JComboBox<>(new String[]{"CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)"});
+        cbStationBranch = new JComboBox<>(new String[]{"CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)", "Toàn hệ thống (Tất cả trạm)"});
         cbStationBranch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        cbStationBranch.setPreferredSize(new Dimension(150, 32));
+        cbStationBranch.setPreferredSize(new Dimension(180, 32));
 
         lblNetworkStatus = new JLabel("Online (Đồng bộ)");
         lblNetworkStatus.setFont(new Font("Segoe UI", Font.BOLD, 11));
@@ -563,12 +563,18 @@ public class CheckInForm extends JPanel {
             com.nhom12.gym.util.SoundHelper.playSuccessBeep();
 
             HoiVien hv = res.hoiVien;
+            String phone = (hv.getSoDienThoai() != null && !hv.getSoDienThoai().trim().isEmpty())
+                    ? hv.getSoDienThoai().trim() : ("09" + (Math.abs(hv.getHoTen().hashCode()) % 80000000 + 10000000));
+            String goiTap = (hv.getGoiTapDangKy() != null && !hv.getGoiTapDangKy().trim().isEmpty())
+                    ? hv.getGoiTapDangKy().trim() : res.goiTapDisplay;
+            String chiNhanh = com.nhom12.gym.util.TextSanitizer.normalizeBranch(hv.getChiNhanhDangKy());
+
             lblMemberName.setText("Họ Và Tên: " + hv.getHoTen());
             lblMemberCode.setText("Mã Thẻ QR: " + hv.getMaTheQR());
-            lblMemberPhone.setText("Số Điện Thoại: 09" + (Math.abs(hv.getHoTen().hashCode()) % 80000000 + 10000000));
-            lblMemberPackage.setText("Gói Tập: " + res.goiTapDisplay);
+            lblMemberPhone.setText("Số Điện Thoại: " + phone);
+            lblMemberPackage.setText("Gói Tập: " + goiTap);
             lblMemberExpire.setText("Thời Hạn Sử Dụng: Đến " + (hv.getNgayHetHan() != null ? sdf.format(hv.getNgayHetHan()) : "31/12/2026"));
-            lblMemberBranch.setText("Phạm Vi Tập: " + hv.getChiNhanhDangKy());
+            lblMemberBranch.setText("Phạm Vi Tập: " + chiNhanh);
 
             if (res.isVipSecret) {
                 lblSecretVipNote.setText("[ƯU ĐÃI NỘI BỘ]: Hội viên đặc biệt của Chủ phòng (Giảm 50% - Bảo mật với nhân viên)");
@@ -593,12 +599,18 @@ public class CheckInForm extends JPanel {
 
             if (res.hoiVien != null) {
                 HoiVien hv = res.hoiVien;
+                String phone = (hv.getSoDienThoai() != null && !hv.getSoDienThoai().trim().isEmpty())
+                        ? hv.getSoDienThoai().trim() : ("09" + (Math.abs(hv.getHoTen().hashCode()) % 80000000 + 10000000));
+                String goiTap = (hv.getGoiTapDangKy() != null && !hv.getGoiTapDangKy().trim().isEmpty())
+                        ? hv.getGoiTapDangKy().trim() : "Gói Standard 3 Tháng";
+                String chiNhanh = com.nhom12.gym.util.TextSanitizer.normalizeBranch(hv.getChiNhanhDangKy());
+
                 lblMemberName.setText("Họ Và Tên: " + hv.getHoTen());
                 lblMemberCode.setText("Mã Thẻ QR: " + hv.getMaTheQR());
-                lblMemberPhone.setText("Số Điện Thoại: ---");
-                lblMemberPackage.setText("Gói Tập: " + res.goiTapDisplay);
+                lblMemberPhone.setText("Số Điện Thoại: " + phone);
+                lblMemberPackage.setText("Gói Tập: " + goiTap);
                 lblMemberExpire.setText("Thời Hạn Sử Dụng: Đến " + (hv.getNgayHetHan() != null ? sdf.format(hv.getNgayHetHan()) : "---"));
-                lblMemberBranch.setText("Phạm Vi Tập: " + hv.getChiNhanhDangKy());
+                lblMemberBranch.setText("Phạm Vi Tập: " + chiNhanh);
             } else {
                 lblMemberName.setText("Họ Và Tên: ---");
                 lblMemberCode.setText("Mã Thẻ QR: " + code);

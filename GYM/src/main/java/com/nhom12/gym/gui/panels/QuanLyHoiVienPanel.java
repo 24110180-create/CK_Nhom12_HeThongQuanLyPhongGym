@@ -357,6 +357,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnExport.addActionListener(e -> com.nhom12.gym.util.ExcelExportHelper.exportTableToExcel(this, table, "DanhSach_HoiVien_DaDangKy"));
 
         // Định dạng căn chỉnh renderer
+        // Định dạng căn chỉnh renderer
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
 
@@ -371,21 +372,46 @@ public class QuanLyHoiVienPanel extends JPanel {
         table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer); // Ngày giờ đăng ký
         table.getColumnModel().getColumn(6).setCellRenderer(rightRenderer);  // Số tiền đã TT
         table.getColumnModel().getColumn(7).setCellRenderer(centerRenderer); // Hình thức TT
+        table.getColumnModel().getColumn(8).setCellRenderer(centerRenderer); // Chi nhánh
         table.getColumnModel().getColumn(9).setCellRenderer(centerRenderer); // Ngày hết hạn
-        table.getColumnModel().getColumn(10).setCellRenderer(centerRenderer); // Trạng thái
 
-        // Tùy chỉnh độ rộng cột
-        table.getColumnModel().getColumn(0).setPreferredWidth(55);
-        table.getColumnModel().getColumn(1).setPreferredWidth(75);
-        table.getColumnModel().getColumn(2).setPreferredWidth(130);
-        table.getColumnModel().getColumn(3).setPreferredWidth(95);
-        table.getColumnModel().getColumn(4).setPreferredWidth(140);
-        table.getColumnModel().getColumn(5).setPreferredWidth(145);
-        table.getColumnModel().getColumn(6).setPreferredWidth(110);
-        table.getColumnModel().getColumn(7).setPreferredWidth(130);
-        table.getColumnModel().getColumn(8).setPreferredWidth(100);
-        table.getColumnModel().getColumn(9).setPreferredWidth(95);
-        table.getColumnModel().getColumn(10).setPreferredWidth(80);
+        // Renderer màu cho trạng thái (Active: Xanh, Expired: Đỏ, Locked: Cam)
+        table.getColumnModel().getColumn(10).setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable t, Object val, boolean isSel, boolean hasFocus, int r, int c) {
+                JLabel l = (JLabel) super.getTableCellRendererComponent(t, val, isSel, hasFocus, r, c);
+                l.setHorizontalAlignment(SwingConstants.CENTER);
+                String s = (val != null) ? val.toString() : "";
+                if (s.toLowerCase().contains("active") || s.toLowerCase().contains("hoạt động")) {
+                    l.setForeground(new Color(16, 185, 129));
+                    l.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                } else if (s.toLowerCase().contains("expired") || s.toLowerCase().contains("hết hạn")) {
+                    l.setForeground(new Color(239, 68, 68));
+                    l.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                } else if (s.toLowerCase().contains("locked") || s.toLowerCase().contains("khóa")) {
+                    l.setForeground(new Color(245, 158, 11));
+                    l.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                } else {
+                    l.setForeground(new Color(71, 85, 105));
+                    l.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+                }
+                return l;
+            }
+        });
+
+        // Bật cuộn ngang tự do và tinh chỉnh độ rộng chuẩn xác cho từng cột (chống co rút cắt chữ ...)
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.getColumnModel().getColumn(0).setPreferredWidth(65);  // Mã HV
+        table.getColumnModel().getColumn(1).setPreferredWidth(115); // Mã Thẻ QR
+        table.getColumnModel().getColumn(2).setPreferredWidth(160); // Họ Và Tên
+        table.getColumnModel().getColumn(3).setPreferredWidth(105); // Số ĐT
+        table.getColumnModel().getColumn(4).setPreferredWidth(170); // Gói Tập
+        table.getColumnModel().getColumn(5).setPreferredWidth(150); // Ngày Giờ ĐK
+        table.getColumnModel().getColumn(6).setPreferredWidth(125); // Số Tiền Đã TT
+        table.getColumnModel().getColumn(7).setPreferredWidth(150); // Hình Thức TT
+        table.getColumnModel().getColumn(8).setPreferredWidth(175); // Chi Nhánh
+        table.getColumnModel().getColumn(9).setPreferredWidth(105); // Ngày Hết Hạn
+        table.getColumnModel().getColumn(10).setPreferredWidth(130); // Trạng Thái
 
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
         return panel;
@@ -428,23 +454,26 @@ public class QuanLyHoiVienPanel extends JPanel {
                 }
 
                 String dateHetHanStr = (hv.getNgayHetHan() != null) ? sdfDate.format(hv.getNgayHetHan()) : "31/12/2026";
-                String status = hv.getTrangThai() != null ? hv.getTrangThai() : "Active";
-                if ("Active".equalsIgnoreCase(status) || "Hoạt động".equalsIgnoreCase(status)) {
+                String cleanStatus = com.nhom12.gym.util.TextSanitizer.sanitize(hv.getTrangThai());
+                String cleanBranch = com.nhom12.gym.util.TextSanitizer.normalizeBranch(hv.getChiNhanhDangKy());
+                String cleanName = com.nhom12.gym.util.TextSanitizer.sanitize(hv.getHoTen());
+
+                if (cleanStatus.toLowerCase().contains("active") || cleanStatus.toLowerCase().contains("hoạt động")) {
                     activeCount++;
                 }
 
                 tableModel.addRow(new Object[]{
                         hv.getMaHoiVien(),
                         hv.getMaTheQR(),
-                        hv.getHoTen(),
+                        cleanName,
                         sdt,
                         goiTap,
                         ngayDangKyStr,
                         df.format(tien),
                         hinhThucTT,
-                        hv.getChiNhanhDangKy(),
+                        cleanBranch,
                         dateHetHanStr,
-                        status
+                        cleanStatus
                 });
             }
         }

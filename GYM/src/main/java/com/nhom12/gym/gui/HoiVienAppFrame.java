@@ -155,7 +155,6 @@ public class HoiVienAppFrame extends JFrame {
         addSidebarItem(menuContainer, "Lịch Tập Với PT", "Số buổi kèm & kỷ lục tạ PR", TAB_PT, accentColor, false);
         addSidebarItem(menuContainer, "Chỉ Số Cơ Thể InBody", "Theo dõi cơ, mỡ, BMI cá nhân", TAB_INBODY, accentColor, false);
         addSidebarItem(menuContainer, "Gói Tập & Gia Hạn", "Hợp đồng & thanh toán VietQR", TAB_PACKAGE, accentColor, false);
-        addSidebarItem(menuContainer, "Đánh Giá & Góp Ý", "Chấm điểm dịch vụ phòng gym", TAB_FEEDBACK, accentColor, false);
 
         // Sidebar Bottom: Đổi mật khẩu & Đăng xuất
         JPanel sidebarBottom = new JPanel(new GridLayout(2, 1, 0, 8));
@@ -242,7 +241,6 @@ public class HoiVienAppFrame extends JFrame {
         contentArea.add(new HoiVienLichPTPanel(), TAB_PT);
         contentArea.add(new HoiVienInBodyPanel(), TAB_INBODY);
         contentArea.add(new HoiVienGoiTapPanel(), TAB_PACKAGE);
-        contentArea.add(new HoiVienGopYPanel(), TAB_FEEDBACK);
 
         mainArea.add(contentArea, BorderLayout.CENTER);
         root.add(mainArea, BorderLayout.CENTER);

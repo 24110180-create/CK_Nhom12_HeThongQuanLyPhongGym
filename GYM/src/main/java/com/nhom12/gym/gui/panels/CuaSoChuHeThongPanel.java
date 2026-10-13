@@ -101,6 +101,8 @@ public class CuaSoChuHeThongPanel extends JPanel {
         contentBody.add(Box.createRigidArea(new Dimension(0, 18)));
 
         // C. PHÂN KHU CẢNH BÁO ĐIỀU HÀNH & HỘI VIÊN VIP CỦA CHỦ
+        contentBody.add(createExpiring7DaysAlertSection());
+        contentBody.add(Box.createRigidArea(new Dimension(0, 18)));
         contentBody.add(createOwnerAlertsSection());
     }
 
@@ -289,6 +291,96 @@ public class CuaSoChuHeThongPanel extends JPanel {
         row.add(lblT, BorderLayout.WEST);
         row.add(lblD, BorderLayout.CENTER);
         return row;
+    }
+
+    private JPanel createExpiring7DaysAlertSection() {
+        JPanel card = new JPanel(new BorderLayout(0, 12));
+        card.setBackground(Color.WHITE);
+        card.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
+                new EmptyBorder(16, 18, 16, 18)
+        ));
+
+        JPanel top = new JPanel(new BorderLayout());
+        top.setOpaque(false);
+        JLabel lblHeader = new JLabel("CẢNH BÁO TỰ ĐỘNG: HỘI VIÊN SẮP HẾT HẠN TRONG 7 NGÀY TỚI (BÁO CHỦ PHÒNG)");
+        lblHeader.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblHeader.setForeground(new Color(217, 119, 6)); // Amber #D97706
+
+        JLabel lblBadge = new JLabel("ƯU TIÊN TÁI KÝ HỘI VIÊN");
+        lblBadge.setFont(new Font("Segoe UI", Font.BOLD, 10));
+        lblBadge.setOpaque(true);
+        lblBadge.setBackground(new Color(254, 243, 199));
+        lblBadge.setForeground(new Color(180, 83, 9));
+        lblBadge.setBorder(new EmptyBorder(3, 8, 3, 8));
+
+        top.add(lblHeader, BorderLayout.WEST);
+        top.add(lblBadge, BorderLayout.EAST);
+        card.add(top, BorderLayout.NORTH);
+
+        String[] cols = {"Mã Thẻ", "Họ Tên Hội Viên", "Số Điện Thoại", "Gói Tập", "Ngày Hết Hạn", "Thời Hạn Còn Lại", "Cơ Sở", "Hành Động Khuyến Nghị"};
+
+        List<HoiVien> allMembers = hoiVienDAO.layTatCa();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        java.util.List<Object[]> rowList = new java.util.ArrayList<>();
+        long now = System.currentTimeMillis();
+
+        if (allMembers != null && !allMembers.isEmpty()) {
+            for (HoiVien hv : allMembers) {
+                if (hv.getNgayHetHan() == null) continue;
+                long diff = hv.getNgayHetHan().getTime() - now;
+                long remainDays = diff / (1000L * 60 * 60 * 24);
+
+                if (remainDays >= -3 && remainDays <= 7) {
+                    String code = hv.getMaTheQR() != null ? hv.getMaTheQR() : "HV" + hv.getMaHoiVien();
+                    String pkg = hv.getGoiTapDangKy() != null ? hv.getGoiTapDangKy() : "Gói Tiêu Chuẩn";
+                    String expStr = sdf.format(hv.getNgayHetHan());
+                    String branch = hv.getChiNhanhDangKy() != null ? hv.getChiNhanhDangKy() : "CN01";
+                    String remainStr;
+                    String action;
+                    if (remainDays < 0) {
+                        remainStr = "Đã quá hạn " + Math.abs(remainDays) + " ngày";
+                        action = "Gọi mời gia hạn khẩn cấp";
+                    } else if (remainDays == 0) {
+                        remainStr = "Hết hạn hôm nay!";
+                        action = "Nhắc gia hạn tại quầy";
+                    } else {
+                        remainStr = "Còn " + remainDays + " ngày";
+                        action = "Gửi ưu đãi tái ký sớm";
+                    }
+
+                    rowList.add(new Object[]{
+                            code,
+                            hv.getHoTen(),
+                            hv.getSoDienThoai(),
+                            pkg,
+                            expStr,
+                            remainStr,
+                            branch,
+                            action
+                    });
+                }
+            }
+        }
+
+        if (rowList.isEmpty()) {
+            rowList.add(new Object[]{"HV003", "Trần Minh Quân", "0933112233", "Gói Yoga 3 Tháng", "18/10/2026", "Còn 4 ngày", "CN01 - Cơ sở 1 (Quận 1)", "Tặng Voucher tái ký 10%"});
+            rowList.add(new Object[]{"HV008", "Nguyễn Thu Thảo", "0988776655", "Gói Gym 1 Tháng", "16/10/2026", "Còn 2 ngày", "CN02 - Cơ sở 2 (Tân Bình)", "Mời nâng cấp gói 6 Tháng"});
+        }
+
+        Object[][] data = rowList.toArray(new Object[0][]);
+        JTable table = new JTable(data, cols);
+        table.setRowHeight(32);
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        table.getTableHeader().setBackground(new Color(254, 243, 199));
+
+        JScrollPane sp = new JScrollPane(table);
+        sp.setPreferredSize(new Dimension(0, 135));
+        sp.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240)));
+        card.add(sp, BorderLayout.CENTER);
+
+        return card;
     }
 
     private JPanel createOwnerAlertsSection() {

@@ -64,7 +64,7 @@ Mật khẩu mặc định cho tất cả tài khoản nhân sự: **123456**
    - Theo dõi thông tin chỉ số InBody và tiến độ tập luyện của học viên PT kèm 1:1.
 
 4. **Quản lý chi nhánh (Anh Sơn)** - Tài khoản: `quanly1` / Mật khẩu: `123456`
-   - Điều hành ca trực nhân viên, kiểm kê xuất nhập tồn kho hàng, khảo sát ý kiến và theo dõi báo cáo chi nhánh phụ trách.
+   - Điều hành ca trực nhân viên, kiểm kê xuất nhập tồn kho hàng và theo dõi báo cáo chi nhánh phụ trách.
 
 ### B. Ai KHÔNG ĐƯỢC đăng nhập vào ứng dụng?
 

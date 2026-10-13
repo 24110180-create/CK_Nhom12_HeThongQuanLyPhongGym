@@ -152,9 +152,27 @@ public class LoginForm extends JFrame {
         rightPanel.add(lblPassTitle);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 6)));
         rightPanel.add(txtPass);
-        rightPanel.add(Box.createRigidArea(new Dimension(0, 22)));
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         rightPanel.add(btnLogin);
-        rightPanel.add(Box.createRigidArea(new Dimension(0, 12)));
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        JButton btnRegisterMember = new JButton("Khách hàng mới? Bấm vào đây để Đăng Ký Hội Viên Mới");
+        btnRegisterMember.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnRegisterMember.setForeground(new Color(37, 99, 235));
+        btnRegisterMember.setBorderPainted(false);
+        btnRegisterMember.setContentAreaFilled(false);
+        btnRegisterMember.setFocusPainted(false);
+        btnRegisterMember.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnRegisterMember.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnRegisterMember.addActionListener(e -> {
+            JDialog dlg = new JDialog(this, "Tiếp Nhận & Đăng Ký Hội Viên FitLife", true);
+            dlg.setSize(1100, 720);
+            dlg.setLocationRelativeTo(this);
+            dlg.add(new com.nhom12.gym.gui.panels.DangKyHoiVienPanel(() -> dlg.dispose(), () -> dlg.dispose()));
+            dlg.setVisible(true);
+        });
+
+        rightPanel.add(btnRegisterMember);
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 8)));
 
         JLabel lblSecNote = new JLabel("🔒 Hệ thống quản trị nội bộ. Tài khoản do Chủ phòng tập (Anh Đức) cấp phát.");
         lblSecNote.setFont(new Font("Segoe UI", Font.ITALIC, 11));

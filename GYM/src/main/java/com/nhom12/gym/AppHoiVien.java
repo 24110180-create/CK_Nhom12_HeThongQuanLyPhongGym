@@ -103,12 +103,7 @@ public class AppHoiVien extends JFrame {
         btnRegister.setFocusPainted(false);
         btnRegister.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnRegister.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnRegister.addActionListener(e -> {
-            new com.nhom12.gym.gui.DangKyTaiKhoanDialog(this, (u, p) -> {
-                txtPhone.setText(u);
-                txtPass.setText(p);
-            }).setVisible(true);
-        });
+        btnRegister.addActionListener(e -> moDialogDangKyApp());
 
         pnlBody.add(lblPhoneTitle);
         pnlBody.add(Box.createRigidArea(new Dimension(0, 6)));
@@ -210,6 +205,23 @@ public class AppHoiVien extends JFrame {
                 c.add(java.util.Calendar.MONTH, 1);
                 hv.setNgayHetHan(c.getTime());
                 hvDAO.them(hv);
+
+                com.nhom12.gym.entity.HoaDon hd = new com.nhom12.gym.entity.HoaDon(
+                        "HD-REG-" + System.currentTimeMillis(),
+                        hv.getMaHoiVien(),
+                        name,
+                        "Đăng ký Gói Trải Nghiệm 1 Tháng (App Hội Viên)",
+                        500000.0,
+                        0.0,
+                        500000.0,
+                        "Chuyển khoản (VietQR)",
+                        "Tự đăng ký qua App",
+                        (String) cbBr.getSelectedItem(),
+                        new java.util.Date(),
+                        "Đã thanh toán",
+                        "Đăng ký thành viên trực tuyến trên App Hội Viên"
+                );
+                com.nhom12.gym.dao.HoaDonDAO.getInstance().them(hd);
             } catch (Exception ignored) {}
 
             txtPhone.setText(phone);

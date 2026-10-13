@@ -274,6 +274,29 @@ public class MainDashboard extends JFrame {
         JPanel headerRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         headerRight.setOpaque(false);
 
+        // Nút Đăng ký hội viên nhanh
+        JButton btnQuickRegister = new JButton("➕ Đăng Ký Hội Viên");
+        btnQuickRegister.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnQuickRegister.setBackground(new Color(37, 99, 235));
+        btnQuickRegister.setForeground(Color.WHITE);
+        btnQuickRegister.setFocusPainted(false);
+        btnQuickRegister.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnQuickRegister.setPreferredSize(new Dimension(165, 32));
+        btnQuickRegister.addActionListener(e -> {
+            for (SidebarMenuItem item : sidebarMenuItems) {
+                if (item.title.contains("Đăng Ký Hội Viên")) {
+                    selectSidebarItem(item);
+                    return;
+                }
+            }
+            lblWorkspaceTitle.setText("TIẾP NHẬN & ĐĂNG KÝ HỘI VIÊN MỚI");
+            lblWorkspaceBreadcrumb.setText("Hệ thống > Đăng Ký Hội Viên Mới");
+            workspaceContainer.removeAll();
+            workspaceContainer.add(new JScrollPane(new DangKyHoiVienPanel()), BorderLayout.CENTER);
+            workspaceContainer.revalidate();
+            workspaceContainer.repaint();
+        });
+
         // Nút Quét mã check-in
         JButton btnQuickCheckIn = new JButton("Quét QR Check-in");
         btnQuickCheckIn.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -286,6 +309,8 @@ public class MainDashboard extends JFrame {
             Window top = SwingUtilities.getWindowAncestor(this);
             new QRScannerSimulatorDialog(top).setVisible(true);
         });
+
+        headerRight.add(btnQuickRegister);
 
         // Dropdown chuyển góc nhìn (CHỈ DÀNH RIÊNG CHO CHỦ PHÒNG TẬP)
         boolean isRealOwner = "Chủ".equalsIgnoreCase(Auth.vaiTro);
@@ -412,6 +437,10 @@ public class MainDashboard extends JFrame {
         addSidebarItem(menuContainer, "Phân Tích Giờ Cao Điểm", "Quyết định xếp ca & mở rộng phòng 6h-22h", () -> new HeatmapGioCaoDiemPanel(), accent, false);
         addSidebarItem(menuContainer, "Lịch Sử Giao Dịch", "Kiểm toán, đối soát dòng tiền & hóa đơn", () -> new LichSuGiaoDichPanel(), accent, false);
 
+        addSidebarCategoryHeader(menuContainer, "Khách Hàng & Hội Viên");
+        addSidebarItem(menuContainer, "Đăng Ký Hội Viên Mới", "Tiếp nhận hội viên mới & biểu phí thu ngân", () -> new DangKyHoiVienPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý & Hồ Sơ Hội Viên", "Danh bạ thẻ QR & kiểm toán hồ sơ hội viên", () -> new QuanLyHoiVienHubPanel(), accent, false);
+
         addSidebarCategoryHeader(menuContainer, "Chiến Lược Kinh Doanh");
         addSidebarItem(menuContainer, "Quản Lý Gói Tập & Giá Tiền", "Quyết định chính sách giá & bảng giá dịch vụ", () -> new QuanLyGoiTapPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Khuyến Mãi", "Quyết định marketing, gói VIP ẩn 50% & chống bán chui", () -> new QuanLyKhuyenMaiPanel(), accent, false);
@@ -427,9 +456,13 @@ public class MainDashboard extends JFrame {
     // 2. MENU LỄ TÂN (8 MÔ-ĐUN THAO TÁC TRỰC TIẾP TẠI QUẦY)
     // =========================================================================
     private void setupReceptionistMenu(JPanel menuContainer, Color accent) {
+        addSidebarCategoryHeader(menuContainer, "Nghiệp Vụ Hội Viên");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên & cửa flap barrier", () -> new CheckInForm(), accent, true);
+        addSidebarItem(menuContainer, "Đăng Ký Hội Viên Mới", "Biểu mẫu phát hành thẻ & thu phí VietQR", () -> new DangKyHoiVienPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý & Hồ Sơ Hội Viên", "Danh bạ thẻ QR & tiếp nhận đăng ký mới", () -> new QuanLyHoiVienHubPanel(), accent, false);
         addSidebarItem(menuContainer, "Gia Hạn Gói Tập", "Nâng cấp gói tập & gia hạn thẻ", () -> new GiaHanGoiTapPanel(), accent, false);
+
+        addSidebarCategoryHeader(menuContainer, "Dịch Vụ & Quầy Bar");
         addSidebarItem(menuContainer, "Lịch Lớp Học & Điểm Danh", "Thời khóa biểu lớp nhóm & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Bán nước giải khát, whey & đồ tập", () -> new BanHangPOSPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Tủ Đồ Locker", "20 tủ đồ cá nhân thông minh", () -> new QuanLyLockerPanel(), accent, false);
@@ -452,6 +485,7 @@ public class MainDashboard extends JFrame {
     private void setupManagerMenu(JPanel menuContainer, Color accent) {
         addSidebarCategoryHeader(menuContainer, "Vận Hành Quầy & Dịch Vụ");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên tại quầy", () -> new CheckInForm(), accent, true);
+        addSidebarItem(menuContainer, "Đăng Ký Hội Viên Mới", "Tiếp nhận & phát hành thẻ hội viên mới", () -> new DangKyHoiVienPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý & Hồ Sơ Hội Viên", "Hồ sơ hội viên & tiếp nhận đăng ký", () -> new QuanLyHoiVienHubPanel(), accent, false);
         addSidebarItem(menuContainer, "Gia Hạn Gói Tập", "Nâng cấp gói & gia hạn thẻ", () -> new GiaHanGoiTapPanel(), accent, false);
         addSidebarItem(menuContainer, "Lịch Lớp Học & Điểm Danh", "Điều phối lớp nhóm & điểm danh", () -> new LichLopHocPanel(), accent, false);

@@ -156,8 +156,8 @@ public class LoginForm extends JFrame {
         rightPanel.add(btnLogin);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 12)));
 
-        // Dòng liên kết Đăng ký tài khoản (hỗ trợ chọn vai trò: Lễ tân, HLV, Quản lý, Hội viên, Chủ)
-        JButton btnRegisterMultiRole = new JButton("Chưa có tài khoản? Bấm vào đây để Đăng Ký (Chọn Vai Trò)");
+        // Dòng liên kết Đăng ký tài khoản (hỗ trợ chọn vai trò: Hội viên, Lễ tân, HLV, Quản lý, Chủ phòng)
+        JButton btnRegisterMultiRole = new JButton("Bạn chưa có tài khoản?Đăng kí ngay tại đây!");
         btnRegisterMultiRole.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnRegisterMultiRole.setForeground(new Color(2, 132, 199));
         btnRegisterMultiRole.setBorderPainted(false);
@@ -167,21 +167,6 @@ public class LoginForm extends JFrame {
         btnRegisterMultiRole.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnRegisterMultiRole.addActionListener(e -> moDialogDangKyChonRole());
         rightPanel.add(btnRegisterMultiRole);
-        rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        JButton btnOpenMemberApp = new JButton("Khởi Chạy Ứng Dụng Riêng Cho Hội Viên");
-        btnOpenMemberApp.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnOpenMemberApp.setBackground(new Color(241, 245, 249));
-        btnOpenMemberApp.setForeground(new Color(30, 41, 59));
-        btnOpenMemberApp.setFocusPainted(false);
-        btnOpenMemberApp.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnOpenMemberApp.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
-        btnOpenMemberApp.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnOpenMemberApp.addActionListener(e -> {
-            this.dispose();
-            new com.nhom12.gym.AppHoiVien().setVisible(true);
-        });
-        rightPanel.add(btnOpenMemberApp);
 
         mainContainer.add(leftPanel);
         mainContainer.add(rightPanel);

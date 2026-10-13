@@ -52,7 +52,17 @@ public class DangKyHoiVienPanel extends JPanel {
     private JLabel lblCardExpire;
     private JLabel lblCardBranch;
 
+    private final Runnable onBackToList;
+    private final Runnable onRegistrationSuccess;
+
     public DangKyHoiVienPanel() {
+        this(null, null);
+    }
+
+    public DangKyHoiVienPanel(Runnable onBackToList, Runnable onRegistrationSuccess) {
+        this.onBackToList = onBackToList;
+        this.onRegistrationSuccess = onRegistrationSuccess;
+
         this.setLayout(new BorderLayout(15, 10));
         this.setBorder(BorderFactory.createEmptyBorder(12, 16, 12, 16));
         this.setBackground(new Color(245, 247, 250));
@@ -68,6 +78,18 @@ public class DangKyHoiVienPanel extends JPanel {
         lblSubtitle.setForeground(new Color(100, 116, 139));
         headerPanel.add(lblTitle, BorderLayout.NORTH);
         headerPanel.add(lblSubtitle, BorderLayout.SOUTH);
+
+        if (onBackToList != null) {
+            JButton btnBack = new JButton("📋 Xem Danh Sách Hội Viên");
+            btnBack.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            btnBack.setBackground(new Color(241, 245, 249));
+            btnBack.setForeground(new Color(37, 99, 235));
+            btnBack.setFocusPainted(false);
+            btnBack.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            btnBack.addActionListener(e -> onBackToList.run());
+            headerPanel.add(btnBack, BorderLayout.EAST);
+        }
+
         this.add(headerPanel, BorderLayout.NORTH);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -578,6 +600,10 @@ public class DangKyHoiVienPanel extends JPanel {
 
                         Frame f = (Frame) SwingUtilities.getWindowAncestor(this);
                         new GuiMaQRDialog(f, finalCode, name, phone, cbPackage.getSelectedItem().toString(), cbBranch.getSelectedItem().toString(), phone, "123456").setVisible(true);
+
+                        if (onRegistrationSuccess != null) {
+                            onRegistrationSuccess.run();
+                        }
                     }
                 }
         );

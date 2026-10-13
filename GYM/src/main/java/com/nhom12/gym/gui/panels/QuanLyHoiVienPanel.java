@@ -4,48 +4,38 @@ import com.nhom12.gym.entity.HoiVien;
 import com.nhom12.gym.gui.GuiMaQRDialog;
 import com.nhom12.gym.gui.QRScannerSimulatorDialog;
 import com.nhom12.gym.service.HoiVienService;
+import com.nhom12.gym.util.ExcelExportHelper;
+import com.nhom12.gym.util.TextSanitizer;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 /**
- * Màn hình Quản Lý Hội Viên Đã Đăng Ký
- * Hiển thị chi tiết Ngày Giờ Đăng Ký, Số Tiền Đã Thanh Toán, Gói Tập, Hình Thức Thanh Toán,
- * kèm thanh KPI thống kê tổng doanh thu thực thu từ hội viên.
+ * MÀN HÌNH QUẢN TRỊ DANH SÁCH & HỒ SƠ HỘI VIÊN (MEMBER MASTER DIRECTORY)
+ * Tối ưu hiển thị toàn màn hình, tra cứu thông minh, kiểm toán phí hội viên
+ * và tích hợp liên kết trực tiếp tới quy trình Tiếp nhận / Đăng ký mới.
  */
 public class QuanLyHoiVienPanel extends JPanel {
+
     private final HoiVienService service = new HoiVienService();
     private final DecimalFormat df = new DecimalFormat("#,### đ");
     private final SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     private final SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy");
 
-    // Các thành phần Form
-    private JTextField txtMaHV;
-    private JTextField txtQR;
-    private JTextField txtHoTen;
-    private JTextField txtSDT;
-    private JTextField txtGoiTap;
-    private JTextField txtNgayDangKy;
-    private JTextField txtSoTien;
-    private JComboBox<String> cbHinhThucTT;
-    private JComboBox<String> cbChiNhanh;
-    private JTextField txtNgayHetHan;
-    private JComboBox<String> cbTrangThai;
-
-    private JButton btnThem;
-    private JButton btnSua;
-    private JButton btnXoa;
-    private JButton btnLamMoi;
+    private final Runnable onOpenRegistration;
 
     private JTable table;
     private DefaultTableModel tableModel;
+    private TableRowSorter<DefaultTableModel> sorter;
 
     // Các nhãn KPI thống kê
     private JLabel lblKpiTongHoiVien;
@@ -54,15 +44,20 @@ public class QuanLyHoiVienPanel extends JPanel {
     private JLabel lblKpiChuyenKhoan;
 
     public QuanLyHoiVienPanel() {
+        this(null);
+    }
+
+    public QuanLyHoiVienPanel(Runnable onOpenRegistration) {
+        this.onOpenRegistration = onOpenRegistration;
         setLayout(new BorderLayout(12, 12));
-        setBorder(new EmptyBorder(15, 15, 15, 15));
+        setBorder(new EmptyBorder(12, 14, 14, 14));
         setBackground(new Color(248, 250, 252));
 
         // HEADER & KPI
         JPanel topContainer = new JPanel(new BorderLayout(10, 10));
         topContainer.setOpaque(false);
 
-        JLabel lblTitle = new JLabel("HỆ THỐNG QUẢN LÝ HỘI VIÊN ĐÃ ĐĂNG KÝ & DOANH THU HỘI PHÍ");
+        JLabel lblTitle = new JLabel("HỆ THỐNG QUẢN LÝ DANH SÁCH HỘI VIÊN & DOANH THU HỘI PHÍ");
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 20));
         lblTitle.setForeground(new Color(15, 23, 42));
         topContainer.add(lblTitle, BorderLayout.NORTH);
@@ -70,18 +65,9 @@ public class QuanLyHoiVienPanel extends JPanel {
         topContainer.add(createKpiPanel(), BorderLayout.CENTER);
         add(topContainer, BorderLayout.NORTH);
 
-        // NỘI DUNG CHÍNH (SPLIT PANE)
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setDividerLocation(390);
-        splitPane.setDividerSize(6);
-        splitPane.setOpaque(false);
-        splitPane.setBorder(null);
+        // BẢNG DANH SÁCH RỘNG RÃI TOÀN MÀN HÌNH (CENTER)
+        add(createTablePanel(), BorderLayout.CENTER);
 
-        splitPane.setLeftComponent(createFormPanel());
-        splitPane.setRightComponent(createTablePanel());
-        add(splitPane, BorderLayout.CENTER);
-
-        setupActions();
         loadDataToTable();
     }
 
@@ -123,210 +109,81 @@ public class QuanLyHoiVienPanel extends JPanel {
         return card;
     }
 
-    private JPanel createFormPanel() {
-        JPanel formContainer = new JPanel(new BorderLayout());
-        formContainer.setBackground(Color.WHITE);
-        formContainer.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(226, 232, 240)),
-                new EmptyBorder(12, 12, 12, 12)
-        ));
-
-        JPanel formGrid = new JPanel(new GridBagLayout());
-        formGrid.setOpaque(false);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(4, 4, 4, 4);
-        gbc.weightx = 1.0;
-
-        Font fontLabel = new Font("Segoe UI", Font.BOLD, 12);
-        Font fontInput = new Font("Segoe UI", Font.PLAIN, 12);
-
-        TitledBorder border = BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(new Color(203, 213, 225)),
-                " Chi Tiết Hội Viên & Giao Dịch "
-        );
-        border.setTitleFont(new Font("Segoe UI", Font.BOLD, 13));
-        border.setTitleColor(new Color(37, 99, 235));
-        formContainer.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(0, 0, 0, 0), border));
-
-        int r = 0;
-
-        // Mã HV & Mã Thẻ QR
-        gbc.gridx = 0; gbc.gridy = r++;
-        formGrid.add(createLabel("Mã HV / Mã Thẻ QR (*):", fontLabel), gbc);
-        JPanel pCode = new JPanel(new GridLayout(1, 2, 8, 0));
-        pCode.setOpaque(false);
-        txtMaHV = new JTextField();
-        txtMaHV.setEditable(false);
-        txtMaHV.setBackground(new Color(241, 245, 249));
-        txtMaHV.setFont(fontInput);
-        txtQR = new JTextField();
-        txtQR.setFont(fontInput);
-        pCode.add(txtMaHV);
-        pCode.add(txtQR);
-        gbc.gridy = r++;
-        formGrid.add(pCode, gbc);
-
-        // Họ và Tên
-        gbc.gridy = r++;
-        formGrid.add(createLabel("Họ Và Tên (*):", fontLabel), gbc);
-        txtHoTen = new JTextField();
-        txtHoTen.setFont(fontInput);
-        gbc.gridy = r++;
-        formGrid.add(txtHoTen, gbc);
-
-        // Số Điện Thoại & Gói Tập
-        gbc.gridy = r++;
-        formGrid.add(createLabel("Số Điện Thoại:", fontLabel), gbc);
-        txtSDT = new JTextField();
-        txtSDT.setFont(fontInput);
-        gbc.gridy = r++;
-        formGrid.add(txtSDT, gbc);
-
-        gbc.gridy = r++;
-        formGrid.add(createLabel("Gói Tập Đã Đăng Ký:", fontLabel), gbc);
-        txtGoiTap = new JTextField("Gói Standard 3 Tháng");
-        txtGoiTap.setFont(fontInput);
-        gbc.gridy = r++;
-        formGrid.add(txtGoiTap, gbc);
-
-        // Ngày Giờ Đăng Ký (Timestamp chi tiết)
-        gbc.gridy = r++;
-        formGrid.add(createLabel("Ngày Giờ Đăng Ký (dd/MM/yyyy HH:mm:ss):", fontLabel), gbc);
-        txtNgayDangKy = new JTextField(sdfDateTime.format(new Date()));
-        txtNgayDangKy.setFont(fontInput);
-        gbc.gridy = r++;
-        formGrid.add(txtNgayDangKy, gbc);
-
-        // Số Tiền Đã Thanh Toán
-        gbc.gridy = r++;
-        formGrid.add(createLabel("Số Tiền Đã Thanh Toán (VNĐ):", fontLabel), gbc);
-        txtSoTien = new JTextField("2400000");
-        txtSoTien.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        txtSoTien.setForeground(new Color(16, 185, 129));
-        gbc.gridy = r++;
-        formGrid.add(txtSoTien, gbc);
-
-        // Hình Thức Thanh Toán
-        gbc.gridy = r++;
-        formGrid.add(createLabel("Hình Thức Thanh Toán:", fontLabel), gbc);
-        cbHinhThucTT = new JComboBox<>(new String[]{"Chuyển khoản VietQR", "Tiền mặt", "Quẹt thẻ POS"});
-        cbHinhThucTT.setFont(fontInput);
-        gbc.gridy = r++;
-        formGrid.add(cbHinhThucTT, gbc);
-
-        // Chi Nhánh & Ngày Hết Hạn
-        gbc.gridy = r++;
-        formGrid.add(createLabel("Chi Nhánh Đăng Ký (*):", fontLabel), gbc);
-        cbChiNhanh = new JComboBox<>(new String[]{"CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)", "Toàn hệ thống (VIP)"});
-        cbChiNhanh.setFont(fontInput);
-        gbc.gridy = r++;
-        formGrid.add(cbChiNhanh, gbc);
-
-        gbc.gridy = r++;
-        formGrid.add(createLabel("Ngày Hết Hạn Gói (dd/MM/yyyy):", fontLabel), gbc);
-        txtNgayHetHan = new JTextField("31/12/2026");
-        txtNgayHetHan.setFont(fontInput);
-        gbc.gridy = r++;
-        formGrid.add(txtNgayHetHan, gbc);
-
-        // Trạng Thái
-        gbc.gridy = r++;
-        formGrid.add(createLabel("Trạng Thái Hoạt Động:", fontLabel), gbc);
-        cbTrangThai = new JComboBox<>(new String[]{"Active", "Expired", "Pending", "Locked"});
-        cbTrangThai.setFont(fontInput);
-        gbc.gridy = r++;
-        formGrid.add(cbTrangThai, gbc);
-
-        // Các nút bấm hành động
-        JPanel btnPanel = new JPanel(new GridLayout(2, 2, 6, 6));
-        btnPanel.setOpaque(false);
-
-        btnThem = new JButton("Thêm Mới");
-        btnThem.setBackground(new Color(16, 185, 129));
-        btnThem.setForeground(Color.WHITE);
-        btnThem.setFont(fontLabel);
-        btnThem.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        btnSua = new JButton("Cập Nhật");
-        btnSua.setBackground(new Color(37, 99, 235));
-        btnSua.setForeground(Color.WHITE);
-        btnSua.setFont(fontLabel);
-        btnSua.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        btnXoa = new JButton("Xóa Hội Viên");
-        btnXoa.setBackground(new Color(239, 68, 68));
-        btnXoa.setForeground(Color.WHITE);
-        btnXoa.setFont(fontLabel);
-        btnXoa.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        btnLamMoi = new JButton("Làm Mới Form");
-        btnLamMoi.setBackground(new Color(241, 245, 249));
-        btnLamMoi.setForeground(new Color(51, 65, 85));
-        btnLamMoi.setFont(fontLabel);
-        btnLamMoi.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        btnPanel.add(btnThem);
-        btnPanel.add(btnSua);
-        btnPanel.add(btnXoa);
-        btnPanel.add(btnLamMoi);
-
-        gbc.gridy = r++;
-        gbc.insets = new Insets(12, 4, 4, 4);
-        formGrid.add(btnPanel, gbc);
-
-        JScrollPane scrollForm = new JScrollPane(formGrid);
-        scrollForm.setBorder(null);
-        scrollForm.getVerticalScrollBar().setUnitIncrement(16);
-        formContainer.add(scrollForm, BorderLayout.CENTER);
-
-        return formContainer;
-    }
-
-    private JLabel createLabel(String text, Font font) {
-        JLabel lbl = new JLabel(text);
-        lbl.setFont(font);
-        lbl.setForeground(new Color(51, 65, 85));
-        return lbl;
-    }
-
     private JPanel createTablePanel() {
         JPanel panel = new JPanel(new BorderLayout(0, 8));
         panel.setBackground(Color.WHITE);
-        panel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(new Color(203, 213, 225)),
-                " Danh Sách Hội Viên Đã Đăng Ký & Chi Tiết Ngày Giờ / Tiền Thanh Toán ",
-                0, 0, new Font("Segoe UI", Font.BOLD, 14), new Color(30, 41, 59)
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
+                new EmptyBorder(10, 12, 10, 12)
         ));
 
-        // Thanh tìm kiếm và xuất file có bộ lọc cơ sở
-        JPanel toolBar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
+        // --- TOP TOOLBAR: BỘ LỌC + TÌM KIẾM + NÚT ĐĂNG KÝ MỚI ---
+        JPanel toolBar = new JPanel(new BorderLayout(10, 0));
         toolBar.setOpaque(false);
 
+        // Bên trái toolbar: Bộ lọc cơ sở & trạng thái
+        JPanel filterBox = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
+        filterBox.setOpaque(false);
+
+        JLabel lblFBranch = new JLabel("Cơ sở:");
+        lblFBranch.setFont(new Font("Segoe UI", Font.BOLD, 12));
         JComboBox<String> cbFilterBranch = new JComboBox<>(new String[]{
-                "Tất Cả Cơ Sở", "CN01", "CN02", "Toàn hệ thống"
+                "Tất Cả Cơ Sở", "CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)", "Toàn hệ thống"
         });
         cbFilterBranch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
-        JTextField txtSearchTable = new JTextField(15);
-        txtSearchTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtSearchTable.putClientProperty("JTextField.placeholderText", "Tìm tên, SĐT, mã QR, gói...");
+        JLabel lblFStatus = new JLabel("Trạng thái:");
+        lblFStatus.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        JComboBox<String> cbFilterStatus = new JComboBox<>(new String[]{
+                "Tất Cả Trạng Thái", "Active (Đang hoạt động)", "Expired (Hết hạn)", "Locked (Tạm khóa)"
+        });
+        cbFilterStatus.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
-        JButton btnExport = new JButton("Xuất File Excel (.csv)");
+        filterBox.add(lblFBranch);
+        filterBox.add(cbFilterBranch);
+        filterBox.add(lblFStatus);
+        filterBox.add(cbFilterStatus);
+
+        toolBar.add(filterBox, BorderLayout.WEST);
+
+        // Bên phải toolbar: Tìm kiếm + Nút Đăng ký mới + Xuất Excel
+        JPanel actionBox = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 4));
+        actionBox.setOpaque(false);
+
+        JTextField txtSearch = new JTextField(16);
+        txtSearch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        txtSearch.putClientProperty("JTextField.placeholderText", "Tìm tên, SĐT, mã QR, gói...");
+
+        JButton btnDangKyMoi = new JButton("➕ Đăng Ký Hội Viên Mới");
+        btnDangKyMoi.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnDangKyMoi.setBackground(new Color(16, 185, 129));
+        btnDangKyMoi.setForeground(Color.WHITE);
+        btnDangKyMoi.setFocusPainted(false);
+        btnDangKyMoi.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnDangKyMoi.addActionListener(e -> {
+            if (onOpenRegistration != null) {
+                onOpenRegistration.run();
+            } else {
+                moDialogDangKyNhanh();
+            }
+        });
+
+        JButton btnExport = new JButton("Xuất Excel (.csv)");
         btnExport.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnExport.setBackground(new Color(241, 245, 249));
         btnExport.setForeground(new Color(15, 118, 110));
         btnExport.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnExport.addActionListener(e -> ExcelExportHelper.exportTableToExcel(this, table, "DanhSach_HoiVien_DaDangKy"));
 
-        toolBar.add(new JLabel("Lọc cơ sở:"));
-        toolBar.add(cbFilterBranch);
-        toolBar.add(new JLabel("Tìm kiếm:"));
-        toolBar.add(txtSearchTable);
-        toolBar.add(btnExport);
+        actionBox.add(new JLabel("Tìm kiếm:"));
+        actionBox.add(txtSearch);
+        actionBox.add(btnDangKyMoi);
+        actionBox.add(btnExport);
+
+        toolBar.add(actionBox, BorderLayout.EAST);
         panel.add(toolBar, BorderLayout.NORTH);
 
-        // Bảng dữ liệu có đầy đủ Ngày Giờ Đăng Ký và Số Tiền Đã Thanh Toán
+        // --- BẢNG DỮ LIỆU ĐẦY ĐỦ 11 CỘT ---
         String[] cols = {
                 "Mã HV", "Mã Thẻ QR", "Họ Và Tên", "Số ĐT", "Gói Tập",
                 "Ngày Giờ Đăng Ký", "Số Tiền Đã TT", "Hình Thức TT",
@@ -346,13 +203,16 @@ public class QuanLyHoiVienPanel extends JPanel {
         table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
         table.getTableHeader().setBackground(new Color(241, 245, 249));
 
-        javax.swing.table.TableRowSorter<DefaultTableModel> sorter = new javax.swing.table.TableRowSorter<>(tableModel);
+        sorter = new TableRowSorter<>(tableModel);
         table.setRowSorter(sorter);
 
+        // Bộ lọc tự động kết hợp Search + Cơ Sở + Trạng Thái
         Runnable doFilter = () -> {
-            String text = txtSearchTable.getText().trim();
+            String text = txtSearch.getText().trim();
             int brIdx = cbFilterBranch.getSelectedIndex();
-            java.util.List<RowFilter<Object, Object>> filters = new java.util.ArrayList<>();
+            int stIdx = cbFilterStatus.getSelectedIndex();
+
+            List<RowFilter<Object, Object>> filters = new ArrayList<>();
             if (!text.isEmpty()) {
                 filters.add(RowFilter.regexFilter("(?i)" + text));
             }
@@ -363,6 +223,15 @@ public class QuanLyHoiVienPanel extends JPanel {
             } else if (brIdx == 3) {
                 filters.add(RowFilter.regexFilter("(?i)Toàn|VIP", 8));
             }
+
+            if (stIdx == 1) {
+                filters.add(RowFilter.regexFilter("(?i)Active|Hoạt động", 10));
+            } else if (stIdx == 2) {
+                filters.add(RowFilter.regexFilter("(?i)Expired|Hết hạn", 10));
+            } else if (stIdx == 3) {
+                filters.add(RowFilter.regexFilter("(?i)Locked|Khóa", 10));
+            }
+
             if (filters.isEmpty()) {
                 sorter.setRowFilter(null);
             } else {
@@ -370,16 +239,14 @@ public class QuanLyHoiVienPanel extends JPanel {
             }
         };
 
-        txtSearchTable.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+        txtSearch.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             public void insertUpdate(javax.swing.event.DocumentEvent e) { doFilter.run(); }
             public void removeUpdate(javax.swing.event.DocumentEvent e) { doFilter.run(); }
             public void changedUpdate(javax.swing.event.DocumentEvent e) { doFilter.run(); }
         });
         cbFilterBranch.addActionListener(e -> doFilter.run());
+        cbFilterStatus.addActionListener(e -> doFilter.run());
 
-        btnExport.addActionListener(e -> com.nhom12.gym.util.ExcelExportHelper.exportTableToExcel(this, table, "DanhSach_HoiVien_DaDangKy"));
-
-        // Định dạng căn chỉnh renderer
         // Định dạng căn chỉnh renderer
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
@@ -392,7 +259,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer); // Mã HV
         table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer); // Mã QR
         table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer); // SĐT
-        table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer); // Ngày giờ đăng ký
+        table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer); // Ngày giờ ĐK
         table.getColumnModel().getColumn(6).setCellRenderer(rightRenderer);  // Số tiền đã TT
         table.getColumnModel().getColumn(7).setCellRenderer(centerRenderer); // Hình thức TT
         table.getColumnModel().getColumn(8).setCellRenderer(centerRenderer); // Chi nhánh
@@ -422,31 +289,46 @@ public class QuanLyHoiVienPanel extends JPanel {
             }
         });
 
-        // Bật cuộn ngang tự do và tinh chỉnh độ rộng chuẩn xác cho từng cột (chống co rút cắt chữ ...)
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        table.getColumnModel().getColumn(0).setPreferredWidth(65);  // Mã HV
-        table.getColumnModel().getColumn(1).setPreferredWidth(115); // Mã Thẻ QR
-        table.getColumnModel().getColumn(2).setPreferredWidth(160); // Họ Và Tên
-        table.getColumnModel().getColumn(3).setPreferredWidth(105); // Số ĐT
-        table.getColumnModel().getColumn(4).setPreferredWidth(170); // Gói Tập
-        table.getColumnModel().getColumn(5).setPreferredWidth(150); // Ngày Giờ ĐK
-        table.getColumnModel().getColumn(6).setPreferredWidth(125); // Số Tiền Đã TT
-        table.getColumnModel().getColumn(7).setPreferredWidth(150); // Hình Thức TT
-        table.getColumnModel().getColumn(8).setPreferredWidth(175); // Chi Nhánh
-        table.getColumnModel().getColumn(9).setPreferredWidth(105); // Ngày Hết Hạn
-        table.getColumnModel().getColumn(10).setPreferredWidth(130); // Trạng Thái
+        // Tinh chỉnh độ rộng các cột
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        table.getColumnModel().getColumn(0).setPreferredWidth(55);  // Mã HV
+        table.getColumnModel().getColumn(1).setPreferredWidth(95);  // Mã Thẻ QR
+        table.getColumnModel().getColumn(2).setPreferredWidth(140); // Họ Và Tên
+        table.getColumnModel().getColumn(3).setPreferredWidth(95);  // Số ĐT
+        table.getColumnModel().getColumn(4).setPreferredWidth(140); // Gói Tập
+        table.getColumnModel().getColumn(5).setPreferredWidth(130); // Ngày Giờ ĐK
+        table.getColumnModel().getColumn(6).setPreferredWidth(105); // Số Tiền Đã TT
+        table.getColumnModel().getColumn(7).setPreferredWidth(115); // Hình Thức TT
+        table.getColumnModel().getColumn(8).setPreferredWidth(135); // Chi Nhánh
+        table.getColumnModel().getColumn(9).setPreferredWidth(90);  // Ngày Hết Hạn
+        table.getColumnModel().getColumn(10).setPreferredWidth(100); // Trạng Thái
+
+        // Double click mở dialog xem/cập nhật hồ sơ
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (e.getClickCount() == 2 && table.getSelectedRow() != -1) {
+                    moDialogCapNhatHoiVienDangChon();
+                }
+            }
+        });
 
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
 
-        // Thanh công cụ thao tác thẻ QR và Check-in
-        JPanel bottomActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 6));
+        // --- BOTTOM ACTIONS: THAO TÁC HỒ SƠ & THẺ ---
+        JPanel bottomActions = new JPanel(new BorderLayout());
         bottomActions.setOpaque(false);
+        bottomActions.setBorder(new EmptyBorder(6, 0, 0, 0));
 
-        JLabel lblHint = new JLabel("Chọn một hội viên để xem thẻ QR hoặc quét thử Check-in:");
-        lblHint.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        JLabel lblHint = new JLabel("💡 Mẹo: Nhấp đúp chuột vào hàng hoặc chọn nút dưới đây để cập nhật hồ sơ, khóa thẻ hoặc gửi mã QR:");
+        lblHint.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         lblHint.setForeground(new Color(100, 116, 139));
+        bottomActions.add(lblHint, BorderLayout.WEST);
 
-        JButton btnXemTheQR = new JButton("Xem & Gửi Thẻ QR");
+        JPanel btnActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        btnActions.setOpaque(false);
+
+        JButton btnXemTheQR = new JButton("📱 Xem & Gửi Thẻ QR");
         btnXemTheQR.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnXemTheQR.setBackground(new Color(37, 99, 235));
         btnXemTheQR.setForeground(Color.WHITE);
@@ -454,7 +336,23 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnXemTheQR.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnXemTheQR.addActionListener(e -> xemTheQRHoiVienDangChon());
 
-        JButton btnQuetCheckIn = new JButton("Quét Thử Check-in Thẻ Này");
+        JButton btnCapNhat = new JButton("✏️ Cập Nhật Hồ Sơ");
+        btnCapNhat.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnCapNhat.setBackground(new Color(14, 165, 233));
+        btnCapNhat.setForeground(Color.WHITE);
+        btnCapNhat.setFocusPainted(false);
+        btnCapNhat.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnCapNhat.addActionListener(e -> moDialogCapNhatHoiVienDangChon());
+
+        JButton btnToggleLock = new JButton("🔒 Khóa / Mở Khóa");
+        btnToggleLock.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnToggleLock.setBackground(new Color(245, 158, 11));
+        btnToggleLock.setForeground(Color.WHITE);
+        btnToggleLock.setFocusPainted(false);
+        btnToggleLock.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnToggleLock.addActionListener(e -> xuLyKhoaMoKhoaThe());
+
+        JButton btnQuetCheckIn = new JButton("⏱️ Quét Thử Check-in");
         btnQuetCheckIn.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnQuetCheckIn.setBackground(new Color(16, 185, 129));
         btnQuetCheckIn.setForeground(Color.WHITE);
@@ -462,59 +360,33 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnQuetCheckIn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnQuetCheckIn.addActionListener(e -> quetCheckInHoiVienDangChon());
 
-        bottomActions.add(lblHint);
-        bottomActions.add(btnXemTheQR);
-        bottomActions.add(btnQuetCheckIn);
+        JButton btnXoa = new JButton("🗑️ Xóa");
+        btnXoa.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnXoa.setBackground(new Color(239, 68, 68));
+        btnXoa.setForeground(Color.WHITE);
+        btnXoa.setFocusPainted(false);
+        btnXoa.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnXoa.addActionListener(e -> xuLyXoaHoiVien());
+
+        JButton btnLamMoi = new JButton("🔄 Tải Lại");
+        btnLamMoi.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnLamMoi.setBackground(new Color(241, 245, 249));
+        btnLamMoi.setForeground(new Color(71, 85, 105));
+        btnLamMoi.setFocusPainted(false);
+        btnLamMoi.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnLamMoi.addActionListener(e -> loadDataToTable());
+
+        btnActions.add(btnXemTheQR);
+        btnActions.add(btnCapNhat);
+        btnActions.add(btnToggleLock);
+        btnActions.add(btnQuetCheckIn);
+        btnActions.add(btnXoa);
+        btnActions.add(btnLamMoi);
+
+        bottomActions.add(btnActions, BorderLayout.EAST);
         panel.add(bottomActions, BorderLayout.SOUTH);
 
         return panel;
-    }
-
-    private void xemTheQRHoiVienDangChon() {
-        int row = table.getSelectedRow();
-        if (row < 0) {
-            JOptionPane.showMessageDialog(this,
-                    "Vui lòng chọn một dòng hội viên trong bảng để xem thẻ QR!",
-                    "Chưa chọn hội viên", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        int modelRow = table.convertRowIndexToModel(row);
-        String maQR = (String) tableModel.getValueAt(modelRow, 1);
-        String hoTen = (String) tableModel.getValueAt(modelRow, 2);
-        String sdt = (String) tableModel.getValueAt(modelRow, 3);
-        String goiTap = (String) tableModel.getValueAt(modelRow, 4);
-        String chiNhanh = (String) tableModel.getValueAt(modelRow, 8);
-
-        Frame parentFrame = (Frame) SwingUtilities.getWindowAncestor(this);
-        GuiMaQRDialog dialog = new GuiMaQRDialog(parentFrame, maQR, hoTen, sdt, goiTap, chiNhanh, sdt, "123456");
-        dialog.setVisible(true);
-    }
-
-    private void quetCheckInHoiVienDangChon() {
-        int row = table.getSelectedRow();
-        if (row < 0) {
-            JOptionPane.showMessageDialog(this,
-                    "Vui lòng chọn một dòng hội viên trong bảng để quét thử Check-in!",
-                    "Chưa chọn hội viên", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        int modelRow = table.convertRowIndexToModel(row);
-        String maQR = (String) tableModel.getValueAt(modelRow, 1);
-        String hoTen = (String) tableModel.getValueAt(modelRow, 2);
-
-        Window parentWindow = SwingUtilities.getWindowAncestor(this);
-        QRScannerSimulatorDialog scanner = new QRScannerSimulatorDialog(parentWindow, code -> {
-            // Mở trạm check-in và quét trực tiếp
-            JOptionPane.showMessageDialog(parentWindow,
-                    "ĐÃ BẮN MÃ QUÉT THẺ THÀNH CÔNG!\n"
-                            + "• Mã Thẻ: " + code + "\n"
-                            + "• Hội Viên: " + hoTen + "\n\n"
-                            + "Hệ thống đã ghi nhận tín hiệu từ máy quét Honeywell Voyager 1450g!",
-                    "Tín Hiệu Máy Quét Ghi Nhận", JOptionPane.INFORMATION_MESSAGE);
-        });
-        scanner.setVisible(true);
     }
 
     public void loadDataToTable() {
@@ -554,9 +426,9 @@ public class QuanLyHoiVienPanel extends JPanel {
                 }
 
                 String dateHetHanStr = (hv.getNgayHetHan() != null) ? sdfDate.format(hv.getNgayHetHan()) : "31/12/2026";
-                String cleanStatus = com.nhom12.gym.util.TextSanitizer.sanitize(hv.getTrangThai());
-                String cleanBranch = com.nhom12.gym.util.TextSanitizer.normalizeBranch(hv.getChiNhanhDangKy());
-                String cleanName = com.nhom12.gym.util.TextSanitizer.sanitize(hv.getHoTen());
+                String cleanStatus = TextSanitizer.sanitize(hv.getTrangThai());
+                String cleanBranch = TextSanitizer.normalizeBranch(hv.getChiNhanhDangKy());
+                String cleanName = TextSanitizer.sanitize(hv.getHoTen());
 
                 if (cleanStatus.toLowerCase().contains("active") || cleanStatus.toLowerCase().contains("hoạt động")) {
                     activeCount++;
@@ -585,203 +457,199 @@ public class QuanLyHoiVienPanel extends JPanel {
         lblKpiChuyenKhoan.setText(df.format(tongVietQR));
     }
 
-    private void setupActions() {
-        // Sự kiện click chọn dòng trên bảng -> Điền toàn bộ thông tin lên Form
-        table.getSelectionModel().addListSelectionListener(e -> {
-            int row = table.getSelectedRow();
-            if (row >= 0) {
-                txtMaHV.setText(table.getValueAt(row, 0).toString());
-                txtQR.setText(table.getValueAt(row, 1).toString());
-                txtHoTen.setText(table.getValueAt(row, 2).toString());
-                txtSDT.setText(table.getValueAt(row, 3) != null ? table.getValueAt(row, 3).toString() : "");
-                txtGoiTap.setText(table.getValueAt(row, 4) != null ? table.getValueAt(row, 4).toString() : "");
-                txtNgayDangKy.setText(table.getValueAt(row, 5) != null ? table.getValueAt(row, 5).toString() : "");
+    private HoiVien getSelectedHoiVien() {
+        int row = table.getSelectedRow();
+        if (row < 0) return null;
+        int modelRow = table.convertRowIndexToModel(row);
+        int maHV = (Integer) tableModel.getValueAt(modelRow, 0);
+        return service.timTheoId(maHV);
+    }
 
-                String tienRaw = table.getValueAt(row, 6) != null
-                        ? table.getValueAt(row, 6).toString().replaceAll("[^0-9]", "")
-                        : "0";
-                txtSoTien.setText(tienRaw);
+    private void xemTheQRHoiVienDangChon() {
+        int row = table.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn một hội viên trong bảng để xem mã thẻ QR!",
+                    "Chưa chọn hội viên", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
-                String ht = table.getValueAt(row, 7) != null ? table.getValueAt(row, 7).toString() : "Chuyển khoản VietQR";
-                cbHinhThucTT.setSelectedItem(ht);
+        int modelRow = table.convertRowIndexToModel(row);
+        String maQR = (String) tableModel.getValueAt(modelRow, 1);
+        String hoTen = (String) tableModel.getValueAt(modelRow, 2);
+        String sdt = (String) tableModel.getValueAt(modelRow, 3);
+        String goiTap = (String) tableModel.getValueAt(modelRow, 4);
+        String chiNhanh = (String) tableModel.getValueAt(modelRow, 8);
 
-                String br = table.getValueAt(row, 8) != null ? table.getValueAt(row, 8).toString() : "";
-                if (br.contains("02") || br.contains("Tân Bình")) {
-                    cbChiNhanh.setSelectedIndex(1);
-                } else if (br.contains("Toàn") || br.contains("VIP")) {
-                    cbChiNhanh.setSelectedIndex(2);
-                } else {
-                    cbChiNhanh.setSelectedIndex(0);
-                }
-                txtNgayHetHan.setText(table.getValueAt(row, 9) != null ? table.getValueAt(row, 9).toString() : "31/12/2026");
-                cbTrangThai.setSelectedItem(table.getValueAt(row, 10).toString());
-            }
+        Frame parentFrame = (Frame) SwingUtilities.getWindowAncestor(this);
+        GuiMaQRDialog dialog = new GuiMaQRDialog(parentFrame, maQR, hoTen, sdt, goiTap, chiNhanh, sdt, "123456");
+        dialog.setVisible(true);
+    }
+
+    private void moDialogCapNhatHoiVienDangChon() {
+        HoiVien hv = getSelectedHoiVien();
+        if (hv == null) {
+            JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn một hội viên trong bảng để cập nhật hồ sơ!",
+                    "Chưa chọn hội viên", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Window parentWindow = SwingUtilities.getWindowAncestor(this);
+        JDialog dlg = new JDialog(parentWindow, "CẬP NHẬT HỒ SƠ HỘI VIÊN (" + hv.getMaTheQR() + ")", Dialog.ModalityType.APPLICATION_MODAL);
+        dlg.setSize(480, 520);
+        dlg.setLocationRelativeTo(parentWindow);
+        dlg.setLayout(new BorderLayout(10, 10));
+
+        JPanel pForm = new JPanel(new GridLayout(0, 1, 6, 6));
+        pForm.setBorder(new EmptyBorder(16, 20, 16, 20));
+
+        JTextField txtName = new JTextField(hv.getHoTen());
+        JTextField txtPhone = new JTextField(hv.getSoDienThoai() != null ? hv.getSoDienThoai() : "");
+        JTextField txtPackage = new JTextField(hv.getGoiTapDangKy() != null ? hv.getGoiTapDangKy() : "");
+        JComboBox<String> cbBranch = new JComboBox<>(new String[]{
+                "CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)", "Toàn hệ thống (VIP)"
         });
+        cbBranch.setSelectedItem(TextSanitizer.normalizeBranch(hv.getChiNhanhDangKy()));
 
-        // 1. THÊM MỚI HỘI VIÊN
-        btnThem.addActionListener(e -> {
-            String qr = txtQR.getText().trim();
-            String name = txtHoTen.getText().trim();
-            String sdt = txtSDT.getText().trim();
-            String goiTap = txtGoiTap.getText().trim();
-            String branch = cbChiNhanh.getSelectedItem().toString();
-            String status = cbTrangThai.getSelectedItem().toString();
-            String htTT = cbHinhThucTT.getSelectedItem().toString();
-            double tien = 0;
-            try {
-                tien = Double.parseDouble(txtSoTien.getText().replaceAll("[^0-9]", "").trim());
-            } catch (Exception ignored) {}
+        JTextField txtExpire = new JTextField(hv.getNgayHetHan() != null ? sdfDate.format(hv.getNgayHetHan()) : "31/12/2026");
+        JComboBox<String> cbStatus = new JComboBox<>(new String[]{"Active", "Expired", "Locked"});
+        cbStatus.setSelectedItem(hv.getTrangThai() != null && hv.getTrangThai().contains("Lock") ? "Locked" : "Active");
 
-            if (name.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng nhập Họ Tên hội viên!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+        pForm.add(new JLabel("Họ Và Tên:"));
+        pForm.add(txtName);
+        pForm.add(new JLabel("Số Điện Thoại:"));
+        pForm.add(txtPhone);
+        pForm.add(new JLabel("Gói Tập Đã Đăng Ký:"));
+        pForm.add(txtPackage);
+        pForm.add(new JLabel("Cơ Sở Đăng Ký:"));
+        pForm.add(cbBranch);
+        pForm.add(new JLabel("Ngày Hết Hạn (dd/MM/yyyy):"));
+        pForm.add(txtExpire);
+        pForm.add(new JLabel("Trạng Thái:"));
+        pForm.add(cbStatus);
+
+        JPanel pBtns = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+        JButton btnSave = new JButton("Lưu Thay Đổi");
+        btnSave.setBackground(new Color(16, 185, 129));
+        btnSave.setForeground(Color.WHITE);
+        btnSave.setFont(new Font("Segoe UI", Font.BOLD, 12));
+
+        JButton btnCancel = new JButton("Hủy Bỏ");
+        btnCancel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+
+        btnSave.addActionListener(ev -> {
+            String newName = txtName.getText().trim();
+            if (newName.isEmpty()) {
+                JOptionPane.showMessageDialog(dlg, "Họ tên không được để trống!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-
-            int nextId = 1;
-            for (int i = 0; i < tableModel.getRowCount(); i++) {
-                try {
-                    int idVal = Integer.parseInt(tableModel.getValueAt(i, 0).toString());
-                    if (idVal >= nextId) nextId = idVal + 1;
-                } catch (Exception ignored) {}
-            }
-
-            if (qr.isEmpty()) {
-                qr = String.format("HV%03d", nextId);
-                txtQR.setText(qr);
-            }
-
-            for (int i = 0; i < tableModel.getRowCount(); i++) {
-                if (tableModel.getValueAt(i, 1).toString().equalsIgnoreCase(qr)) {
-                    JOptionPane.showMessageDialog(this, "Mã thẻ QR '" + qr + "' đã tồn tại!", "Cảnh báo trùng lặp", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-            }
-
-            Date now = new Date();
+            hv.setHoTen(newName);
+            hv.setSoDienThoai(txtPhone.getText().trim());
+            hv.setGoiTapDangKy(txtPackage.getText().trim());
+            hv.setChiNhanhDangKy(cbBranch.getSelectedItem().toString());
+            hv.setTrangThai(cbStatus.getSelectedItem().toString());
             try {
-                if (!txtNgayDangKy.getText().trim().isEmpty()) {
-                    now = sdfDateTime.parse(txtNgayDangKy.getText().trim());
-                }
+                hv.setNgayHetHan(sdfDate.parse(txtExpire.getText().trim()));
             } catch (Exception ignored) {}
 
-            Date hetHan = new Date(System.currentTimeMillis() + 90L * 24 * 3600 * 1000);
-            try {
-                if (!txtNgayHetHan.getText().trim().isEmpty()) {
-                    hetHan = sdfDate.parse(txtNgayHetHan.getText().trim());
-                }
-            } catch (Exception ignored) {}
-
-            HoiVien hv = new HoiVien(nextId, qr, name, sdt, branch.isEmpty() ? "CN01 - Quận 1" : branch,
-                    goiTap, now, hetHan, tien, htTT, status);
-
-            try {
-                service.luuHoiVien(hv, false);
-            } catch (Exception ignored) {}
-
+            service.luuHoiVien(hv, true);
             loadDataToTable();
-            JOptionPane.showMessageDialog(this, "Đã thêm mới hội viên '" + name + "' thành công với số tiền " + df.format(tien) + "!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-            btnLamMoi.doClick();
+            dlg.dispose();
+            JOptionPane.showMessageDialog(this, "Đã cập nhật hồ sơ hội viên thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
         });
 
-        // 2. CẬP NHẬT HỘI VIÊN
-        btnSua.addActionListener(e -> {
-            int row = table.getSelectedRow();
-            if (row < 0 && txtMaHV.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 hội viên trên bảng để cập nhật!", "Thông báo", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
+        btnCancel.addActionListener(ev -> dlg.dispose());
 
-            String qr = txtQR.getText().trim();
-            String name = txtHoTen.getText().trim();
-            String sdt = txtSDT.getText().trim();
-            String goiTap = txtGoiTap.getText().trim();
-            String branch = cbChiNhanh.getSelectedItem().toString();
-            String status = cbTrangThai.getSelectedItem().toString();
-            String htTT = cbHinhThucTT.getSelectedItem().toString();
-            double tien = 0;
-            try {
-                tien = Double.parseDouble(txtSoTien.getText().replaceAll("[^0-9]", "").trim());
-            } catch (Exception ignored) {}
+        pBtns.add(btnCancel);
+        pBtns.add(btnSave);
 
-            if (name.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Họ Tên không được để trống!", "Thông báo", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
+        dlg.add(pForm, BorderLayout.CENTER);
+        dlg.add(pBtns, BorderLayout.SOUTH);
+        dlg.setVisible(true);
+    }
 
-            int id = 1;
-            try {
-                id = Integer.parseInt(txtMaHV.getText().trim());
-            } catch (Exception ignored) {}
+    private void xuLyKhoaMoKhoaThe() {
+        HoiVien hv = getSelectedHoiVien();
+        if (hv == null) {
+            JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn một hội viên trong bảng để khóa hoặc mở khóa thẻ!",
+                    "Chưa chọn hội viên", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
-            Date now = new Date();
-            try {
-                if (!txtNgayDangKy.getText().trim().isEmpty()) {
-                    now = sdfDateTime.parse(txtNgayDangKy.getText().trim());
-                }
-            } catch (Exception ignored) {}
+        String cur = hv.getTrangThai() != null ? hv.getTrangThai().toLowerCase() : "";
+        boolean isLocked = cur.contains("lock") || cur.contains("khóa");
+        String nextStatus = isLocked ? "Active" : "Locked";
+        String actionText = isLocked ? "MỞ KHÓA" : "TẠM KHÓA";
 
-            Date hetHan = new Date(System.currentTimeMillis() + 90L * 24 * 3600 * 1000);
-            try {
-                if (!txtNgayHetHan.getText().trim().isEmpty()) {
-                    hetHan = sdfDate.parse(txtNgayHetHan.getText().trim());
-                }
-            } catch (Exception ignored) {}
-
-            HoiVien hv = new HoiVien(id, qr, name, sdt, branch, goiTap, now, hetHan, tien, htTT, status);
-            try {
-                service.luuHoiVien(hv, true);
-            } catch (Exception ignored) {}
-
+        int cf = JOptionPane.showConfirmDialog(this,
+                "Bạn có chắc muốn " + actionText + " thẻ của hội viên: " + hv.getHoTen() + " (" + hv.getMaTheQR() + ")?",
+                "Xác nhận thay đổi trạng thái thẻ", JOptionPane.YES_NO_OPTION);
+        if (cf == JOptionPane.YES_OPTION) {
+            hv.setTrangThai(nextStatus);
+            service.luuHoiVien(hv, true);
             loadDataToTable();
-            JOptionPane.showMessageDialog(this, "Đã cập nhật thông tin hội viên & số tiền thanh toán thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Đã " + actionText.toLowerCase() + " thẻ thành công cho hội viên " + hv.getHoTen() + "!",
+                    "Thành công", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    private void quetCheckInHoiVienDangChon() {
+        int row = table.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn một hội viên trong bảng để quét thử Check-in!",
+                    "Chưa chọn hội viên", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int modelRow = table.convertRowIndexToModel(row);
+        String maQR = (String) tableModel.getValueAt(modelRow, 1);
+        String hoTen = (String) tableModel.getValueAt(modelRow, 2);
+
+        Window parentWindow = SwingUtilities.getWindowAncestor(this);
+        QRScannerSimulatorDialog scanner = new QRScannerSimulatorDialog(parentWindow, code -> {
+            JOptionPane.showMessageDialog(parentWindow,
+                    "ĐÃ BẮN MÃ QUÉT THẺ THÀNH CÔNG!\n"
+                            + "• Mã Thẻ: " + code + "\n"
+                            + "• Hội Viên: " + hoTen + "\n\n"
+                            + "Hệ thống đã ghi nhận tín hiệu từ máy quét Honeywell Voyager 1450g!",
+                    "Tín Hiệu Máy Quét Ghi Nhận", JOptionPane.INFORMATION_MESSAGE);
         });
+        scanner.setVisible(true);
+    }
 
-        // 3. XÓA HỘI VIÊN
-        btnXoa.addActionListener(e -> {
-            int row = table.getSelectedRow();
-            if (row < 0) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn hội viên cần xóa trên bảng!", "Thông báo", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
+    private void xuLyXoaHoiVien() {
+        HoiVien hv = getSelectedHoiVien();
+        if (hv == null) {
+            JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn một hội viên trong bảng để xóa!",
+                    "Chưa chọn hội viên", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
-            String name = tableModel.getValueAt(row, 2).toString();
-            int confirm = JOptionPane.showConfirmDialog(this,
-                    "Bạn có chắc chắn muốn xóa hội viên '" + name + "'?",
-                    "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
+        int cf = JOptionPane.showConfirmDialog(this,
+                "Bạn có chắc chắn muốn xóa hội viên: " + hv.getHoTen() + " (Mã: " + hv.getMaTheQR() + ") khỏi hệ thống?",
+                "Xác nhận xóa hội viên", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (cf == JOptionPane.YES_OPTION) {
+            service.xoaHoiVien(hv.getMaHoiVien());
+            loadDataToTable();
+            JOptionPane.showMessageDialog(this, "Đã xóa hội viên thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
 
-            if (confirm == JOptionPane.YES_OPTION) {
-                try {
-                    int id = Integer.parseInt(tableModel.getValueAt(row, 0).toString());
-                    service.xoaHoiVien(id);
-                } catch (Exception ignored) {}
-
-                loadDataToTable();
-                btnLamMoi.doClick();
-                JOptionPane.showMessageDialog(this, "Đã xóa hội viên thành công!");
-            }
+    private void moDialogDangKyNhanh() {
+        Window parentWindow = SwingUtilities.getWindowAncestor(this);
+        JDialog dlg = new JDialog(parentWindow, "TIẾP NHẬN & ĐĂNG KÝ HỘI VIÊN MỚI", Dialog.ModalityType.APPLICATION_MODAL);
+        dlg.setSize(1080, 700);
+        dlg.setLocationRelativeTo(parentWindow);
+        DangKyHoiVienPanel pnl = new DangKyHoiVienPanel(dlg::dispose, () -> {
+            loadDataToTable();
+            dlg.dispose();
         });
-
-        // 4. LÀM MỚI FORM
-        btnLamMoi.addActionListener(e -> {
-            int nextId = 1;
-            for (int i = 0; i < tableModel.getRowCount(); i++) {
-                try {
-                    int idVal = Integer.parseInt(tableModel.getValueAt(i, 0).toString());
-                    if (idVal >= nextId) nextId = idVal + 1;
-                } catch (Exception ignored) {}
-            }
-            txtMaHV.setText(String.valueOf(nextId));
-            txtQR.setText(String.format("HV%03d", nextId));
-            txtHoTen.setText("");
-            txtSDT.setText("");
-            txtGoiTap.setText("Gói Standard 3 Tháng");
-            txtNgayDangKy.setText(sdfDateTime.format(new Date()));
-            txtSoTien.setText("2400000");
-            cbHinhThucTT.setSelectedIndex(0);
-            cbChiNhanh.setSelectedIndex(0);
-            txtNgayHetHan.setText("31/12/2026");
-            cbTrangThai.setSelectedIndex(0);
-            table.clearSelection();
-        });
+        dlg.setContentPane(pnl);
+        dlg.setVisible(true);
     }
 }

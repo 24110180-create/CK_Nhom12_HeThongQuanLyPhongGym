@@ -428,8 +428,7 @@ public class MainDashboard extends JFrame {
     // =========================================================================
     private void setupReceptionistMenu(JPanel menuContainer, Color accent) {
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên & cửa flap barrier", () -> new CheckInForm(), accent, true);
-        addSidebarItem(menuContainer, "Danh Sách Hội Viên", "Quản lý danh bạ & hồ sơ hội viên", () -> new QuanLyHoiVienPanel(), accent, false);
-        addSidebarItem(menuContainer, "Đăng Ký Hội Viên Mới", "Tạo hợp đồng & cấp mã thẻ QR", () -> new DangKyHoiVienPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý & Hồ Sơ Hội Viên", "Danh bạ thẻ QR & tiếp nhận đăng ký mới", () -> new QuanLyHoiVienHubPanel(), accent, false);
         addSidebarItem(menuContainer, "Gia Hạn Gói Tập", "Nâng cấp gói tập & gia hạn thẻ", () -> new GiaHanGoiTapPanel(), accent, false);
         addSidebarItem(menuContainer, "Lịch Lớp Học & Điểm Danh", "Thời khóa biểu lớp nhóm & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Bán nước giải khát, whey & đồ tập", () -> new BanHangPOSPanel(), accent, false);
@@ -448,13 +447,12 @@ public class MainDashboard extends JFrame {
     }
 
     // =========================================================================
-    // 4. MENU QUẢN LÝ (13 MÔ-ĐUN ĐIỀU HÀNH CHI NHÁNH & SỐ LIỆU CƠ SỞ)
+    // 4. MENU QUẢN LÝ (12 MÔ-ĐUN ĐIỀU HÀNH CHI NHÁNH & SỐ LIỆU CƠ SỞ)
     // =========================================================================
     private void setupManagerMenu(JPanel menuContainer, Color accent) {
         addSidebarCategoryHeader(menuContainer, "Vận Hành Quầy & Dịch Vụ");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên tại quầy", () -> new CheckInForm(), accent, true);
-        addSidebarItem(menuContainer, "Danh Sách Hội Viên", "Hồ sơ hội viên chi nhánh", () -> new QuanLyHoiVienPanel(), accent, false);
-        addSidebarItem(menuContainer, "Đăng Ký Hội Viên Mới", "Tạo hợp đồng & cấp mã thẻ QR", () -> new DangKyHoiVienPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý & Hồ Sơ Hội Viên", "Hồ sơ hội viên & tiếp nhận đăng ký", () -> new QuanLyHoiVienHubPanel(), accent, false);
         addSidebarItem(menuContainer, "Gia Hạn Gói Tập", "Nâng cấp gói & gia hạn thẻ", () -> new GiaHanGoiTapPanel(), accent, false);
         addSidebarItem(menuContainer, "Lịch Lớp Học & Điểm Danh", "Điều phối lớp nhóm & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Thu ngân quầy bar & sản phẩm", () -> new BanHangPOSPanel(), accent, false);

@@ -52,7 +52,7 @@ public class BanHangPOSPanel extends JPanel implements KhoHangService.KhoHangLis
         lblLeftTitle.setFont(new Font("Segoe UI", Font.BOLD, 15));
         lblLeftTitle.setForeground(new Color(30, 41, 59));
 
-        JLabel lblSyncStatus = new JLabel("🟢 Đồng bộ kho thời gian thực");
+        JLabel lblSyncStatus = new JLabel("● Đồng bộ kho thời gian thực");
         lblSyncStatus.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblSyncStatus.setForeground(new Color(16, 185, 129));
 
@@ -118,18 +118,68 @@ public class BanHangPOSPanel extends JPanel implements KhoHangService.KhoHangLis
         scrollCart.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240)));
         rightPanel.add(scrollCart, BorderLayout.CENTER);
 
-        // Thanh thao tác dưới giỏ hàng (+1 / -1 / Xóa)
-        JPanel cartActionPanel = new JPanel(new GridLayout(1, 2, 8, 0));
+        // Thanh thao tác dưới giỏ hàng (Giảm / Tăng số lượng chuyên nghiệp)
+        JPanel cartActionPanel = new JPanel(new GridLayout(1, 2, 10, 0));
         cartActionPanel.setOpaque(false);
-        JButton btnGiam = new JButton("➖ Giảm 1 SL");
-        btnGiam.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnGiam.setBackground(new Color(241, 245, 249));
-        btnGiam.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        cartActionPanel.setPreferredSize(new Dimension(0, 36));
 
-        JButton btnTang = new JButton("➕ Tăng 1 SL");
+        JButton btnGiam = new JButton("Giảm Số Lượng (-1)");
+        btnGiam.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnGiam.setBackground(new Color(255, 241, 242));
+        btnGiam.setForeground(new Color(225, 29, 72));
+        btnGiam.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(254, 205, 211), 1),
+                BorderFactory.createEmptyBorder(6, 12, 6, 12)
+        ));
+        btnGiam.setFocusPainted(false);
+        btnGiam.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnGiam.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                btnGiam.setBackground(new Color(254, 226, 226));
+                btnGiam.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(244, 63, 94), 1),
+                        BorderFactory.createEmptyBorder(6, 12, 6, 12)
+                ));
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                btnGiam.setBackground(new Color(255, 241, 242));
+                btnGiam.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(254, 205, 211), 1),
+                        BorderFactory.createEmptyBorder(6, 12, 6, 12)
+                ));
+            }
+        });
+
+        JButton btnTang = new JButton("Tăng Số Lượng (+1)");
         btnTang.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnTang.setBackground(new Color(241, 245, 249));
+        btnTang.setBackground(new Color(236, 253, 245));
+        btnTang.setForeground(new Color(5, 150, 105));
+        btnTang.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(167, 243, 208), 1),
+                BorderFactory.createEmptyBorder(6, 12, 6, 12)
+        ));
+        btnTang.setFocusPainted(false);
         btnTang.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnTang.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                btnTang.setBackground(new Color(209, 250, 229));
+                btnTang.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(16, 185, 129), 1),
+                        BorderFactory.createEmptyBorder(6, 12, 6, 12)
+                ));
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                btnTang.setBackground(new Color(236, 253, 245));
+                btnTang.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(167, 243, 208), 1),
+                        BorderFactory.createEmptyBorder(6, 12, 6, 12)
+                ));
+            }
+        });
 
         btnGiam.addActionListener(e -> giamSoLuongDongChon());
         btnTang.addActionListener(e -> tangSoLuongDongChon());
@@ -294,7 +344,7 @@ public class BanHangPOSPanel extends JPanel implements KhoHangService.KhoHangLis
         if (icon != null) {
             lblImage.setIcon(icon);
         } else {
-            lblImage.setText("📦 " + sp.getTenSP());
+            lblImage.setText(sp.getTenSP());
             lblImage.setFont(new Font("Segoe UI", Font.PLAIN, 12));
             lblImage.setForeground(Color.GRAY);
         }

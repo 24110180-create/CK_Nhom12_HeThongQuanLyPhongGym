@@ -93,10 +93,10 @@ public class QuanLyHoiVienPanel extends JPanel {
         lblKpiDangHoatDong = new JLabel("0 HV", SwingConstants.CENTER);
         lblKpiChuyenKhoan = new JLabel("0 đ", SwingConstants.CENTER);
 
-        kpiPanel.add(createKpiCard("👥 Tổng Hội Viên Đã Đăng Ký", lblKpiTongHoiVien, new Color(37, 99, 235), new Color(239, 246, 255)));
-        kpiPanel.add(createKpiCard("💰 Tổng Tiền Đã Thanh Toán", lblKpiTongDoanhThu, new Color(16, 185, 129), new Color(236, 253, 245)));
-        kpiPanel.add(createKpiCard("🟢 Đang Hoạt Động (Active)", lblKpiDangHoatDong, new Color(14, 165, 233), new Color(240, 249, 255)));
-        kpiPanel.add(createKpiCard("📱 Thanh Toán VietQR / Chuyển Khoản", lblKpiChuyenKhoan, new Color(139, 92, 246), new Color(245, 243, 255)));
+        kpiPanel.add(createKpiCard("Tổng Hội Viên Đã Đăng Ký", lblKpiTongHoiVien, new Color(37, 99, 235), new Color(239, 246, 255)));
+        kpiPanel.add(createKpiCard("Tổng Tiền Đã Thanh Toán", lblKpiTongDoanhThu, new Color(16, 185, 129), new Color(236, 253, 245)));
+        kpiPanel.add(createKpiCard("Hội Viên Đang Hoạt Động (Active)", lblKpiDangHoatDong, new Color(14, 165, 233), new Color(240, 249, 255)));
+        kpiPanel.add(createKpiCard("Thanh Toán VietQR / Chuyển Khoản", lblKpiChuyenKhoan, new Color(139, 92, 246), new Color(245, 243, 255)));
 
         return kpiPanel;
     }
@@ -306,7 +306,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         txtSearchTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         txtSearchTable.putClientProperty("JTextField.placeholderText", "Tìm tên, SĐT, mã QR, gói...");
 
-        JButton btnExport = new JButton("📊 Xuất File Excel (.csv)");
+        JButton btnExport = new JButton("Xuất File Excel (.csv)");
         btnExport.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnExport.setBackground(new Color(241, 245, 249));
         btnExport.setForeground(new Color(15, 118, 110));

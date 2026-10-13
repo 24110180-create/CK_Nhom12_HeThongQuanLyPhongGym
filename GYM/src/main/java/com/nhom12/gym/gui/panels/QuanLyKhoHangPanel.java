@@ -71,8 +71,8 @@ public class QuanLyKhoHangPanel extends JPanel implements KhoHangService.KhoHang
         // Tabbed Pane chính
         tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        tabbedPane.addTab("📦 TỒN KHO & NHẬP HÀNG", createTabTonKho());
-        tabbedPane.addTab("📊 SẢN PHẨM ĐÃ BÁN & ĐỒNG BỘ KHO", createTabDaBan());
+        tabbedPane.addTab("TỒN KHO & NHẬP HÀNG", createTabTonKho());
+        tabbedPane.addTab("SẢN PHẨM ĐÃ BÁN & ĐỒNG BỘ KHO", createTabDaBan());
 
         add(tabbedPane, BorderLayout.CENTER);
 
@@ -98,9 +98,9 @@ public class QuanLyKhoHangPanel extends JPanel implements KhoHangService.KhoHang
         lblKpiTongSoLuongTon = new JLabel("0 Sản Phẩm", SwingConstants.CENTER);
         lblKpiSapHetHang = new JLabel("0 Cảnh Báo", SwingConstants.CENTER);
 
-        kpiPanel.add(createKpiCard("📦 Tổng Danh Mục Mặt Hàng", lblKpiTongMatHang, new Color(37, 99, 235), new Color(239, 246, 255)));
-        kpiPanel.add(createKpiCard("📈 Tổng Số Lượng Tồn Trong Kho", lblKpiTongSoLuongTon, new Color(16, 185, 129), new Color(236, 253, 245)));
-        kpiPanel.add(createKpiCard("⚠️ Mặt Hàng Sắp Hết / Hết Kho", lblKpiSapHetHang, new Color(239, 68, 68), new Color(254, 242, 242)));
+        kpiPanel.add(createKpiCard("Tổng Danh Mục Mặt Hàng", lblKpiTongMatHang, new Color(37, 99, 235), new Color(239, 246, 255)));
+        kpiPanel.add(createKpiCard("Tổng Số Lượng Tồn Trong Kho", lblKpiTongSoLuongTon, new Color(16, 185, 129), new Color(236, 253, 245)));
+        kpiPanel.add(createKpiCard("Mặt Hàng Sắp Hết / Hết Kho", lblKpiSapHetHang, new Color(239, 68, 68), new Color(254, 242, 242)));
         panel.add(kpiPanel, BorderLayout.NORTH);
 
         JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -174,37 +174,37 @@ public class QuanLyKhoHangPanel extends JPanel implements KhoHangService.KhoHang
         JPanel btnPanel = new JPanel(new GridLayout(3, 2, 6, 6));
         btnPanel.setOpaque(false);
 
-        JButton btnNhapKhoThem = new JButton("📦 Nhập Thêm (+SL)");
+        JButton btnNhapKhoThem = new JButton("Nhập Thêm Số Lượng (+)");
         btnNhapKhoThem.setFont(fontLabel);
         btnNhapKhoThem.setBackground(new Color(16, 185, 129));
         btnNhapKhoThem.setForeground(Color.WHITE);
         btnNhapKhoThem.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        JButton btnThemMoi = new JButton("➕ Thêm Hàng Mới");
+        JButton btnThemMoi = new JButton("Thêm Hàng Mới");
         btnThemMoi.setFont(fontLabel);
         btnThemMoi.setBackground(new Color(14, 165, 233));
         btnThemMoi.setForeground(Color.WHITE);
         btnThemMoi.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        JButton btnCapNhat = new JButton("✏️ Cập Nhật");
+        JButton btnCapNhat = new JButton("Cập Nhật");
         btnCapNhat.setFont(fontLabel);
         btnCapNhat.setBackground(new Color(37, 99, 235));
         btnCapNhat.setForeground(Color.WHITE);
         btnCapNhat.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        JButton btnXoa = new JButton("🗑️ Xóa Hàng");
+        JButton btnXoa = new JButton("Xóa Hàng");
         btnXoa.setFont(fontLabel);
         btnXoa.setBackground(new Color(239, 68, 68));
         btnXoa.setForeground(Color.WHITE);
         btnXoa.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        JButton btnLamMoi = new JButton("🔄 Làm Mới Form");
+        JButton btnLamMoi = new JButton("Làm Mới Form");
         btnLamMoi.setFont(fontLabel);
         btnLamMoi.setBackground(new Color(241, 245, 249));
         btnLamMoi.setForeground(new Color(71, 85, 105));
         btnLamMoi.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        JButton btnChuyenTabBan = new JButton("📊 Xem Hàng Đã Bán ➔");
+        JButton btnChuyenTabBan = new JButton("Xem Hàng Đã Bán >>");
         btnChuyenTabBan.setFont(fontLabel);
         btnChuyenTabBan.setBackground(new Color(245, 243, 255));
         btnChuyenTabBan.setForeground(new Color(124, 58, 237));
@@ -243,7 +243,7 @@ public class QuanLyKhoHangPanel extends JPanel implements KhoHangService.KhoHang
         txtSearchKho.setFont(fontInput);
         txtSearchKho.putClientProperty("JTextField.placeholderText", "Tìm mã hoặc tên sản phẩm...");
 
-        JButton btnExportKho = new JButton("📊 Xuất Danh Mục Kho (.csv)");
+        JButton btnExportKho = new JButton("Xuất Danh Mục Kho (.csv)");
         btnExportKho.setFont(new Font("Segoe UI", Font.BOLD, 11));
         btnExportKho.setBackground(new Color(241, 245, 249));
         btnExportKho.setForeground(new Color(15, 118, 110));
@@ -456,9 +456,9 @@ public class QuanLyKhoHangPanel extends JPanel implements KhoHangService.KhoHang
         lblKpiDoanhThuDaBan = new JLabel("0 đ", SwingConstants.CENTER);
         lblKpiBanChayNhat = new JLabel("Chưa có", SwingConstants.CENTER);
 
-        kpiPanel.add(createKpiCard("🛒 Tổng Số Lượng Đã Bán Tại Quầy", lblKpiTongDaBan, new Color(139, 92, 246), new Color(245, 243, 255)));
-        kpiPanel.add(createKpiCard("💰 Tổng Doanh Thu Bán Hàng Kho", lblKpiDoanhThuDaBan, new Color(16, 185, 129), new Color(236, 253, 245)));
-        kpiPanel.add(createKpiCard("🌟 Mặt Hàng Bán Chạy Nhất", lblKpiBanChayNhat, new Color(245, 158, 11), new Color(254, 252, 232)));
+        kpiPanel.add(createKpiCard("Tổng Số Lượng Đã Bán Tại Quầy", lblKpiTongDaBan, new Color(139, 92, 246), new Color(245, 243, 255)));
+        kpiPanel.add(createKpiCard("Tổng Doanh Thu Hàng Bán Lẻ", lblKpiDoanhThuDaBan, new Color(16, 185, 129), new Color(236, 253, 245)));
+        kpiPanel.add(createKpiCard("Mặt Hàng Bán Chạy Nhất", lblKpiBanChayNhat, new Color(245, 158, 11), new Color(254, 252, 232)));
         panel.add(kpiPanel, BorderLayout.NORTH);
 
         // Bảng dữ liệu sản phẩm đã bán
@@ -477,13 +477,13 @@ public class QuanLyKhoHangPanel extends JPanel implements KhoHangService.KhoHang
         JPanel leftActions = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
         leftActions.setOpaque(false);
 
-        JButton btnHoanTra = new JButton("🔄 Hoàn Trả Hàng (Tăng Lại Vào Kho)");
+        JButton btnHoanTra = new JButton("Hoàn Trả Hàng (Tăng Lại Vào Kho)");
         btnHoanTra.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnHoanTra.setBackground(new Color(239, 246, 255));
         btnHoanTra.setForeground(new Color(37, 99, 235));
         btnHoanTra.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        JButton btnLamMoiDaBan = new JButton("🔄 Làm Mới");
+        JButton btnLamMoiDaBan = new JButton("Làm Mới Danh Sách");
         btnLamMoiDaBan.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnLamMoiDaBan.setBackground(new Color(241, 245, 249));
         btnLamMoiDaBan.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -498,7 +498,7 @@ public class QuanLyKhoHangPanel extends JPanel implements KhoHangService.KhoHang
         txtSearchDaBan.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         txtSearchDaBan.putClientProperty("JTextField.placeholderText", "Tìm mã GD, tên SP, ngày giờ...");
 
-        JButton btnExportDaBan = new JButton("📊 Xuất Báo Cáo (.csv)");
+        JButton btnExportDaBan = new JButton("Xuất Báo Cáo (.csv)");
         btnExportDaBan.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnExportDaBan.setBackground(new Color(241, 245, 249));
         btnExportDaBan.setForeground(new Color(15, 118, 110));
@@ -665,13 +665,13 @@ public class QuanLyKhoHangPanel extends JPanel implements KhoHangService.KhoHang
             tongSL += sp.getSoLuongTon();
             String tt;
             if (sp.getSoLuongTon() <= 0) {
-                tt = "❌ Hết hàng (0)";
+                tt = "Hết hàng (0)";
                 sapHet++;
             } else if (sp.getSoLuongTon() <= 10) {
-                tt = "⚠️ Sắp hết (" + sp.getSoLuongTon() + ")";
+                tt = "Sắp hết (" + sp.getSoLuongTon() + ")";
                 sapHet++;
             } else {
-                tt = "✅ Đủ hàng (" + sp.getSoLuongTon() + ")";
+                tt = "Đủ hàng (" + sp.getSoLuongTon() + ")";
             }
 
             modelKho.addRow(new Object[]{

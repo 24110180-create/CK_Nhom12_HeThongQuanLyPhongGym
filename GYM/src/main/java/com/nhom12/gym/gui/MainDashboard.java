@@ -127,7 +127,6 @@ public class MainDashboard extends JFrame {
         p1.items.add(new OwnerModuleItem("Đăng Ký Hội Viên Mới", "Tạo hợp đồng & cấp mã QR", () -> new DangKyHoiVienPanel()));
         p1.items.add(new OwnerModuleItem("Gia Hạn Gói Tập", "Nâng cấp gói & gia hạn thẻ", () -> new GiaHanGoiTapPanel()));
         p1.items.add(new OwnerModuleItem("Quản Lý Gói Tập", "Cấu hình bảng giá dịch vụ", () -> new QuanLyGoiTapPanel()));
-        p1.items.add(new OwnerModuleItem("Lịch Lớp Học", "Lớp Yoga, Zumba, Boxing", () -> new LichLopHocPanel()));
         ownerPillars.add(p1);
 
         // Trụ cột 2: Kinh Doanh & Dịch Vụ
@@ -142,6 +141,7 @@ public class MainDashboard extends JFrame {
 
         // Trụ cột 3: Huấn Luyện Viên
         OwnerPillar p3 = new OwnerPillar("Huấn Luyện Viên", new Color(245, 158, 11));
+        p3.items.add(new OwnerModuleItem("Lịch Lớp Học & Điểm Danh", "Quản lý lớp nhóm, sĩ số & điểm danh học viên", () -> new LichLopHocPanel()));
         p3.items.add(new OwnerModuleItem("Theo Dõi InBody", "Mỡ cơ, trọng lượng, BMR", () -> new TheoDoiChiSoPanel()));
         p3.items.add(new OwnerModuleItem("Lịch Dạy Huấn Luyện Viên", "Lịch phân ca huấn luyện viên", () -> new LichDayHLVPanel()));
         p3.items.add(new OwnerModuleItem("Sổ Tay Tiến Độ PT", "Giáo án tập luyện cá nhân 1:1", () -> new GhiChuTienDoPTPanel()));
@@ -840,10 +840,6 @@ public class MainDashboard extends JFrame {
             addSidebarItem(menuContainer, "Quản Lý Tủ Đồ Locker", "Sơ đồ 20 tủ đồ thông minh", () -> new QuanLyLockerPanel(), accent, !hasAny);
             hasAny = true;
         }
-        if (ps.hasPermission("Lễ tân", PermissionService.PERM_LOPHOC)) {
-            addSidebarItem(menuContainer, "Lịch Lớp Học", "Lớp Yoga, Zumba, Boxing", () -> new LichLopHocPanel(), accent, !hasAny);
-            hasAny = true;
-        }
         if (ps.hasPermission("Lễ tân", PermissionService.PERM_HOIVIEN)) {
             addSidebarItem(menuContainer, "Chăm Sóc Khách Hàng", "Gửi SMS & Zalo nhắc hạn", () -> new ChamSocKhachHangPanel(), accent, !hasAny);
             addSidebarItem(menuContainer, "Hồ Sơ & Lịch Sử HV", "Hồ sơ chi tiết & lượt quét", () -> new ChiTietHoiVienPanel(), accent, false);
@@ -866,17 +862,14 @@ public class MainDashboard extends JFrame {
         boolean hasAny = false;
 
         if (ps.hasPermission("HLV", PermissionService.PERM_LOPHOC)) {
-            addSidebarItem(menuContainer, "Lịch Dạy & Điểm Danh", "Ca dạy hôm nay & sĩ số", () -> new LichDayHLVPanel(), accent, !hasAny);
+            addSidebarItem(menuContainer, "Lịch Lớp Học & Điểm Danh", "Quản lý lớp, ghi danh & điểm danh học viên", () -> new LichLopHocPanel(), accent, !hasAny);
             hasAny = true;
+            addSidebarItem(menuContainer, "Lịch Dạy Huấn Luyện Viên", "Ca dạy hôm nay & sĩ số phòng", () -> new LichDayHLVPanel(), accent, false);
             addSidebarItem(menuContainer, "Sổ Tay Tiến Độ PT", "Nhật ký mức tạ & số buổi", () -> new GhiChuTienDoPTPanel(), accent, false);
             addSidebarItem(menuContainer, "Đo Đạc Chỉ Số InBody", "Phân tích cơ, mỡ & BMI", () -> new TheoDoiChiSoPanel(), accent, false);
         }
         if (ps.hasPermission("HLV", PermissionService.PERM_HOIVIEN) || ps.hasPermission("HLV", PermissionService.PERM_CHECKIN)) {
             addSidebarItem(menuContainer, "Hồ Sơ Học Viên Kèm", "Hồ sơ học viên cá nhân", () -> new ChiTietHoiVienPanel(), accent, !hasAny);
-            hasAny = true;
-        }
-        if (ps.hasPermission("HLV", PermissionService.PERM_LOPHOC)) {
-            addSidebarItem(menuContainer, "Lịch Lớp Học Nhóm", "Thời khóa biểu các lớp", () -> new LichLopHocPanel(), accent, !hasAny);
             hasAny = true;
         }
 

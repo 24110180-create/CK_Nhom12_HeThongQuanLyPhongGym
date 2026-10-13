@@ -27,28 +27,36 @@ public class LopHocDAO {
 
     private static void khoiTaoDuLieuMauNeuTrong() {
         if (!memoryClasses.isEmpty()) return;
-        memoryClasses.add(new LopHoc("LH01", "Yoga Trị Liệu Cột Sống", "Yoga", "Nguyễn Thu Thảo", "06:30 - 07:30 (T2-T4-T6)", "Studio 1 (Tầng 2)", 20, 18));
-        memoryClasses.add(new LopHoc("LH02", "Zumba Cardio Đốt Mỡ", "Zumba", "Lê Mai Hương", "18:00 - 19:00 (T3-T5-T7)", "Studio 2 (Tầng 2)", 25, 22));
-        memoryClasses.add(new LopHoc("LH03", "Kickboxing Tự Vệ Nâng Cao", "Boxing", "Phan Thanh Sơn", "19:15 - 20:15 (T2-T4-T6)", "Khu Võ Thuật Ring A", 15, 12));
-        memoryClasses.add(new LopHoc("LH04", "HIIT Cardio Kháng Lực", "Cardio", "Trần Tuấn Kiệt", "07:00 - 08:00 (T3-T5)", "Khu Functional", 15, 10));
-        memoryClasses.add(new LopHoc("LH05", "Pilates Dẻo Dai & Thon Gọn", "Pilates", "Nguyễn Thu Thảo", "17:30 - 18:30 (T2-T4-T6)", "Studio 1 (Tầng 2)", 18, 15));
+        memoryClasses.add(new LopHoc("LH01", "Yoga Trị Liệu Cột Sống", "Yoga", "Nguyễn Thu Thảo", "06:30 - 07:30 (T2-T4-T6)", "Studio 1 (Tầng 2)", 20, 3));
+        memoryClasses.add(new LopHoc("LH02", "Zumba Cardio Đốt Mỡ", "Zumba", "Lê Mai Hương", "18:00 - 19:00 (T3-T5-T7)", "Studio 2 (Tầng 2)", 25, 1));
+        memoryClasses.add(new LopHoc("LH03", "Kickboxing Tự Vệ Nâng Cao", "Boxing", "Phan Thanh Sơn", "19:15 - 20:15 (T2-T4-T6)", "Khu Võ Thuật Ring A", 15, 1));
+        memoryClasses.add(new LopHoc("LH04", "HIIT Cardio Kháng Lực", "Cardio", "Trần Tuấn Kiệt", "07:00 - 08:00 (T3-T5)", "Khu Functional", 15, 0));
+        memoryClasses.add(new LopHoc("LH05", "Pilates Dẻo Dai & Thon Gọn", "Pilates", "Nguyễn Thu Thảo", "17:30 - 18:30 (T2-T4-T6)", "Studio 1 (Tầng 2)", 18, 0));
     }
 
     public List<LopHoc> layTatCa() {
+        List<LopHoc> list = null;
         SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf != null) {
             try (Session session = sf.openSession()) {
-                List<LopHoc> list = session.createQuery("FROM LopHoc ORDER BY maLop ASC", LopHoc.class).list();
+                list = session.createQuery("FROM LopHoc ORDER BY maLop ASC", LopHoc.class).list();
                 if (list != null && !list.isEmpty()) {
                     memoryClasses.clear();
                     memoryClasses.addAll(list);
-                    return list;
                 }
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Lỗi truy vấn danh sách lớp từ CSDL, dùng cache: {0}", e.getMessage());
             }
         }
-        return new ArrayList<>(memoryClasses);
+        if (list == null || list.isEmpty()) {
+            list = new ArrayList<>(memoryClasses);
+        }
+        // Đồng bộ sĩ số thực tế từ danh sách đăng ký
+        for (LopHoc lh : list) {
+            int actualCount = dangKyLopDAO.layDanhSachTheoLop(lh.getMaLop()).size();
+            lh.setSiSoHienTai(actualCount);
+        }
+        return list;
     }
 
     public LopHoc timTheoMa(String maLop) {
@@ -184,5 +192,25 @@ public class LopHocDAO {
 
     public boolean capNhatDiemDanh(int id, String trangThai) {
         return dangKyLopDAO.capNhatDiemDanh(id, trangThai);
+    }
+
+    public boolean huyDangKy(int idDangKy, String maLop) {
+        boolean thanhCong = dangKyLopDAO.xoa(idDangKy);
+        if (thanhCong && maLop != null) {
+            LopHoc lh = timTheoMa(maLop);
+            if (lh != null && lh.getSiSoHienTai() > 0) {
+                lh.setSiSoHienTai(lh.getSiSoHienTai() - 1);
+                capNhat(lh);
+            }
+        }
+        return thanhCong;
+    }
+
+    public void diemDanhTatCa(String maLop, String trangThai) {
+        if (maLop == null || maLop.trim().isEmpty()) return;
+        List<DangKyLop> dks = dangKyLopDAO.layDanhSachTheoLop(maLop);
+        for (DangKyLop dk : dks) {
+            dangKyLopDAO.capNhatDiemDanh(dk.getId(), trangThai);
+        }
     }
 }

@@ -10,4 +10,5 @@ oracleJdk-27/
 # Bảo mật thông tin cấu hình nhạy cảm CSDL
 database.properties
 *.properties.local
+fitlife_permissions.properties
 .env

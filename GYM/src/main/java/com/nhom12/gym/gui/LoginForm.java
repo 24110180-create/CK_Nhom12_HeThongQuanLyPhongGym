@@ -167,6 +167,21 @@ public class LoginForm extends JFrame {
         btnRegisterApp.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnRegisterApp.addActionListener(e -> moDialogDangKyAppHoiVien());
         rightPanel.add(btnRegisterApp);
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        JButton btnOpenMemberApp = new JButton("Khởi Chạy Ứng Dụng Riêng Cho Hội Viên");
+        btnOpenMemberApp.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnOpenMemberApp.setBackground(new Color(241, 245, 249));
+        btnOpenMemberApp.setForeground(new Color(30, 41, 59));
+        btnOpenMemberApp.setFocusPainted(false);
+        btnOpenMemberApp.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnOpenMemberApp.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
+        btnOpenMemberApp.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnOpenMemberApp.addActionListener(e -> {
+            this.dispose();
+            new com.nhom12.gym.AppHoiVien().setVisible(true);
+        });
+        rightPanel.add(btnOpenMemberApp);
 
         mainContainer.add(leftPanel);
         mainContainer.add(rightPanel);
@@ -288,7 +303,11 @@ public class LoginForm extends JFrame {
                 JOptionPane.showMessageDialog(this, msg, "Đăng Nhập Thành Công", JOptionPane.INFORMATION_MESSAGE);
             }
             this.dispose();
-            new MainDashboard().setVisible(true);
+            if ("Hội viên".equalsIgnoreCase(Auth.vaiTro)) {
+                new HoiVienAppFrame().setVisible(true);
+            } else {
+                new MainDashboard().setVisible(true);
+            }
         } else {
             JOptionPane.showMessageDialog(this, res.message, "Lỗi đăng nhập", JOptionPane.ERROR_MESSAGE);
         }

@@ -8,6 +8,7 @@ import com.nhom12.gym.entity.TaiKhoan;
  */
 public class Auth {
     public static volatile String tenDangNhap = null;
+    public static volatile String soDienThoai = null;
     public static volatile String vaiTro = null;
     public static volatile String hoTen = null;
     public static volatile String chiNhanh = "Toàn hệ thống";
@@ -23,6 +24,7 @@ public class Auth {
         if (tk != null) {
             currentUser = tk;
             tenDangNhap = tk.getTenDangNhap();
+            soDienThoai = tk.getTenDangNhap();
             vaiTro = tk.getVaiTro();
             hoTen = tk.getHoTen();
             chiNhanh = tk.getChiNhanh() != null ? tk.getChiNhanh() : "Toàn hệ thống";
@@ -76,6 +78,7 @@ public class Auth {
     public static synchronized void clear() {
         currentUser = null;
         tenDangNhap = null;
+        soDienThoai = null;
         vaiTro = null;
         hoTen = null;
         chiNhanh = "Toàn hệ thống";

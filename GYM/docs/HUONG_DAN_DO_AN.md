@@ -24,8 +24,9 @@
    - **Quản lý chi nhánh**: Operations Center (Tổng quan vận hành, Báo cáo doanh số 2 cơ sở, Phân ca trực, Quản lý kho hàng).
    - **Hội viên (Member VIP)**: Cổng thông tin thẻ điện tử, check-in QR, xem lịch lớp, theo dõi InBody, gia hạn VietQR.
 
-### B. Ngoài Scope (Đã Quy Định Rõ Trong Đề Cương):
-- *App di động Native độc lập*: Thay vào đó đã tích hợp Cổng Dịch Vụ Hội Viên (Member Portal) trực tiếp ngay trên hệ thống.
+### B. Phân Tách 2 Ứng Dụng Độc Lập (Admin Suite vs FitLife Member App):
+- **Hệ thống Quản Trị Chuỗi Gym (`App.java` / `Chay_HeThong_FitLife.bat`)**: Dành riêng cho Chủ phòng, Lễ tân trạm Check-in, Huấn luyện viên, Quản lý chi nhánh.
+- **Ứng Dụng Riêng Biệt Cho Hội Viên (`AppHoiVien.java` / `Chay_App_HoiVien.bat`)**: Ứng dụng độc lập hoàn toàn, mô phỏng Client/Kiosk/Mobile Portal dành riêng cho Hội viên (Thẻ VIP số, Mã QR cá nhân, Đặt lớp Yoga/Zumba/KickBoxing, Đặt lịch PT kèm 1-1, Lịch sử chỉ số InBody & BMI, Bảng gói tập & Gia hạn VietQR, Đánh giá chất lượng dịch vụ). Tách biệt hoàn toàn, hội viên không đụng chạm vào nghiệp vụ nhân sự hay tài chính của phòng gym.
 - *Cổng thanh toán Online tự động trừ tiền*: Hệ thống ghi nhận thanh toán tiền mặt và chuyển khoản chuẩn VietQR tĩnh.
 
 ---
@@ -180,16 +181,25 @@ Hệ thống được thiết kế phân tầng chuẩn mực theo mô hình ki�
 
 ---
 
-## 6. HƯỚNG DẪN TEST DÀNH CHO THẦY CÔ VÀ HỘI ĐỒNG CHẤM THI
+## 6. HƯỚNG DẪN KHỞI CHẠY VÀ TEST DÀNH CHO HỘI ĐỒNG CHẤM THI
 
-### A. Tài khoản mặc định 5 vai trò (Mật khẩu chung: `123456`):
-- **Chủ phòng**: `admin` / `123456`
-- **Lễ tân**: `letan1` / `123456`
-- **Huấn luyện viên**: `hlv1` / `123456`
-- **Quản lý chi nhánh**: `quanly1` / `123456`
-- **Hội viên VIP**: `hoivien1` / `123456`
+### A. Hai Cách Khởi Chạy Ứng Dụng Độc Lập:
+1. **Khởi chạy bằng 1 Click (Tập tin kịch bản Batch ở thư mục gốc)**:
+   - **`Chay_HeThong_FitLife.bat`**: Khởi chạy Hệ Thống Quản Trị Trung Tâm (`App.java` - Dành cho Chủ, Quản lý, Lễ tân, HLV).
+   - **`Chay_App_HoiVien.bat`**: Khởi chạy Ứng Dụng Riêng Biệt Cho Hội Viên (`AppHoiVien.java` - Dành cho Hội viên với giao diện Mobile/Kiosk sang trọng, có nút test 1-chạm `hoivien1`).
+2. **Khởi chạy từ IntelliJ IDEA / NetBeans / VS Code**:
+   - Chạy file `com.nhom12.gym.App`: Mở cổng quản trị chuỗi FitLife Gym.
+   - Chạy file `com.nhom12.gym.AppHoiVien`: Mở ứng dụng chuyên biệt của Hội viên.
+   *(Lưu ý: Nếu đăng nhập bằng tài khoản Hội viên trên form đăng nhập quản trị, hệ thống cũng tự động nhận diện và chuyển hướng an toàn sang ứng dụng Hội viên)*.
 
-### B. Bộ Mã Test Use Case Check-in Nhanh (Click 1 chạm trên màn hình Check-in):
+### B. Tài khoản mặc định 5 vai trò (Mật khẩu chung: `123456`):
+- **Chủ phòng**: `admin` / `123456` (Toàn quyền quản trị, xem doanh thu thật, bảo mật giá ẩn)
+- **Lễ tân**: `letan1` / `123456` (Check-in cổng tự động, Đăng ký thẻ, Gia hạn gói tập)
+- **Huấn luyện viên**: `hlv1` / `123456` (Lịch dạy lớp Yoga/Zumba/Pilates, Điểm danh lớp, InBody)
+- **Quản lý chi nhánh**: `quanly1` / `123456` (Báo cáo hoạt động chi nhánh, phân ca trực)
+- **Hội viên VIP**: `hoivien1` / `123456` (Cổng hội viên: Xem mã QR check-in, Đặt lớp, Đặt lịch PT, InBody, Gia hạn)
+
+### C. Bộ Mã Test Use Case Check-in Nhanh (Click 1 chạm trên màn hình Check-in):
 * **`QR001`**: Thẻ hợp lệ ➔ Bíp sắc nét 1200Hz, cổng mở xanh lá, chào mừng Lê Anh Duy (VIP Diamond).
 * **`QR002`**: Thẻ hết hạn ➔ Cảnh báo 420Hz, cổng khóa đỏ, báo ngày hết hạn và hiện nút *"⚡ Gia Hạn Gói Tập Ngay"*.
 * **`QR003`**: Thẻ bị tạm khóa ➔ Cảnh báo 420Hz, cổng khóa đỏ, từ chối cho vào.

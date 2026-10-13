@@ -228,7 +228,7 @@ public class AppHoiVien extends JFrame {
             txtPass.setText(pass);
             dlg.dispose();
 
-            new com.nhom12.gym.gui.GuiMaQRDialog(this, code, name, phone, "Gói Đăng Ký Trực Tuyến", (String) cbBr.getSelectedItem(), phone, pass).setVisible(true);
+            new com.nhom12.gym.gui.GuiMaQRDialog(this, code, name, phone, "Gói Đăng Ký Trực Tuyến", (String) cbBr.getSelectedItem()).setVisible(true);
 
             // Tự động kích hoạt đăng nhập
             xuLyDangNhapHoiVien();

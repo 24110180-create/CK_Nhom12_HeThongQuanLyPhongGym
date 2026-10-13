@@ -100,10 +100,6 @@ public class AuthService {
                 offlineTK = new TaiKhoan("hlv3", hashedDefault, "HLV", "Nguyễn Thu Thảo", "CN01 - Cơ sở 1 (Quận 1)");
             } else if ("quanly1".equalsIgnoreCase(user)) {
                 offlineTK = new TaiKhoan("quanly1", hashedDefault, "Quản lý", "Lê Thanh Sơn", "CN02 - Cơ sở 2 (Tân Bình)");
-            } else if ("hoivien1".equalsIgnoreCase(user)) {
-                offlineTK = new TaiKhoan("hoivien1", hashedDefault, "Hội viên", "Lê Anh Duy", "CN01 - Cơ sở 1 (Quận 1)");
-            } else if ("hoivien2".equalsIgnoreCase(user)) {
-                offlineTK = new TaiKhoan("hoivien2", hashedDefault, "Hội viên", "Đặng Thu Thảo", "CN02 - Cơ sở 2 (Tân Bình)");
             }
 
             if (offlineTK != null) {

@@ -39,7 +39,6 @@ public class DangKyHoiVienPanel extends JPanel {
     private JComboBox<String> cbTrainer;
     private JComboBox<String> cbPayment;
     private JLabel lblVipPolicyNotice;
-    private JCheckBox chkCreateAppAccount;
 
     private JLabel lblTotalCost;
     private long currentPrice = 500000;
@@ -226,17 +225,8 @@ public class DangKyHoiVienPanel extends JPanel {
         totalBar.add(lblTotalCost, BorderLayout.EAST);
 
         gbc.gridy = r++;
-        gbc.insets = new Insets(10, 5, 5, 5);
+        gbc.insets = new Insets(10, 5, 12, 5);
         formGrid.add(totalBar, gbc);
-
-        // Checkbox cấp tài khoản App
-        chkCreateAppAccount = new JCheckBox("Tự động kích hoạt & cấp tài khoản FitLife App (User: SĐT, Mật khẩu: 123456)", true);
-        chkCreateAppAccount.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        chkCreateAppAccount.setForeground(new Color(37, 99, 235));
-        chkCreateAppAccount.setOpaque(false);
-        gbc.gridy = r++;
-        gbc.insets = new Insets(4, 5, 10, 5);
-        formGrid.add(chkCreateAppAccount, gbc);
 
         // Buttons
         JPanel actionButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
@@ -610,15 +600,8 @@ public class DangKyHoiVienPanel extends JPanel {
                         } catch (Exception ignored) {
                         }
 
-                        if (chkCreateAppAccount != null && chkCreateAppAccount.isSelected()) {
-                            try {
-                                taiKhoanDAO.them(new TaiKhoan(phone, "123456", "Hội viên", name));
-                            } catch (Exception ignored) {
-                            }
-                        }
-
                         Frame f = (Frame) SwingUtilities.getWindowAncestor(this);
-                        new GuiMaQRDialog(f, finalCode, name, phone, cbPackage.getSelectedItem().toString(), cbBranch.getSelectedItem().toString(), phone, "123456").setVisible(true);
+                        new GuiMaQRDialog(f, finalCode, name, phone, cbPackage.getSelectedItem().toString(), cbBranch.getSelectedItem().toString()).setVisible(true);
 
                         if (onRegistrationSuccess != null) {
                             onRegistrationSuccess.run();
@@ -639,7 +622,7 @@ public class DangKyHoiVienPanel extends JPanel {
         String br = cbBranch.getSelectedItem().toString();
 
         Frame topFrame = (Frame) SwingUtilities.getWindowAncestor(this);
-        new GuiMaQRDialog(topFrame, code, name, phone, pkg, br, phone, "123456").setVisible(true);
+        new GuiMaQRDialog(topFrame, code, name, phone, pkg, br).setVisible(true);
     }
 
     private void printCard() {

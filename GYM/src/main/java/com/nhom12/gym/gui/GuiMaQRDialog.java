@@ -21,6 +21,11 @@ public class GuiMaQRDialog extends JDialog {
     private final String appPassword;
 
     public GuiMaQRDialog(Frame parent, String memberCode, String memberName, String memberPhone,
+                         String packageName, String branchName) {
+        this(parent, memberCode, memberName, memberPhone, packageName, branchName, null, null);
+    }
+
+    public GuiMaQRDialog(Frame parent, String memberCode, String memberName, String memberPhone,
                          String packageName, String branchName, String appUsername, String appPassword) {
         super(parent, "Xuất & Gửi Mã QR Check-in - " + memberName, true);
         this.memberCode = (memberCode != null && !memberCode.isEmpty()) ? memberCode : "HV" + (System.currentTimeMillis() % 1000);
@@ -54,7 +59,7 @@ public class GuiMaQRDialog extends JDialog {
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 20));
         lblTitle.setForeground(new Color(15, 23, 42));
 
-        JLabel lblSub = new JLabel("Mã QR định danh cá nhân và thông tin tài khoản đăng nhập FitLife App");
+        JLabel lblSub = new JLabel("Mã QR định danh hội viên & thông tin thẻ thành viên FitLife Gym");
         lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         lblSub.setForeground(new Color(100, 116, 139));
         titleGroup.add(lblTitle);
@@ -67,7 +72,7 @@ public class GuiMaQRDialog extends JDialog {
         top.add(lblStatus, BorderLayout.EAST);
         root.add(top, BorderLayout.NORTH);
 
-        // 2. CENTER: 2 CỘT (Cột trái: QR Code trực quan; Cột phải: Thông tin thẻ & Tài khoản App)
+        // 2. CENTER: 2 CỘT (Cột trái: QR Code trực quan; Cột phải: Thông tin thẻ & Hướng dẫn sử dụng)
         JPanel center = new JPanel(new GridLayout(1, 2, 20, 0));
         center.setOpaque(false);
 
@@ -157,7 +162,7 @@ public class GuiMaQRDialog extends JDialog {
         leftQR.add(lblQRNote, BorderLayout.SOUTH);
         center.add(leftQR);
 
-        // --- CỘT PHẢI: CHI TIẾT THẺ & TÀI KHOẢN APP HỘI VIÊN ---
+        // --- CỘT PHẢI: CHI TIẾT THẺ & QUY ĐỊNH CHECK-IN ---
         JPanel rightInfo = new JPanel();
         rightInfo.setLayout(new BoxLayout(rightInfo, BoxLayout.Y_AXIS));
         rightInfo.setOpaque(false);
@@ -182,23 +187,23 @@ public class GuiMaQRDialog extends JDialog {
         rightInfo.add(pnlCardInfo);
         rightInfo.add(Box.createRigidArea(new Dimension(0, 12)));
 
-        // Khung tài khoản đăng nhập FitLife App
-        JPanel pnlAppAcc = new JPanel(new GridLayout(4, 1, 0, 5));
-        pnlAppAcc.setBackground(new Color(240, 249, 255));
-        pnlAppAcc.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(186, 230, 253), 1),
+        // Khung quy định & hướng dẫn sử dụng thẻ (Hội viên chỉ dùng thẻ check-in, không đăng nhập phần mềm)
+        JPanel pnlCardUsage = new JPanel(new GridLayout(4, 1, 0, 5));
+        pnlCardUsage.setBackground(new Color(240, 253, 250));
+        pnlCardUsage.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(153, 246, 228), 1),
                 new EmptyBorder(12, 16, 12, 16)
         ));
 
-        JLabel lblSec2 = new JLabel("TÀI KHOẢN ĐĂNG NHẬP FITLIFE APP CỦA HỘI VIÊN");
+        JLabel lblSec2 = new JLabel("QUY ĐỊNH CHECK-IN & SỬ DỤNG THẺ HỘI VIÊN");
         lblSec2.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        lblSec2.setForeground(new Color(2, 132, 199));
-        pnlAppAcc.add(lblSec2);
+        lblSec2.setForeground(new Color(13, 148, 136));
+        pnlCardUsage.add(lblSec2);
 
-        pnlAppAcc.add(createRow("Tên đăng nhập App:", appUsername, new Color(2, 132, 199), true));
-        pnlAppAcc.add(createRow("Mật khẩu ban đầu:", appPassword, new Color(225, 29, 72), true));
-        pnlAppAcc.add(createRow("Vai trò hệ thống:", "Hội viên (Member VIP)", new Color(15, 23, 42), false));
-        rightInfo.add(pnlAppAcc);
+        pnlCardUsage.add(createRow("Mã định danh thẻ:", memberCode, new Color(13, 148, 136), true));
+        pnlCardUsage.add(createRow("Phương thức ra vào:", "Quét mã QR tại cổng Flap Barrier / Lễ tân", new Color(15, 23, 42), false));
+        pnlCardUsage.add(createRow("Trạng thái thẻ:", "Đã kích hoạt - Sẵn sàng check-in", new Color(16, 185, 129), true));
+        rightInfo.add(pnlCardUsage);
 
         center.add(rightInfo);
         root.add(center, BorderLayout.CENTER);
@@ -283,12 +288,12 @@ public class GuiMaQRDialog extends JDialog {
                 "</div>" +
                 "<div style='padding: 12px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; margin-top: 8px;'>" +
                 "<p>Kính chào Quý hội viên <b>" + memberName + "</b>,</p>" +
-                "<p>Chúc mừng bạn đã gia nhập hệ sinh thái FitLife Gym! Dưới đây là thông tin thẻ và tài khoản đăng nhập App của bạn:</p>" +
+                "<p>Chúc mừng bạn đã gia nhập hệ sinh thái FitLife Gym! Dưới đây là thông tin thẻ thành viên và mã QR check-in của bạn:</p>" +
                 "<ul>" +
                 "<li><b>Mã thẻ QR:</b> " + memberCode + " (Kèm file ảnh QR đính kèm)</li>" +
                 "<li><b>Gói tập:</b> " + packageName + "</li>" +
-                "<li><b>Tài khoản App:</b> " + appUsername + "</li>" +
-                "<li><b>Mật khẩu App:</b> " + appPassword + "</li>" +
+                "<li><b>Cơ sở đăng ký:</b> " + branchName + "</li>" +
+                "<li><b>Quy định ra vào:</b> Quét mã QR trực tiếp tại cổng Flap Barrier hoặc quầy Lễ tân</li>" +
                 "</ul>" +
                 "<p style='color: #0284c7; font-size: 11px;'><i>Thời gian gửi: " + time + " • Trạng thái: Đã nhận</i></p>" +
                 "</div>" +
@@ -304,7 +309,7 @@ public class GuiMaQRDialog extends JDialog {
                 "<p><b>Người nhận:</b> " + memberPhone + "</p>" +
                 "<div style='background-color: #f1f5f9; padding: 10px; border-left: 4px solid #10b981; font-size: 12px;'>" +
                 "[FITLIFE] Chuc mung " + memberName + " da dang ky thanh cong the hoi vien " + memberCode + ". " +
-                "Mat khau dang nhap App la: " + appPassword + ". Mo the QR tai: https://fitlife.vn/card/" + memberCode +
+                "Xuat trinh ma QR de check-in tai quay Le tan hoac cong Flap Barrier tu dong. Chi tiet: https://fitlife.vn/card/" + memberCode +
                 "</div>" +
                 "<p style='color: #64748b; font-size: 11px; margin-top: 6px;'>Đã chuyển tin nhắn thành công qua hạ tầng Viễn thông lúc " + time + "</p>" +
                 "</body></html>";

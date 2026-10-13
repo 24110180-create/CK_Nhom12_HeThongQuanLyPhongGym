@@ -283,7 +283,7 @@ public class QuanLyTaiKhoanAppPanel extends JPanel {
             dlg.dispose();
 
             // Bật ngay cửa sổ gửi QR
-            new GuiMaQRDialog(topFrame, code, name, phone, (String) cbPkg.getSelectedItem(), (String) cbBr.getSelectedItem(), phone, pass).setVisible(true);
+            new GuiMaQRDialog(topFrame, code, name, phone, (String) cbPkg.getSelectedItem(), (String) cbBr.getSelectedItem()).setVisible(true);
         });
 
         dlg.add(form, BorderLayout.CENTER);
@@ -304,7 +304,7 @@ public class QuanLyTaiKhoanAppPanel extends JPanel {
         String pkg = table.getValueAt(row, 3).toString();
 
         Frame topFrame = (Frame) SwingUtilities.getWindowAncestor(this);
-        new GuiMaQRDialog(topFrame, code, name, phone, pkg, "FitLife Central", phone, "123456").setVisible(true);
+        new GuiMaQRDialog(topFrame, code, name, phone, pkg, "FitLife Central").setVisible(true);
     }
 
     private void xuLyResetMatKhau() {

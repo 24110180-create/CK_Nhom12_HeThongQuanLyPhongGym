@@ -36,8 +36,6 @@ public class TaiKhoanDAO {
         memoryCache.add(new TaiKhoan("hlv2", hashed123456, "HLV", "Phạm Quốc Bảo", "CN02 - Cơ sở 2 (Tân Bình)"));
         memoryCache.add(new TaiKhoan("hlv3", hashed123456, "HLV", "Nguyễn Thu Thảo", "CN01 - Cơ sở 1 (Quận 1)"));
         memoryCache.add(new TaiKhoan("quanly1", hashed123456, "Quản lý", "Lê Thanh Sơn", "CN02 - Cơ sở 2 (Tân Bình)"));
-        memoryCache.add(new TaiKhoan("hoivien1", hashed123456, "Hội viên", "Lê Anh Duy", "CN01 - Cơ sở 1 (Quận 1)"));
-        memoryCache.add(new TaiKhoan("hoivien2", hashed123456, "Hội viên", "Đặng Thu Thảo", "CN02 - Cơ sở 2 (Tân Bình)"));
     }
 
     public List<TaiKhoan> layTatCa() {

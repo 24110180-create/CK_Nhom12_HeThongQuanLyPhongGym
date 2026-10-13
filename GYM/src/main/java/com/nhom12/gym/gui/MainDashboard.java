@@ -447,7 +447,7 @@ public class MainDashboard extends JFrame {
 
         addSidebarCategoryHeader(menuContainer, "Con Người & Hệ Thống");
         addSidebarItem(menuContainer, "Quản Lý Nhân Sự & Bảng Lương", "Danh sách HLV, nhân viên & bảng lương hệ thống", () -> new QuanLyNhanSuPanel(), accent, false);
-        addSidebarItem(menuContainer, "Tài Khoản App & 4 Vai Trò", "Duyệt hồ sơ mới & quản trị tài khoản 4 vai trò", () -> new QuanLyTaiKhoanVaNhanSuPanel(), accent, false);
+        addSidebarItem(menuContainer, "Tài Khoản Nhân Sự & Phân Quyền", "Quản trị tài khoản 4 vai trò nhân sự nội bộ", () -> new QuanLyTaiKhoanVaNhanSuPanel(), accent, false);
         addSidebarItem(menuContainer, "Phân Quyền Người Dùng", "Quản trị an ninh & phân quyền 5 vai trò", () -> new PhanQuyenPanel(), accent, false);
         addSidebarItem(menuContainer, "Cài Đặt Chung", "Cấu hình chuỗi phòng tập & hệ thống", () -> new CaiDatHeThongPanel(), accent, false);
     }

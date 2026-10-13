@@ -491,7 +491,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         String chiNhanh = (String) tableModel.getValueAt(modelRow, 8);
 
         Frame parentFrame = (Frame) SwingUtilities.getWindowAncestor(this);
-        GuiMaQRDialog dialog = new GuiMaQRDialog(parentFrame, maQR, hoTen, sdt, goiTap, chiNhanh, sdt, "123456");
+        GuiMaQRDialog dialog = new GuiMaQRDialog(parentFrame, maQR, hoTen, sdt, goiTap, chiNhanh);
         dialog.setVisible(true);
     }
 

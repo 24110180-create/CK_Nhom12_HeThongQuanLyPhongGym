@@ -156,8 +156,8 @@ public class LoginForm extends JFrame {
         rightPanel.add(btnLogin);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 12)));
 
-        // Nút liên kết Đăng ký tài khoản (hỗ trợ chọn 4 vai trò: Lễ tân, HLV, Quản lý, Hội viên VIP)
-        JButton btnRegisterApp = new JButton("Bạn chưa có tài khoản? Đăng ký theo 4 vai trò tại đây!");
+        // Nút liên kết Đăng ký tài khoản nội bộ (4 vai trò nhân sự: Lễ tân, HLV, Quản lý, Chủ phòng)
+        JButton btnRegisterApp = new JButton("Bạn là nhân sự mới? Đăng ký tài khoản nội bộ tại đây!");
         btnRegisterApp.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnRegisterApp.setForeground(new Color(2, 132, 199));
         btnRegisterApp.setBorderPainted(false);
@@ -167,21 +167,6 @@ public class LoginForm extends JFrame {
         btnRegisterApp.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnRegisterApp.addActionListener(e -> moDialogDangKyTheoRole());
         rightPanel.add(btnRegisterApp);
-        rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        JButton btnOpenMemberApp = new JButton("Khởi Chạy Ứng Dụng Riêng Cho Hội Viên");
-        btnOpenMemberApp.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnOpenMemberApp.setBackground(new Color(241, 245, 249));
-        btnOpenMemberApp.setForeground(new Color(30, 41, 59));
-        btnOpenMemberApp.setFocusPainted(false);
-        btnOpenMemberApp.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnOpenMemberApp.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
-        btnOpenMemberApp.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnOpenMemberApp.addActionListener(e -> {
-            this.dispose();
-            new com.nhom12.gym.AppHoiVien().setVisible(true);
-        });
-        rightPanel.add(btnOpenMemberApp);
 
         mainContainer.add(leftPanel);
         mainContainer.add(rightPanel);
@@ -212,6 +197,17 @@ public class LoginForm extends JFrame {
 
         com.nhom12.gym.service.AuthService.LoginResult res = authService.dangNhap(user, pass);
         if (res.success) {
+            // Kiểm tra phân quyền: Hội viên KHÔNG ĐƯỢC đăng nhập ứng dụng quản trị nội bộ
+            if ("Hội viên".equalsIgnoreCase(Auth.vaiTro)) {
+                JOptionPane.showMessageDialog(this,
+                        "⚠️ HỘI VIÊN (KHÁCH TẬP) KHÔNG ĐƯỢC ĐĂNG NHẬP VÀO ỨNG DỤNG NỘI BỘ NÀY!\n\n" +
+                        "• Theo tài liệu phạm vi dự án FitLife Gym, App riêng cho hội viên nằm ngoài phạm vi triển khai (Out of Scope).\n" +
+                        "• Hội viên chỉ tương tác gián tiếp: Vui lòng xuất trình mã QR hoặc thẻ tập tại quầy Lễ tân để check-in và nhờ lễ tân thao tác đăng ký gói / xếp lớp.",
+                        "Thông Báo Phạm Vi Ứng Dụng",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             String msg = "Xin chào " + Auth.vaiTro + " - " + Auth.hoTen + "!";
             if (res.isOffline) {
                 msg += "\n\n⚠️ ĐANG CHẠY CHẾ ĐỘ OFFLINE – DỮ LIỆU ĐỆM GIẢ LẬP\n(Không có kết nối máy chủ SQL Server, hệ thống kích hoạt đệm ngoại tuyến).";
@@ -220,11 +216,7 @@ public class LoginForm extends JFrame {
                 JOptionPane.showMessageDialog(this, msg, "Đăng Nhập Thành Công", JOptionPane.INFORMATION_MESSAGE);
             }
             this.dispose();
-            if ("Hội viên".equalsIgnoreCase(Auth.vaiTro)) {
-                new HoiVienAppFrame().setVisible(true);
-            } else {
-                new MainDashboard().setVisible(true);
-            }
+            new MainDashboard().setVisible(true);
         } else {
             JOptionPane.showMessageDialog(this, res.message, "Lỗi đăng nhập", JOptionPane.ERROR_MESSAGE);
         }

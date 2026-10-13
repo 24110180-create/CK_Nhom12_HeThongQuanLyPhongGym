@@ -40,17 +40,45 @@ Dự án áp dụng kiến trúc phân tầng 3-Tier (Layered Architecture):
 
 ---
 
-## 4. TÀI KHOẢN KIỂM THỬ (DEMO CREDENTIALS)
+## 4. PHẠM VI TRUY CẬP & TÀI KHOẢN KIỂM THỬ (USER ROLES & DEMO CREDENTIALS)
 
-Mật khẩu mặc định cho tất cả tài khoản: 123456
+Mật khẩu mặc định cho tất cả tài khoản nhân sự: **123456**
+
+### A. Những người ĐƯỢC QUYỀN đăng nhập và sử dụng (Nhân sự nội bộ):
+
+1. **Chủ phòng tập (Anh Đức)** - Tài khoản: `admin` / Mật khẩu: `123456`
+   - Đăng nhập để xem các báo cáo tổng hợp: doanh thu theo ngày/tuần/tháng, doanh thu từng chi nhánh (CN01, CN02) và tần suất sử dụng phòng tập.
+   - Xem danh sách cảnh báo tự động các hội viên sắp hết hạn trong vòng 7 ngày tới để chăm sóc khách hàng.
+   - Quản trị nhân sự: theo dõi, quản lý lịch làm việc của 4 nhân viên và các huấn luyện viên.
+   - Cấu hình và xem giá thực tế của các hội viên VIP (chính sách giảm 50% theo yêu cầu bảo mật).
+
+2. **Lễ tân (Chị Linh)** - Tài khoản: `letan1` (CN01) hoặc `letan2` (CN02) / Mật khẩu: `123456`
+   - Đăng nhập tại quầy lễ tân để xử lý nghiệp vụ vận hành hàng ngày.
+   - Thao tác quét mã / nhập mã check-in cho hội viên với tốc độ dưới 2 giây.
+   - Tạo mới hồ sơ hội viên, bán gói tập, thực hiện gia hạn gói và ghi nhận các khoản thu tiền mặt/chuyển khoản.
+   - Đăng ký hội viên vào các lịch lớp học cụ thể (Yoga, Zumba, Cardio).
+
+3. **Huấn luyện viên (Anh Tuấn)** - Tài khoản: `hlv1` (CN01) hoặc `hlv2` (CN02) / Mật khẩu: `123456`
+   - Đăng nhập để xem và cập nhật lịch làm việc cá nhân.
+   - Thực hiện điểm danh danh sách học viên có mặt trong các buổi dạy lớp.
+   - Theo dõi thông tin chỉ số InBody và tiến độ tập luyện của học viên PT kèm 1:1.
+
+4. **Quản lý chi nhánh (Anh Sơn)** - Tài khoản: `quanly1` / Mật khẩu: `123456`
+   - Điều hành ca trực nhân viên, kiểm kê xuất nhập tồn kho hàng, khảo sát ý kiến và theo dõi báo cáo chi nhánh phụ trách.
+
+### B. Ai KHÔNG ĐƯỢC đăng nhập vào ứng dụng?
+
+- **Hội viên (Khách tập) - KHÔNG ĐƯỢC ĐĂNG NHẬP:**
+  - Tài liệu dự án xác định rõ: **App di động riêng cho hội viên đặt lịch nằm ngoài phạm vi (Out of Scope)** vì quy mô tính năng quá lớn.
+  - Dù mục bảo mật có liệt kê 4 role lý thuyết (trong đó có role "Hội viên nếu có app riêng"), nhưng trong phiên bản triển khai thực tế này, **hội viên không có giao diện đăng nhập**.
+  - Hội viên chỉ tương tác **gián tiếp**: xuất trình thẻ vật lý hoặc mã QR để lễ tân quét mã check-in tại quầy, và nhờ lễ tân thao tác đăng ký gói hoặc giữ chỗ lớp học trên hệ thống.
 
 | Tài khoản | Mật khẩu | Vai trò (Role) | Chức năng kiểm thử chính |
 | :--- | :--- | :--- | :--- |
-| admin | 123456 | Chủ hệ thống | Toàn quyền hệ thống, xem KPI, báo cáo doanh thu, biểu đồ giờ cao điểm. |
-| letan1 | 123456 | Lễ tân | Check-in thẻ/QR, bán hàng POS, đăng ký hội viên, sơ đồ tủ Locker. |
-| hlv1 | 123456 | Huấn luyện viên | Lịch dạy cá nhân, điểm danh lớp học, theo dõi chỉ số InBody hội viên. |
-| quanly1 | 123456 | Quản lý chi nhánh | Phân ca làm việc nhân viên, quản lý kho hàng, theo dõi vận hành cơ sở. |
-| hoivien1 | 123456 | Hội viên | Cổng thông tin hội viên, thẻ QR điện tử, đặt chỗ lớp học. |
+| `admin` | 123456 | Chủ phòng (Anh Đức) | Xem KPI, báo cáo doanh thu chuỗi, cảnh báo hết hạn 7 ngày, quản trị nhân sự, giá VIP ẩn 50%. |
+| `letan1` | 123456 | Lễ tân (Chị Linh) | Check-in < 2s, tạo hồ sơ hội viên, bán gói, thu tiền, xếp lớp Yoga/Zumba. |
+| `hlv1` | 123456 | Huấn luyện viên (Anh Tuấn) | Lịch làm việc cá nhân, điểm danh lớp học, theo dõi InBody & tiến độ PT. |
+| `quanly1` | 123456 | Quản lý chi nhánh | Phân ca làm việc nhân viên, quản lý kho hàng, theo dõi vận hành cơ sở. |
 ## 5. HƯỚNG DẪN CÀI ĐẶT VÀ CHẠY ỨNG DỤNG
 
 Yêu cầu trước khi chạy:

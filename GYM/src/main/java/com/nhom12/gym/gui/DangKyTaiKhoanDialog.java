@@ -1,26 +1,22 @@
 package com.nhom12.gym.gui;
 
-import com.nhom12.gym.dao.HoiVienDAO;
 import com.nhom12.gym.dao.TaiKhoanDAO;
-import com.nhom12.gym.entity.HoiVien;
 import com.nhom12.gym.entity.TaiKhoan;
 import com.nhom12.gym.util.Auth;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.function.BiConsumer;
 
 /**
- * MÀN HÌNH ĐĂNG KÝ TÀI KHOẢN PHÂN HỆ 4 VAI TRÒ
- * Chia 4 vai trò rõ ràng, giao diện đồng bộ với nhận diện trong màn hình Chủ Phòng:
- * 1. Trạm Lễ Tân & Bán Hàng (Emerald #10B981)
- * 2. Không Gian Huấn Luyện Viên (Amber #F59E0B)
- * 3. Điều Hành Quản Lý Chi Nhánh (Sky Blue #0EA5E9)
- * 4. Cổng Dịch Vụ Hội Viên VIP (Gold #EAB308)
- * Sau khi đăng ký thành công, cho phép khởi chạy thẳng App riêng của vai trò đó hoặc quay về màn hình đăng nhập.
+ * MÀN HÌNH ĐĂNG KÝ TÀI KHOẢN PHÂN HỆ 4 VAI TRÒ NHÂN SỰ NỘI BỘ
+ * Tuân thủ phạm vi dự án FitLife Gym: Chỉ nhân sự nội bộ mới có tài khoản đăng nhập.
+ * 1. Trạm Lễ Tân (Chị Linh) - Emerald #10B981
+ * 2. Không Gian Huấn Luyện Viên (Anh Tuấn) - Amber #F59E0B
+ * 3. Điều Hành Quản Lý Chi Nhánh (Anh Sơn) - Sky Blue #0EA5E9
+ * 4. Ban Quản Trị / Chủ Phòng (Anh Đức) - Indigo #6366F1
+ * Hội viên (Khách tập) tương tác gián tiếp tại quầy Lễ tân (Out of Scope app riêng).
  */
 public class DangKyTaiKhoanDialog extends JDialog {
 
@@ -45,14 +41,14 @@ public class DangKyTaiKhoanDialog extends JDialog {
     }
 
     private static final RoleDefinition[] ROLES = new RoleDefinition[]{
-            new RoleDefinition("Lễ tân", "TRẠM LỄ TÂN", "TRẠM VẬN HÀNH QUẦY",
-                    "Check-in thẻ, đăng ký khách, bán hàng POS, tủ locker", "App Trạm Lễ Tân", new Color(16, 185, 129), "LT"),
-            new RoleDefinition("HLV", "TRẠM HLV", "HUẤN LUYỆN VIÊN",
-                    "Theo dõi InBody, lịch dạy PT 1:1, giáo án học viên, điểm danh lớp", "App Huấn Luyện Viên", new Color(245, 158, 11), "PT"),
-            new RoleDefinition("Quản lý", "TRẠM QUẢN LÝ", "QUẢN LÝ CHI NHÁNH",
-                    "Xếp ca làm việc, kho hàng, kiểm toán số liệu & báo cáo cơ sở", "App Quản Lý Chi Nhánh", new Color(14, 165, 233), "QL"),
-            new RoleDefinition("Hội viên", "HỘI VIÊN VIP", "THÀNH VIÊN VIP",
-                    "Mã thẻ QR điện tử, đặt lịch tập cá nhân, đặt chỗ lớp Yoga/Boxing", "App Hội Viên VIP", new Color(234, 179, 8), "HV")
+            new RoleDefinition("Lễ tân", "TRẠM LỄ TÂN", "LỄ TÂN (CHỊ LINH)",
+                    "Check-in < 2s, tạo hồ sơ, bán gói tập, thu tiền, xếp lớp Yoga/Zumba/Cardio", "App Trạm Lễ Tân", new Color(16, 185, 129), "LT"),
+            new RoleDefinition("HLV", "TRẠM HLV", "HUẤN LUYỆN VIÊN (ANH TUẤN)",
+                    "Xem/cập nhật lịch dạy cá nhân, điểm danh lớp học, theo dõi InBody & PT 1:1", "App Huấn Luyện Viên", new Color(245, 158, 11), "PT"),
+            new RoleDefinition("Quản lý", "TRẠM QUẢN LÝ", "QUẢN LÝ CHI NHÁNH (ANH SƠN)",
+                    "Xếp ca làm việc nhân viên, quản lý kho hàng, kiểm toán số liệu cơ sở phụ trách", "App Quản Lý Chi Nhánh", new Color(14, 165, 233), "QL"),
+            new RoleDefinition("Chủ", "CHỦ PHÒNG TẬP", "CHỦ PHÒNG TẬP (ANH ĐỨC)",
+                    "Báo cáo tổng hợp chuỗi 2 cơ sở, cảnh báo hết hạn 7 ngày, quản trị nhân sự, giá VIP ẩn 50%", "Bảng Điều Hành Trung Tâm", new Color(99, 102, 241), "AD")
     };
 
     private RoleDefinition selectedRole = ROLES[0]; // Mặc định Trạm Lễ Tân
@@ -68,14 +64,14 @@ public class DangKyTaiKhoanDialog extends JDialog {
     private final JComboBox<String> cbBranch = new JComboBox<>(new String[]{
             "CN01 - Cơ sở 1 (Quận 1)",
             "CN02 - Cơ sở 2 (Tân Bình)",
-            "Toàn hệ thống (Hội viên VIP / Quản trị)"
+            "Toàn hệ thống (Chủ chuỗi / Quản trị)"
     });
 
     private final Frame parentFrame;
     private final BiConsumer<String, String> onSuccessCallback;
 
     public DangKyTaiKhoanDialog(Frame parent, BiConsumer<String, String> onSuccessCallback) {
-        super(parent, "ĐĂNG KÝ TÀI KHOẢN APP FITLIFE GYM - CHỌN 4 VAI TRÒ", true);
+        super(parent, "ĐĂNG KÝ TÀI KHOẢN NHÂN SỰ NỘI BỘ FITLIFE GYM - 4 VAI TRÒ", true);
         this.parentFrame = parent;
         this.onSuccessCallback = onSuccessCallback;
 
@@ -100,11 +96,11 @@ public class DangKyTaiKhoanDialog extends JDialog {
         JPanel headerText = new JPanel(new GridLayout(2, 1, 0, 4));
         headerText.setOpaque(false);
 
-        JLabel lblBrand = new JLabel("FITLIFE GYM MANAGEMENT • ĐĂNG KÝ TÀI KHOẢN THEO 4 VAI TRÒ");
+        JLabel lblBrand = new JLabel("FITLIFE GYM MANAGEMENT • ĐĂNG KÝ TÀI KHOẢN NHÂN SỰ NỘI BỘ");
         lblBrand.setFont(new Font("Segoe UI", Font.BOLD, 17));
         lblBrand.setForeground(Color.WHITE);
 
-        JLabel lblSub = new JLabel("Hệ thống chia làm 4 trạm nghiệp vụ độc lập. Vui lòng bấm chọn vai trò của bạn để thiết lập tài khoản & khởi chạy ứng dụng tương ứng:");
+        JLabel lblSub = new JLabel("Hệ thống phục vụ 4 vai trò nhân sự nội bộ theo phạm vi dự án. Bấm chọn vai trò của bạn để thiết lập tài khoản & khởi chạy:");
         lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblSub.setForeground(new Color(148, 163, 184));
 
@@ -304,7 +300,7 @@ public class DangKyTaiKhoanDialog extends JDialog {
         btnSubmit.setText("ĐĂNG KÝ VÀ KHỞI CHẠY " + selectedRole.title);
 
         // Gợi ý chi nhánh phù hợp
-        if ("Hội viên".equalsIgnoreCase(selectedRole.roleKey)) {
+        if ("Chủ".equalsIgnoreCase(selectedRole.roleKey)) {
             cbBranch.setSelectedIndex(2); // Toàn hệ thống
         } else if ("Quản lý".equalsIgnoreCase(selectedRole.roleKey)) {
             cbBranch.setSelectedIndex(1); // Tân Bình
@@ -347,7 +343,7 @@ public class DangKyTaiKhoanDialog extends JDialog {
             return;
         }
 
-        // Lưu tài khoản mới
+        // Lưu tài khoản nhân sự mới
         TaiKhoan newAccount = new TaiKhoan(username, pass, selectedRole.roleKey, fullName, branch);
         boolean ok = tkDAO.them(newAccount);
 
@@ -356,38 +352,15 @@ public class DangKyTaiKhoanDialog extends JDialog {
             return;
         }
 
-        // Nếu là Hội Viên: Tự động khởi tạo thêm hồ sơ HoiVien và mã thẻ QR
-        String memberCode = "HV" + (System.currentTimeMillis() % 10000);
-        if ("Hội viên".equalsIgnoreCase(selectedRole.roleKey)) {
-            try {
-                HoiVienDAO hvDAO = new HoiVienDAO();
-                HoiVien hv = new HoiVien();
-                hv.setHoTen(fullName);
-                hv.setSoDienThoai(username);
-                hv.setMaTheQR(memberCode);
-                hv.setChiNhanhDangKy(branch);
-                hv.setGoiTapDangKy("Gói Trải Nghiệm 1 Tháng");
-                hv.setNgayDangKy(new Date());
-                hv.setSoTienDaThanhToan(500000.0);
-                hv.setHinhThucThanhToan("Chuyển khoản (VietQR)");
-                hv.setTrangThai("Hoạt động");
-                Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.MONTH, 1);
-                hv.setNgayHetHan(cal.getTime());
-                hvDAO.them(hv);
-            } catch (Exception ignored) {}
-        }
-
         // Hộp thoại tùy chọn sau đăng ký thành công
         String[] options = {"Khởi Chạy " + selectedRole.title + " Ngay", "Quay Lại Đăng Nhập"};
         int choice = JOptionPane.showOptionDialog(this,
                 "<html><body style='width: 340px; padding: 4px;'>" +
-                        "<h3 style='color: " + toHexColor(selectedRole.color) + "; margin: 0;'>ĐĂNG KÝ TÀI KHOẢN THÀNH CÔNG!</h3>" +
+                        "<h3 style='color: " + toHexColor(selectedRole.color) + "; margin: 0;'>ĐĂNG KÝ TÀI KHOẢN NHÂN SỰ THÀNH CÔNG!</h3>" +
                         "<p>Họ tên: <b>" + fullName + "</b></p>" +
                         "<p>Tài khoản: <b>" + username + "</b></p>" +
                         "<p>Vai trò phân hệ: <b>" + selectedRole.title + " (" + selectedRole.badge + ")</b></p>" +
                         "<p>Cơ sở hoạt động: <b>" + branch + "</b></p>" +
-                        ("Hội viên".equalsIgnoreCase(selectedRole.roleKey) ? "<p style='color: #10b981;'>Mã thẻ QR cá nhân: <b>" + memberCode + "</b></p>" : "") +
                         "<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 8px 0;'/>" +
                         "<p style='color: #0284c7; font-weight: bold;'>Bạn có muốn mở trực tiếp Ứng Dụng dành riêng cho " + selectedRole.title + " ngay bây giờ không?</p>" +
                         "</body></html>",

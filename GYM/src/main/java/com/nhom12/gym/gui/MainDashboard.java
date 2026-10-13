@@ -308,19 +308,17 @@ public class MainDashboard extends JFrame {
         lblGoc.setForeground(new Color(100, 116, 139));
 
         JComboBox<String> cbStaffView = new JComboBox<>(new String[]{
-                "Chủ Phòng",
-                "Trạm Lễ Tân",
-                "Trạm HLV",
-                "Trạm Quản Lý",
-                "Hội Viên VIP"
+                "Chủ Phòng (Anh Đức)",
+                "Trạm Lễ Tân (Chị Linh)",
+                "Trạm HLV (Anh Tuấn)",
+                "Trạm Quản Lý (Anh Sơn)"
         });
         cbStaffView.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        cbStaffView.setPreferredSize(new Dimension(115, 30));
+        cbStaffView.setPreferredSize(new Dimension(175, 30));
 
         if ("Lễ tân".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(1);
         else if ("HLV".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(2);
         else if ("Quản lý".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(3);
-        else if ("Hội viên".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(4);
         else cbStaffView.setSelectedIndex(0);
 
         cbStaffView.addActionListener(e -> {
@@ -328,7 +326,6 @@ public class MainDashboard extends JFrame {
             if (s == 1) buildVerticalWorkstationLayout("Lễ tân");
             else if (s == 2) buildVerticalWorkstationLayout("HLV");
             else if (s == 3) buildVerticalWorkstationLayout("Quản lý");
-            else if (s == 4) buildVerticalWorkstationLayout("Hội viên");
             else buildVerticalWorkstationLayout("Chủ");
             revalidate();
             repaint();

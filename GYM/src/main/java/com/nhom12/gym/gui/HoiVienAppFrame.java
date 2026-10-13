@@ -47,9 +47,10 @@ public class HoiVienAppFrame extends JFrame {
     public HoiVienAppFrame() {
         if (Auth.vaiTro == null || Auth.vaiTro.trim().isEmpty()) {
             Auth.vaiTro = "Hội viên";
-            Auth.hoTen = "Nguyễn Văn An";
+            Auth.hoTen = "Lê Anh Duy";
             Auth.tenDangNhap = "hoivien1";
-            Auth.soDienThoai = "0901234567";
+            Auth.soDienThoai = "0974482749";
+            Auth.chiNhanh = "CN01 - Cơ sở 1 (Quận 1)";
         }
 
         setTitle("FITLIFE MEMBER - CỔNG THÀNH VIÊN ĐIỆN TỬ (" + Auth.hoTen + ")");

@@ -257,7 +257,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         lblFBranch.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblFBranch.setForeground(new Color(71, 85, 105));
 
-        cbFilterBranch = new JComboBox<>(new String[]{"Tất cả cơ sở", "CN01 - Quận 1", "CN02 - Tân Bình", "Toàn hệ thống"});
+        cbFilterBranch = new JComboBox<>(new String[]{"Tất cả cơ sở", "CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)", "Toàn hệ thống"});
         cbFilterBranch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         cbFilterBranch.setPreferredSize(new Dimension(145, 32));
 
@@ -440,7 +440,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         formGrid.add(lBranch, gbc);
 
         gbc.gridy = r++;
-        cbBranch = new JComboBox<>(new String[]{"CN01 - Quận 1", "CN02 - Tân Bình", "Toàn hệ thống"});
+        cbBranch = new JComboBox<>(new String[]{"CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)", "Toàn hệ thống"});
         cbBranch.setFont(fInput);
         formGrid.add(cbBranch, gbc);
 
@@ -658,12 +658,12 @@ public class QuanLyNhanSuPanel extends JPanel {
 
         // Nạp dữ liệu nền tảng chuẩn mực cho chuỗi 2 cơ sở
         staffList.add(new StaffDetail("admin", "Võ Anh Đức", "Chủ", "Toàn hệ thống", "Ca hành chính (08:00 - 17:00)", "0909000001", 30000000, 10000000, "5.0 ⭐ (Xuất sắc)", "Đang làm việc"));
-        staffList.add(new StaffDetail("letan1", "Nguyễn Thị Linh", "Lễ tân", "CN01 - Quận 1", "Ca sáng (06:00 - 14:00)", "0912345601", 7500000, 1500000, "5.0 ⭐ (Xuất sắc)", "Đang làm việc"));
-        staffList.add(new StaffDetail("letan2", "Trần Thị Mai", "Lễ tân", "CN02 - Tân Bình", "Ca chiều (14:00 - 22:00)", "0912345602", 7500000, 1200000, "4.8 ⭐ (Tốt)", "Đang làm việc"));
-        staffList.add(new StaffDetail("hlv1", "Trần Tuấn Kiệt", "HLV", "CN01 - Quận 1", "Ca chiều (14:00 - 22:00)", "0912345603", 15000000, 4500000, "4.9 ⭐ (Xuất sắc)", "Đang làm việc"));
-        staffList.add(new StaffDetail("hlv2", "Phạm Quốc Bảo", "HLV", "CN02 - Tân Bình", "Ca sáng (06:00 - 14:00)", "0912345604", 14000000, 3800000, "4.8 ⭐ (Tốt)", "Đang làm việc"));
-        staffList.add(new StaffDetail("hlv3", "Nguyễn Thu Thảo", "HLV", "CN01 - Quận 1", "Ca sáng (06:00 - 14:00)", "0912345605", 13000000, 3200000, "5.0 ⭐ (Xuất sắc)", "Đang làm việc"));
-        staffList.add(new StaffDetail("quanly1", "Lê Thanh Sơn", "Quản lý", "CN02 - Tân Bình", "Ca hành chính (08:00 - 17:00)", "0912345606", 18000000, 4000000, "4.9 ⭐ (Xuất sắc)", "Đang làm việc"));
+        staffList.add(new StaffDetail("letan1", "Nguyễn Thị Linh", "Lễ tân", "CN01 - Cơ sở 1 (Quận 1)", "Ca sáng (06:00 - 14:00)", "0912345601", 7500000, 1500000, "5.0 ⭐ (Xuất sắc)", "Đang làm việc"));
+        staffList.add(new StaffDetail("letan2", "Trần Thị Mai", "Lễ tân", "CN02 - Cơ sở 2 (Tân Bình)", "Ca chiều (14:00 - 22:00)", "0912345602", 7500000, 1200000, "4.8 ⭐ (Tốt)", "Đang làm việc"));
+        staffList.add(new StaffDetail("hlv1", "Trần Tuấn Kiệt", "HLV", "CN01 - Cơ sở 1 (Quận 1)", "Ca chiều (14:00 - 22:00)", "0912345603", 15000000, 4500000, "4.9 ⭐ (Xuất sắc)", "Đang làm việc"));
+        staffList.add(new StaffDetail("hlv2", "Phạm Quốc Bảo", "HLV", "CN02 - Cơ sở 2 (Tân Bình)", "Ca sáng (06:00 - 14:00)", "0912345604", 14000000, 3800000, "4.8 ⭐ (Tốt)", "Đang làm việc"));
+        staffList.add(new StaffDetail("hlv3", "Nguyễn Thu Thảo", "HLV", "CN01 - Cơ sở 1 (Quận 1)", "Ca sáng (06:00 - 14:00)", "0912345605", 13000000, 3200000, "5.0 ⭐ (Xuất sắc)", "Đang làm việc"));
+        staffList.add(new StaffDetail("quanly1", "Lê Thanh Sơn", "Quản lý", "CN02 - Cơ sở 2 (Tân Bình)", "Ca hành chính (08:00 - 17:00)", "0912345606", 18000000, 4000000, "4.9 ⭐ (Xuất sắc)", "Đang làm việc"));
 
         // Đồng bộ dữ liệu thực tế từ TaiKhoanDAO (bao gồm các tài khoản mới được tạo bởi Anh Đức)
         try {
@@ -671,6 +671,9 @@ public class QuanLyNhanSuPanel extends JPanel {
             if (dbAccounts != null) {
                 for (TaiKhoan tk : dbAccounts) {
                     if (tk == null || tk.getTenDangNhap() == null) continue;
+                    // Bỏ qua tài khoản hội viên, trung tâm nhân sự chỉ quản lý nội bộ
+                    if ("Hội viên".equalsIgnoreCase(tk.getVaiTro())) continue;
+
                     boolean exists = false;
                     for (StaffDetail s : staffList) {
                         if (s.username.equalsIgnoreCase(tk.getTenDangNhap())) {
@@ -683,7 +686,7 @@ public class QuanLyNhanSuPanel extends JPanel {
                     }
                     if (!exists) {
                         String r = (tk.getVaiTro() != null) ? tk.getVaiTro() : "Nhân viên";
-                        String b = (tk.getChiNhanh() != null) ? tk.getChiNhanh() : "CN01 - Quận 1";
+                        String b = (tk.getChiNhanh() != null) ? tk.getChiNhanh() : "CN01 - Cơ sở 1 (Quận 1)";
                         String fn = (tk.getHoTen() != null && !tk.getHoTen().trim().isEmpty()) ? tk.getHoTen() : tk.getTenDangNhap();
                         double base = "HLV".equalsIgnoreCase(r) ? 14000000 : ("Quản lý".equalsIgnoreCase(r) ? 18000000 : 7500000);
                         double bonus = "HLV".equalsIgnoreCase(r) ? 3500000 : 1500000;
@@ -1136,7 +1139,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         pForm.add(lblCurrentBranch);
 
         pForm.add(new JLabel("Cơ sở điều động đến (*):"));
-        JComboBox<String> cbNewBranch = new JComboBox<>(new String[]{"CN01 - Quận 1", "CN02 - Tân Bình", "Toàn hệ thống"});
+        JComboBox<String> cbNewBranch = new JComboBox<>(new String[]{"CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)", "Toàn hệ thống"});
         if (staff.branch.contains("CN01")) cbNewBranch.setSelectedIndex(1);
         else if (staff.branch.contains("CN02")) cbNewBranch.setSelectedIndex(0);
         else cbNewBranch.setSelectedIndex(0);

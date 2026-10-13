@@ -20,8 +20,9 @@ public class AppQuanLy {
         SwingUtilities.invokeLater(() -> {
             if (Auth.vaiTro == null || Auth.vaiTro.isEmpty()) {
                 Auth.vaiTro = "Quản lý";
-                Auth.hoTen = "Quản Lý Cơ Sở";
-                Auth.chiNhanh = "CN02 - Tân Bình";
+                Auth.hoTen = "Lê Thanh Sơn";
+                Auth.tenDangNhap = "quanly1";
+                Auth.chiNhanh = "CN02 - Cơ sở 2 (Tân Bình)";
             }
             new MainDashboard("Quản lý").setVisible(true);
         });

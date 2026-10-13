@@ -20,8 +20,9 @@ public class AppHLV {
         SwingUtilities.invokeLater(() -> {
             if (Auth.vaiTro == null || Auth.vaiTro.isEmpty()) {
                 Auth.vaiTro = "HLV";
-                Auth.hoTen = "Huấn Luyện Viên PT";
-                Auth.chiNhanh = "CN01 - Quận 1";
+                Auth.hoTen = "Trần Tuấn Kiệt";
+                Auth.tenDangNhap = "hlv1";
+                Auth.chiNhanh = "CN01 - Cơ sở 1 (Quận 1)";
             }
             new MainDashboard("HLV").setVisible(true);
         });

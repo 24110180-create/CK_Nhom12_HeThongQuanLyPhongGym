@@ -56,11 +56,15 @@ GO
 
 -- Mật khẩu ban đầu mặc định cho 5 vai trò là '123456' (Đã băm SHA-256: 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92)
 INSERT INTO TaiKhoan (TenDangNhap, MatKhau, VaiTro, HoTen, ChiNhanh) VALUES 
-('admin',    '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Chủ',      N'Võ Anh Đức (Chủ Hệ Thống)', N'Toàn hệ thống'),
-('letan1',   '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Lễ tân',   N'Nguyễn Thị Linh (Lễ Tân CN01)', N'CN01 - Quận 1'),
-('hlv1',     '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'HLV',      N'Trần Tuấn Kiệt (HLV Trưởng)', N'CN01 - Quận 1'),
-('quanly1',  '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Quản lý',  N'Lê Thanh Sơn (Quản Lý Chi Nhánh)', N'CN02 - Tân Bình'),
-('hoivien1', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Hội viên', N'Lê Anh Duy (Hội Viên VIP Diamond)', N'CN01 - Quận 1');
+('admin',    '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Chủ',      N'Võ Anh Đức', N'Toàn hệ thống'),
+('letan1',   '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Lễ tân',   N'Nguyễn Thị Linh', N'CN01 - Cơ sở 1 (Quận 1)'),
+('letan2',   '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Lễ tân',   N'Trần Thị Mai', N'CN02 - Cơ sở 2 (Tân Bình)'),
+('hlv1',     '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'HLV',      N'Trần Tuấn Kiệt', N'CN01 - Cơ sở 1 (Quận 1)'),
+('hlv2',     '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'HLV',      N'Phạm Quốc Bảo', N'CN02 - Cơ sở 2 (Tân Bình)'),
+('hlv3',     '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'HLV',      N'Nguyễn Thu Thảo', N'CN01 - Cơ sở 1 (Quận 1)'),
+('quanly1',  '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Quản lý',  N'Lê Thanh Sơn', N'CN02 - Cơ sở 2 (Tân Bình)'),
+('hoivien1', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Hội viên', N'Lê Anh Duy', N'CN01 - Cơ sở 1 (Quận 1)'),
+('hoivien2', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Hội viên', N'Đặng Thu Thảo', N'CN02 - Cơ sở 2 (Tân Bình)');
 GO
 
 -- 4. BẢNG HỘI VIÊN (HỖ TRỢ MÃ QR/BARCODE VÀ QUẢN LÝ GÓI TẬP)
@@ -75,12 +79,12 @@ CREATE TABLE HoiVien (
 GO
 
 INSERT INTO HoiVien (MaTheQR, HoTen, ChiNhanhDangKy, NgayHetHan, TrangThai) VALUES 
-('QR001', N'Lê Anh Duy',       N'CN01 - Quận 1',         '2026-12-31', N'Active'),
-('QR002', N'Võ Lê Ngọc Hưng',  N'CN02 - Tân Bình',       '2026-10-15', N'Active'),
-('QR003', N'Võ Tấn Phát',      N'CN01 - Quận 1',         '2025-01-01', N'Active'), -- Đã hết hạn để test
-('QR004', N'Trần Minh Quân',   N'CN01 - Quận 1',         '2026-11-20', N'Active'),
-('QR005', N'Hoàng Thùy Linh',  N'CN02 - Tân Bình',       '2026-08-15', N'Active'),
-('VIP007',N'Đỗ Minh Trí',      N'Toàn hệ thống (VIP)',    '2027-12-31', N'Active');
+('QR001', N'Lê Anh Duy',       N'CN01 - Cơ sở 1 (Quận 1)',   '2026-12-31', N'Active'),
+('QR002', N'Võ Lê Ngọc Hưng',  N'CN02 - Cơ sở 2 (Tân Bình)', '2026-10-15', N'Active'),
+('QR003', N'Võ Tấn Phát',      N'CN01 - Cơ sở 1 (Quận 1)',   '2025-01-01', N'Active'), -- Đã hết hạn để test
+('QR004', N'Trần Minh Quân',   N'CN01 - Cơ sở 1 (Quận 1)',   '2026-11-20', N'Active'),
+('QR005', N'Hoàng Thùy Linh',  N'CN02 - Cơ sở 2 (Tân Bình)', '2026-08-15', N'Active'),
+('VIP007',N'Đỗ Minh Trí',      N'Toàn hệ thống (VIP)',      '2027-12-31', N'Active');
 GO
 
 -- 4. BẢNG GÓI TẬP (CỘT TIỀN DÙNG DECIMAL(18, 2) ĐỂ CHỐNG SAI SỐ LÀM TRÒN)
@@ -119,11 +123,11 @@ CREATE TABLE HuanLuyenVien (
 GO
 
 INSERT INTO HuanLuyenVien (MaHLV, HoTen, SoDienThoai, ChuyenMon, KinhNghiemNam, ChiNhanh, CaLamViec, DanhGiaSao, TrangThai) VALUES
-('HLV01', N'Trần Tuấn Kiệt', '0912345678', N'Bodybuilding / PT Tăng cơ', 6, N'CN01 - Quận 1', N'Ca chiều (14:00 - 22:00)', 4.9, N'Đang làm việc'),
-('HLV02', N'Nguyễn Thu Thảo', '0987654321', N'Yoga Thảo dược / Pilates', 5, N'CN01 - Quận 1', N'Ca sáng (06:00 - 14:00)', 5.0, N'Đang làm việc'),
-('HLV03', N'Phan Thanh Sơn', '0903112233', N'Kickboxing & HIIT Cardio', 4, N'CN02 - Tân Bình', N'Ca chiều (14:00 - 22:00)', 4.8, N'Đang làm việc'),
-('HLV04', N'Lê Mai Hương', '0934556677', N'Zumba Dance & Aerobic', 3, N'CN02 - Tân Bình', N'Ca sáng (06:00 - 14:00)', 4.9, N'Đang làm việc'),
-('HLV05', N'Đặng Minh Trí', '0977889900', N'CrossFit & Phục hồi cơ', 7, N'CN02 - Tân Bình', N'Ca sáng (06:00 - 14:00)', 4.9, N'Đang làm việc');
+('HLV01', N'Trần Tuấn Kiệt', '0912345678', N'Bodybuilding / PT Tăng cơ', 6, N'CN01 - Cơ sở 1 (Quận 1)', N'Ca chiều (14:00 - 22:00)', 4.9, N'Đang làm việc'),
+('HLV02', N'Nguyễn Thu Thảo', '0987654321', N'Yoga Thảo dược / Pilates', 5, N'CN01 - Cơ sở 1 (Quận 1)', N'Ca sáng (06:00 - 14:00)', 5.0, N'Đang làm việc'),
+('HLV03', N'Phan Thanh Sơn', '0903112233', N'Kickboxing & HIIT Cardio', 4, N'CN02 - Cơ sở 2 (Tân Bình)', N'Ca chiều (14:00 - 22:00)', 4.8, N'Đang làm việc'),
+('HLV04', N'Lê Mai Hương', '0934556677', N'Zumba Dance & Aerobic', 3, N'CN02 - Cơ sở 2 (Tân Bình)', N'Ca sáng (06:00 - 14:00)', 4.9, N'Đang làm việc'),
+('HLV05', N'Phạm Quốc Bảo', '0912345604', N'CrossFit & Phục hồi chức năng', 7, N'CN02 - Cơ sở 2 (Tân Bình)', N'Ca sáng (06:00 - 14:00)', 4.9, N'Đang làm việc');
 GO
 
 -- 7. BẢNG LỚP HỌC THEO LỊCH (YOGA, ZUMBA, PILATES, CARDIO)
@@ -141,11 +145,11 @@ CREATE TABLE LopHoc (
 GO
 
 INSERT INTO LopHoc (MaLop, TenLop, BoMon, HuanLuyenVien, ThoiGian, PhongTap, ChiNhanh, SiSoToiDa, SiSoHienTai) VALUES
-('LH01', N'Yoga Trị Liệu Cột Sống', N'Yoga', N'Nguyễn Thu Thảo', N'06:30 - 07:30 (T2-T4-T6)', N'Studio 1 (Tầng 2)', N'CN01 - Quận 1', 20, 18),
-('LH02', N'Zumba Cardio Đốt Mỡ', N'Zumba', N'Lê Mai Hương', N'18:00 - 19:00 (T3-T5-T7)', N'Studio 2 (Tầng 2)', N'CN01 - Quận 1', 25, 22),
-('LH03', N'Kickboxing Tự Vệ Nâng Cao', N'Boxing', N'Phan Thanh Sơn', N'19:15 - 20:15 (T2-T4-T6)', N'Khu Võ Thuật Ring A', N'CN02 - Tân Bình', 15, 12),
-('LH04', N'HIIT Cardio Kháng Lực', N'Cardio', N'Trần Tuấn Kiệt', N'07:00 - 08:00 (T3-T5)', N'Khu Functional', N'CN02 - Tân Bình', 15, 10),
-('LH05', N'Pilates Dẻo Dai & Thon Gọn', N'Pilates', N'Nguyễn Thu Thảo', N'17:30 - 18:30 (T2-T4-T6)', N'Studio 1 (Tầng 2)', N'CN01 - Quận 1', 18, 15);
+('LH01', N'Yoga Trị Liệu Cột Sống', N'Yoga', N'Nguyễn Thu Thảo', N'06:30 - 07:30 (T2-T4-T6)', N'Studio 1 (Tầng 2)', N'CN01 - Cơ sở 1 (Quận 1)', 20, 18),
+('LH02', N'Zumba Cardio Đốt Mỡ', N'Zumba', N'Lê Mai Hương', N'18:00 - 19:00 (T3-T5-T7)', N'Studio 2 (Tầng 2)', N'CN01 - Cơ sở 1 (Quận 1)', 25, 22),
+('LH03', N'Kickboxing Tự Vệ Nâng Cao', N'Boxing', N'Phan Thanh Sơn', N'19:15 - 20:15 (T2-T4-T6)', N'Khu Võ Thuật Ring A', N'CN02 - Cơ sở 2 (Tân Bình)', 15, 12),
+('LH04', N'HIIT Cardio Kháng Lực', N'Cardio', N'Trần Tuấn Kiệt', N'07:00 - 08:00 (T3-T5)', N'Khu Functional', N'CN02 - Cơ sở 2 (Tân Bình)', 15, 10),
+('LH05', N'Pilates Dẻo Dai & Thon Gọn', N'Pilates', N'Nguyễn Thu Thảo', N'17:30 - 18:30 (T2-T4-T6)', N'Studio 1 (Tầng 2)', N'CN01 - Cơ sở 1 (Quận 1)', 18, 15);
 GO
 
 -- 7. BẢNG ĐĂNG KÝ VÀ ĐIỂM DANH LỚP HỌC (QUẢN LÝ BỞI DangKyLopDAO)
@@ -186,11 +190,11 @@ CREATE TABLE LichSuCheckIn (
 GO
 
 INSERT INTO LichSuCheckIn (MaHoiVien, TenHoiVien, MaTheQR, ThoiGian, ChiNhanh, CuaRaVao, PhuongThuc, TrangThai, GhiChu, ThoiGianPhanHoiMs) VALUES
-(1, N'Lê Anh Duy', 'QR001', DATEADD(MINUTE, -180, GETDATE()), N'CN01 - Quận 1', N'Cổng Flap A1', N'Mã QR App', N'Hợp lệ', N'Vào cửa thành công', 18),
-(2, N'Võ Lê Ngọc Hưng', 'QR002', DATEADD(MINUTE, -120, GETDATE()), N'CN02 - Tân Bình', N'Cổng Flap B1', N'Mã Barcode Thẻ', N'Hợp lệ', N'Vào cửa thành công', 22),
-(3, N'Võ Tấn Phát', 'QR003', DATEADD(MINUTE, -60, GETDATE()), N'CN01 - Quận 1', N'Cổng Flap A2', N'Mã QR App', N'Từ chối', N'Thẻ đã hết hạn 01/01/2025', 25),
-(4, N'Trần Minh Quân', 'QR004', DATEADD(MINUTE, -30, GETDATE()), N'CN02 - Tân Bình', N'Cổng Flap B2', N'Mã Barcode Thẻ', N'Từ chối', N'Sai chi nhánh đăng ký (CN01)', 20),
-(6, N'Đỗ Minh Trí', 'VIP007', DATEADD(MINUTE, -10, GETDATE()), N'CN01 - Quận 1', N'Cổng VIP Gate', N'Mã QR VIP Pass', N'Hợp lệ', N'VIP President - Miễn phí trọn đời', 16);
+(1, N'Lê Anh Duy', 'QR001', DATEADD(MINUTE, -180, GETDATE()), N'CN01 - Cơ sở 1 (Quận 1)', N'Cổng Flap A1', N'Mã QR App', N'Hợp lệ', N'Vào cửa thành công', 18),
+(2, N'Võ Lê Ngọc Hưng', 'QR002', DATEADD(MINUTE, -120, GETDATE()), N'CN02 - Cơ sở 2 (Tân Bình)', N'Cổng Flap B1', N'Mã Barcode Thẻ', N'Hợp lệ', N'Vào cửa thành công', 22),
+(3, N'Võ Tấn Phát', 'QR003', DATEADD(MINUTE, -60, GETDATE()), N'CN01 - Cơ sở 1 (Quận 1)', N'Cổng Flap A2', N'Mã QR App', N'Từ chối', N'Thẻ đã hết hạn 01/01/2025', 25),
+(4, N'Trần Minh Quân', 'QR004', DATEADD(MINUTE, -30, GETDATE()), N'CN02 - Cơ sở 2 (Tân Bình)', N'Cổng Flap B2', N'Mã Barcode Thẻ', N'Từ chối', N'Sai chi nhánh đăng ký (CN01)', 20),
+(6, N'Đỗ Minh Trí', 'VIP007', DATEADD(MINUTE, -10, GETDATE()), N'CN01 - Cơ sở 1 (Quận 1)', N'Cổng VIP Gate', N'Mã QR VIP Pass', N'Hợp lệ', N'VIP President - Miễn phí trọn đời', 16);
 GO
 
 -- 9. BẢNG HÓA ĐƠN & GIAO DỊCH TÀI CHÍNH (CỘT TIỀN DECIMAL(18, 2) CHUẨN KẾ TOÁN)
@@ -212,9 +216,9 @@ CREATE TABLE HoaDon (
 GO
 
 INSERT INTO HoaDon (MaHoaDon, MaHoiVien, TenHoiVien, LoaiGiaoDich, TongTien, GiamGia, ThanhTien, HinhThucThanhToan, NguoiLap, ChiNhanh, NgayLap, TrangThai, GhiChu) VALUES
-('HD2026-001', 1, N'Lê Anh Duy', N'Đăng ký gói tập VIP Năm', 4500000.00, 0.00, 4500000.00, N'Chuyển khoản VietQR', 'letan1', N'CN01 - Quận 1', DATEADD(DAY, -10, GETDATE()), N'Đã thanh toán', N'Gói VIP Diamond toàn hệ thống'),
-('HD2026-002', 2, N'Võ Lê Ngọc Hưng', N'Gia hạn gói 3 Tháng', 1350000.00, 100000.00, 1250000.00, N'Tiền mặt', 'letan1', N'CN02 - Tân Bình', DATEADD(DAY, -5, GETDATE()), N'Đã thanh toán', N'Khuyến mãi voucher 100k'),
-('HD2026-003', 4, N'Trần Minh Quân', N'Đăng ký Gói PT 1:1', 7500000.00, 500000.00, 7000000.00, N'Chuyển khoản VietQR', 'letan1', N'CN01 - Quận 1', DATEADD(DAY, -3, GETDATE()), N'Đã thanh toán', N'30 buổi cùng HLV Trần Tuấn Kiệt'),
-('HD2026-004', 5, N'Hoàng Thùy Linh', N'Thuê tủ Locker 6 tháng', 600000.00, 0.00, 600000.00, N'Tiền mặt', 'letan1', N'CN02 - Tân Bình', DATEADD(DAY, -2, GETDATE()), N'Đã thanh toán', N'Locker VIP A12'),
-('HD2026-005', 6, N'Đỗ Minh Trí', N'Đăng ký gói 6 Tháng', 2500000.00, 200000.00, 2300000.00, N'Chuyển khoản VietQR', 'admin', N'CN02 - Tân Bình', DATEADD(DAY, -1, GETDATE()), N'Đã thanh toán', N'Khách VIP hệ thống');
+('HD2026-001', 1, N'Lê Anh Duy', N'Đăng ký gói tập VIP Năm', 4500000.00, 0.00, 4500000.00, N'Chuyển khoản VietQR', 'letan1', N'CN01 - Cơ sở 1 (Quận 1)', DATEADD(DAY, -10, GETDATE()), N'Đã thanh toán', N'Gói VIP Diamond toàn hệ thống'),
+('HD2026-002', 2, N'Võ Lê Ngọc Hưng', N'Gia hạn gói 3 Tháng', 1350000.00, 100000.00, 1250000.00, N'Tiền mặt', 'letan1', N'CN02 - Cơ sở 2 (Tân Bình)', DATEADD(DAY, -5, GETDATE()), N'Đã thanh toán', N'Khuyến mãi voucher 100k'),
+('HD2026-003', 4, N'Trần Minh Quân', N'Đăng ký Gói PT 1:1', 7500000.00, 500000.00, 7000000.00, N'Chuyển khoản VietQR', 'letan1', N'CN01 - Cơ sở 1 (Quận 1)', DATEADD(DAY, -3, GETDATE()), N'Đã thanh toán', N'30 buổi cùng HLV Trần Tuấn Kiệt'),
+('HD2026-004', 5, N'Hoàng Thùy Linh', N'Thuê tủ Locker 6 tháng', 600000.00, 0.00, 600000.00, N'Tiền mặt', 'letan1', N'CN02 - Cơ sở 2 (Tân Bình)', DATEADD(DAY, -2, GETDATE()), N'Đã thanh toán', N'Locker VIP A12'),
+('HD2026-005', 6, N'Đỗ Minh Trí', N'Đăng ký gói 6 Tháng', 2500000.00, 200000.00, 2300000.00, N'Chuyển khoản VietQR', 'admin', N'CN02 - Cơ sở 2 (Tân Bình)', DATEADD(DAY, -1, GETDATE()), N'Đã thanh toán', N'Khách VIP hệ thống');
 GO

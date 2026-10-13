@@ -20,8 +20,9 @@ public class AppLeTan {
         SwingUtilities.invokeLater(() -> {
             if (Auth.vaiTro == null || Auth.vaiTro.isEmpty()) {
                 Auth.vaiTro = "Lễ tân";
-                Auth.hoTen = "Lễ Tân Trực Ca";
-                Auth.chiNhanh = "CN01 - Quận 1";
+                Auth.hoTen = "Nguyễn Thị Linh";
+                Auth.tenDangNhap = "letan1";
+                Auth.chiNhanh = "CN01 - Cơ sở 1 (Quận 1)";
             }
             new MainDashboard("Lễ tân").setVisible(true);
         });

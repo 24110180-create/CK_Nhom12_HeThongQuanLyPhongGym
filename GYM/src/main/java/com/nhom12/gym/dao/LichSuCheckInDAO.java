@@ -29,19 +29,19 @@ public class LichSuCheckInDAO {
         if (!memoryLogs.isEmpty()) return;
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY, 6); cal.set(Calendar.MINUTE, 15);
-        memoryLogs.add(new LichSuCheckIn(1, 1, "Lê Anh Duy", "QR001", cal.getTime(), "CN01 - Quận 1", "Cổng Flap A1", "Mã QR App", "Hợp lệ", "Vào cửa thành công", 18));
+        memoryLogs.add(new LichSuCheckIn(1, 1, "Lê Anh Duy", "QR001", cal.getTime(), "CN01 - Cơ sở 1 (Quận 1)", "Cổng Flap A1", "Mã QR App", "Hợp lệ", "Vào cửa thành công", 18));
 
         cal.set(Calendar.HOUR_OF_DAY, 7); cal.set(Calendar.MINUTE, 2);
-        memoryLogs.add(new LichSuCheckIn(2, 2, "Võ Lê Ngọc Hưng", "QR002", cal.getTime(), "CN02 - Tân Bình", "Cổng Flap B1", "Mã Barcode Thẻ", "Hợp lệ", "Vào cửa thành công", 22));
+        memoryLogs.add(new LichSuCheckIn(2, 2, "Võ Lê Ngọc Hưng", "QR002", cal.getTime(), "CN02 - Cơ sở 2 (Tân Bình)", "Cổng Flap B1", "Mã Barcode Thẻ", "Hợp lệ", "Vào cửa thành công", 22));
 
         cal.set(Calendar.HOUR_OF_DAY, 8); cal.set(Calendar.MINUTE, 30);
-        memoryLogs.add(new LichSuCheckIn(3, 3, "Võ Tấn Phát", "QR003", cal.getTime(), "CN01 - Quận 1", "Cổng Flap A2", "Mã QR App", "Từ chối", "Thẻ đã hết hạn 01/01/2025", 25));
+        memoryLogs.add(new LichSuCheckIn(3, 3, "Võ Tấn Phát", "QR003", cal.getTime(), "CN01 - Cơ sở 1 (Quận 1)", "Cổng Flap A2", "Mã QR App", "Từ chối", "Thẻ đã hết hạn 01/01/2025", 25));
 
         cal.set(Calendar.HOUR_OF_DAY, 9); cal.set(Calendar.MINUTE, 10);
-        memoryLogs.add(new LichSuCheckIn(4, 4, "Trần Minh Quân", "QR004", cal.getTime(), "CN02 - Tân Bình", "Cổng Flap B2", "Mã Barcode Thẻ", "Từ chối", "Sai chi nhánh đăng ký (CN01)", 20));
+        memoryLogs.add(new LichSuCheckIn(4, 4, "Trần Minh Quân", "QR004", cal.getTime(), "CN02 - Cơ sở 2 (Tân Bình)", "Cổng Flap B2", "Mã Barcode Thẻ", "Từ chối", "Sai chi nhánh đăng ký (CN01)", 20));
 
         cal.set(Calendar.HOUR_OF_DAY, 17); cal.set(Calendar.MINUTE, 45);
-        memoryLogs.add(new LichSuCheckIn(5, 6, "Đỗ Minh Trí", "VIP007", cal.getTime(), "CN01 - Quận 1", "Cổng VIP Gate", "Mã QR VIP Pass", "Hợp lệ", "VIP President - Miễn phí trọn đời", 16));
+        memoryLogs.add(new LichSuCheckIn(5, 6, "Đỗ Minh Trí", "VIP007", cal.getTime(), "CN01 - Cơ sở 1 (Quận 1)", "Cổng VIP Gate", "Mã QR VIP Pass", "Hợp lệ", "VIP President - Miễn phí trọn đời", 16));
     }
 
     public boolean luuCheckIn(LichSuCheckIn log) {

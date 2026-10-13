@@ -251,9 +251,10 @@ public class AppHoiVien extends JFrame {
             // Cho phép đăng nhập fallback vào app hội viên nếu là tài khoản mẫu
             if (phone.equalsIgnoreCase("hoivien1") && pass.equals("123456")) {
                 Auth.vaiTro = "Hội viên";
-                Auth.hoTen = "Nguyễn Văn An";
+                Auth.hoTen = "Lê Anh Duy";
                 Auth.tenDangNhap = "hoivien1";
-                Auth.soDienThoai = "0901234567";
+                Auth.soDienThoai = "0974482749";
+                Auth.chiNhanh = "CN01 - Cơ sở 1 (Quận 1)";
                 dispose();
                 new HoiVienAppFrame().setVisible(true);
             } else {

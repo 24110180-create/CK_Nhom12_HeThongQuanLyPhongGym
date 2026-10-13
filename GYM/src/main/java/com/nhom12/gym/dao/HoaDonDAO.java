@@ -24,19 +24,19 @@ public class HoaDonDAO {
         if (!memoryCache.isEmpty()) return;
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, -10);
-        memoryCache.add(new HoaDon("HD2026-001", 1, "Lê Anh Duy", "Đăng ký gói tập VIP Năm", 4500000, 0, 4500000, "Chuyển khoản VietQR", "letan1", "CN01 - Quận 1", cal.getTime(), "Đã thanh toán", "Gói VIP Diamond toàn hệ thống"));
+        memoryCache.add(new HoaDon("HD2026-001", 1, "Lê Anh Duy", "Đăng ký gói tập VIP Năm", 4500000, 0, 4500000, "Chuyển khoản VietQR", "letan1", "CN01 - Cơ sở 1 (Quận 1)", cal.getTime(), "Đã thanh toán", "Gói VIP Diamond toàn hệ thống"));
 
         cal.add(Calendar.DAY_OF_MONTH, 2);
-        memoryCache.add(new HoaDon("HD2026-002", 2, "Võ Lê Ngọc Hưng", "Gia hạn gói 3 Tháng", 1350000, 100000, 1250000, "Tiền mặt", "letan1", "CN02 - Tân Bình", cal.getTime(), "Đã thanh toán", "Khuyến mãi voucher 100k"));
+        memoryCache.add(new HoaDon("HD2026-002", 2, "Võ Lê Ngọc Hưng", "Gia hạn gói 3 Tháng", 1350000, 100000, 1250000, "Tiền mặt", "letan1", "CN02 - Cơ sở 2 (Tân Bình)", cal.getTime(), "Đã thanh toán", "Khuyến mãi voucher 100k"));
 
         cal.add(Calendar.DAY_OF_MONTH, 3);
-        memoryCache.add(new HoaDon("HD2026-003", 4, "Trần Minh Quân", "Đăng ký Gói PT 1:1", 7500000, 500000, 7000000, "Chuyển khoản VietQR", "letan1", "CN01 - Quận 1", cal.getTime(), "Đã thanh toán", "30 buổi cùng HLV"));
+        memoryCache.add(new HoaDon("HD2026-003", 4, "Trần Minh Quân", "Đăng ký Gói PT 1:1", 7500000, 500000, 7000000, "Chuyển khoản VietQR", "letan1", "CN01 - Cơ sở 1 (Quận 1)", cal.getTime(), "Đã thanh toán", "30 buổi cùng HLV"));
 
         cal.add(Calendar.DAY_OF_MONTH, 1);
-        memoryCache.add(new HoaDon("HD2026-004", 5, "Hoàng Thùy Linh", "Thuê tủ Locker 6 tháng", 600000, 0, 600000, "Tiền mặt", "letan1", "CN02 - Tân Bình", cal.getTime(), "Đã thanh toán", "Locker VIP A12"));
+        memoryCache.add(new HoaDon("HD2026-004", 5, "Hoàng Thùy Linh", "Thuê tủ Locker 6 tháng", 600000, 0, 600000, "Tiền mặt", "letan1", "CN02 - Cơ sở 2 (Tân Bình)", cal.getTime(), "Đã thanh toán", "Locker VIP A12"));
 
         cal.add(Calendar.DAY_OF_MONTH, 2);
-        memoryCache.add(new HoaDon("HD2026-005", 6, "Đỗ Minh Trí", "Đăng ký gói 6 Tháng", 2500000, 200000, 2300000, "Chuyển khoản VietQR", "admin", "CN02 - Tân Bình", cal.getTime(), "Đã thanh toán", "Khách VIP"));
+        memoryCache.add(new HoaDon("HD2026-005", 6, "Đỗ Minh Trí", "Đăng ký gói 6 Tháng", 2500000, 200000, 2300000, "Chuyển khoản VietQR", "admin", "CN02 - Cơ sở 2 (Tân Bình)", cal.getTime(), "Đã thanh toán", "Khách VIP"));
     }
 
     private static final HoaDonDAO INSTANCE = new HoaDonDAO();

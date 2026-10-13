@@ -540,7 +540,12 @@ public class DangKyHoiVienPanel extends JPanel {
                             hv.setMaHoiVien(finalNextId);
                             hv.setHoTen(name);
                             hv.setMaTheQR(finalCode);
+                            hv.setSoDienThoai(phone);
                             hv.setChiNhanhDangKy(cbBranch.getSelectedItem().toString());
+                            hv.setGoiTapDangKy(pkgName);
+                            hv.setNgayDangKy(new Date()); // Lưu ngày giờ đăng ký chính xác
+                            hv.setSoTienDaThanhToan(finalPrice); // Lưu số tiền đã thanh toán
+                            hv.setHinhThucThanhToan(cbPayment.getSelectedItem().toString());
                             hv.setTrangThai("Hoạt động");
                             Calendar cal = Calendar.getInstance();
                             try {

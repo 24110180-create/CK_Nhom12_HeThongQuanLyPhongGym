@@ -31,13 +31,26 @@ public class HoiVienDAO {
     private static void khoiTaoDuLieuMauNeuTrong() {
         if (!memoryCache.isEmpty()) return;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
-            memoryCache.add(new HoiVien(1, "QR001", "Lê Anh Duy", "CN01 - Quận 1", sdf.parse("2026-12-31"), "Active"));
-            memoryCache.add(new HoiVien(2, "QR002", "Võ Lê Ngọc Hưng", "CN02 - Tân Bình", sdf.parse("2026-10-15"), "Active"));
-            memoryCache.add(new HoiVien(3, "QR003", "Võ Tấn Phát", "CN01 - Quận 1", sdf.parse("2025-01-01"), "Active"));
-            memoryCache.add(new HoiVien(4, "QR004", "Trần Minh Quân", "CN01 - Quận 1", sdf.parse("2026-11-20"), "Active"));
-            memoryCache.add(new HoiVien(5, "QR005", "Hoàng Thùy Linh", "CN02 - Tân Bình", sdf.parse("2026-08-15"), "Active"));
-            memoryCache.add(new HoiVien(6, "VIP007", "Đỗ Minh Trí", "Toàn hệ thống (VIP)", sdf.parse("2027-12-31"), "Active"));
+            memoryCache.add(new HoiVien(1, "QR001", "Lê Anh Duy", "0974482749", "CN01 - Quận 1",
+                    "Gói Kim Cương 12 Tháng", sdfTime.parse("2026-01-15 08:30:15"), sdf.parse("2026-12-31"),
+                    8500000.0, "Chuyển khoản VietQR", "Active"));
+            memoryCache.add(new HoiVien(2, "QR002", "Võ Lê Ngọc Hưng", "0912345678", "CN02 - Tân Bình",
+                    "Gói Standard 3 Tháng", sdfTime.parse("2026-07-15 14:15:20"), sdf.parse("2026-10-15"),
+                    2400000.0, "Chuyển khoản VietQR", "Active"));
+            memoryCache.add(new HoiVien(3, "QR003", "Võ Tấn Phát", "0988776655", "CN01 - Quận 1",
+                    "Gói Cơ Bản 1 Tháng", sdfTime.parse("2024-12-01 09:45:00"), sdf.parse("2025-01-01"),
+                    900000.0, "Tiền mặt", "Expired"));
+            memoryCache.add(new HoiVien(4, "QR004", "Trần Minh Quân", "0933221100", "CN01 - Quận 1",
+                    "Gói Premium 6 Tháng", sdfTime.parse("2026-05-20 16:20:45"), sdf.parse("2026-11-20"),
+                    4800000.0, "Quẹt thẻ POS", "Active"));
+            memoryCache.add(new HoiVien(5, "QR005", "Hoàng Thùy Linh", "0977112233", "CN02 - Tân Bình",
+                    "Gói Sinh Viên 3 Tháng", sdfTime.parse("2026-05-15 10:05:12"), sdf.parse("2026-08-15"),
+                    1500000.0, "Chuyển khoản VietQR", "Active"));
+            memoryCache.add(new HoiVien(6, "VIP007", "Đỗ Minh Trí", "0909998877", "Toàn hệ thống (VIP)",
+                    "Gói VIP Toàn Hệ Thống 2 Năm", sdfTime.parse("2026-01-01 11:30:00"), sdf.parse("2027-12-31"),
+                    15000000.0, "Chuyển khoản VietQR", "Active"));
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Không thể nạp danh sách hội viên mẫu", e);
         }

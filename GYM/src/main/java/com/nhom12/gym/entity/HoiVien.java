@@ -42,6 +42,22 @@ public class HoiVien implements Serializable {
     @Column(name = "TrangThai", length = 30)
     private String trangThai;
 
+    @Column(name = "SoDienThoai", length = 20)
+    private String soDienThoai;
+
+    @Column(name = "GoiTapDangKy", length = 100)
+    private String goiTapDangKy;
+
+    @Column(name = "NgayDangKy")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date ngayDangKy;
+
+    @Column(name = "SoTienDaThanhToan")
+    private Double soTienDaThanhToan;
+
+    @Column(name = "HinhThucThanhToan", length = 50)
+    private String hinhThucThanhToan;
+
     public HoiVien() {
     }
 
@@ -51,6 +67,22 @@ public class HoiVien implements Serializable {
         this.hoTen = hoTen;
         this.chiNhanhDangKy = chiNhanhDangKy;
         this.ngayHetHan = ngayHetHan;
+        this.trangThai = trangThai;
+    }
+
+    public HoiVien(int maHoiVien, String maTheQR, String hoTen, String soDienThoai, String chiNhanhDangKy,
+                   String goiTapDangKy, Date ngayDangKy, Date ngayHetHan, Double soTienDaThanhToan,
+                   String hinhThucThanhToan, String trangThai) {
+        this.maHoiVien = maHoiVien;
+        this.maTheQR = maTheQR;
+        this.hoTen = hoTen;
+        this.soDienThoai = soDienThoai;
+        this.chiNhanhDangKy = chiNhanhDangKy;
+        this.goiTapDangKy = goiTapDangKy;
+        this.ngayDangKy = ngayDangKy;
+        this.ngayHetHan = ngayHetHan;
+        this.soTienDaThanhToan = soTienDaThanhToan;
+        this.hinhThucThanhToan = hinhThucThanhToan;
         this.trangThai = trangThai;
     }
 
@@ -102,6 +134,46 @@ public class HoiVien implements Serializable {
         this.trangThai = trangThai;
     }
 
+    public String getSoDienThoai() {
+        return soDienThoai;
+    }
+
+    public void setSoDienThoai(String soDienThoai) {
+        this.soDienThoai = soDienThoai;
+    }
+
+    public String getGoiTapDangKy() {
+        return goiTapDangKy;
+    }
+
+    public void setGoiTapDangKy(String goiTapDangKy) {
+        this.goiTapDangKy = goiTapDangKy;
+    }
+
+    public Date getNgayDangKy() {
+        return ngayDangKy;
+    }
+
+    public void setNgayDangKy(Date ngayDangKy) {
+        this.ngayDangKy = ngayDangKy;
+    }
+
+    public Double getSoTienDaThanhToan() {
+        return soTienDaThanhToan != null ? soTienDaThanhToan : 0.0;
+    }
+
+    public void setSoTienDaThanhToan(Double soTienDaThanhToan) {
+        this.soTienDaThanhToan = soTienDaThanhToan;
+    }
+
+    public String getHinhThucThanhToan() {
+        return hinhThucThanhToan;
+    }
+
+    public void setHinhThucThanhToan(String hinhThucThanhToan) {
+        this.hinhThucThanhToan = hinhThucThanhToan;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -124,6 +196,11 @@ public class HoiVien implements Serializable {
                 "maHoiVien=" + maHoiVien +
                 ", maTheQR='" + maTheQR + '\'' +
                 ", hoTen='" + hoTen + '\'' +
+                ", soDienThoai='" + soDienThoai + '\'' +
+                ", goiTapDangKy='" + goiTapDangKy + '\'' +
+                ", ngayDangKy=" + ngayDangKy +
+                ", soTienDaThanhToan=" + soTienDaThanhToan +
+                ", hinhThucThanhToan='" + hinhThucThanhToan + '\'' +
                 ", chiNhanhDangKy='" + chiNhanhDangKy + '\'' +
                 ", ngayHetHan=" + ngayHetHan +
                 ", trangThai='" + trangThai + '\'' +

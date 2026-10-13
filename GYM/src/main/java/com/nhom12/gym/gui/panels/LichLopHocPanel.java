@@ -6,6 +6,7 @@ import com.nhom12.gym.dao.LopHocDAO;
 import com.nhom12.gym.entity.DangKyLop;
 import com.nhom12.gym.entity.HoiVien;
 import com.nhom12.gym.entity.LopHoc;
+import com.nhom12.gym.util.Auth;
 import com.nhom12.gym.util.ExcelExportHelper;
 import com.nhom12.gym.util.SoundHelper;
 
@@ -52,6 +53,7 @@ public class LichLopHocPanel extends JPanel {
     private TableRowSorter<DefaultTableModel> sorterLop;
     private JTextField txtSearchLop;
     private JComboBox<String> cbFilterBoMon;
+    private JComboBox<String> cbFilterChiNhanh;
 
     // Component Bảng Học Viên & Điểm Danh (Detail)
     private JLabel lblDetailTitle;
@@ -185,6 +187,22 @@ public class LichLopHocPanel extends JPanel {
             public void changedUpdate(DocumentEvent e) { filterMaster(); }
         });
 
+        JLabel lChiNhanh = new JLabel("Cơ sở:");
+        lChiNhanh.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lChiNhanh.setForeground(new Color(51, 65, 85));
+
+        cbFilterChiNhanh = new JComboBox<>(new String[]{"Tất Cả Cơ Sở", "CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)"});
+        cbFilterChiNhanh.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        String curBranch = Auth.getChiNhanhHienTai();
+        if (curBranch.contains("CN01")) {
+            cbFilterChiNhanh.setSelectedIndex(1);
+        } else if (curBranch.contains("CN02")) {
+            cbFilterChiNhanh.setSelectedIndex(2);
+        } else {
+            cbFilterChiNhanh.setSelectedIndex(0);
+        }
+        cbFilterChiNhanh.addActionListener(e -> filterMaster());
+
         JLabel lBoMon = new JLabel("Bộ môn:");
         lBoMon.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lBoMon.setForeground(new Color(51, 65, 85));
@@ -195,6 +213,8 @@ public class LichLopHocPanel extends JPanel {
 
         pFilter.add(lSearch);
         pFilter.add(txtSearchLop);
+        pFilter.add(lChiNhanh);
+        pFilter.add(cbFilterChiNhanh);
         pFilter.add(lBoMon);
         pFilter.add(cbFilterBoMon);
         pTool.add(pFilter);
@@ -246,7 +266,7 @@ public class LichLopHocPanel extends JPanel {
         panel.add(pTool, BorderLayout.NORTH);
 
         // Bảng Lớp Học
-        String[] cols = {"Mã Lớp", "Bộ Môn", "Tên Lớp Học", "Huấn Luyện Viên", "Phòng Tập", "Khung Giờ & Lịch Tập", "Sĩ Số", "Tình Trạng Chỗ"};
+        String[] cols = {"Mã Lớp", "Cơ Sở", "Bộ Môn", "Tên Lớp Học", "Huấn Luyện Viên", "Phòng Tập", "Khung Giờ & Lịch Tập", "Sĩ Số", "Tình Trạng Chỗ"};
         modelLop = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int r, int c) { return false; }
@@ -262,22 +282,24 @@ public class LichLopHocPanel extends JPanel {
         sorterLop = new TableRowSorter<>(modelLop);
         tableLop.setRowSorter(sorterLop);
 
-        // Căn giữa các cột Mã, Bộ Môn, Phòng, Sĩ Số, Tình trạng
+        // Căn giữa các cột Mã, Cơ Sở, Bộ Môn, Phòng, Sĩ Số, Tình trạng
         DefaultTableCellRenderer centerRender = new DefaultTableCellRenderer();
         centerRender.setHorizontalAlignment(SwingConstants.CENTER);
         tableLop.getColumnModel().getColumn(0).setCellRenderer(centerRender);
-        tableLop.getColumnModel().getColumn(0).setPreferredWidth(80);
+        tableLop.getColumnModel().getColumn(0).setPreferredWidth(70);
         tableLop.getColumnModel().getColumn(1).setCellRenderer(centerRender);
-        tableLop.getColumnModel().getColumn(1).setPreferredWidth(90);
-        tableLop.getColumnModel().getColumn(2).setPreferredWidth(170);
-        tableLop.getColumnModel().getColumn(3).setPreferredWidth(140);
+        tableLop.getColumnModel().getColumn(1).setPreferredWidth(130);
+        tableLop.getColumnModel().getColumn(2).setCellRenderer(centerRender);
+        tableLop.getColumnModel().getColumn(2).setPreferredWidth(85);
+        tableLop.getColumnModel().getColumn(3).setPreferredWidth(160);
         tableLop.getColumnModel().getColumn(4).setPreferredWidth(130);
-        tableLop.getColumnModel().getColumn(5).setPreferredWidth(160);
-        tableLop.getColumnModel().getColumn(6).setCellRenderer(centerRender);
-        tableLop.getColumnModel().getColumn(6).setPreferredWidth(80);
+        tableLop.getColumnModel().getColumn(5).setPreferredWidth(120);
+        tableLop.getColumnModel().getColumn(6).setPreferredWidth(155);
+        tableLop.getColumnModel().getColumn(7).setCellRenderer(centerRender);
+        tableLop.getColumnModel().getColumn(7).setPreferredWidth(75);
 
-        // Renderer Badge Tình Trạng Chỗ
-        tableLop.getColumnModel().getColumn(7).setCellRenderer(new DefaultTableCellRenderer() {
+        // Renderer Badge Tình Trạng Chỗ (Col 8)
+        tableLop.getColumnModel().getColumn(8).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel l = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -293,7 +315,7 @@ public class LichLopHocPanel extends JPanel {
                 return l;
             }
         });
-        tableLop.getColumnModel().getColumn(7).setPreferredWidth(100);
+        tableLop.getColumnModel().getColumn(8).setPreferredWidth(100);
 
         // Sự kiện chọn dòng lớp học -> Nạp danh sách học viên
         tableLop.getSelectionModel().addListSelectionListener(e -> {
@@ -507,8 +529,10 @@ public class LichLopHocPanel extends JPanel {
             tongHocVien += cur;
 
             String tinhTrang = (cur >= max) ? "ĐẦY LỚP" : "CÒN CHỖ (" + (max - cur) + ")";
+            String branchName = (lh.getChiNhanh() != null) ? lh.getChiNhanh() : "CN01 - Cơ sở 1 (Quận 1)";
             modelLop.addRow(new Object[]{
                     lh.getMaLop(),
+                    branchName,
                     lh.getBoMon() != null ? lh.getBoMon() : "Khác",
                     lh.getTenLop(),
                     lh.getHuanLuyenVien(),
@@ -599,13 +623,18 @@ public class LichLopHocPanel extends JPanel {
     private void filterMaster() {
         String keyword = txtSearchLop.getText().trim().toLowerCase();
         String selectedBoMon = (String) cbFilterBoMon.getSelectedItem();
+        String selectedBranch = (cbFilterChiNhanh != null) ? (String) cbFilterChiNhanh.getSelectedItem() : "Tất Cả Cơ Sở";
 
         List<RowFilter<Object, Object>> filters = new ArrayList<>();
         if (!keyword.isEmpty()) {
             filters.add(RowFilter.regexFilter("(?i)" + keyword));
         }
+        if (selectedBranch != null && !selectedBranch.startsWith("Tất Cả")) {
+            String branchCode = selectedBranch.contains("CN01") ? "CN01" : (selectedBranch.contains("CN02") ? "CN02" : selectedBranch);
+            filters.add(RowFilter.regexFilter("(?i)" + branchCode, 1));
+        }
         if (selectedBoMon != null && !selectedBoMon.startsWith("Tất Cả")) {
-            filters.add(RowFilter.regexFilter("(?i)" + selectedBoMon, 1));
+            filters.add(RowFilter.regexFilter("(?i)" + selectedBoMon, 2));
         }
 
         if (filters.isEmpty()) {
@@ -732,7 +761,7 @@ public class LichLopHocPanel extends JPanel {
         String title = isEdit ? "CẬP NHẬT LỚP HỌC: " + lopCanSua.getMaLop() : "THÊM LỚP HỌC MỚI";
 
         JDialog dlg = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), title, true);
-        dlg.setSize(520, 520);
+        dlg.setSize(520, 560);
         dlg.setLocationRelativeTo(this);
         dlg.setLayout(new BorderLayout(15, 15));
         ((JPanel) dlg.getContentPane()).setBorder(new EmptyBorder(20, 24, 20, 24));
@@ -847,6 +876,20 @@ public class LichLopHocPanel extends JPanel {
         }
         pForm.add(cbTime, gbc);
 
+        // Cơ Sở
+        gbc.gridy = r++;
+        JLabel lCN = new JLabel("Cơ Sở Trực Thuộc (*):"); lCN.setFont(fontL);
+        pForm.add(lCN, gbc);
+        gbc.gridy = r++;
+        JComboBox<String> cbCN = new JComboBox<>(new String[]{"CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)"});
+        cbCN.setFont(fontI);
+        if (isEdit && lopCanSua.getChiNhanh() != null) {
+            cbCN.setSelectedItem(lopCanSua.getChiNhanh().contains("CN02") ? "CN02 - Cơ sở 2 (Tân Bình)" : "CN01 - Cơ sở 1 (Quận 1)");
+        } else if (Auth.getChiNhanhHienTai().contains("CN02")) {
+            cbCN.setSelectedIndex(1);
+        }
+        pForm.add(cbCN, gbc);
+
         // Sĩ Số Tối Đa
         gbc.gridy = r++;
         JLabel lMax = new JLabel("Sĩ Số Tối Đa (*):"); lMax.setFont(fontL);
@@ -870,6 +913,7 @@ public class LichLopHocPanel extends JPanel {
             String hlv = (String) cbHLV.getSelectedItem();
             String phong = (String) cbPhong.getSelectedItem();
             String time = (String) cbTime.getSelectedItem();
+            String branch = (String) cbCN.getSelectedItem();
             String maxStr = txtMax.getText().trim();
 
             if (ma.isEmpty() || ten.isEmpty() || maxStr.isEmpty()) {
@@ -895,7 +939,7 @@ public class LichLopHocPanel extends JPanel {
                     JOptionPane.showMessageDialog(dlg, "Mã lớp [" + ma + "] đã tồn tại trong hệ thống!", "Trùng mã", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                LopHoc lopMoi = new LopHoc(ma, ten, boMon, hlv, time, phong, maxSiSo, 0);
+                LopHoc lopMoi = new LopHoc(ma, ten, boMon, hlv, time, phong, branch, maxSiSo, 0);
                 boolean ok = lopHocDAO.them(lopMoi);
                 if (ok) {
                     SoundHelper.playSuccessBeep();
@@ -909,6 +953,7 @@ public class LichLopHocPanel extends JPanel {
                 }
             } else {
                 lopCanSua.setTenLop(ten);
+                lopCanSua.setChiNhanh(branch);
                 lopCanSua.setBoMon(boMon);
                 lopCanSua.setHuanLuyenVien(hlv);
                 lopCanSua.setPhongTap(phong);

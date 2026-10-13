@@ -127,36 +127,28 @@ public class MainDashboard extends JFrame {
         String staffName;
         String statusText;
 
+        String rawName = (Auth.hoTen != null && !Auth.hoTen.trim().isEmpty()) ? Auth.hoTen : ((Auth.tenDangNhap != null) ? Auth.tenDangNhap : "Nhân Sự");
+        staffName = rawName;
+        avatarInitials = tinhAvatarInitials(rawName);
+
+        String activeUser = (Auth.tenDangNhap != null) ? Auth.tenDangNhap : "nhansu";
+
         if ("Chủ".equalsIgnoreCase(role)) {
             roleColor = new Color(99, 102, 241); // Indigo
-            roleBadgeText = "QUẢN TRỊ CHỦ HỆ THỐNG";
-            avatarInitials = "AD";
-            staffName = (Auth.hoTen != null && !Auth.hoTen.isEmpty()) ? Auth.hoTen : "Anh Đức";
-            statusText = "Chủ Chuỗi 2 Cơ Sở • Điều Hành";
+            roleBadgeText = "CHỦ PHÒNG TẬP";
+            statusText = "Điều Hành Chuỗi • @" + activeUser;
         } else if ("Lễ tân".equalsIgnoreCase(role)) {
             roleColor = new Color(16, 185, 129); // Emerald
-            roleBadgeText = "TRẠM LỄ TÂN & BÁN HÀNG";
-            avatarInitials = "LT";
-            staffName = (Auth.hoTen != null && !Auth.hoTen.isEmpty()) ? Auth.hoTen : "Lễ Tân Ca Trực";
-            statusText = "Đang trực ca • Sẵn sàng";
+            roleBadgeText = "TRẠM LỄ TÂN";
+            statusText = "Đang trực ca • @" + activeUser;
         } else if ("HLV".equalsIgnoreCase(role)) {
             roleColor = new Color(245, 158, 11); // Amber
-            roleBadgeText = "KHÔNG GIAN HUẤN LUYỆN VIÊN";
-            avatarInitials = "PT";
-            staffName = (Auth.hoTen != null && !Auth.hoTen.isEmpty()) ? Auth.hoTen : "Huấn Luyện Viên";
-            statusText = "Huấn luyện viên PT • Sẵn sàng";
-        } else if ("Hội viên".equalsIgnoreCase(role)) {
-            roleColor = new Color(234, 179, 8); // Gold
-            roleBadgeText = "CỔNG DỊCH VỤ HỘI VIÊN VIP";
-            avatarInitials = "HV";
-            staffName = (Auth.hoTen != null && !Auth.hoTen.isEmpty()) ? Auth.hoTen : "Nguyễn Văn An";
-            statusText = "Thành viên VIP • Đang kích hoạt";
+            roleBadgeText = "HUẤN LUYỆN VIÊN";
+            statusText = "HLV Sàn & PT • @" + activeUser;
         } else { // Quản lý
             roleColor = new Color(14, 165, 233); // Sky Blue
-            roleBadgeText = "ĐIỀU HÀNH QUẢN LÝ CHI NHÁNH";
-            avatarInitials = "QL";
-            staffName = (Auth.hoTen != null && !Auth.hoTen.isEmpty()) ? Auth.hoTen : "Quản Lý Cơ Sở";
-            statusText = "Quản lý cơ sở • Đang điều hành";
+            roleBadgeText = "QUẢN LÝ CHI NHÁNH";
+            statusText = "Quản lý cơ sở • @" + activeUser;
         }
 
         // --- A. SIDEBAR DỌC BÊN TRÁI (275px) ---
@@ -208,16 +200,7 @@ public class MainDashboard extends JFrame {
         lblShift.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblShift.setForeground(new Color(52, 211, 153));
 
-        String staffBranch;
-        if ("Chủ".equalsIgnoreCase(role)) {
-            staffBranch = "Toàn hệ thống (Chuỗi 2 cơ sở)";
-        } else if ("Hội viên".equalsIgnoreCase(role)) {
-            staffBranch = (Auth.chiNhanh != null && !Auth.chiNhanh.isEmpty()) ? Auth.chiNhanh : "Toàn hệ thống (VIP)";
-        } else if ("Quản lý".equalsIgnoreCase(role)) {
-            staffBranch = (Auth.chiNhanh != null && !Auth.chiNhanh.isEmpty()) ? Auth.chiNhanh : "CN02 - Tân Bình";
-        } else {
-            staffBranch = (Auth.chiNhanh != null && !Auth.chiNhanh.isEmpty()) ? Auth.chiNhanh : "CN01 - Quận 1";
-        }
+        String staffBranch = Auth.getChiNhanhHienTai();
         JLabel lblBranch = new JLabel("Cơ sở: " + staffBranch);
         lblBranch.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblBranch.setForeground(new Color(148, 163, 184));
@@ -302,43 +285,87 @@ public class MainDashboard extends JFrame {
             new QRScannerSimulatorDialog(top).setVisible(true);
         });
 
-        // Dropdown chuyển góc nhìn
-        JLabel lblGoc = new JLabel("Góc nhìn:");
-        lblGoc.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        lblGoc.setForeground(new Color(100, 116, 139));
+        // Dropdown chuyển góc nhìn (CHỈ DÀNH RIÊNG CHO CHỦ PHÒNG TẬP)
+        boolean isRealOwner = "Chủ".equalsIgnoreCase(Auth.vaiTro);
+        if (isRealOwner) {
+            JLabel lblGoc = new JLabel("Góc nhìn:");
+            lblGoc.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+            lblGoc.setForeground(new Color(100, 116, 139));
 
-        JComboBox<String> cbStaffView = new JComboBox<>(new String[]{
-                "Chủ Phòng (Anh Đức)",
-                "Trạm Lễ Tân (Chị Linh)",
-                "Trạm HLV (Anh Tuấn)",
-                "Trạm Quản Lý (Anh Sơn)"
-        });
-        cbStaffView.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        cbStaffView.setPreferredSize(new Dimension(175, 30));
+            JComboBox<String> cbStaffView = new JComboBox<>(new String[]{
+                    "Chủ Phòng Tập",
+                    "Trạm Lễ Tân",
+                    "Trạm HLV",
+                    "Trạm Quản Lý"
+            });
+            cbStaffView.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+            cbStaffView.setPreferredSize(new Dimension(140, 30));
 
-        if ("Lễ tân".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(1);
-        else if ("HLV".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(2);
-        else if ("Quản lý".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(3);
-        else cbStaffView.setSelectedIndex(0);
+            if ("Lễ tân".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(1);
+            else if ("HLV".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(2);
+            else if ("Quản lý".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(3);
+            else cbStaffView.setSelectedIndex(0);
 
-        cbStaffView.addActionListener(e -> {
-            int s = cbStaffView.getSelectedIndex();
-            if (s == 1) buildVerticalWorkstationLayout("Lễ tân");
-            else if (s == 2) buildVerticalWorkstationLayout("HLV");
-            else if (s == 3) buildVerticalWorkstationLayout("Quản lý");
-            else buildVerticalWorkstationLayout("Chủ");
-            revalidate();
-            repaint();
-        });
+            cbStaffView.addActionListener(e -> {
+                int s = cbStaffView.getSelectedIndex();
+                if (s == 1) buildVerticalWorkstationLayout("Lễ tân");
+                else if (s == 2) buildVerticalWorkstationLayout("HLV");
+                else if (s == 3) buildVerticalWorkstationLayout("Quản lý");
+                else buildVerticalWorkstationLayout("Chủ");
+                revalidate();
+                repaint();
+            });
+
+            // Bộ lọc chi nhánh dành cho Chủ phòng
+            JLabel lblBranchHead = new JLabel("Cơ sở:");
+            lblBranchHead.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+            lblBranchHead.setForeground(new Color(100, 116, 139));
+
+            JComboBox<String> cbBranchSelector = new JComboBox<>(new String[]{
+                    "Toàn hệ thống",
+                    "CN01 - Cơ sở 1 (Quận 1)",
+                    "CN02 - Cơ sở 2 (Tân Bình)"
+            });
+            cbBranchSelector.setFont(new Font("Segoe UI", Font.BOLD, 11));
+            cbBranchSelector.setPreferredSize(new Dimension(175, 30));
+            if (Auth.chiNhanhDangChon != null) {
+                if (Auth.chiNhanhDangChon.contains("CN01")) cbBranchSelector.setSelectedIndex(1);
+                else if (Auth.chiNhanhDangChon.contains("CN02")) cbBranchSelector.setSelectedIndex(2);
+                else cbBranchSelector.setSelectedIndex(0);
+            }
+            cbBranchSelector.addActionListener(e -> {
+                String selected = (String) cbBranchSelector.getSelectedItem();
+                Auth.chiNhanhDangChon = selected;
+                JOptionPane.showMessageDialog(this,
+                        "Đã chuyển phạm vi điều hành sang: " + selected + "\nCác mô-đun nghiệp vụ sẽ ưu tiên theo cơ sở này.",
+                        "Chuyển Đổi Chi Nhánh", JOptionPane.INFORMATION_MESSAGE);
+            });
+
+            headerRight.add(btnQuickCheckIn);
+            headerRight.add(lblGoc);
+            headerRight.add(cbStaffView);
+            headerRight.add(lblBranchHead);
+            headerRight.add(cbBranchSelector);
+        } else {
+            // Đối với nhân sự (Lễ tân, HLV, Quản lý): Cố định chi nhánh công tác, không có dropdown đổi góc nhìn
+            JLabel lblStaffBranchBadge = new JLabel(" Cơ sở: " + Auth.getChiNhanhHienTai() + " ");
+            lblStaffBranchBadge.setFont(new Font("Segoe UI", Font.BOLD, 11));
+            lblStaffBranchBadge.setForeground(new Color(30, 41, 59));
+            lblStaffBranchBadge.setBackground(new Color(241, 245, 249));
+            lblStaffBranchBadge.setOpaque(true);
+            lblStaffBranchBadge.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(203, 213, 225), 1),
+                    new EmptyBorder(4, 8, 4, 8)
+            ));
+
+            headerRight.add(btnQuickCheckIn);
+            headerRight.add(lblStaffBranchBadge);
+        }
 
         String today = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
         JLabel lblDate = new JLabel("Ngày: " + today);
         lblDate.setFont(new Font("Segoe UI", Font.BOLD, 11));
         lblDate.setForeground(new Color(100, 116, 139));
-
-        headerRight.add(btnQuickCheckIn);
-        headerRight.add(lblGoc);
-        headerRight.add(cbStaffView);
         headerRight.add(lblDate);
         workspaceHeader.add(headerRight, BorderLayout.EAST);
 
@@ -561,6 +588,17 @@ public class MainDashboard extends JFrame {
             btn.setBackground(new Color(15, 23, 42));
         }
         btn.repaint();
+    }
+
+    private String tinhAvatarInitials(String fullName) {
+        if (fullName == null || fullName.trim().isEmpty()) return "AD";
+        String[] parts = fullName.trim().split("\\s+");
+        if (parts.length == 1) {
+            return parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
+        }
+        String first = parts[0].substring(0, 1).toUpperCase();
+        String last = parts[parts.length - 1].substring(0, 1).toUpperCase();
+        return first + last;
     }
 
     private JButton createLogoutButton() {

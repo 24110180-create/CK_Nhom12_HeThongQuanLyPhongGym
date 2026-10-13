@@ -27,11 +27,11 @@ public class LopHocDAO {
 
     private static void khoiTaoDuLieuMauNeuTrong() {
         if (!memoryClasses.isEmpty()) return;
-        memoryClasses.add(new LopHoc("LH01", "Yoga Trị Liệu Cột Sống", "Yoga", "Nguyễn Thu Thảo", "06:30 - 07:30 (T2-T4-T6)", "Studio 1 (Tầng 2)", 20, 3));
-        memoryClasses.add(new LopHoc("LH02", "Zumba Cardio Đốt Mỡ", "Zumba", "Lê Mai Hương", "18:00 - 19:00 (T3-T5-T7)", "Studio 2 (Tầng 2)", 25, 1));
-        memoryClasses.add(new LopHoc("LH03", "Kickboxing Tự Vệ Nâng Cao", "Boxing", "Phan Thanh Sơn", "19:15 - 20:15 (T2-T4-T6)", "Khu Võ Thuật Ring A", 15, 1));
-        memoryClasses.add(new LopHoc("LH04", "HIIT Cardio Kháng Lực", "Cardio", "Trần Tuấn Kiệt", "07:00 - 08:00 (T3-T5)", "Khu Functional", 15, 0));
-        memoryClasses.add(new LopHoc("LH05", "Pilates Dẻo Dai & Thon Gọn", "Pilates", "Nguyễn Thu Thảo", "17:30 - 18:30 (T2-T4-T6)", "Studio 1 (Tầng 2)", 18, 0));
+        memoryClasses.add(new LopHoc("LH01", "Yoga Trị Liệu Cột Sống", "Yoga", "Nguyễn Thu Thảo", "06:30 - 07:30 (T2-T4-T6)", "Studio 1 (Tầng 2)", "CN01 - Cơ sở 1 (Quận 1)", 20, 3));
+        memoryClasses.add(new LopHoc("LH02", "Zumba Cardio Đốt Mỡ", "Zumba", "Lê Mai Hương", "18:00 - 19:00 (T3-T5-T7)", "Studio 2 (Tầng 2)", "CN01 - Cơ sở 1 (Quận 1)", 25, 1));
+        memoryClasses.add(new LopHoc("LH03", "Kickboxing Tự Vệ Nâng Cao", "Boxing", "Phan Thanh Sơn", "19:15 - 20:15 (T2-T4-T6)", "Khu Võ Thuật Ring A", "CN02 - Cơ sở 2 (Tân Bình)", 15, 1));
+        memoryClasses.add(new LopHoc("LH04", "HIIT Cardio Kháng Lực", "Cardio", "Trần Tuấn Kiệt", "07:00 - 08:00 (T3-T5)", "Khu Functional", "CN02 - Cơ sở 2 (Tân Bình)", 15, 0));
+        memoryClasses.add(new LopHoc("LH05", "Pilates Dẻo Dai & Thon Gọn", "Pilates", "Nguyễn Thu Thảo", "17:30 - 18:30 (T2-T4-T6)", "Studio 1 (Tầng 2)", "CN01 - Cơ sở 1 (Quận 1)", 18, 0));
     }
 
     public List<LopHoc> layTatCa() {

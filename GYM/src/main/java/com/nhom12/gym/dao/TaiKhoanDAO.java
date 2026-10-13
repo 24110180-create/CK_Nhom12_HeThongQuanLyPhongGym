@@ -45,14 +45,16 @@ public class TaiKhoanDAO {
             try (Session session = sf.openSession()) {
                 List<TaiKhoan> list = session.createQuery("FROM TaiKhoan ORDER BY tenDangNhap ASC", TaiKhoan.class).list();
                 if (list != null && !list.isEmpty()) {
-                    memoryCache.clear();
-                    memoryCache.addAll(list);
-                    return list;
+                    for (TaiKhoan dbTk : list) {
+                        memoryCache.removeIf(item -> item.getTenDangNhap().equalsIgnoreCase(dbTk.getTenDangNhap()));
+                        memoryCache.add(dbTk);
+                    }
                 }
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Lỗi lấy danh sách tài khoản từ CSDL, dùng bộ nhớ đệm: {0}", e.getMessage());
             }
         }
+        khoiTaoDuLieuMauNeuTrong();
         return new java.util.ArrayList<>(memoryCache);
     }
 
@@ -76,10 +78,9 @@ public class TaiKhoanDAO {
 
     /**
      * Xác thực đăng nhập an toàn:
-     * - Tìm tài khoản theo TenDangNhap
+     * - Tìm tài khoản theo TenDangNhap trong CSDL và bộ nhớ đệm
      * - Đối soát mã băm mật khẩu bằng PasswordUtil.checkPassword() (BCrypt / SHA-256)
-     * - Tuyệt đối không truyền chuỗi mật khẩu thô vào mệnh đề WHERE của SQL/HQL
-     * - Ném ngoại lệ khi mất kết nối CSDL để Service phân biệt với trường hợp gõ sai mật khẩu
+     * - Tự động đồng bộ vào CSDL nếu tài khoản hợp lệ từ memoryCache
      */
     public TaiKhoan dangNhap(String tenDangNhap, String matKhau) throws Exception {
         if (tenDangNhap == null || matKhau == null) return null;
@@ -92,6 +93,26 @@ public class TaiKhoanDAO {
 
         try (Session session = sf.openSession()) {
             TaiKhoan tk = session.get(TaiKhoan.class, tenDangNhap.trim());
+
+            // Nếu CSDL chưa có tài khoản (ví dụ quanly1), tìm trong memoryCache
+            if (tk == null) {
+                for (TaiKhoan mem : memoryCache) {
+                    if (mem.getTenDangNhap().equalsIgnoreCase(tenDangNhap.trim())) {
+                        tk = mem;
+                        // Tự động persist vào CSDL để lưu trữ bền vững
+                        Transaction tx = null;
+                        try {
+                            tx = session.beginTransaction();
+                            session.persist(new TaiKhoan(mem.getTenDangNhap(), mem.getMatKhau(), mem.getVaiTro(), mem.getHoTen(), mem.getChiNhanh()));
+                            tx.commit();
+                        } catch (Exception ex) {
+                            if (tx != null) tx.rollback();
+                        }
+                        break;
+                    }
+                }
+            }
+
             if (tk != null) {
                 // Kiểm tra mật khẩu (đối soát BCrypt / SHA-256 an toàn)
                 if (PasswordUtil.checkPassword(matKhau, tk.getMatKhau())) {
@@ -104,10 +125,10 @@ public class TaiKhoanDAO {
                     return tk;
                 }
             }
-            return null; // Tài khoản không tồn tại hoặc sai mật khẩu khi CSDL đang online
+            return null; // Tài khoản không tồn tại hoặc sai mật khẩu
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Lỗi kết nối CSDL khi đăng nhập", e);
-            throw e; // Ném ngoại lệ để tầng Service nhận biết sự cố kết nối CSDL
+            throw e;
         }
     }
 

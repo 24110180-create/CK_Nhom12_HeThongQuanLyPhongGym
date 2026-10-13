@@ -59,6 +59,8 @@ public class QuanLyNhanSuPanel extends JPanel {
     private JButton btnExportExcel;
     private JButton btnShiftBoard;
     private JButton btnCalculateKPI;
+    private JButton btnTransferBranch;
+    private JButton btnViewProfile;
 
     // Table & Model
     private JTable table;
@@ -221,21 +223,27 @@ public class QuanLyNhanSuPanel extends JPanel {
     }
 
     private JPanel createFilterToolbar() {
-        JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
+        JPanel bar = new JPanel();
+        bar.setLayout(new BoxLayout(bar, BoxLayout.Y_AXIS));
         bar.setBackground(Color.WHITE);
         bar.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(226, 232, 240)),
-                new EmptyBorder(4, 12, 4, 12)
+                new EmptyBorder(8, 12, 8, 12)
         ));
         bar.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Hàng 1: Tìm kiếm & Các bộ lọc đa chiều
+        JPanel pRow1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
+        pRow1.setOpaque(false);
+        pRow1.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel lblSearch = new JLabel("Tìm kiếm:");
         lblSearch.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblSearch.setForeground(new Color(71, 85, 105));
 
-        txtSearch = new JTextField(15);
+        txtSearch = new JTextField(14);
         txtSearch.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        txtSearch.setPreferredSize(new Dimension(180, 32));
+        txtSearch.setPreferredSize(new Dimension(170, 32));
 
         JLabel lblFRole = new JLabel("Vai trò:");
         lblFRole.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -259,24 +267,37 @@ public class QuanLyNhanSuPanel extends JPanel {
 
         cbFilterStatus = new JComboBox<>(new String[]{"Tất cả", "Đang làm việc", "Tạm khóa"});
         cbFilterStatus.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        cbFilterStatus.setPreferredSize(new Dimension(120, 32));
+        cbFilterStatus.setPreferredSize(new Dimension(115, 32));
 
-        // Nút tính năng sáng tạo
-        btnExportExcel = new JButton("Xuất Excel");
-        btnExportExcel.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnExportExcel.setBackground(new Color(16, 185, 129));
-        btnExportExcel.setForeground(Color.WHITE);
-        btnExportExcel.setFocusPainted(false);
-        btnExportExcel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnExportExcel.setPreferredSize(new Dimension(110, 32));
+        pRow1.add(lblSearch);
+        pRow1.add(txtSearch);
+        pRow1.add(lblFRole);
+        pRow1.add(cbFilterRole);
+        pRow1.add(lblFBranch);
+        pRow1.add(cbFilterBranch);
+        pRow1.add(lblFStatus);
+        pRow1.add(cbFilterStatus);
 
-        btnShiftBoard = new JButton("Lịch Trực Ca");
+        // Hàng 2: Bộ công cụ điều hành chuyên sâu cho Chủ phòng (Anh Đức)
+        JPanel pRow2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
+        pRow2.setOpaque(false);
+        pRow2.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        btnShiftBoard = new JButton("Lịch Trực & Độ Phủ Ca");
         btnShiftBoard.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnShiftBoard.setBackground(new Color(14, 165, 233));
         btnShiftBoard.setForeground(Color.WHITE);
         btnShiftBoard.setFocusPainted(false);
         btnShiftBoard.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnShiftBoard.setPreferredSize(new Dimension(115, 32));
+        btnShiftBoard.setPreferredSize(new Dimension(165, 32));
+
+        btnTransferBranch = new JButton("Điều Động Chi Nhánh");
+        btnTransferBranch.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnTransferBranch.setBackground(new Color(99, 102, 241));
+        btnTransferBranch.setForeground(Color.WHITE);
+        btnTransferBranch.setFocusPainted(false);
+        btnTransferBranch.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnTransferBranch.setPreferredSize(new Dimension(165, 32));
 
         btnCalculateKPI = new JButton("Tính Thưởng KPI");
         btnCalculateKPI.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -284,19 +305,33 @@ public class QuanLyNhanSuPanel extends JPanel {
         btnCalculateKPI.setForeground(Color.WHITE);
         btnCalculateKPI.setFocusPainted(false);
         btnCalculateKPI.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnCalculateKPI.setPreferredSize(new Dimension(135, 32));
+        btnCalculateKPI.setPreferredSize(new Dimension(140, 32));
 
-        bar.add(lblSearch);
-        bar.add(txtSearch);
-        bar.add(lblFRole);
-        bar.add(cbFilterRole);
-        bar.add(lblFBranch);
-        bar.add(cbFilterBranch);
-        bar.add(lblFStatus);
-        bar.add(cbFilterStatus);
-        bar.add(btnExportExcel);
-        bar.add(btnShiftBoard);
-        bar.add(btnCalculateKPI);
+        btnViewProfile = new JButton("Hồ Sơ Chi Tiết");
+        btnViewProfile.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnViewProfile.setBackground(new Color(79, 70, 229));
+        btnViewProfile.setForeground(Color.WHITE);
+        btnViewProfile.setFocusPainted(false);
+        btnViewProfile.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnViewProfile.setPreferredSize(new Dimension(125, 32));
+
+        btnExportExcel = new JButton("Xuất Excel");
+        btnExportExcel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnExportExcel.setBackground(new Color(16, 185, 129));
+        btnExportExcel.setForeground(Color.WHITE);
+        btnExportExcel.setFocusPainted(false);
+        btnExportExcel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnExportExcel.setPreferredSize(new Dimension(105, 32));
+
+        pRow2.add(btnShiftBoard);
+        pRow2.add(btnTransferBranch);
+        pRow2.add(btnCalculateKPI);
+        pRow2.add(btnViewProfile);
+        pRow2.add(btnExportExcel);
+
+        bar.add(pRow1);
+        bar.add(Box.createRigidArea(new Dimension(0, 4)));
+        bar.add(pRow2);
 
         // Listeners lọc dữ liệu tức thì
         DocumentListener dl = new DocumentListener() {
@@ -311,7 +346,9 @@ public class QuanLyNhanSuPanel extends JPanel {
 
         btnExportExcel.addActionListener(e -> xuLyXuatExcel());
         btnShiftBoard.addActionListener(e -> moDialogLichTrucHomNay());
+        btnTransferBranch.addActionListener(e -> moDialogDieuDongChiNhanh());
         btnCalculateKPI.addActionListener(e -> moDialogTinhThuongKPI());
+        btnViewProfile.addActionListener(e -> moDialogHoSoChiTiet());
 
         return bar;
     }
@@ -603,6 +640,15 @@ public class QuanLyNhanSuPanel extends JPanel {
             }
         });
 
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (e.getClickCount() == 2 && table.getSelectedRow() != -1) {
+                    moDialogHoSoChiTiet();
+                }
+            }
+        });
+
         right.add(new JScrollPane(table), BorderLayout.CENTER);
         return right;
     }
@@ -610,14 +656,42 @@ public class QuanLyNhanSuPanel extends JPanel {
     private void initDefaultStaffData() {
         staffList.clear();
 
-        // Nạp dữ liệu đồng bộ với tài khoản hệ thống của CSDL & bộ nhớ đệm
-        staffList.add(new StaffDetail("admin", "Võ Anh Đức (Chủ Hệ Thống)", "Chủ", "Toàn hệ thống", "Ca hành chính (08:00 - 17:00)", "0909000001", 30000000, 10000000, "5.0 ⭐ (Xuất sắc)", "Đang làm việc"));
-        staffList.add(new StaffDetail("letan1", "Nguyễn Thị Linh (Chị Linh)", "Lễ tân", "CN01 - Quận 1", "Ca sáng (06:00 - 14:00)", "0912345601", 7500000, 1500000, "5.0 ⭐ (Xuất sắc)", "Đang làm việc"));
-        staffList.add(new StaffDetail("letan2", "Trần Thị Mai (Lễ Tân CN02)", "Lễ tân", "CN02 - Tân Bình", "Ca chiều (14:00 - 22:00)", "0912345602", 7500000, 1200000, "4.8 ⭐ (Tốt)", "Đang làm việc"));
-        staffList.add(new StaffDetail("hlv1", "Trần Tuấn Kiệt (Anh Tuấn)", "HLV", "CN01 - Quận 1", "Ca chiều (14:00 - 22:00)", "0912345603", 15000000, 4500000, "4.9 ⭐ (Xuất sắc)", "Đang làm việc"));
-        staffList.add(new StaffDetail("hlv2", "Phạm Quốc Bảo (HLV CN02)", "HLV", "CN02 - Tân Bình", "Ca sáng (06:00 - 14:00)", "0912345604", 14000000, 3800000, "4.8 ⭐ (Tốt)", "Đang làm việc"));
-        staffList.add(new StaffDetail("hlv3", "Nguyễn Thu Thảo (HLV Yoga)", "HLV", "CN01 - Quận 1", "Ca sáng (06:00 - 14:00)", "0912345605", 13000000, 3200000, "5.0 ⭐ (Xuất sắc)", "Đang làm việc"));
-        staffList.add(new StaffDetail("quanly1", "Lê Thanh Sơn (Anh Sơn)", "Quản lý", "CN02 - Tân Bình", "Ca hành chính (08:00 - 17:00)", "0912345606", 18000000, 4000000, "4.9 ⭐ (Xuất sắc)", "Đang làm việc"));
+        // Nạp dữ liệu nền tảng chuẩn mực cho chuỗi 2 cơ sở
+        staffList.add(new StaffDetail("admin", "Võ Anh Đức", "Chủ", "Toàn hệ thống", "Ca hành chính (08:00 - 17:00)", "0909000001", 30000000, 10000000, "5.0 ⭐ (Xuất sắc)", "Đang làm việc"));
+        staffList.add(new StaffDetail("letan1", "Nguyễn Thị Linh", "Lễ tân", "CN01 - Quận 1", "Ca sáng (06:00 - 14:00)", "0912345601", 7500000, 1500000, "5.0 ⭐ (Xuất sắc)", "Đang làm việc"));
+        staffList.add(new StaffDetail("letan2", "Trần Thị Mai", "Lễ tân", "CN02 - Tân Bình", "Ca chiều (14:00 - 22:00)", "0912345602", 7500000, 1200000, "4.8 ⭐ (Tốt)", "Đang làm việc"));
+        staffList.add(new StaffDetail("hlv1", "Trần Tuấn Kiệt", "HLV", "CN01 - Quận 1", "Ca chiều (14:00 - 22:00)", "0912345603", 15000000, 4500000, "4.9 ⭐ (Xuất sắc)", "Đang làm việc"));
+        staffList.add(new StaffDetail("hlv2", "Phạm Quốc Bảo", "HLV", "CN02 - Tân Bình", "Ca sáng (06:00 - 14:00)", "0912345604", 14000000, 3800000, "4.8 ⭐ (Tốt)", "Đang làm việc"));
+        staffList.add(new StaffDetail("hlv3", "Nguyễn Thu Thảo", "HLV", "CN01 - Quận 1", "Ca sáng (06:00 - 14:00)", "0912345605", 13000000, 3200000, "5.0 ⭐ (Xuất sắc)", "Đang làm việc"));
+        staffList.add(new StaffDetail("quanly1", "Lê Thanh Sơn", "Quản lý", "CN02 - Tân Bình", "Ca hành chính (08:00 - 17:00)", "0912345606", 18000000, 4000000, "4.9 ⭐ (Xuất sắc)", "Đang làm việc"));
+
+        // Đồng bộ dữ liệu thực tế từ TaiKhoanDAO (bao gồm các tài khoản mới được tạo bởi Anh Đức)
+        try {
+            List<TaiKhoan> dbAccounts = taiKhoanDAO.layTatCa();
+            if (dbAccounts != null) {
+                for (TaiKhoan tk : dbAccounts) {
+                    if (tk == null || tk.getTenDangNhap() == null) continue;
+                    boolean exists = false;
+                    for (StaffDetail s : staffList) {
+                        if (s.username.equalsIgnoreCase(tk.getTenDangNhap())) {
+                            exists = true;
+                            if (tk.getHoTen() != null && !tk.getHoTen().trim().isEmpty()) s.fullName = tk.getHoTen();
+                            if (tk.getVaiTro() != null && !tk.getVaiTro().trim().isEmpty()) s.role = tk.getVaiTro();
+                            if (tk.getChiNhanh() != null && !tk.getChiNhanh().trim().isEmpty()) s.branch = tk.getChiNhanh();
+                            break;
+                        }
+                    }
+                    if (!exists) {
+                        String r = (tk.getVaiTro() != null) ? tk.getVaiTro() : "Nhân viên";
+                        String b = (tk.getChiNhanh() != null) ? tk.getChiNhanh() : "CN01 - Quận 1";
+                        String fn = (tk.getHoTen() != null && !tk.getHoTen().trim().isEmpty()) ? tk.getHoTen() : tk.getTenDangNhap();
+                        double base = "HLV".equalsIgnoreCase(r) ? 14000000 : ("Quản lý".equalsIgnoreCase(r) ? 18000000 : 7500000);
+                        double bonus = "HLV".equalsIgnoreCase(r) ? 3500000 : 1500000;
+                        staffList.add(new StaffDetail(tk.getTenDangNhap(), fn, r, b, "Ca xoay linh hoạt", "0909112233", base, bonus, "5.0 ⭐ (Xuất sắc)", "Đang làm việc"));
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
     }
 
     private void loadTableData() {
@@ -921,28 +995,79 @@ public class QuanLyNhanSuPanel extends JPanel {
     }
 
     private void moDialogLichTrucHomNay() {
-        JDialog dlg = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "BẢNG PHÂN CA TRỰC CHUỖI HÔM NAY (ANH ĐỨC)", true);
-        dlg.setSize(750, 480);
+        JDialog dlg = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "BẢNG ĐIỀU PHỐI & KIỂM TRA ĐỘ PHỦ CA TRỰC CHUỖI (ANH ĐỨC)", true);
+        dlg.setSize(820, 530);
         dlg.setLocationRelativeTo(this);
 
         JPanel pnl = new JPanel(new BorderLayout(10, 14));
         pnl.setBackground(Color.WHITE);
         pnl.setBorder(new EmptyBorder(16, 20, 16, 20));
 
-        JLabel title = new JLabel("BẢNG ĐIỀU PHỐI CA TRỰC HÔM NAY (ĐỦ 2 CHI NHÁNH)");
+        // Phân tích độ phủ ca trực
+        int cn1Morning = 0, cn1Afternoon = 0;
+        int cn2Morning = 0, cn2Afternoon = 0;
+
+        for (StaffDetail s : staffList) {
+            if ("Tạm khóa".equalsIgnoreCase(s.status)) continue;
+            boolean isCN1 = s.branch.contains("CN01");
+            boolean isCN2 = s.branch.contains("CN02");
+            boolean isMorning = s.shift.toLowerCase().contains("sáng");
+            boolean isAfternoon = s.shift.toLowerCase().contains("chiều");
+
+            if (isCN1) {
+                if (isMorning) cn1Morning++;
+                if (isAfternoon) cn1Afternoon++;
+            }
+            if (isCN2) {
+                if (isMorning) cn2Morning++;
+                if (isAfternoon) cn2Afternoon++;
+            }
+        }
+
+        JPanel pHeader = new JPanel(new BorderLayout(0, 8));
+        pHeader.setOpaque(false);
+
+        JLabel title = new JLabel("BẢNG ĐIỀU PHỐI & ĐỘ PHỦ CA TRỰC TOÀN CHUỖI (ANH ĐỨC)");
         title.setFont(new Font("Segoe UI", Font.BOLD, 17));
         title.setForeground(new Color(15, 23, 42));
-        pnl.add(title, BorderLayout.NORTH);
+
+        boolean coverageOk = (cn1Morning > 0 && cn1Afternoon > 0 && cn2Morning > 0 && cn2Afternoon > 0);
+        String alertText = coverageOk ?
+                "🟢 HỆ THỐNG AN TOÀN: CN01 (" + cn1Morning + " sáng / " + cn1Afternoon + " chiều) • CN02 (" + cn2Morning + " sáng / " + cn2Afternoon + " chiều) • Đầy đủ nhân lực trực" :
+                "⚠️ CẢNH BÁO CA TRỰC: Có ca thiếu nhân lực trực! Chủ phòng cần điều động thêm nhân sự.";
+
+        JLabel lblAlert = new JLabel(alertText);
+        lblAlert.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblAlert.setOpaque(true);
+        lblAlert.setBackground(coverageOk ? new Color(236, 253, 245) : new Color(254, 243, 199));
+        lblAlert.setForeground(coverageOk ? new Color(16, 185, 129) : new Color(217, 119, 6));
+        lblAlert.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(coverageOk ? new Color(16, 185, 129) : new Color(217, 119, 6), 1),
+                new EmptyBorder(6, 10, 6, 10)
+        ));
+
+        pHeader.add(title, BorderLayout.NORTH);
+        pHeader.add(lblAlert, BorderLayout.SOUTH);
+        pnl.add(pHeader, BorderLayout.NORTH);
 
         String[] cols = {"Cơ Sở", "Ca Làm Việc", "Nhân Sự Trực", "Vai Trò", "Số ĐT", "Tình Trạng"};
-        DefaultTableModel m = new DefaultTableModel(cols, 0);
+        DefaultTableModel m = new DefaultTableModel(cols, 0) {
+            @Override
+            public boolean isCellEditable(int r, int c) { return false; }
+        };
 
-        m.addRow(new Object[]{"CN01 - Quận 1", "Ca sáng (06:00 - 14:00)", "Nguyễn Thị Linh", "Lễ tân", "0912345601", "🟢 Đang trực ca"});
-        m.addRow(new Object[]{"CN01 - Quận 1", "Ca sáng (06:00 - 14:00)", "Nguyễn Thu Thảo", "HLV Yoga", "0912345605", "🟢 Đang đứng lớp"});
-        m.addRow(new Object[]{"CN01 - Quận 1", "Ca chiều (14:00 - 22:00)", "Trần Tuấn Kiệt", "HLV PT Trưởng", "0912345603", "🟡 Ca tiếp theo"});
-        m.addRow(new Object[]{"CN02 - Tân Bình", "Ca sáng (06:00 - 14:00)", "Phạm Quốc Bảo", "HLV Gym", "0912345604", "🟢 Đang trực sàn"});
-        m.addRow(new Object[]{"CN02 - Tân Bình", "Ca chiều (14:00 - 22:00)", "Trần Thị Mai", "Lễ tân", "0912345602", "🟡 Ca tiếp theo"});
-        m.addRow(new Object[]{"CN02 - Tân Bình", "Ca hành chính (08:00 - 17:00)", "Lê Thanh Sơn", "Quản lý cơ sở", "0912345606", "🟢 Đang điều hành"});
+        for (StaffDetail s : staffList) {
+            String sttBadge = "Tạm khóa".equalsIgnoreCase(s.status) ? "🔴 Tạm khóa" :
+                             (s.shift.toLowerCase().contains("sáng") ? "🟢 Đang trực ca" : "🟡 Ca tiếp theo");
+            m.addRow(new Object[]{
+                    s.branch,
+                    s.shift,
+                    s.fullName,
+                    s.role,
+                    s.phone,
+                    sttBadge
+            });
+        }
 
         JTable t = new JTable(m);
         t.setRowHeight(34);
@@ -951,12 +1076,238 @@ public class QuanLyNhanSuPanel extends JPanel {
 
         pnl.add(new JScrollPane(t), BorderLayout.CENTER);
 
+        JPanel pFooter = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        pFooter.setOpaque(false);
         JButton btnClose = new JButton("Đóng Cửa Sổ");
         btnClose.addActionListener(e -> dlg.dispose());
-        pnl.add(btnClose, BorderLayout.SOUTH);
+        pFooter.add(btnClose);
+        pnl.add(pFooter, BorderLayout.SOUTH);
 
         dlg.setContentPane(pnl);
         dlg.setVisible(true);
+    }
+
+    private void moDialogDieuDongChiNhanh() {
+        int selected = table.getSelectedRow();
+        if (selected == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một nhân sự cần điều động chi nhánh!", "Chưa chọn nhân sự", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        int modelRow = table.convertRowIndexToModel(selected);
+        String username = (String) model.getValueAt(modelRow, 0);
+
+        StaffDetail staff = null;
+        for (StaffDetail s : staffList) {
+            if (s.username.equalsIgnoreCase(username)) {
+                staff = s;
+                break;
+            }
+        }
+        if (staff == null) return;
+
+        JDialog dlg = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "ĐIỀU ĐỘNG & BIỆT PHÁI NHÂN SỰ LIÊN CHI NHÁNH (ANH ĐỨC)", true);
+        dlg.setSize(520, 420);
+        dlg.setLocationRelativeTo(this);
+        dlg.setLayout(new BorderLayout(15, 15));
+        ((JPanel) dlg.getContentPane()).setBorder(new EmptyBorder(20, 24, 20, 24));
+        dlg.getContentPane().setBackground(Color.WHITE);
+
+        JPanel pHead = new JPanel(new BorderLayout(0, 4));
+        pHead.setOpaque(false);
+        JLabel lblH = new JLabel("LỆNH ĐIỀU ĐỘNG CÔNG TÁC CHI NHÁNH");
+        lblH.setFont(new Font("Segoe UI", Font.BOLD, 17));
+        lblH.setForeground(new Color(15, 23, 42));
+        JLabel lblSub = new JLabel("Điều phối nhân sự giữa CN01 (Quận 1) và CN02 (Tân Bình) • Quyền hạn Chủ phòng");
+        lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblSub.setForeground(new Color(100, 116, 139));
+        pHead.add(lblH, BorderLayout.NORTH);
+        pHead.add(lblSub, BorderLayout.SOUTH);
+        dlg.add(pHead, BorderLayout.NORTH);
+
+        JPanel pForm = new JPanel(new GridLayout(5, 2, 10, 12));
+        pForm.setOpaque(false);
+
+        pForm.add(new JLabel("Nhân sự điều động:"));
+        JLabel lblStaffName = new JLabel("<html><b>" + staff.fullName + "</b> (" + staff.username + " - " + staff.role + ")</html>");
+        pForm.add(lblStaffName);
+
+        pForm.add(new JLabel("Cơ sở hiện tại:"));
+        JLabel lblCurrentBranch = new JLabel("<html><font color='#0284c7'><b>" + staff.branch + "</b></font> (" + staff.shift + ")</html>");
+        pForm.add(lblCurrentBranch);
+
+        pForm.add(new JLabel("Cơ sở điều động đến (*):"));
+        JComboBox<String> cbNewBranch = new JComboBox<>(new String[]{"CN01 - Quận 1", "CN02 - Tân Bình", "Toàn hệ thống"});
+        if (staff.branch.contains("CN01")) cbNewBranch.setSelectedIndex(1);
+        else if (staff.branch.contains("CN02")) cbNewBranch.setSelectedIndex(0);
+        else cbNewBranch.setSelectedIndex(0);
+        pForm.add(cbNewBranch);
+
+        pForm.add(new JLabel("Ca làm việc mới (*):"));
+        JComboBox<String> cbNewShift = new JComboBox<>(new String[]{
+                "Ca sáng (06:00 - 14:00)",
+                "Ca chiều (14:00 - 22:00)",
+                "Ca hành chính (08:00 - 17:00)",
+                "Ca xoay linh hoạt"
+        });
+        cbNewShift.setSelectedItem(staff.shift);
+        pForm.add(cbNewShift);
+
+        pForm.add(new JLabel("Lý do điều động / Ghi chú:"));
+        JTextField txtReason = new JTextField("Điều phối tăng cường nhân lực theo kế hoạch chuỗi của Anh Đức");
+        pForm.add(txtReason);
+
+        dlg.add(pForm, BorderLayout.CENTER);
+
+        JPanel pBot = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        pBot.setOpaque(false);
+        JButton btnConfirm = new JButton("Xác Nhận Điều Động");
+        btnConfirm.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnConfirm.setBackground(new Color(16, 185, 129));
+        btnConfirm.setForeground(Color.WHITE);
+
+        StaffDetail finalStaff = staff;
+        btnConfirm.addActionListener(e -> {
+            String newBranch = (String) cbNewBranch.getSelectedItem();
+            String newShift = (String) cbNewShift.getSelectedItem();
+            String reason = txtReason.getText().trim();
+
+            finalStaff.branch = newBranch;
+            finalStaff.shift = newShift;
+
+            // Cập nhật CSDL
+            TaiKhoan tk = taiKhoanDAO.timTheoTenDangNhap(finalStaff.username);
+            if (tk != null) {
+                tk.setChiNhanh(newBranch);
+                taiKhoanDAO.capNhat(tk);
+            }
+
+            loadTableData();
+            updateKpiMetrics();
+            dlg.dispose();
+            JOptionPane.showMessageDialog(this,
+                    "<html><body>" +
+                            "<h3 style='color: #10B981;'>ĐIỀU ĐỘNG NHÂN SỰ THÀNH CÔNG!</h3>" +
+                            "<p>Nhân sự: <b>" + finalStaff.fullName + "</b> (" + finalStaff.username + ")</p>" +
+                            "<p>Cơ sở mới: <b>" + newBranch + "</b></p>" +
+                            "<p>Ca trực: <b>" + newShift + "</b></p>" +
+                            "<p>Lý do: <i>" + reason + "</i></p>" +
+                            "</body></html>",
+                    "Thành Công", JOptionPane.INFORMATION_MESSAGE);
+        });
+
+        JButton btnClose = new JButton("Hủy Bỏ");
+        btnClose.addActionListener(e -> dlg.dispose());
+
+        pBot.add(btnConfirm);
+        pBot.add(btnClose);
+        dlg.add(pBot, BorderLayout.SOUTH);
+
+        dlg.setVisible(true);
+    }
+
+    private void moDialogHoSoChiTiet() {
+        int selected = table.getSelectedRow();
+        if (selected == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn nhân sự trong danh sách để xem hồ sơ chi tiết!", "Chưa chọn nhân sự", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        int modelRow = table.convertRowIndexToModel(selected);
+        String username = (String) model.getValueAt(modelRow, 0);
+
+        StaffDetail staff = null;
+        for (StaffDetail s : staffList) {
+            if (s.username.equalsIgnoreCase(username)) {
+                staff = s;
+                break;
+            }
+        }
+        if (staff == null) return;
+
+        JDialog dlg = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "HỒ SƠ NHÂN SỰ CHI TIẾT - " + staff.fullName, true);
+        dlg.setSize(580, 520);
+        dlg.setLocationRelativeTo(this);
+        dlg.setLayout(new BorderLayout(15, 15));
+        ((JPanel) dlg.getContentPane()).setBorder(new EmptyBorder(20, 24, 20, 24));
+        dlg.getContentPane().setBackground(Color.WHITE);
+
+        // Header Avatar & Badge
+        JPanel pTop = new JPanel(new BorderLayout(15, 0));
+        pTop.setOpaque(false);
+        pTop.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(226, 232, 240)),
+                new EmptyBorder(0, 0, 14, 0)
+        ));
+
+        String initials = "AD";
+        if (staff.fullName != null && !staff.fullName.trim().isEmpty()) {
+            String[] parts = staff.fullName.trim().split("\\s+");
+            if (parts.length == 1) initials = parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
+            else initials = parts[0].substring(0, 1).toUpperCase() + parts[parts.length - 1].substring(0, 1).toUpperCase();
+        }
+
+        JLabel lblAv = new JLabel(initials, SwingConstants.CENTER);
+        lblAv.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblAv.setForeground(Color.WHITE);
+        lblAv.setOpaque(true);
+        Color avBg = "Chủ".equalsIgnoreCase(staff.role) ? new Color(99, 102, 241) :
+                     ("Lễ tân".equalsIgnoreCase(staff.role) ? new Color(16, 185, 129) :
+                     ("HLV".equalsIgnoreCase(staff.role) ? new Color(245, 158, 11) : new Color(14, 165, 233)));
+        lblAv.setBackground(avBg);
+        lblAv.setPreferredSize(new Dimension(50, 50));
+
+        JPanel pName = new JPanel(new GridLayout(2, 1, 0, 3));
+        pName.setOpaque(false);
+        JLabel lName = new JLabel(staff.fullName);
+        lName.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lName.setForeground(new Color(15, 23, 42));
+
+        JLabel lRoleSub = new JLabel("Vai trò: " + staff.role + " • Tài khoản: @" + staff.username + " • Trạng thái: " + staff.status);
+        lRoleSub.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lRoleSub.setForeground(new Color(100, 116, 139));
+        pName.add(lName);
+        pName.add(lRoleSub);
+
+        pTop.add(lblAv, BorderLayout.WEST);
+        pTop.add(pName, BorderLayout.CENTER);
+        dlg.add(pTop, BorderLayout.NORTH);
+
+        // Center Details Grid
+        JPanel pCenter = new JPanel(new GridLayout(7, 2, 10, 8));
+        pCenter.setOpaque(false);
+
+        addProfileField(pCenter, "Cơ Sở Công Tác:", staff.branch);
+        addProfileField(pCenter, "Ca Trực Phân Công:", staff.shift);
+        addProfileField(pCenter, "Số Điện Thoại Liên Hệ:", staff.phone);
+        addProfileField(pCenter, "Đánh Giá Hiệu Suất:", staff.rating);
+        addProfileField(pCenter, "Lương Cứng Định Mức:", df.format(staff.baseSalary));
+        addProfileField(pCenter, "Thưởng KPI / Hoa Hồng:", df.format(staff.kpiBonus));
+        addProfileField(pCenter, "Tổng Thu Nhập Tháng:", df.format(staff.getTotalIncome()));
+
+        dlg.add(pCenter, BorderLayout.CENTER);
+
+        JPanel pBot = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        pBot.setOpaque(false);
+
+        JButton btnClose = new JButton("Đóng Cửa Sổ");
+        btnClose.addActionListener(e -> dlg.dispose());
+
+        pBot.add(btnClose);
+        dlg.add(pBot, BorderLayout.SOUTH);
+
+        dlg.setVisible(true);
+    }
+
+    private void addProfileField(JPanel parent, String label, String value) {
+        JLabel l = new JLabel(label);
+        l.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        l.setForeground(new Color(71, 85, 105));
+
+        JLabel v = new JLabel(value);
+        v.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        v.setForeground(new Color(15, 23, 42));
+
+        parent.add(l);
+        parent.add(v);
     }
 
     private void moDialogTinhThuongKPI() {

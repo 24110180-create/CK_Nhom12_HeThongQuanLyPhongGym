@@ -62,7 +62,13 @@ public class AuthService {
                 Auth.setSession(tk, false);
                 return new LoginResult(true, "Đăng nhập thành công!", false, tk);
             } else {
-                // Mật khẩu sai hoặc tài khoản không tồn tại trên CSDL -> BÁO LỖI NGAY, TUYỆT ĐỐI KHÔNG FALLBACK
+                // Kiểm tra dự phòng trong bộ nhớ đệm (hỗ trợ tài khoản mẫu hoặc vừa tạo mới)
+                TaiKhoan cachedTK = taiKhoanDAO.timTheoTenDangNhap(user);
+                if (cachedTK != null && PasswordUtil.checkPassword(pass, cachedTK.getMatKhau())) {
+                    Auth.setSession(cachedTK, false);
+                    taiKhoanDAO.them(cachedTK); // Tự động đồng bộ vào CSDL
+                    return new LoginResult(true, "Đăng nhập thành công!", false, cachedTK);
+                }
                 return new LoginResult(false, "Tên đăng nhập hoặc mật khẩu không chính xác!", false, null);
             }
         }

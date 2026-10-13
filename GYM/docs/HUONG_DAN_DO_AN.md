@@ -17,12 +17,23 @@
    - **Báo cáo 1**: Doanh thu theo từng chi nhánh (CN01 - Quận 1, CN02 - Tân Bình) với biểu đồ so sánh và bảng số liệu.
    - **Báo cáo 2**: Danh sách hội viên sắp hết hạn (Cảnh báo Cấp 1 / Cấp 2 / Quá hạn) hỗ trợ gửi tin nhắn Zalo ZNS / SMS nhắc hạn tự động.
    - **Báo cáo 3**: Mức độ sử dụng phòng tập theo giờ (Hourly Peak Traffic Heatmap 06:00 - 22:00) nhận diện 2 khung giờ vàng cao điểm sáng và tối.
-7. **Phân quyền người dùng (Role-Based Access Control - 5 Vai Trò)**:
-   - **Chủ phòng**: Giao diện **Executive Command Cockpit** cao cấp với thanh menu 2 tầng (Dual-Tier Command Ribbon gồm 5 Trụ cột chiến lược), dải Live KPI tài chính/hội viên thời gian thực, không gian làm việc nhúng trực tiếp toàn cảnh (Panoramic Embedded Workspace) và tùy chọn chuyển chế độ Lưới Ma Trận (Grid Matrix).
-   - **Lễ tân**: Trạm vận hành Front-Desk (Check-in thẻ/QR, Đăng ký thẻ mới, Gia hạn gói tập, Tủ đồ Locker, CSKH, Quản lý tài khoản App).
-   - **HLV (Coach)**: Trainer Studio (Lịch dạy, Điểm danh lớp, Đo InBody, Sổ tay PR).
-   - **Quản lý chi nhánh**: Operations Center (Tổng quan vận hành, Báo cáo doanh số 2 cơ sở, Phân ca trực, Quản lý kho hàng).
-   - **Hội viên (Member VIP)**: Cổng thông tin thẻ điện tử, check-in QR, xem lịch lớp, theo dõi InBody, gia hạn VietQR.
+7. **Phân quyền người dùng & Phân bổ 25 màn hình tối ưu (Role-Based Access Control - 5 Vai Trò)**:
+   - **Chủ phòng (10 màn hình cấp cao - Tầm nhìn chiến lược & ra quyết định)**:
+     * Nhóm 1 (Tổng quan): Trang Chủ (KPI tổng hợp - `CuaSoChuHeThongPanel`).
+     * Nhóm 2 (Báo cáo): Báo Cáo Doanh Thu, Phân Tích Giờ Cao Điểm, Lịch Sử Giao Dịch.
+     * Nhóm 3 (Chiến lược): Quản Lý Gói Tập & Giá Tiền, Quản Lý Khuyến Mãi (VIP Ẩn 50%).
+     * Nhóm 4 (Hệ thống): Quản Lý Nhân Sự & Bảng Lương, Quản Trị Tài Khoản & App Hội Viên, Phân Quyền Người Dùng, Cài Đặt Chung.
+     * **Cửa phụ "Góc nhìn"**: Dropdown góc nhìn cho phép Chủ ghé xem/thao tác trực tiếp 15 màn hình vận hành của Lễ tân, HLV, Quản lý bất kỳ lúc nào để demo và kiểm tra!
+   - **Lễ tân (8 màn hình thao tác quầy trực tiếp)**: Quét Thẻ & Check-in, Danh Sách Hội Viên, Đăng Ký Hội Viên Mới, Gia Hạn Gói Tập, Lịch Lớp Học & Điểm Danh, Quầy Bán Hàng POS, Quản Lý Tủ Đồ Locker, Chăm Sóc Khách Hàng CRM.
+   - **HLV (Huấn luyện viên - 4 màn hình chuyên môn sâu)**: Theo Dõi InBody & Thể Lực, Lịch Dạy Huấn Luyện Viên, Sổ Tay Tiến Độ PT 1:1, Hồ Sơ Học Viên Phụ Trách.
+   - **Quản lý chi nhánh (13 màn hình = 8 của Lễ tân + 3 điều hành cơ sở + 2 số liệu chi nhánh)**: Kế thừa 8 màn hình Lễ tân + Quản Lý Kho Hàng + Khảo Sát & Phản Hồi + Phân Ca Làm Việc + Phân Tích Giờ Cao Điểm (Khóa theo chi nhánh) + Báo Cáo Doanh Thu (Khóa theo chi nhánh).
+   - **Hội viên (Member VIP - 5 module app)**: Thẻ VIP & Check-in QR, Đặt Chỗ Lớp Nhóm, Lịch PT Kèm 1:1, Chỉ Số InBody, Gói Tập & Lịch Sử Giao Dịch.
+8. **Màn hình Đăng Ký Tài Khoản Chọn Role (`DangKyTaiKhoanDialog`)**:
+   - Cho phép người dùng trực tiếp chọn 1 trong 5 vai trò (Hội viên, Lễ tân, HLV, Quản lý, Chủ phòng) qua giao diện thẻ trực quan.
+   - Tài khoản đăng ký mới tự động kích hoạt và đăng nhập được ngay lập tức vào đúng không gian làm việc của vai trò tương ứng.
+9. **Đồng bộ chuẩn giao diện Menu Dọc (Vertical Sidebar Layout) cho mọi vai trò**:
+   - Sidebar bên trái: Rộng 275px màu Slate 900 (`#0F172A`) chứa Logo FitLife Gym, Huy hiệu màu nhận diện vai trò, Thẻ thông tin cá nhân và Danh sách các mục menu xếp dọc xuống (kèm phụ đề nghiệp vụ, hiệu ứng gạch đứng 4px khi active).
+   - Header đỉnh bên phải: Nền trắng viền xám chứa Tiêu đề mô-đun, Breadcrumb, Nút Quét Mã Check-in (Emerald 500), Dropdown chuyển "Góc nhìn" (5 vai trò), Dropdown Chi nhánh và Ngày giờ hệ thống.
 
 ### B. Phân Tách 2 Ứng Dụng Độc Lập (Admin Suite vs FitLife Member App):
 - **Hệ thống Quản Trị Chuỗi Gym (`App.java` / `Chay_HeThong_FitLife.bat`)**: Dành riêng cho Chủ phòng, Lễ tân trạm Check-in, Huấn luyện viên, Quản lý chi nhánh.

@@ -365,7 +365,7 @@ public class DangKyHoiVienPanel extends JPanel {
         previewActions.setOpaque(false);
         previewActions.add(cardPreview, BorderLayout.NORTH);
 
-        JLabel lblNote = new JLabel("<html>Mã thẻ QR hiển thị trực tiếp trên thẻ. Bấm gửi nhanh Zalo / SMS hoặc in thẻ cứng tại quầy.</html>");
+        JLabel lblNote = new JLabel("<html>Mã thẻ QR hiển thị trực quan ngay trên thẻ. Bạn có thể bấm gửi nhanh qua Zalo / SMS hoặc in thẻ cứng tại quầy.</html>");
         lblNote.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblNote.setForeground(new Color(100, 116, 139));
         previewActions.add(lblNote, BorderLayout.CENTER);

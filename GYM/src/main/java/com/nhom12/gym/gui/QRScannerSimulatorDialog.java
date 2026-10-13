@@ -79,7 +79,7 @@ public class QRScannerSimulatorDialog extends JDialog {
         titleGroup.add(lblSub);
         topHeader.add(titleGroup, BorderLayout.WEST);
 
-        JLabel lblHwBadge = new JLabel("● HONEYWELL 1450G CONNECTED");
+        JLabel lblHwBadge = new JLabel("HONEYWELL 1450G SẴN SÀNG");
         lblHwBadge.setFont(new Font("Segoe UI", Font.BOLD, 11));
         lblHwBadge.setForeground(new Color(16, 185, 129));
         topHeader.add(lblHwBadge, BorderLayout.EAST);
@@ -192,7 +192,7 @@ public class QRScannerSimulatorDialog extends JDialog {
         lblTargetName.setForeground(new Color(203, 213, 225));
         lblTargetName.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JButton btnTriggerScan = new JButton("⚡ BẮN TIA QUÉT (TRIGGER SCAN)");
+        JButton btnTriggerScan = new JButton("BẮN TIA QUÉT (TRIGGER SCAN)");
         btnTriggerScan.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnTriggerScan.setBackground(new Color(239, 68, 68)); // Đỏ Laser
         btnTriggerScan.setForeground(Color.WHITE);
@@ -219,7 +219,6 @@ public class QRScannerSimulatorDialog extends JDialog {
         tabOptions.addTab("Thẻ Nghiệp Vụ Test Đồ Án", taoTabTheNghiepVu());
         tabOptions.addTab("Thẻ Hội Viên CSDL", taoTabTheHoiVienCSDL());
         tabOptions.addTab("Quét Từ File Ảnh", taoTabQuetTuFileAnh());
-        tabOptions.addTab("Cơ Chế Máy Quét USB", taoTabCoChePhanCung());
 
         centerGrid.add(tabOptions);
         root.add(centerGrid, BorderLayout.CENTER);
@@ -228,8 +227,8 @@ public class QRScannerSimulatorDialog extends JDialog {
         JPanel bottomBar = new JPanel(new BorderLayout());
         bottomBar.setOpaque(false);
 
-        JLabel lblHelp = new JLabel("💡 Mẹo: Bấm chọn bất kỳ thẻ nào ở danh sách bên phải, sau đó bấm [Bắn Tia Quét] để mở cổng Flap Barrier!");
-        lblHelp.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        JLabel lblHelp = new JLabel("Lưu ý: Bấm chọn bất kỳ thẻ nào ở danh sách bên phải, sau đó bấm [Bắn Tia Quét] để mở cổng Flap Barrier.");
+        lblHelp.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblHelp.setForeground(new Color(100, 116, 139));
         bottomBar.add(lblHelp, BorderLayout.WEST);
 
@@ -273,12 +272,12 @@ public class QRScannerSimulatorDialog extends JDialog {
         JPanel pnlList = new JPanel(new GridLayout(6, 1, 0, 8));
         pnlList.setOpaque(false);
 
-        pnlList.add(createCardItem("QR001", "Lê Anh Duy (VIP Diamond)", "Hợp lệ 100% • Mở cổng Flap Barrier xanh lá", new Color(16, 185, 129)));
-        pnlList.add(createCardItem("QR002", "Trần Thị Mai (Standard 1M)", "Gói tập hết hạn • Khóa cổng đỏ & hiện nút Gia Hạn", new Color(239, 68, 68)));
-        pnlList.add(createCardItem("QR003", "Hoàng Văn Bình (Thẻ VIP)", "Thẻ bị tạm khóa vi phạm nội quy • Từ chối check-in", new Color(245, 158, 11)));
+        pnlList.add(createCardItem("QR001", "Lê Anh Duy (VIP Diamond)", "Hợp lệ 100% - Mở cổng Flap Barrier xanh lá", new Color(16, 185, 129)));
+        pnlList.add(createCardItem("QR002", "Trần Thị Mai (Standard 1M)", "Gói tập hết hạn - Khóa cổng đỏ & hiện nút Gia Hạn", new Color(239, 68, 68)));
+        pnlList.add(createCardItem("QR003", "Hoàng Văn Bình (Thẻ VIP)", "Thẻ bị tạm khóa vi phạm nội quy - Từ chối check-in", new Color(245, 158, 11)));
         pnlList.add(createCardItem("QR004", "Phạm Quốc Cường (Cơ sở 1)", "Sai chi nhánh (Đăng ký CN01 mang sang CN02 quét)", new Color(139, 92, 246)));
         pnlList.add(createCardItem("VIP007", "Khách VIP Anh Đức (Chủ)", "Giảm giá 50% bảo mật nội bộ với nhân viên", new Color(14, 165, 233)));
-        pnlList.add(createCardItem("PASS-8888", "Võ Hoàng Yến (Khách Vãng Lai)", "Vé lẻ 1 ngày (80k) xuất VietQR • Chỉ mở cổng 1 lần", new Color(217, 119, 6)));
+        pnlList.add(createCardItem("PASS-8888", "Võ Hoàng Yến (Khách Vãng Lai)", "Vé lẻ 1 ngày (80k) xuất VietQR - Chỉ mở cổng 1 lần", new Color(217, 119, 6)));
 
         pnl.add(pnlList, BorderLayout.CENTER);
         return pnl;
@@ -412,7 +411,7 @@ public class QRScannerSimulatorDialog extends JDialog {
         JPanel pnlCenter = new JPanel(new GridLayout(3, 1, 0, 10));
         pnlCenter.setOpaque(false);
 
-        JButton btnChooseFile = new JButton("📁 Chọn Tệp Ảnh Mã QR Từ Máy Tính...");
+        JButton btnChooseFile = new JButton("Chọn Tệp Ảnh Mã QR Từ Máy Tính...");
         btnChooseFile.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnChooseFile.setBackground(new Color(241, 245, 249));
         btnChooseFile.setForeground(new Color(30, 41, 59));
@@ -434,7 +433,7 @@ public class QRScannerSimulatorDialog extends JDialog {
                 chonThe(extractedCode, "Quét từ file ảnh: " + f.getName(), "Giải mã hình ảnh", "Tất cả chi nhánh");
                 JOptionPane.showMessageDialog(this,
                         "Đã nhận diện thành công mã QR từ file ảnh [" + f.getName() + "]:\n"
-                                + "• Mã Thẻ Giải Mã: " + extractedCode + "\n"
+                                + "- Mã Thẻ Giải Mã: " + extractedCode + "\n"
                                 + "Mã thẻ đã được đưa vào tâm ngắm camera máy quét!",
                         "Đọc File Ảnh Thành Công", JOptionPane.INFORMATION_MESSAGE);
             }
@@ -463,45 +462,6 @@ public class QRScannerSimulatorDialog extends JDialog {
         pnlCenter.add(pnlManual);
         pnl.add(pnlCenter, BorderLayout.CENTER);
 
-        return pnl;
-    }
-
-    // --- TAB 4: CƠ CHẾ PHẦN CỨNG MÁY QUÉT HONEYWELL ---
-    private JPanel taoTabCoChePhanCung() {
-        JPanel pnl = new JPanel(new BorderLayout());
-        pnl.setBackground(Color.WHITE);
-        pnl.setBorder(new EmptyBorder(12, 12, 12, 12));
-
-        JTextArea txtHw = new JTextArea();
-        txtHw.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtHw.setEditable(false);
-        txtHw.setLineWrap(true);
-        txtHw.setWrapStyleWord(true);
-        txtHw.setBackground(new Color(248, 250, 252));
-        txtHw.setText("""
-                CƠ CHẾ KỸ THUẬT CỦA MÁY QUÉT USB HONEYWELL VOYAGER 1450G:
-                
-                1. Chuẩn Kết Nối:
-                   - Giao tiếp qua cổng USB 2.0 / 3.0 Type-A tiêu chuẩn.
-                   - Hoạt động theo giao thức quốc tế: USB HID Keyboard Emulation (Mô phỏng bàn phím USB ảo).
-                
-                2. Nguyên Lý Vận Hành:
-                   - Không cần cài đặt Driver riêng biệt (Chuẩn Plug & Play trên Windows 10/11).
-                   - Khi chiếu tia laser đỏ vào mã QR trên điện thoại hoặc thẻ cứng:
-                     + Mắt đọc quang học Area-Imaging (640 x 480 pixel array) thu nhận hình ảnh.
-                     + Bộ vi xử lý của súng quét giải mã ma trận QR thành chuỗi ký tự (VD: QR001).
-                     + Súng quét tự động "gõ" chuỗi ký tự đó vào ô văn bản đang Focus của hệ thống với tốc độ siêu nhanh (~5ms).
-                     + Kết thúc bằng việc tự động phát mã phím ENTER (Carriage Return \\n).
-                
-                3. Tích Hợp Trong Phần Mềm FitLife Gym:
-                   - Ô txtMaQR trong CheckInForm luôn được duy trì AUTO-FOCUS liên tục.
-                   - Lắng nghe sự kiện ActionEvent (phím Enter từ súng quét) để tự động kích hoạt Check-in tức thì.
-                   - Sau khi check-in, ô nhập tự động xóa trắng và focus lại để sẵn sàng cho khách kế tiếp.
-                """);
-
-        JScrollPane sc = new JScrollPane(txtHw);
-        sc.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240)));
-        pnl.add(sc, BorderLayout.CENTER);
         return pnl;
     }
 

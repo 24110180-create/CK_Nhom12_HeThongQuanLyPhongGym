@@ -295,13 +295,13 @@ public class MainDashboard extends JFrame {
         lblUser.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblUser.setForeground(new Color(241, 245, 249));
 
-        JButton btnQuickCheckIn = new JButton("⚡ Quét Mã Check-in");
+        JButton btnQuickCheckIn = new JButton("Quét Mã Check-in");
         btnQuickCheckIn.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnQuickCheckIn.setBackground(new Color(16, 185, 129)); // Emerald 500
         btnQuickCheckIn.setForeground(Color.WHITE);
         btnQuickCheckIn.setFocusPainted(false);
         btnQuickCheckIn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnQuickCheckIn.setPreferredSize(new Dimension(150, 30));
+        btnQuickCheckIn.setPreferredSize(new Dimension(140, 30));
         btnQuickCheckIn.addActionListener(e -> {
             if (ownerPillars.size() > 1 && !ownerPillars.get(1).items.isEmpty()) {
                 activeOwnerPillarIdx = 1; // Pillar Vận Hành Phòng Tập

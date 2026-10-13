@@ -61,7 +61,7 @@ public class GuiMaQRDialog extends JDialog {
         titleGroup.add(lblSub);
         top.add(titleGroup, BorderLayout.WEST);
 
-        JLabel lblStatus = new JLabel("● ĐÃ KÍCH HOẠT");
+        JLabel lblStatus = new JLabel("ĐÃ KÍCH HOẠT");
         lblStatus.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblStatus.setForeground(new Color(16, 185, 129));
         top.add(lblStatus, BorderLayout.EAST);

@@ -157,7 +157,7 @@ public class CheckInForm extends JPanel {
         lblScanTitle.setFont(new Font("Segoe UI", Font.BOLD, 13));
         lblScanTitle.setForeground(new Color(15, 23, 42));
 
-        JLabel lblHwStatus = new JLabel("● Súng quét USB Honeywell: Sẵn sàng");
+        JLabel lblHwStatus = new JLabel("Súng quét USB Honeywell: Sẵn sàng");
         lblHwStatus.setFont(new Font("Segoe UI", Font.BOLD, 11));
         lblHwStatus.setForeground(new Color(16, 185, 129));
 
@@ -177,13 +177,13 @@ public class CheckInForm extends JPanel {
         JPanel actionBtns = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
         actionBtns.setOpaque(false);
 
-        JButton btnOpenScanner = new JButton("📸 Mở Máy Quét Ảo (Simulator)");
+        JButton btnOpenScanner = new JButton("Mở Máy Quét Ảo (Simulator)");
         btnOpenScanner.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnOpenScanner.setBackground(new Color(124, 58, 237)); // Tím Neon công nghệ #7C3AED
         btnOpenScanner.setForeground(Color.WHITE);
         btnOpenScanner.setFocusPainted(false);
         btnOpenScanner.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnOpenScanner.setPreferredSize(new Dimension(215, 44));
+        btnOpenScanner.setPreferredSize(new Dimension(210, 44));
         btnOpenScanner.addActionListener(e -> moMayQuetAo());
 
         JButton btnSubmit = new JButton("Check-in");
@@ -219,7 +219,7 @@ public class CheckInForm extends JPanel {
         quickTestRow.add(createTestBadge("VIP007 (Ẩn 50% Anh Đức)", "VIP007", new Color(14, 165, 233)));
         quickTestRow.add(createTestBadge("PASS-8888 (Vé Lẻ 1 Ngày)", "PASS-8888", new Color(217, 119, 6)));
 
-        JButton btnScanImgFile = new JButton("📁 Quét Ảnh QR...");
+        JButton btnScanImgFile = new JButton("Quét Ảnh QR...");
         btnScanImgFile.setFont(new Font("Segoe UI", Font.BOLD, 11));
         btnScanImgFile.setBackground(new Color(241, 245, 249));
         btnScanImgFile.setForeground(new Color(15, 118, 110));
@@ -552,11 +552,11 @@ public class CheckInForm extends JPanel {
     }
 
     private void capNhatThongKeAudit() {
-        lblLogSummary.setText("● Hôm nay: " + logModel.getRowCount() + " lượt quét • "
-                + checkInService.getSuccessCountToday() + " hợp lệ • "
-                + checkInService.getFailCountToday() + " từ chối • "
-                + "Barrier mở: " + checkInService.getTotalBarrierOpenSuccess() + " • "
-                + "Mở thủ công: " + checkInService.getManualGateOpenCount() + " (Đối soát gian lận)");
+        lblLogSummary.setText("Hôm nay: " + logModel.getRowCount() + " lượt quét - "
+                + checkInService.getSuccessCountToday() + " hợp lệ - "
+                + checkInService.getFailCountToday() + " từ chối - "
+                + "Barrier mở: " + checkInService.getTotalBarrierOpenSuccess() + " - "
+                + "Mở thủ công: " + checkInService.getManualGateOpenCount() + " (Đối soát)");
     }
 
     private JButton createTestBadge(String label, String code, Color bg) {

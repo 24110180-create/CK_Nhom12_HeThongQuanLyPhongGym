@@ -203,12 +203,12 @@ Hệ thống được thiết kế phân tầng chuẩn mực theo mô hình ki�
    - Ô nhập mã trên `CheckInForm` luôn được duy trì **Auto-Focus liên tục**.
    - Khi đưa mã QR trên điện thoại hoặc thẻ cứng vào tia laser, súng quét tự động bắn chuỗi ký tự và tự động gõ phím **Enter (`\n`)** ➔ Kích hoạt mở cổng Flap Barrier và phát tiếng bíp trong 20ms.
 2. **Cách 2: Sử Dụng Bộ Mô Phỏng Máy Quét Ảo Trực Quan (Interactive Scanner Simulator)**:
-   - Ngay cạnh ô quét, bấm nút **`[ 📸 Mở Máy Quét Ảo (Simulator) ]`** (hoặc nút **`[ ⚡ Quét Mã Check-in ]`** trên thanh Top Navbar của Chủ).
+   - Ngay cạnh ô quét, bấm nút **`[ Mở Máy Quét Ảo (Simulator) ]`** (hoặc nút **`[ Quét Mã Check-in ]`** trên thanh Top Navbar của Chủ).
    - Một cửa sổ ống kính máy quét chuyên nghiệp hiện ra với **Tia Laser Đỏ chuyển động quét lên xuống**.
-   - Chọn bất kỳ thẻ nào trong danh sách (thẻ kịch bản 5 Rules hoặc thẻ lấy trực tiếp từ CSDL SQL Server) ➔ Bấm nút **`[ ⚡ BẮN TIA QUÉT (TRIGGER SCAN) ]`** ➔ Phát tiếng bíp và tự động mở cổng an ninh.
+   - Chọn bất kỳ thẻ nào trong danh sách (thẻ kịch bản 5 Rules hoặc thẻ lấy trực tiếp từ CSDL SQL Server) ➔ Bấm nút **`[ BẮN TIA QUÉT (TRIGGER SCAN) ]`** ➔ Phát tiếng bíp và tự động mở cổng an ninh.
 3. **Cách 3: Quét Từ File Ảnh QR & Thao Tác Trực Tiếp Từ Danh Sách Hội Viên**:
-   - Bấm nút **`[ 📁 Quét Ảnh QR... ]`** để chọn tệp hình ảnh mã thẻ từ máy tính.
-   - Hoặc trong màn hình **Danh Sách Hội Viên Đã Đăng Ký**, chọn bất kỳ hội viên nào trong bảng và bấm nút **`[ 📇 Xem & Gửi Thẻ QR ]`** hoặc **`[ ⚡ Quét Thử Check-in Thẻ Này ]`**.
+   - Bấm nút **`[ Quét Ảnh QR... ]`** để chọn tệp hình ảnh mã thẻ từ máy tính.
+   - Hoặc trong màn hình **Danh Sách Hội Viên Đã Đăng Ký**, chọn bất kỳ hội viên nào trong bảng và bấm nút **`[ Xem & Gửi Thẻ QR ]`** hoặc **`[ Quét Thử Check-in Thẻ Này ]`**.
 
 ---
 

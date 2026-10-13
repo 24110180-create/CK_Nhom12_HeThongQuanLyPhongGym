@@ -421,11 +421,11 @@ public class QuanLyHoiVienPanel extends JPanel {
         JPanel bottomActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 6));
         bottomActions.setOpaque(false);
 
-        JLabel lblHint = new JLabel("💡 Chọn một hội viên để xem thẻ QR hoặc quét thử Check-in:");
-        lblHint.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        JLabel lblHint = new JLabel("Chọn một hội viên để xem thẻ QR hoặc quét thử Check-in:");
+        lblHint.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblHint.setForeground(new Color(100, 116, 139));
 
-        JButton btnXemTheQR = new JButton("📇 Xem & Gửi Thẻ QR");
+        JButton btnXemTheQR = new JButton("Xem & Gửi Thẻ QR");
         btnXemTheQR.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnXemTheQR.setBackground(new Color(37, 99, 235));
         btnXemTheQR.setForeground(Color.WHITE);
@@ -433,7 +433,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnXemTheQR.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnXemTheQR.addActionListener(e -> xemTheQRHoiVienDangChon());
 
-        JButton btnQuetCheckIn = new JButton("⚡ Quét Thử Check-in Thẻ Này");
+        JButton btnQuetCheckIn = new JButton("Quét Thử Check-in Thẻ Này");
         btnQuetCheckIn.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnQuetCheckIn.setBackground(new Color(16, 185, 129));
         btnQuetCheckIn.setForeground(Color.WHITE);

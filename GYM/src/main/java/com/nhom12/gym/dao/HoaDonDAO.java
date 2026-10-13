@@ -39,6 +39,12 @@ public class HoaDonDAO {
         memoryCache.add(new HoaDon("HD2026-005", 6, "Đỗ Minh Trí", "Đăng ký gói 6 Tháng", 2500000, 200000, 2300000, "Chuyển khoản VietQR", "admin", "CN02 - Tân Bình", cal.getTime(), "Đã thanh toán", "Khách VIP"));
     }
 
+    private static final HoaDonDAO INSTANCE = new HoaDonDAO();
+
+    public static HoaDonDAO getInstance() {
+        return INSTANCE;
+    }
+
     /**
      * Thêm hóa đơn mới vào hệ thống
      * @return true nếu lưu CSDL thành công, false nếu giao dịch thất bại
@@ -57,7 +63,8 @@ public class HoaDonDAO {
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            System.err.println("[HoaDonDAO] Lỗi thêm hóa đơn vào CSDL: " + e.getMessage());
+            System.err.println("[HoaDonDAO] Lỗi thêm hóa đơn vào CSDL (Lưu tạm vào bộ đệm offline): " + e.getMessage());
+            memoryCache.add(0, hd);
             return false;
         }
     }

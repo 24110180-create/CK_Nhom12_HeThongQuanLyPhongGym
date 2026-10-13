@@ -146,14 +146,14 @@ public class CaiDatHeThongPanel extends JPanel {
         JLabel lAcc = new JLabel("Số Tài Khoản:"); lAcc.setFont(fontLabel);
         bankPanel.add(lAcc, gbcBank);
         gbcBank.gridx = 1; gbcBank.weightx = 0.65;
-        txtBankAcc = new JTextField("090123456789"); txtBankAcc.setFont(fontInput);
+        txtBankAcc = new JTextField("0974482749"); txtBankAcc.setFont(fontInput);
         bankPanel.add(txtBankAcc, gbcBank);
 
         br++; gbcBank.gridx = 0; gbcBank.gridy = br; gbcBank.weightx = 0.35;
         JLabel lHolder = new JLabel("Tên Chủ TK:"); lHolder.setFont(fontLabel);
         bankPanel.add(lHolder, gbcBank);
         gbcBank.gridx = 1; gbcBank.weightx = 0.65;
-        txtBankHolder = new JTextField("FITLIFE GYM CENTER"); txtBankHolder.setFont(fontInput);
+        txtBankHolder = new JTextField("LE ANH DUY"); txtBankHolder.setFont(fontInput);
         bankPanel.add(txtBankHolder, gbcBank);
 
         br++; gbcBank.gridx = 0; gbcBank.gridy = br; gbcBank.gridwidth = 2;

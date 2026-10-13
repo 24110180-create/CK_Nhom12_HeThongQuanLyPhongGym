@@ -13,6 +13,8 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Window;
+import javax.swing.SwingUtilities;
 import java.awt.Insets;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -385,53 +387,33 @@ public class GiaHanGoiTapPanel extends JPanel {
         String newExpire = sdf.format(newExpireDate);
 
         // Cập nhật thực tế cho Hội Viên
-        currentHoiVien.setNgayHetHan(newExpireDate);
-        currentHoiVien.setTrangThai("Active");
-        hoiVienDAO.capNhat(currentHoiVien);
-
-        // Tạo hóa đơn tài chính thực tế
         long finalPrice = basePrice - (basePrice * discountPercent / 100);
         String maHD = "HD" + (System.currentTimeMillis() % 1000000);
-        String nguoiLap = (Auth.tenDangNhap != null && !Auth.tenDangNhap.isEmpty()) ? Auth.tenDangNhap : "letan1";
-        String branch = currentHoiVien.getChiNhanhDangKy() != null ? currentHoiVien.getChiNhanhDangKy() : "CN01 - Quận 1";
+        String pkgName = cbGoi.getSelectedItem().toString();
 
-        HoaDon hd = new HoaDon(
+        java.util.List<com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang> items = new java.util.ArrayList<>();
+        items.add(new com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang("Gia hạn " + pkgName + " (Hạn mới: " + newExpire + ")", 1, basePrice, finalPrice));
+
+        Window parent = SwingUtilities.getWindowAncestor(this);
+        com.nhom12.gym.gui.ThanhToanHoaDonDialog dialog = new com.nhom12.gym.gui.ThanhToanHoaDonDialog(
+                parent,
                 maHD,
-                currentHoiVien.getMaHoiVien(),
-                currentHoiVien.getHoTen(),
-                "Gia hạn " + cbGoi.getSelectedItem().toString(),
+                currentHoiVien.getHoTen() + " (" + currentHoiVien.getMaTheQR() + ")",
+                "Gia hạn " + pkgName,
                 basePrice,
                 basePrice * discountPercent / 100,
                 finalPrice,
-                cbThanhToan.getSelectedItem().toString(),
-                nguoiLap,
-                branch,
-                new Date(),
-                "Đã thanh toán",
-                "Gia hạn thành công trên hệ thống FitLife"
+                items,
+                success -> {
+                    if (success) {
+                        currentHoiVien.setNgayHetHan(newExpireDate);
+                        currentHoiVien.setTrangThai("Active");
+                        hoiVienDAO.capNhat(currentHoiVien);
+                        displayMember(currentHoiVien);
+                    }
+                }
         );
-        hoaDonDAO.them(hd);
-
-        String invoice = "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-                + "            HÓA ĐƠN GIA HẠN GÓI TẬP\n"
-                + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-                + "Mã Hóa Đơn: " + maHD + "\n"
-                + "Mã Hội Viên: " + currentHoiVien.getMaHoiVien() + " (Mã Thẻ: " + currentHoiVien.getMaTheQR() + ")\n"
-                + "Hội Viên: " + currentHoiVien.getHoTen() + "\n"
-                + "Chi Nhánh: " + branch + "\n"
-                + "Gói Gia Hạn: " + cbGoi.getSelectedItem() + "\n"
-                + "Ngày Bắt Đầu: " + txtNgay.getText().trim() + "\n"
-                + "HẠN MỚI ĐẾN NGÀY: " + newExpire + "\n"
-                + "Hình Thức Thanh Toán: " + cbThanhToan.getSelectedItem() + "\n"
-                + "Ưu Đãi: " + discountPercent + "%\n"
-                + "TỔNG TIỀN THANH TOÁN: " + lblThanhTien.getText() + "\n"
-                + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-                + "✓ Đã cập nhật ngày hết hạn mới vào hệ thống!\n"
-                + "✓ Đã lưu hóa đơn tài chính và in phiếu thu thành công!";
-
-        JOptionPane.showMessageDialog(this, invoice, "Gia Hạn Thành Công", JOptionPane.INFORMATION_MESSAGE);
-
-        displayMember(currentHoiVien);
+        dialog.setVisible(true);
     }
 
     private void resetForm() {

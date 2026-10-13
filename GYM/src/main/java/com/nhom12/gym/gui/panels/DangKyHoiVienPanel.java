@@ -515,39 +515,60 @@ public class DangKyHoiVienPanel extends JPanel {
         lblCardCode.setText(code);
         lblCardPhone.setText("SĐT: " + phone);
 
-        // Lưu vào CSDL và Fallback Cache
-        try {
-            HoiVien hv = new HoiVien();
-            hv.setMaHoiVien(nextId);
-            hv.setHoTen(name);
-            hv.setMaTheQR(code);
-            hv.setChiNhanhDangKy(cbBranch.getSelectedItem().toString());
-            hv.setTrangThai("Hoạt động");
-            Calendar cal = Calendar.getInstance();
-            try {
-                if (txtStartDate != null && !txtStartDate.getText().trim().isEmpty()) {
-                    cal.setTime(new SimpleDateFormat("dd/MM/yyyy").parse(txtStartDate.getText().trim()));
+        double finalPrice = currentPrice - (currentPrice * discountPercent / 100);
+        String pkgName = cbPackage.getSelectedItem().toString();
+        java.util.List<com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang> items = new java.util.ArrayList<>();
+        items.add(new com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang("Đăng ký mới " + pkgName, 1, currentPrice, finalPrice));
+
+        final String finalCode = code;
+        final int finalNextId = nextId;
+
+        Window topFrame = SwingUtilities.getWindowAncestor(this);
+        com.nhom12.gym.gui.ThanhToanHoaDonDialog payDialog = new com.nhom12.gym.gui.ThanhToanHoaDonDialog(
+                topFrame,
+                null,
+                name + " (" + code + ")",
+                "Đăng ký " + pkgName,
+                currentPrice,
+                currentPrice * discountPercent / 100,
+                finalPrice,
+                items,
+                success -> {
+                    if (success) {
+                        try {
+                            HoiVien hv = new HoiVien();
+                            hv.setMaHoiVien(finalNextId);
+                            hv.setHoTen(name);
+                            hv.setMaTheQR(finalCode);
+                            hv.setChiNhanhDangKy(cbBranch.getSelectedItem().toString());
+                            hv.setTrangThai("Hoạt động");
+                            Calendar cal = Calendar.getInstance();
+                            try {
+                                if (txtStartDate != null && !txtStartDate.getText().trim().isEmpty()) {
+                                    cal.setTime(new SimpleDateFormat("dd/MM/yyyy").parse(txtStartDate.getText().trim()));
+                                }
+                            } catch (Exception ex) {
+                                cal.setTime(new Date());
+                            }
+                            cal.add(Calendar.MONTH, currentMonths);
+                            hv.setNgayHetHan(cal.getTime());
+                            hoiVienDAO.them(hv);
+                        } catch (Exception ignored) {
+                        }
+
+                        if (chkCreateAppAccount != null && chkCreateAppAccount.isSelected()) {
+                            try {
+                                taiKhoanDAO.them(new TaiKhoan(phone, "123456", "Hội viên", name));
+                            } catch (Exception ignored) {
+                            }
+                        }
+
+                        Frame f = (Frame) SwingUtilities.getWindowAncestor(this);
+                        new GuiMaQRDialog(f, finalCode, name, phone, cbPackage.getSelectedItem().toString(), cbBranch.getSelectedItem().toString(), phone, "123456").setVisible(true);
+                    }
                 }
-            } catch (Exception ex) {
-                cal.setTime(new Date());
-            }
-            cal.add(Calendar.MONTH, currentMonths);
-            hv.setNgayHetHan(cal.getTime());
-            hoiVienDAO.them(hv);
-        } catch (Exception ignored) {
-        }
-
-        // Tự động kích hoạt & cấp tài khoản App cho Hội Viên
-        if (chkCreateAppAccount != null && chkCreateAppAccount.isSelected()) {
-            try {
-                taiKhoanDAO.them(new TaiKhoan(phone, "123456", "Hội viên", name));
-            } catch (Exception ignored) {
-            }
-        }
-
-        // Bật ngay cửa sổ trực quan hiển thị và gửi mã QR / thông tin App cho Hội Viên
-        Frame topFrame = (Frame) SwingUtilities.getWindowAncestor(this);
-        new GuiMaQRDialog(topFrame, code, name, phone, cbPackage.getSelectedItem().toString(), cbBranch.getSelectedItem().toString(), phone, "123456").setVisible(true);
+        );
+        payDialog.setVisible(true);
     }
 
     private void moDialogGuiQR() {

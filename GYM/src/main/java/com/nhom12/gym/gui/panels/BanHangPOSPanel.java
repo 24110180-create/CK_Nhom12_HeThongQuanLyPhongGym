@@ -103,10 +103,31 @@ public class BanHangPOSPanel extends JPanel {
 
         btnPay.addActionListener(e -> {
             if (tongTien > 0) {
-                JOptionPane.showMessageDialog(this,
-                        "Thanh toán thành công: " + df.format(tongTien) + "\nĐang tiến hành in hóa đơn cho khách hàng...",
-                        "Thanh toán thành công", JOptionPane.INFORMATION_MESSAGE);
-                btnClear.doClick();
+                java.util.List<com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang> items = new java.util.ArrayList<>();
+                for (int r = 0; r < cartModel.getRowCount(); r++) {
+                    String ten = cartModel.getValueAt(r, 0).toString();
+                    int sl = Integer.parseInt(cartModel.getValueAt(r, 1).toString());
+                    String giaStr = cartModel.getValueAt(r, 2).toString().replaceAll("[^0-9]", "");
+                    double gia = Double.parseDouble(giaStr);
+                    items.add(new com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang(ten, sl, gia));
+                }
+                Window parent = SwingUtilities.getWindowAncestor(this);
+                com.nhom12.gym.gui.ThanhToanHoaDonDialog dialog = new com.nhom12.gym.gui.ThanhToanHoaDonDialog(
+                        parent,
+                        null,
+                        "Khách Lẻ Quầy POS",
+                        "Bán hàng nước & thực phẩm POS",
+                        tongTien,
+                        0,
+                        tongTien,
+                        items,
+                        success -> {
+                            if (success) {
+                                btnClear.doClick();
+                            }
+                        }
+                );
+                dialog.setVisible(true);
             } else {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm vào giỏ trước khi thanh toán!");
             }

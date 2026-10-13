@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Window;
+import javax.swing.SwingUtilities;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -160,21 +162,25 @@ public class LichSuGiaoDichPanel extends JPanel {
             String total = model.getValueAt(mr, 5).toString();
             String payType = model.getValueAt(mr, 6).toString();
 
-            String bill = "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-                    + "          HÓA ĐƠN THANH TOÁN (IN LẠI)\n"
-                    + "          FITLIFE GYM & FITNESS CENTER\n"
-                    + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-                    + "Số Hóa Đơn: " + code + "\n"
-                    + "Thời Gian: " + time + "\n"
-                    + "Khách Hàng: " + customer + "\n"
-                    + "Loại Giao Dịch: " + type + "\n"
-                    + "Thu Ngân: " + staff + "\n"
-                    + "Hình Thức: " + payType + "\n"
-                    + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-                    + "TỔNG TIỀN: " + total + " VNĐ\n"
-                    + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-                    + "Đã gửi lệnh in lại hóa đơn ra máy in bill nhiệt thành công!";
-            JOptionPane.showMessageDialog(this, bill, "In Hóa Đơn", JOptionPane.INFORMATION_MESSAGE);
+            double num = 0;
+            try {
+                num = Double.parseDouble(total.replaceAll("[^0-9]", ""));
+            } catch (Exception ignored) {}
+            java.util.List<com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang> items = new java.util.ArrayList<>();
+            items.add(new com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang(type, 1, num));
+            Window parent = SwingUtilities.getWindowAncestor(this);
+            com.nhom12.gym.gui.ThanhToanHoaDonDialog dialog = new com.nhom12.gym.gui.ThanhToanHoaDonDialog(
+                    parent,
+                    code,
+                    customer,
+                    type,
+                    num,
+                    0,
+                    num,
+                    items,
+                    null
+            );
+            dialog.setVisible(true);
         });
 
         btnExportExcel.addActionListener(e -> {

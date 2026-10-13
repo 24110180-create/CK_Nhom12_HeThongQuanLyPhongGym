@@ -1,5 +1,6 @@
 package com.nhom12.gym.gui.panels;
 
+import com.nhom12.gym.util.Auth;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
@@ -188,113 +189,32 @@ public class HoiVienGoiTapPanel extends JPanel {
     }
 
     private void hienThiDialogVietQR(String packageName, String price) {
-        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Thanh Toán VietQR - " + packageName, true);
-        dialog.setSize(420, 520);
-        dialog.setLocationRelativeTo(this);
-        dialog.setLayout(new BorderLayout(15, 15));
+        double numPrice = 0;
+        try {
+            String clean = price.replaceAll("[^0-9]", "");
+            if (!clean.isEmpty()) numPrice = Double.parseDouble(clean);
+        } catch (Exception ignored) {}
 
-        JPanel pnl = new JPanel();
-        pnl.setLayout(new BoxLayout(pnl, BoxLayout.Y_AXIS));
-        pnl.setBackground(Color.WHITE);
-        pnl.setBorder(new EmptyBorder(20, 25, 20, 25));
+        java.util.List<com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang> items = new java.util.ArrayList<>();
+        items.add(new com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang("Gia hạn " + packageName, 1, numPrice));
 
-        JLabel lblT = new JLabel("QUÉT MÃ VIETQR ĐỂ GIA HẠN GÓI");
-        lblT.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        lblT.setForeground(new Color(15, 23, 42));
-        lblT.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel lblSub = new JLabel("Hỗ trợ tất cả ngân hàng & ví điện tử qua chuẩn NAPAS 247");
-        lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        lblSub.setForeground(new Color(100, 116, 139));
-        lblSub.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // QR simulation box
-        JPanel qrBox = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                int sz = 160;
-                int sx = (getWidth() - sz) / 2;
-                int sy = 10;
-                g2.setColor(new Color(15, 23, 42));
-                g2.drawRect(sx, sy, sz, sz);
-                g2.setColor(new Color(30, 41, 59));
-                int cells = 16;
-                int cs = sz / cells;
-                for (int r = 0; r < cells; r++) {
-                    for (int c = 0; c < cells; c++) {
-                        if ((r < 3 && c < 3) || (r < 3 && c >= cells - 3) || (r >= cells - 3 && c < 3) || (r + c * 5) % 3 != 0) {
-                            g2.fillRect(sx + c * cs + 1, sy + r * cs + 1, cs - 2, cs - 2);
-                        }
+        Window parent = SwingUtilities.getWindowAncestor(this);
+        String tenHV = (Auth.hoTen != null && !Auth.hoTen.isEmpty()) ? Auth.hoTen : "Hội Viên VIP Diamond";
+        com.nhom12.gym.gui.ThanhToanHoaDonDialog dialog = new com.nhom12.gym.gui.ThanhToanHoaDonDialog(
+                parent,
+                null,
+                tenHV,
+                "Gia hạn gói tập hội viên",
+                numPrice,
+                0,
+                numPrice,
+                items,
+                success -> {
+                    if (success) {
+                        invoiceModel.insertRow(0, new Object[]{"HD" + System.currentTimeMillis() % 100000, packageName, price, "Hôm nay", "VietQR Online (MB Bank)"});
                     }
                 }
-                g2.setColor(new Color(239, 68, 68));
-                g2.fillRoundRect(sx + sz / 2 - 12, sy + sz / 2 - 12, 24, 24, 6, 6);
-                g2.setColor(Color.WHITE);
-                g2.setFont(new Font("Segoe UI", Font.BOLD, 10));
-                g2.drawString("QR", sx + sz / 2 - 8, sy + sz / 2 + 5);
-            }
-        };
-        qrBox.setPreferredSize(new Dimension(180, 180));
-        qrBox.setMaximumSize(new Dimension(180, 180));
-        qrBox.setAlignmentX(Component.CENTER_ALIGNMENT);
-        qrBox.setOpaque(false);
-
-        JLabel lblBank = new JLabel("Ngân hàng: MBBank (Quân Đội)");
-        lblBank.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        lblBank.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel lblAcc = new JLabel("STK: 9988 2244 6688  •  FITLIFE GYM JSC");
-        lblAcc.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        lblAcc.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel lblAmount = new JLabel("Số tiền: " + price);
-        lblAmount.setFont(new Font("Segoe UI", Font.BOLD, 15));
-        lblAmount.setForeground(new Color(16, 185, 129));
-        lblAmount.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel lblContent = new JLabel("Nội dung: FL88992 GIAHAN");
-        lblContent.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        lblContent.setForeground(new Color(71, 85, 105));
-        lblContent.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JButton btnConfirm = new JButton("Tôi Đã Chuyển Khoản Xong");
-        btnConfirm.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btnConfirm.setBackground(new Color(16, 185, 129));
-        btnConfirm.setForeground(Color.WHITE);
-        btnConfirm.setFocusPainted(false);
-        btnConfirm.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnConfirm.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnConfirm.setPreferredSize(new Dimension(240, 42));
-        btnConfirm.setMaximumSize(new Dimension(280, 42));
-
-        btnConfirm.addActionListener(ev -> {
-            dialog.dispose();
-            invoiceModel.insertRow(0, new Object[]{"HD" + System.currentTimeMillis() % 100000, packageName, price, "Hôm nay", "VietQR Online"});
-            JOptionPane.showMessageDialog(this,
-                    "Hệ thống đã nhận diện giao dịch thành công!\nGói tập của bạn đã được gia hạn tự động.",
-                    "Thanh Toán Hoàn Tất", JOptionPane.INFORMATION_MESSAGE);
-        });
-
-        pnl.add(lblT);
-        pnl.add(Box.createRigidArea(new Dimension(0, 4)));
-        pnl.add(lblSub);
-        pnl.add(Box.createRigidArea(new Dimension(0, 15)));
-        pnl.add(qrBox);
-        pnl.add(Box.createRigidArea(new Dimension(0, 15)));
-        pnl.add(lblBank);
-        pnl.add(Box.createRigidArea(new Dimension(0, 3)));
-        pnl.add(lblAcc);
-        pnl.add(Box.createRigidArea(new Dimension(0, 3)));
-        pnl.add(lblAmount);
-        pnl.add(Box.createRigidArea(new Dimension(0, 3)));
-        pnl.add(lblContent);
-        pnl.add(Box.createRigidArea(new Dimension(0, 18)));
-        pnl.add(btnConfirm);
-
-        dialog.add(pnl, BorderLayout.CENTER);
+        );
         dialog.setVisible(true);
     }
 }

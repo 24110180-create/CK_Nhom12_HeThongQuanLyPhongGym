@@ -79,6 +79,15 @@ public class LichLopHocPanel extends JPanel {
 
         khoiTaoGiaoDien();
         taiDuLieuLopHoc();
+
+        // Lắng nghe sự kiện đồng bộ toàn hệ thống
+        com.nhom12.gym.service.DataSyncManager.addListener(type -> {
+            if (type == com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC ||
+                type == com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN ||
+                type == com.nhom12.gym.service.DataSyncManager.DataType.ALL) {
+                taiDuLieuLopHoc();
+            }
+        });
     }
 
     private void khoiTaoGiaoDien() {

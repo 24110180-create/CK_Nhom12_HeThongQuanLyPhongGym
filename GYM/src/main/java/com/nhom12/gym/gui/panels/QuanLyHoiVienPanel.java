@@ -69,6 +69,15 @@ public class QuanLyHoiVienPanel extends JPanel {
         add(createTablePanel(), BorderLayout.CENTER);
 
         loadDataToTable();
+
+        // Lắng nghe sự kiện đồng bộ toàn hệ thống
+        com.nhom12.gym.service.DataSyncManager.addListener(type -> {
+            if (type == com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN ||
+                type == com.nhom12.gym.service.DataSyncManager.DataType.HOA_DON ||
+                type == com.nhom12.gym.service.DataSyncManager.DataType.ALL) {
+                loadDataToTable();
+            }
+        });
     }
 
     private JPanel createKpiPanel() {

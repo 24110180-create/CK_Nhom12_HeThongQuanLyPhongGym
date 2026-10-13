@@ -76,6 +76,7 @@ public class HuanLuyenVienDAO {
             LOGGER.log(Level.WARNING, "CSDL offline - lưu HLV vào bộ nhớ tạm");
             memoryList.removeIf(item -> item.getMaHLV().equalsIgnoreCase(hlv.getMaHLV()));
             memoryList.add(hlv);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
             return true;
         }
 
@@ -87,6 +88,7 @@ public class HuanLuyenVienDAO {
 
             memoryList.removeIf(item -> item.getMaHLV().equalsIgnoreCase(hlv.getMaHLV()));
             memoryList.add(hlv);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
@@ -107,6 +109,7 @@ public class HuanLuyenVienDAO {
                     break;
                 }
             }
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
             return true;
         }
 
@@ -122,6 +125,7 @@ public class HuanLuyenVienDAO {
                     break;
                 }
             }
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
@@ -136,8 +140,11 @@ public class HuanLuyenVienDAO {
         SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf == null) {
             LOGGER.log(Level.WARNING, "CSDL offline - xóa HLV khỏi bộ nhớ tạm");
-            memoryList.removeIf(item -> item.getMaHLV().equalsIgnoreCase(maHLV.trim()));
-            return true;
+            boolean removed = memoryList.removeIf(item -> item.getMaHLV().equalsIgnoreCase(maHLV.trim()));
+            if (removed) {
+                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
+            }
+            return removed;
         }
 
         Transaction tx = null;
@@ -148,6 +155,7 @@ public class HuanLuyenVienDAO {
                 session.remove(hlv);
                 tx.commit();
                 memoryList.removeIf(item -> item.getMaHLV().equalsIgnoreCase(maHLV.trim()));
+                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
                 return true;
             }
             return false;

@@ -112,7 +112,8 @@ public class TheoDoiChiSoPanel extends JPanel {
 
         JPanel pMember = new JPanel(new BorderLayout(0, 3)); pMember.setOpaque(false);
         JLabel lMember = new JLabel("Hội Viên:"); lMember.setFont(fontLabel);
-        cbHoiVien = new JComboBox<>(new String[]{"Nguyễn Văn Tuấn (HV001)", "Trần Thu Hà (HV005)", "Lê Hoàng Phúc (HV012)", "Lê Thị Lan (HV022)", "Phạm Trọng Thủy (HV041)"});
+        cbHoiVien = new JComboBox<>();
+        loadMembersToCombo();
         cbHoiVien.setFont(fontInput);
         pMember.add(lMember, BorderLayout.NORTH); pMember.add(cbHoiVien, BorderLayout.CENTER);
 
@@ -261,10 +262,10 @@ public class TheoDoiChiSoPanel extends JPanel {
 
         String[] cols = new String[]{"Mã Đo", "Hội Viên", "Ngày Đo", "C.Cao (cm)", "C.Nặng (kg)", "Cơ (kg)", "Mỡ (%)", "BMI", "Đánh Giá"};
         Object[][] data = new Object[][]{
-                {"IB01", "Nguyễn Văn Tuấn", "30/09/2026", "175", "72.5", "34.2", "18.5%", "23.7", "Cân đối"},
-                {"IB02", "Trần Thu Hà", "28/09/2026", "160", "52.0", "22.5", "21.0%", "20.3", "Chuẩn mẫu"},
-                {"IB03", "Lê Hoàng Phúc", "25/09/2026", "180", "88.0", "36.0", "26.5%", "27.2", "Thừa cân"},
-                {"IB04", "Phạm Trọng Thủy", "20/09/2026", "168", "60.0", "28.0", "16.0%", "21.3", "Vận động viên"}
+                {"IB01", "Lê Anh Duy", "30/09/2026", "175", "72.5", "34.2", "18.5%", "23.7", "Cân đối"},
+                {"IB02", "Võ Lê Ngọc Hưng", "28/09/2026", "172", "68.0", "32.5", "17.0%", "23.0", "Chuẩn mẫu"},
+                {"IB03", "Trần Minh Quân", "25/09/2026", "180", "82.0", "38.0", "19.5%", "25.3", "Vận động viên"},
+                {"IB04", "Võ Tấn Phát", "20/09/2026", "168", "65.0", "29.0", "20.0%", "23.0", "Cân đối"}
         };
 
         model = new DefaultTableModel(data, cols) {
@@ -329,6 +330,25 @@ public class TheoDoiChiSoPanel extends JPanel {
         btnDelete.addActionListener(e -> actionXoa());
         btnClear.addActionListener(e -> actionLamMoi());
         btnExport.addActionListener(e -> actionInPhieu());
+        
+        com.nhom12.gym.service.DataSyncManager.addListener(type -> {
+            if (type == com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN || type == com.nhom12.gym.service.DataSyncManager.DataType.ALL) {
+                loadMembersToCombo();
+            }
+        });
+    }
+
+    private void loadMembersToCombo() {
+        if (cbHoiVien == null) return;
+        Object cur = cbHoiVien.getSelectedItem();
+        cbHoiVien.removeAllItems();
+        java.util.List<com.nhom12.gym.entity.HoiVien> list = new com.nhom12.gym.dao.HoiVienDAO().layTatCa();
+        if (list != null) {
+            for (com.nhom12.gym.entity.HoiVien hv : list) {
+                cbHoiVien.addItem(hv.getHoTen() + " (" + (hv.getMaTheQR() != null ? hv.getMaTheQR() : "HV" + hv.getMaHoiVien()) + ")");
+            }
+        }
+        if (cur != null) cbHoiVien.setSelectedItem(cur);
     }
 
     private void calculateBMI() {

@@ -87,6 +87,7 @@ public class HoiVienDAO {
         if (sf == null) {
             // Offline mode: lưu vào memory cache
             memoryCache.add(0, hv);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN);
             return true;
         }
 
@@ -98,6 +99,7 @@ public class HoiVienDAO {
 
             memoryCache.removeIf(item -> item.getMaHoiVien() == hv.getMaHoiVien() || item.getMaTheQR().equalsIgnoreCase(hv.getMaTheQR()));
             memoryCache.add(0, hv);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN);
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
@@ -114,6 +116,7 @@ public class HoiVienDAO {
             for (int i = 0; i < memoryCache.size(); i++) {
                 if (memoryCache.get(i).getMaHoiVien() == hv.getMaHoiVien()) {
                     memoryCache.set(i, hv);
+                    com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN);
                     return true;
                 }
             }
@@ -132,6 +135,7 @@ public class HoiVienDAO {
                     break;
                 }
             }
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN);
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
@@ -143,7 +147,11 @@ public class HoiVienDAO {
     public boolean xoa(int maHoiVien) {
         SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf == null) {
-            return memoryCache.removeIf(item -> item.getMaHoiVien() == maHoiVien);
+            boolean removed = memoryCache.removeIf(item -> item.getMaHoiVien() == maHoiVien);
+            if (removed) {
+                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN);
+            }
+            return removed;
         }
 
         Transaction tx = null;
@@ -154,6 +162,7 @@ public class HoiVienDAO {
                 session.remove(hv);
                 tx.commit();
                 memoryCache.removeIf(item -> item.getMaHoiVien() == maHoiVien);
+                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN);
                 return true;
             }
             return false;

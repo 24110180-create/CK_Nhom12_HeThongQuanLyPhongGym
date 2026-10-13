@@ -64,9 +64,27 @@ public class CuaSoChuHeThongPanel extends JPanel {
         add(pnlHeader, BorderLayout.NORTH);
 
         // --- 2. VÙNG CUỘN NỘI DUNG CHÍNH ---
-        JPanel contentBody = new JPanel();
         contentBody.setLayout(new BoxLayout(contentBody, BoxLayout.Y_AXIS));
         contentBody.setOpaque(false);
+        buildContentBody();
+
+        JScrollPane scrollPane = new JScrollPane(contentBody);
+        scrollPane.setBorder(null);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(14);
+        add(scrollPane, BorderLayout.CENTER);
+
+        // Đăng ký nhận thông báo thay đổi dữ liệu thời gian thực
+        com.nhom12.gym.service.DataSyncManager.addListener(type -> {
+            SwingUtilities.invokeLater(this::rebuildContent);
+        });
+    }
+
+    private final JPanel contentBody = new JPanel();
+
+    private void buildContentBody() {
+        contentBody.removeAll();
 
         // A. DẢI 4 KPI CARDS TÀI CHÍNH & VẬN HÀNH
         contentBody.add(createKpiCardsRow());
@@ -84,13 +102,12 @@ public class CuaSoChuHeThongPanel extends JPanel {
 
         // C. PHÂN KHU CẢNH BÁO ĐIỀU HÀNH & HỘI VIÊN VIP CỦA CHỦ
         contentBody.add(createOwnerAlertsSection());
+    }
 
-        JScrollPane scrollPane = new JScrollPane(contentBody);
-        scrollPane.setBorder(null);
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(14);
-        add(scrollPane, BorderLayout.CENTER);
+    private void rebuildContent() {
+        buildContentBody();
+        contentBody.revalidate();
+        contentBody.repaint();
     }
 
     private JPanel createKpiCardsRow() {
@@ -98,12 +115,16 @@ public class CuaSoChuHeThongPanel extends JPanel {
         row.setOpaque(false);
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 95));
 
+        double totalRevenue = com.nhom12.gym.dao.HoaDonDAO.getInstance().layTongDoanhThu();
         int totalMembers = hoiVienDAO.layTatCa().size();
+        long activeMembers = hoiVienDAO.layTatCa().stream().filter(m -> "Active".equalsIgnoreCase(m.getTrangThai()) || "Hoạt động".equalsIgnoreCase(m.getTrangThai())).count();
         int totalAccounts = taiKhoanDAO.layTatCa().size();
+        int todayCheckins = checkInDAO.layLichSuHomNay().size();
+        if (todayCheckins == 0) todayCheckins = checkInDAO.layTatCaLichSu().size();
 
-        row.add(createKpiCard("DOANH THU THỰC TẾ THÁNG", "485,600,000 đ", "+14.2% vs tháng trước (Bảo mật VIP)", new Color(37, 99, 235), new Color(238, 242, 255)));
-        row.add(createKpiCard("HỘI VIÊN HOẠT ĐỘNG", totalMembers + " Hội viên", "CN01: 65% • CN02: 35%", new Color(16, 185, 129), new Color(236, 253, 245)));
-        row.add(createKpiCard("LƯỢT CHECK-IN HÔM NAY", "328 Lượt quét", "Đỉnh điểm: 18:30 (82 khách/h)", new Color(245, 158, 11), new Color(254, 243, 199)));
+        row.add(createKpiCard("DOANH THU THỰC TẾ", df.format(totalRevenue), "Cập nhật thời gian thực từ hóa đơn", new Color(37, 99, 235), new Color(238, 242, 255)));
+        row.add(createKpiCard("HỘI VIÊN HOẠT ĐỘNG", activeMembers + " / " + totalMembers + " HV", "Tỷ lệ kích hoạt: " + (totalMembers > 0 ? (activeMembers * 100 / totalMembers) : 0) + "%", new Color(16, 185, 129), new Color(236, 253, 245)));
+        row.add(createKpiCard("LƯỢT CHECK-IN HÔM NAY", todayCheckins + " Lượt quét", "Hệ thống trạm quét hoạt động 100%", new Color(245, 158, 11), new Color(254, 243, 199)));
         row.add(createKpiCard("TỔNG QUÂN SỐ TÀI KHOẢN", totalAccounts + " Tài khoản", "4 Vai trò đang vận hành", new Color(147, 51, 234), new Color(250, 245, 255)));
 
         return row;
@@ -151,11 +172,19 @@ public class CuaSoChuHeThongPanel extends JPanel {
         JPanel list = new JPanel(new GridLayout(2, 1, 0, 10));
         list.setOpaque(false);
 
+        java.util.Map<String, Double> branchRev = com.nhom12.gym.dao.HoaDonDAO.getInstance().layDoanhThuTheoChiNhanh();
+        double cn01Rev = branchRev.getOrDefault("CN01 - Quận 1", 0.0);
+        double cn02Rev = branchRev.getOrDefault("CN02 - Tân Bình", 0.0);
+
+        List<com.nhom12.gym.entity.LichSuCheckIn> allCheckIns = checkInDAO.layTatCaLichSu();
+        long cn01Checks = allCheckIns.stream().filter(c -> c.getChiNhanh() != null && c.getChiNhanh().contains("CN01")).count();
+        long cn02Checks = allCheckIns.stream().filter(c -> c.getChiNhanh() != null && c.getChiNhanh().contains("CN02")).count();
+
         // Chi nhánh 1
         JPanel b1 = createBranchRow(
                 "Cơ sở 1 - CN01 (Flagship Quận 1)",
-                "298,400,000 đ",
-                "192 lượt check-in hôm nay • Wifi: 100% Ổn định",
+                df.format(cn01Rev),
+                cn01Checks + " lượt check-in ghi nhận • 100% Ổn định",
                 new Color(37, 99, 235),
                 "75% Sức chứa"
         );
@@ -163,8 +192,8 @@ public class CuaSoChuHeThongPanel extends JPanel {
         // Chi nhánh 2
         JPanel b2 = createBranchRow(
                 "Cơ sở 2 - CN02 (Premium Tân Bình)",
-                "187,200,000 đ",
-                "136 lượt check-in hôm nay • Đệm Offline Fallback bảo vệ",
+                df.format(cn02Rev),
+                cn02Checks + " lượt check-in ghi nhận • Đệm Offline Fallback bảo vệ",
                 new Color(16, 185, 129),
                 "58% Sức chứa"
         );

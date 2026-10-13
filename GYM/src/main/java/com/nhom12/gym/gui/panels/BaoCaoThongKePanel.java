@@ -12,6 +12,7 @@ import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -49,14 +50,34 @@ public class BaoCaoThongKePanel extends JPanel {
         add(headerPanel, BorderLayout.NORTH);
 
         // 2. Tabbed Pane
-        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        initTabs();
 
+        add(tabbedPane, BorderLayout.CENTER);
+
+        // Lắng nghe sự kiện đồng bộ toàn hệ thống để cập nhật số liệu và biểu đồ ngay lập tức
+        com.nhom12.gym.service.DataSyncManager.addListener(type -> {
+            if (type == com.nhom12.gym.service.DataSyncManager.DataType.HOA_DON ||
+                type == com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN ||
+                type == com.nhom12.gym.service.DataSyncManager.DataType.CHECK_IN ||
+                type == com.nhom12.gym.service.DataSyncManager.DataType.ALL) {
+                int sel = tabbedPane.getSelectedIndex();
+                initTabs();
+                if (sel >= 0 && sel < tabbedPane.getTabCount()) {
+                    tabbedPane.setSelectedIndex(sel);
+                }
+            }
+        });
+    }
+
+    private JTabbedPane tabbedPane;
+
+    private void initTabs() {
+        tabbedPane.removeAll();
         tabbedPane.addTab("Doanh Thu Theo Chi Nhánh", createRevenueBranchTab());
         tabbedPane.addTab("Hội Viên Sắp Hết Hạn", createExpiringMembersTab());
         tabbedPane.addTab("Mức Độ Sử Dụng Theo Giờ", createHourlyUsageTab());
-
-        add(tabbedPane, BorderLayout.CENTER);
     }
 
     // ==========================================
@@ -97,11 +118,14 @@ public class BaoCaoThongKePanel extends JPanel {
         Map<String, Double> branchRevenue = baoCaoService.getDoanhThuTheoChiNhanh();
         double totalRev = 0;
         for (double v : branchRevenue.values()) totalRev += v;
-        if (totalRev == 0) totalRev = 142500000.0;
+        if (totalRev == 0) totalRev = 1.0; // Tránh chia cho 0
+
+        double cn01Amount = branchRevenue.getOrDefault("CN01 - Quận 1", 0.0);
+        double cn02Amount = branchRevenue.getOrDefault("CN02 - Tân Bình", 0.0);
 
         for (Map.Entry<String, Double> entry : branchRevenue.entrySet()) {
-            double amount = entry.getValue() > 0 ? entry.getValue() : (entry.getKey().contains("CN01") ? 88000000 : 54500000);
-            double pct = (amount / totalRev) * 100.0;
+            double amount = entry.getValue();
+            double pct = (totalRev > 1.0) ? (amount / totalRev) * 100.0 : 0.0;
             String code = entry.getKey().contains("CN01") ? "CN01" : "CN02";
             model.addRow(new Object[]{
                     code, entry.getKey(), dfMoney.format(amount), String.format("%.1f%%", pct), "Hoạt động tốt"
@@ -143,7 +167,7 @@ public class BaoCaoThongKePanel extends JPanel {
         chartCard.add(lblC, BorderLayout.NORTH);
 
         BranchBarChart chart = new BranchBarChart(new String[]{"CN01 - Quận 1", "CN02 - Tân Bình"},
-                new double[]{88000000, 54500000});
+                new double[]{cn01Amount, cn02Amount});
         chartCard.add(chart, BorderLayout.CENTER);
 
         split.setRightComponent(chartCard);
@@ -204,12 +228,59 @@ public class BaoCaoThongKePanel extends JPanel {
             public boolean isCellEditable(int r, int c) { return false; }
         };
 
-        // Seed expiring members
-        model.addRow(new Object[]{3, "Võ Tấn Phát", "0903344556", "QR003", "CN01 - Quận 1", "01/01/2025", "ĐÃ QUÁ HẠN (CẤP 3)"});
-        model.addRow(new Object[]{2, "Võ Lê Ngọc Hưng", "0912233445", "QR002", "CN02 - Tân Bình", "15/10/2026", "CÒN 15 NGÀY (CẤP 2)"});
-        model.addRow(new Object[]{5, "Hoàng Thùy Linh", "0988776655", "QR005", "CN02 - Tân Bình", "15/08/2026", "ĐÃ QUÁ HẠN (CẤP 3)"});
-        model.addRow(new Object[]{8, "Đặng Gia Huy", "0933112233", "QR008", "CN01 - Quận 1", "05/10/2026", "CÒN 5 NGÀY (CẤP 1)"});
-        model.addRow(new Object[]{9, "Nguyễn Minh Châu", "0977445566", "QR009", "CN02 - Tân Bình", "08/10/2026", "CÒN 8 NGÀY (CẤP 1)"});
+        Runnable reloadExpiring = () -> {
+            model.setRowCount(0);
+            int selIdx = cbDays.getSelectedIndex();
+            int days = 7;
+            if (selIdx == 1) days = 14;
+            else if (selIdx == 2) days = 30;
+            else if (selIdx == 3) days = 0;
+
+            List<com.nhom12.gym.entity.HoiVien> allMembers = new com.nhom12.gym.dao.HoiVienDAO().layTatCa();
+            if (allMembers == null) return;
+            long now = System.currentTimeMillis();
+            SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy");
+
+            for (com.nhom12.gym.entity.HoiVien hv : allMembers) {
+                Date exp = hv.getNgayHetHan();
+                if (exp == null) continue;
+                long diff = exp.getTime() - now;
+                long remainDays = diff / (1000L * 60 * 60 * 24);
+
+                if (selIdx == 3) {
+                    if (remainDays < 0) {
+                        model.addRow(new Object[]{
+                                hv.getMaHoiVien(), hv.getHoTen(), hv.getSoDienThoai(),
+                                hv.getMaTheQR() != null ? hv.getMaTheQR() : "",
+                                hv.getChiNhanhDangKy() != null ? hv.getChiNhanhDangKy() : "CN01 - Cơ sở 1 (Quận 1)",
+                                sdfDate.format(exp),
+                                "ĐÃ QUÁ HẠN (CẤP 3)"
+                        });
+                    }
+                } else {
+                    if (remainDays <= days) {
+                        String warning;
+                        if (remainDays < 0) {
+                            warning = "ĐÃ QUÁ HẠN (CẤP 3)";
+                        } else if (remainDays <= 7) {
+                            warning = "CÒN " + remainDays + " NGÀY (CẤP 1)";
+                        } else {
+                            warning = "CÒN " + remainDays + " NGÀY (CẤP 2)";
+                        }
+                        model.addRow(new Object[]{
+                                hv.getMaHoiVien(), hv.getHoTen(), hv.getSoDienThoai(),
+                                hv.getMaTheQR() != null ? hv.getMaTheQR() : "",
+                                hv.getChiNhanhDangKy() != null ? hv.getChiNhanhDangKy() : "CN01 - Cơ sở 1 (Quận 1)",
+                                sdfDate.format(exp),
+                                warning
+                        });
+                    }
+                }
+            }
+        };
+
+        cbDays.addActionListener(e -> reloadExpiring.run());
+        reloadExpiring.run();
 
         JTable table = new JTable(model);
         table.setRowHeight(32);

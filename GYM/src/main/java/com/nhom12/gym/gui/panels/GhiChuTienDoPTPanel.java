@@ -71,18 +71,13 @@ public class GhiChuTienDoPTPanel extends JPanel {
         leftPanel.add(lblLeftTitle, BorderLayout.NORTH);
 
         String[] colsHV = new String[]{"Mã HV", "Tên Học Viên", "Buổi Còn"};
-        Object[][] dataHV = new Object[][]{
-                {"HV012", "Nguyễn Văn Tuấn", "15/20"},
-                {"HV045", "Trần Thu Hà", "8/12"},
-                {"HV088", "Lê Hoàng Phúc", "2/10"},
-                {"HV099", "Phạm Trọng Thủy", "18/20"}
-        };
-        modelHV = new DefaultTableModel(dataHV, colsHV) {
+        modelHV = new DefaultTableModel(colsHV, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
                 return false;
             }
         };
+        loadMembers();
 
         tableHV = new JTable(modelHV);
         tableHV.setRowHeight(38);
@@ -241,5 +236,33 @@ public class GhiChuTienDoPTPanel extends JPanel {
 
             JOptionPane.showMessageDialog(this, "Đã lưu nhật ký buổi tập thành công và trừ 01 buổi tập của học viên!", "Ghi Nhận Thành Công", JOptionPane.INFORMATION_MESSAGE);
         });
+
+        com.nhom12.gym.service.DataSyncManager.addListener(type -> {
+            if (type == com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN || type == com.nhom12.gym.service.DataSyncManager.DataType.ALL) {
+                int sel = tableHV.getSelectedRow();
+                loadMembers();
+                if (sel >= 0 && sel < tableHV.getRowCount()) {
+                    tableHV.setRowSelectionInterval(sel, sel);
+                }
+            }
+        });
+    }
+
+    private void loadMembers() {
+        if (modelHV == null) return;
+        modelHV.setRowCount(0);
+        java.util.List<com.nhom12.gym.entity.HoiVien> list = new com.nhom12.gym.dao.HoiVienDAO().layTatCa();
+        if (list != null) {
+            for (com.nhom12.gym.entity.HoiVien hv : list) {
+                modelHV.addRow(new Object[]{
+                        "HV" + hv.getMaHoiVien(),
+                        hv.getHoTen(),
+                        "15/20"
+                });
+            }
+        }
+        if (tableHV != null && modelHV.getRowCount() > 0 && tableHV.getSelectedRow() == -1) {
+            tableHV.setRowSelectionInterval(0, 0);
+        }
     }
 }

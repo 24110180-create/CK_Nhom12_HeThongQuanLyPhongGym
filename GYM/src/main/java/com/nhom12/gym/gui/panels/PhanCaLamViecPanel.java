@@ -81,9 +81,9 @@ public class PhanCaLamViecPanel extends JPanel {
         // Schedule Table
         String[] cols = new String[]{"Ca Làm Việc", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật"};
         Object[][] data = new Object[][]{
-                {"Ca Sáng (06:00 - 14:00)", "Lê Thị Lan", "Lê Thị Lan", "Lê Thị Lan", "Nguyễn Tuấn", "Lê Thị Lan", "Nguyễn Tuấn", "Nghỉ Luân Phiên"},
-                {"Ca Chiều (14:00 - 22:00)", "Nguyễn Tuấn", "Nguyễn Tuấn", "Lê Thị Lan", "Lê Thị Lan", "Nguyễn Tuấn", "Lê Thị Lan", "Lê Thị Lan"},
-                {"HLV Trực Sàn (Theo Ca)", "Anh Tuấn", "PT John", "Anh Tuấn", "PT John", "Anh Tuấn", "Cả 2 PT", "Anh Tuấn"}
+                {"Ca Sáng (06:00 - 14:00)", "Nguyễn Thị Linh", "Nguyễn Thị Linh", "Nguyễn Thị Linh", "Trần Thị Mai", "Nguyễn Thị Linh", "Trần Thị Mai", "Nghỉ Luân Phiên"},
+                {"Ca Chiều (14:00 - 22:00)", "Trần Thị Mai", "Trần Thị Mai", "Nguyễn Thị Linh", "Nguyễn Thị Linh", "Trần Thị Mai", "Nguyễn Thị Linh", "Nguyễn Thị Linh"},
+                {"HLV Trực Sàn (Theo Ca)", "Trần Tuấn Kiệt", "Nguyễn Thu Thảo", "Phan Thanh Sơn", "Lê Mai Hương", "Phạm Quốc Bảo", "Cả 2 HLV", "Trần Tuấn Kiệt"}
         };
         model = new DefaultTableModel(data, cols);
         table = new JTable(model);

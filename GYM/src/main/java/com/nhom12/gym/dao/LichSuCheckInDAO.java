@@ -51,6 +51,7 @@ public class LichSuCheckInDAO {
         if (sf == null) {
             if (log.getId() <= 0) log.setId(memoryLogs.size() + 1);
             memoryLogs.add(0, log);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.CHECK_IN);
             return true;
         }
 
@@ -61,11 +62,13 @@ public class LichSuCheckInDAO {
             tx.commit();
 
             memoryLogs.add(0, log);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.CHECK_IN);
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
             LOGGER.log(Level.SEVERE, "Lỗi ghi nhật ký check-in vào CSDL", e);
             memoryLogs.add(0, log); // Đệm tạm vào memory để trạm quét không tắc nghẽn
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.CHECK_IN);
             return false;
         }
     }
@@ -96,6 +99,28 @@ public class LichSuCheckInDAO {
         List<LichSuCheckIn> result = new ArrayList<>();
         for (LichSuCheckIn item : layTatCaLichSu()) {
             if (item.getThoiGian() != null && sdf.format(item.getThoiGian()).equals(today)) {
+                result.add(item);
+            }
+        }
+        return result;
+    }
+
+    public List<LichSuCheckIn> timTheoMaTheQR(String maQR) {
+        List<LichSuCheckIn> result = new ArrayList<>();
+        if (maQR == null || maQR.trim().isEmpty()) return result;
+        String q = maQR.trim();
+        for (LichSuCheckIn item : layTatCaLichSu()) {
+            if (item.getMaTheQR() != null && item.getMaTheQR().equalsIgnoreCase(q)) {
+                result.add(item);
+            }
+        }
+        return result;
+    }
+
+    public List<LichSuCheckIn> timTheoMaHoiVien(int maHoiVien) {
+        List<LichSuCheckIn> result = new ArrayList<>();
+        for (LichSuCheckIn item : layTatCaLichSu()) {
+            if (item.getMaHoiVien() == maHoiVien) {
                 result.add(item);
             }
         }

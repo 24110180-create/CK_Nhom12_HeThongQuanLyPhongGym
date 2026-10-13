@@ -59,6 +59,7 @@ public class GoiTapDAO {
                 LOGGER.log(Level.WARNING, "Lỗi thông báo thay đổi gói tập", e);
             }
         }
+        com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.GOI_TAP);
     }
 
     public List<GoiTap> layTatCa() {

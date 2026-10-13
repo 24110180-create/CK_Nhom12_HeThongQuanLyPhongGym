@@ -319,19 +319,33 @@ public class HoiVienTheDienTuPanel extends JPanel {
 
         // Sự kiện mô phỏng Check-in
         btnSimulateCheckin.addActionListener(e -> {
+            com.nhom12.gym.service.CheckInService checkInService = com.nhom12.gym.service.CheckInService.getInstance();
+            com.nhom12.gym.service.CheckInService.CheckInResult result = checkInService.thucHienCheckIn(memberCode, memberBranch);
+
             checkInCount++;
             lblCheckInCount.setText(checkInCount + " buổi");
             pnlQRBox.repaint();
-            JOptionPane.showMessageDialog(this,
-                    "<html><body style='width: 290px; padding: 5px;'>" +
-                    "<h3 style='color: #10b981; margin: 0;'>CHECK-IN THÀNH CÔNG!</h3>" +
-                    "<p>Xin chào: <b>" + memberName + "</b></p>" +
-                    "<p>Mã thẻ: <b>" + memberCode + "</b></p>" +
-                    "<p>Gói tập: <b>" + memberPackage + "</b></p>" +
-                    "<p>Hạn sử dụng: <b>" + memberExpiry + "</b></p>" +
-                    "<p>Cửa tự động Flap Barrier đã mở. Chúc bạn có một buổi tập tràn đầy năng lượng!</p>" +
-                    "</body></html>",
-                    "Cửa Vào FitLife Đã Mở", JOptionPane.INFORMATION_MESSAGE);
+
+            if (result.success) {
+                JOptionPane.showMessageDialog(this,
+                        "<html><body style='width: 290px; padding: 5px;'>" +
+                        "<h3 style='color: #10b981; margin: 0;'>CHECK-IN THÀNH CÔNG!</h3>" +
+                        "<p>Xin chào: <b>" + memberName + "</b></p>" +
+                        "<p>Mã thẻ: <b>" + memberCode + "</b></p>" +
+                        "<p>Gói tập: <b>" + memberPackage + "</b></p>" +
+                        "<p>Hạn sử dụng: <b>" + memberExpiry + "</b></p>" +
+                        "<p>Cửa Flap Barrier đã mở. Lượt quét đã được ghi nhận tự động vào toàn hệ thống!</p>" +
+                        "</body></html>",
+                        "Cửa Vào FitLife Đã Mở", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "<html><body style='width: 290px; padding: 5px;'>" +
+                        "<h3 style='color: #ef4444; margin: 0;'>TỪ CHỐI CHECK-IN!</h3>" +
+                        "<p>" + result.message + "</p>" +
+                        "<p>Lý do: <b>" + result.lyDoTuChoi + "</b></p>" +
+                        "</body></html>",
+                        "Từ Chối Cửa Vào", JOptionPane.WARNING_MESSAGE);
+            }
         });
     }
 

@@ -144,6 +144,7 @@ public class TaiKhoanDAO {
 
         SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf == null) {
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
             return true;
         }
 
@@ -152,10 +153,12 @@ public class TaiKhoanDAO {
             tx = session.beginTransaction();
             session.persist(tk);
             tx.commit();
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
             LOGGER.log(Level.WARNING, "Không thể lưu tài khoản vào CSDL, đã lưu vào bộ nhớ đệm: {0}", e.getMessage());
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
             return true; // Vẫn trả về true vì đã lưu thành công vào memoryCache
         }
     }
@@ -175,6 +178,7 @@ public class TaiKhoanDAO {
 
         SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf == null) {
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
             return true;
         }
 
@@ -183,10 +187,12 @@ public class TaiKhoanDAO {
             tx = session.beginTransaction();
             session.merge(tk);
             tx.commit();
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
             LOGGER.log(Level.WARNING, "Lỗi cập nhật CSDL, đã cập nhật bộ nhớ đệm: {0}", e.getMessage());
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
             return true;
         }
     }
@@ -194,10 +200,13 @@ public class TaiKhoanDAO {
     public boolean xoa(String tenDangNhap) {
         if (tenDangNhap == null || tenDangNhap.trim().isEmpty()) return false;
         String q = tenDangNhap.trim();
-        memoryCache.removeIf(item -> item.getTenDangNhap().equalsIgnoreCase(q));
+        boolean removedFromMemory = memoryCache.removeIf(item -> item.getTenDangNhap().equalsIgnoreCase(q));
 
         SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf == null) {
+            if (removedFromMemory) {
+                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
+            }
             return true;
         }
 
@@ -208,12 +217,21 @@ public class TaiKhoanDAO {
             if (tk != null) {
                 session.remove(tk);
                 tx.commit();
+                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
+                return true;
+            }
+            if (removedFromMemory) {
+                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
                 return true;
             }
             return false;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
             LOGGER.log(Level.SEVERE, "Lỗi xóa tài khoản '" + q + "'", e);
+            if (removedFromMemory) {
+                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
+                return true;
+            }
             return false;
         }
     }

@@ -22,6 +22,12 @@ import java.util.logging.Logger;
 public class CheckInService {
 
     private static final Logger LOGGER = Logger.getLogger(CheckInService.class.getName());
+    private static final CheckInService INSTANCE = new CheckInService();
+
+    public static CheckInService getInstance() {
+        return INSTANCE;
+    }
+
     private final HoiVienDAO hoiVienDAO = new HoiVienDAO();
     private final com.nhom12.gym.dao.LichSuCheckInDAO checkInDAO = new com.nhom12.gym.dao.LichSuCheckInDAO();
     private static final List<CheckInLogEntry> todayLogs = new CopyOnWriteArrayList<>();
@@ -180,55 +186,89 @@ public class CheckInService {
             LOGGER.log(Level.WARNING, "Lỗi tìm kiếm hội viên theo mã {0}: {1}", new Object[]{code, e.getMessage()});
         }
 
-        // Dữ liệu Offline Fallback chuẩn kiểm thử đồ án
+        // Dữ liệu Offline Fallback chuẩn kiểm thử đồ án đồng bộ với HoiVienDAO
         if (hv == null) {
-            if ("QR001".equals(code) || "HV001".equals(code) || "12345".equals(code) || "TUAN".equals(code) || "HOIVIEN1".equals(code)) {
+            if ("QR001".equals(code) || "HV001".equals(code) || "12345".equals(code) || "DUY".equals(code) || "HOIVIEN1".equals(code)) {
                 hv = new HoiVien();
                 hv.setMaHoiVien(1);
-                hv.setHoTen("Nguyễn Văn Tuấn");
+                hv.setHoTen("Lê Anh Duy");
                 hv.setMaTheQR(code);
-                hv.setChiNhanhDangKy("Toàn hệ thống (VIP)");
+                hv.setChiNhanhDangKy("Toàn hệ thống");
                 hv.setGoiTapDangKy("Gói VIP Diamond 12 Tháng");
                 hv.setTrangThai("Active");
                 hv.setNgayHetHan(new Date(System.currentTimeMillis() + 86400000L * 90)); // Còn 90 ngày
-            } else if ("QR002".equals(code) || "HV002".equals(code) || "LAN".equals(code)) {
+            } else if ("QR002".equals(code) || "HV002".equals(code) || "HUNG".equals(code)) {
                 hv = new HoiVien();
                 hv.setMaHoiVien(2);
-                hv.setHoTen("Lê Thị Lan");
-                hv.setMaTheQR(code);
-                hv.setChiNhanhDangKy("CN01 - Cơ sở 1 (Quận 1)");
-                hv.setGoiTapDangKy("Gói Standard 3 Tháng");
-                hv.setTrangThai("Active");
-                hv.setNgayHetHan(new Date(System.currentTimeMillis() - 86400000L * 5)); // Đã hết hạn 5 ngày
-            } else if ("QR003".equals(code) || "HV003".equals(code) || "KHOA".equals(code)) {
-                hv = new HoiVien();
-                hv.setMaHoiVien(3);
-                hv.setHoTen("Trần Văn Khóa");
+                hv.setHoTen("Võ Lê Ngọc Hưng");
                 hv.setMaTheQR(code);
                 hv.setChiNhanhDangKy("CN02 - Cơ sở 2 (Tân Bình)");
-                hv.setGoiTapDangKy("Gói Tiêu Chuẩn 1 Tháng");
-                hv.setTrangThai("Locked");
-                hv.setNgayHetHan(new Date(System.currentTimeMillis() + 86400000L * 60));
-            } else if ("VIP007".equals(code) || "VIP-DUC".equals(code)) {
-                // Yêu cầu ẩn của anh Đức: Hội viên VIP giảm 50% đặc biệt
+                hv.setGoiTapDangKy("Gói Standard 3 Tháng");
+                hv.setTrangThai("Active");
+                hv.setNgayHetHan(new Date(System.currentTimeMillis() + 86400000L * 15));
+            } else if ("QR003".equals(code) || "HV003".equals(code) || "PHAT".equals(code)) {
                 hv = new HoiVien();
-                hv.setMaHoiVien(7);
+                hv.setMaHoiVien(3);
+                hv.setHoTen("Võ Tấn Phát");
+                hv.setMaTheQR(code);
+                hv.setChiNhanhDangKy("CN01 - Cơ sở 1 (Quận 1)");
+                hv.setGoiTapDangKy("Gói Cơ Bản 1 Tháng");
+                hv.setTrangThai("Expired");
+                hv.setNgayHetHan(new Date(System.currentTimeMillis() - 86400000L * 60)); // Đã hết hạn
+            } else if ("VIP007".equals(code) || "VIP-DUC".equals(code) || "TRI".equals(code)) {
+                hv = new HoiVien();
+                hv.setMaHoiVien(6);
                 hv.setHoTen("Đỗ Minh Trí (Khách VIP Anh Đức)");
                 hv.setMaTheQR(code);
                 hv.setChiNhanhDangKy("Toàn hệ thống (VIP)");
                 hv.setGoiTapDangKy("Gói VIP Trọn Đời");
                 hv.setTrangThai("Active");
                 hv.setNgayHetHan(new Date(System.currentTimeMillis() + 86400000L * 300));
-            } else if ("QR004".equals(code) || "HV004".equals(code)) {
-                // Hội viên đăng ký Cơ sở 2 - Tân Bình (Thẻ cơ sở)
+            } else if ("QR004".equals(code) || "HV004".equals(code) || "QUAN".equals(code)) {
                 hv = new HoiVien();
                 hv.setMaHoiVien(4);
-                hv.setHoTen("Phạm Trọng Thủy");
+                hv.setHoTen("Trần Minh Quân");
                 hv.setMaTheQR(code);
-                hv.setChiNhanhDangKy("CN02 - Cơ sở 2 (Tân Bình)");
-                hv.setGoiTapDangKy("Gói Standard 3 Tháng");
+                hv.setChiNhanhDangKy("CN01 - Cơ sở 1 (Quận 1)");
+                hv.setGoiTapDangKy("Gói Premium 6 Tháng");
                 hv.setTrangThai("Active");
                 hv.setNgayHetHan(new Date(System.currentTimeMillis() + 86400000L * 45));
+            } else if ("QR005".equals(code) || "HV005".equals(code) || "LINH".equals(code)) {
+                hv = new HoiVien();
+                hv.setMaHoiVien(5);
+                hv.setHoTen("Hoàng Thùy Linh");
+                hv.setMaTheQR(code);
+                hv.setChiNhanhDangKy("CN02 - Cơ sở 2 (Tân Bình)");
+                hv.setGoiTapDangKy("Gói Sinh Viên 3 Tháng");
+                hv.setTrangThai("Active");
+                hv.setNgayHetHan(new Date(System.currentTimeMillis() + 86400000L * 30));
+            } else if ("KHOA".equals(code)) {
+                hv = new HoiVien();
+                hv.setMaHoiVien(12);
+                hv.setHoTen("Trần Văn Khóa");
+                hv.setMaTheQR(code);
+                hv.setChiNhanhDangKy("CN02 - Cơ sở 2 (Tân Bình)");
+                hv.setGoiTapDangKy("Gói Tiêu Chuẩn 1 Tháng");
+                hv.setTrangThai("Locked");
+                hv.setNgayHetHan(new Date(System.currentTimeMillis() + 86400000L * 60));
+            } else if ("LAN".equals(code)) {
+                hv = new HoiVien();
+                hv.setMaHoiVien(11);
+                hv.setHoTen("Lê Thị Lan");
+                hv.setMaTheQR(code);
+                hv.setChiNhanhDangKy("CN01 - Cơ sở 1 (Quận 1)");
+                hv.setGoiTapDangKy("Gói Standard 3 Tháng");
+                hv.setTrangThai("Active");
+                hv.setNgayHetHan(new Date(System.currentTimeMillis() - 86400000L * 5)); // Đã hết hạn 5 ngày
+            } else if ("TUAN".equals(code)) {
+                hv = new HoiVien();
+                hv.setMaHoiVien(10);
+                hv.setHoTen("Nguyễn Văn Tuấn");
+                hv.setMaTheQR(code);
+                hv.setChiNhanhDangKy("Toàn hệ thống (VIP)");
+                hv.setGoiTapDangKy("Gói VIP Diamond 12 Tháng");
+                hv.setTrangThai("Active");
+                hv.setNgayHetHan(new Date(System.currentTimeMillis() + 86400000L * 90));
             }
         }
 

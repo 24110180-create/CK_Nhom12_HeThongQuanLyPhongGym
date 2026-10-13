@@ -98,6 +98,7 @@ public class LopHocDAO {
 
             memoryClasses.removeIf(item -> item.getMaLop().equalsIgnoreCase(lop.getMaLop()));
             memoryClasses.add(lop);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
@@ -118,6 +119,7 @@ public class LopHocDAO {
                     break;
                 }
             }
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
             return true;
         }
 
@@ -133,6 +135,7 @@ public class LopHocDAO {
                     break;
                 }
             }
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
@@ -147,8 +150,11 @@ public class LopHocDAO {
         SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf == null) {
             LOGGER.log(Level.WARNING, "CSDL offline - xóa lớp học khỏi bộ nhớ tạm");
-            memoryClasses.removeIf(item -> item.getMaLop().equalsIgnoreCase(maLop.trim()));
-            return true;
+            boolean removed = memoryClasses.removeIf(item -> item.getMaLop().equalsIgnoreCase(maLop.trim()));
+            if (removed) {
+                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
+            }
+            return removed;
         }
 
         Transaction tx = null;
@@ -159,6 +165,7 @@ public class LopHocDAO {
                 session.remove(lh);
                 tx.commit();
                 memoryClasses.removeIf(item -> item.getMaLop().equalsIgnoreCase(maLop.trim()));
+                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
                 return true;
             }
             return false;

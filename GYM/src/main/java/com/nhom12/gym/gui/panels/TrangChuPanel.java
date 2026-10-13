@@ -28,25 +28,16 @@ public class TrangChuPanel extends JPanel {
         add(headerPanel, BorderLayout.NORTH);
 
         // 2. Khu vực Thẻ Thống kê (Grid 3 thẻ cao cấp)
-        JPanel widgetPanel = new JPanel(new GridLayout(1, 3, 20, 0));
+        widgetPanel.setLayout(new GridLayout(1, 3, 20, 0));
         widgetPanel.setOpaque(false);
-
-        widgetPanel.add(createWidgetCard(
-                "SỨC CHỨA HIỆN TẠI", "85 / 100", "Mật độ cao điểm (85%)",
-                new Color(239, 68, 68), new Color(249, 115, 22), "REALTIME"
-        ));
-
-        widgetPanel.add(createWidgetCard(
-                "CHECK-IN HÔM NAY", "142", "+18% so với cùng kỳ tuần trước",
-                new Color(13, 148, 136), new Color(16, 185, 129), "HỘI VIÊN"
-        ));
-
-        widgetPanel.add(createWidgetCard(
-                "DOANH THU TRONG NGÀY", "12,500,000 đ", "Bao gồm vé tập & quầy nước",
-                new Color(37, 99, 235), new Color(99, 102, 241), "HÓA ĐƠN"
-        ));
+        updateWidgets();
 
         add(widgetPanel, BorderLayout.CENTER);
+
+        // Lắng nghe sự kiện đồng bộ toàn hệ thống
+        com.nhom12.gym.service.DataSyncManager.addListener(type -> {
+            SwingUtilities.invokeLater(this::updateWidgets);
+        });
 
         // 3. Khu vực Thao tác nhanh & Giờ mở cửa
         JPanel bottomPanel = new JPanel(new BorderLayout(15, 15));
@@ -97,6 +88,37 @@ public class TrangChuPanel extends JPanel {
         btnBaoCao.addActionListener(e -> {
             JOptionPane.showMessageDialog(this, "Đã tổng hợp và xuất Báo Cáo Vận Hành Nhanh hôm nay:\n- Check-in: 142 lượt\n- Sức chứa: 85/100 (Cao điểm)\n- Doanh thu: 12,500,000 đ", "Báo Cáo Nhanh", JOptionPane.INFORMATION_MESSAGE);
         });
+    }
+
+    private final JPanel widgetPanel = new JPanel();
+
+    private void updateWidgets() {
+        widgetPanel.removeAll();
+
+        java.text.DecimalFormat df = new java.text.DecimalFormat("#,### đ");
+        int totalMembers = new com.nhom12.gym.dao.HoiVienDAO().layTatCa().size();
+        long activeMembers = new com.nhom12.gym.dao.HoiVienDAO().layTatCa().stream().filter(m -> "Active".equalsIgnoreCase(m.getTrangThai()) || "Hoạt động".equalsIgnoreCase(m.getTrangThai())).count();
+        int todayCheckins = new com.nhom12.gym.dao.LichSuCheckInDAO().layLichSuHomNay().size();
+        if (todayCheckins == 0) todayCheckins = new com.nhom12.gym.dao.LichSuCheckInDAO().layTatCaLichSu().size();
+        double totalRev = com.nhom12.gym.dao.HoaDonDAO.getInstance().layTongDoanhThu();
+
+        widgetPanel.add(createWidgetCard(
+                "HỘI VIÊN HOẠT ĐỘNG", activeMembers + " / " + totalMembers, "Tỷ lệ kích hoạt: " + (totalMembers > 0 ? (activeMembers * 100 / totalMembers) : 0) + "%",
+                new Color(239, 68, 68), new Color(249, 115, 22), "REALTIME"
+        ));
+
+        widgetPanel.add(createWidgetCard(
+                "CHECK-IN HÔM NAY", String.valueOf(todayCheckins), "Lượt quét thẻ hợp lệ",
+                new Color(13, 148, 136), new Color(16, 185, 129), "HỘI VIÊN"
+        ));
+
+        widgetPanel.add(createWidgetCard(
+                "DOANH THU THỰC TẾ", df.format(totalRev), "Ghi nhận từ hóa đơn toàn hệ thống",
+                new Color(37, 99, 235), new Color(99, 102, 241), "HÓA ĐƠN"
+        ));
+
+        widgetPanel.revalidate();
+        widgetPanel.repaint();
     }
 
     private JPanel createWidgetCard(String title, String mainValue, String subText, Color colorStart, Color colorEnd, String tag) {

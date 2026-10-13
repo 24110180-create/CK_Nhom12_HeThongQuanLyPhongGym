@@ -47,6 +47,13 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
 
         initUI();
         loadAllData();
+
+        // Lắng nghe sự kiện đồng bộ toàn hệ thống
+        com.nhom12.gym.service.DataSyncManager.addListener(type -> {
+            if (type == com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU || type == com.nhom12.gym.service.DataSyncManager.DataType.ALL) {
+                loadAllData();
+            }
+        });
     }
 
     private void initUI() {

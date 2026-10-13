@@ -103,6 +103,7 @@ public class DangKyLopDAO {
         if (sf == null) {
             if (dk.getId() <= 0) dk.setId(memoryCache.size() + 1);
             memoryCache.add(dk);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
             return true;
         }
 
@@ -113,6 +114,7 @@ public class DangKyLopDAO {
             tx.commit();
 
             memoryCache.add(dk);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
@@ -127,6 +129,7 @@ public class DangKyLopDAO {
             for (DangKyLop item : memoryCache) {
                 if (item.getId() == id) {
                     item.setTrangThaiDiemDanh(trangThai);
+                    com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
                     return true;
                 }
             }
@@ -149,6 +152,7 @@ public class DangKyLopDAO {
                         break;
                     }
                 }
+                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
                 return true;
             }
             return false;
@@ -159,6 +163,7 @@ public class DangKyLopDAO {
             for (DangKyLop item : memoryCache) {
                 if (item.getId() == id) {
                     item.setTrangThaiDiemDanh(trangThai);
+                    com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
                     return true;
                 }
             }
@@ -169,7 +174,11 @@ public class DangKyLopDAO {
     public boolean xoa(int id) {
         SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf == null) {
-            return memoryCache.removeIf(item -> item.getId() == id);
+            boolean removed = memoryCache.removeIf(item -> item.getId() == id);
+            if (removed) {
+                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
+            }
+            return removed;
         }
 
         Transaction tx = null;
@@ -180,6 +189,7 @@ public class DangKyLopDAO {
                 session.remove(dk);
                 tx.commit();
                 memoryCache.removeIf(item -> item.getId() == id);
+                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
                 return true;
             }
             return false;
@@ -188,5 +198,15 @@ public class DangKyLopDAO {
             LOGGER.log(Level.SEVERE, "Lỗi xóa đăng ký lớp khỏi CSDL", e);
             return false;
         }
+    }
+
+    public boolean xoaTheoLopVaHoiVien(String maLop, int maHoiVien) {
+        List<DangKyLop> list = layDanhSachTheoLop(maLop);
+        for (DangKyLop dk : list) {
+            if (dk.getMaHoiVien() == maHoiVien) {
+                return xoa(dk.getId());
+            }
+        }
+        return false;
     }
 }

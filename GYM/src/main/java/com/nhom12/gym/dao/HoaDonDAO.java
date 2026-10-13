@@ -60,11 +60,13 @@ public class HoaDonDAO {
 
             // Chỉ khi CSDL commit thành công mới lưu vào bộ nhớ cache
             memoryCache.add(0, hd);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOA_DON);
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
             System.err.println("[HoaDonDAO] Lỗi thêm hóa đơn vào CSDL (Lưu tạm vào bộ đệm offline): " + e.getMessage());
             memoryCache.add(0, hd);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOA_DON);
             return false;
         }
     }

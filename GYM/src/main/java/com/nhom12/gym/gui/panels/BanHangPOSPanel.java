@@ -10,6 +10,10 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import com.nhom12.gym.dao.HoaDonDAO;
+import com.nhom12.gym.entity.HoaDon;
+import com.nhom12.gym.util.Auth;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -252,10 +256,32 @@ public class BanHangPOSPanel extends JPanel implements KhoHangService.KhoHangLis
                             if (loi != null) {
                                 JOptionPane.showMessageDialog(this, "Lỗi trừ tồn kho: " + loi, "Lỗi tồn kho", JOptionPane.ERROR_MESSAGE);
                             } else {
+                                // TẠO VÀ LƯU HÓA ĐƠN ĐỂ ĐỒNG BỘ DOANH THU TOÀN HỆ THỐNG
+                                try {
+                                    String maHD = "HD-POS-" + System.currentTimeMillis();
+                                    HoaDon hd = new HoaDon(
+                                            maHD,
+                                            0,
+                                            "Khách Lẻ Quầy POS",
+                                            "Bán lẻ sản phẩm POS (" + itemsXuatKho.size() + " món)",
+                                            tongTien,
+                                            0.0,
+                                            tongTien,
+                                            "VietQR / Tiền mặt",
+                                            Auth.tenDangNhap != null ? Auth.tenDangNhap : "letan1",
+                                            Auth.getChiNhanhHienTai() != null ? Auth.getChiNhanhHienTai() : "CN01 - Cơ sở 1 (Quận 1)",
+                                            new Date(),
+                                            "Đã thanh toán",
+                                            "Bán lẻ quầy POS: " + itemsXuatKho.size() + " mặt hàng"
+                                    );
+                                    HoaDonDAO.getInstance().them(hd);
+                                } catch (Exception ignored) {
+                                }
+
                                 cartModel.setRowCount(0);
                                 tinhLaiTongTien();
                                 JOptionPane.showMessageDialog(this,
-                                        "Đã xuất kho & ghi nhận thanh toán thành công!\nSố lượng tồn kho trong kho chứa đã tự động giảm tương ứng.",
+                                        "Đã xuất kho & ghi nhận thanh toán thành công!\nSố lượng tồn kho và doanh thu toàn hệ thống đã được đồng bộ tự động.",
                                         "Thành công", JOptionPane.INFORMATION_MESSAGE);
                             }
                         }

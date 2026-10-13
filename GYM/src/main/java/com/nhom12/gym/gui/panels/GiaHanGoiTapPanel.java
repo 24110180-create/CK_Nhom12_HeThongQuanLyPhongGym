@@ -228,6 +228,11 @@ public class GiaHanGoiTapPanel extends JPanel {
         btnConfirm.addActionListener(e -> confirmRenewal());
 
         GoiTapDAO.addChangeListener(this::loadPackageList);
+        com.nhom12.gym.service.DataSyncManager.addListener(type -> {
+            if (type == com.nhom12.gym.service.DataSyncManager.DataType.GOI_TAP || type == com.nhom12.gym.service.DataSyncManager.DataType.ALL) {
+                loadPackageList();
+            }
+        });
         loadInitialMember();
     }
 
@@ -414,6 +419,25 @@ public class GiaHanGoiTapPanel extends JPanel {
                         currentHoiVien.setTrangThai("Hoạt động");
                         currentHoiVien.setSoTienDaThanhToan(finalPrice);
                         hoiVienDAO.capNhat(currentHoiVien);
+
+                        // Đồng bộ tạo Hóa đơn vào HoaDonDAO cho toàn hệ thống
+                        com.nhom12.gym.entity.HoaDon hd = new com.nhom12.gym.entity.HoaDon(
+                                maHD,
+                                currentHoiVien.getMaHoiVien(),
+                                currentHoiVien.getHoTen(),
+                                "Gia hạn " + pkgName,
+                                displayGiaGoc,
+                                displayGiamGia,
+                                finalPrice,
+                                cbThanhToan.getSelectedItem() != null ? cbThanhToan.getSelectedItem().toString() : "Tiền mặt",
+                                Auth.tenDangNhap != null ? Auth.tenDangNhap : "letan1",
+                                currentHoiVien.getChiNhanhDangKy() != null ? currentHoiVien.getChiNhanhDangKy() : "CN01 - Cơ sở 1 (Quận 1)",
+                                new Date(),
+                                "Đã thanh toán",
+                                "Gia hạn thẻ thành công (Hạn mới: " + newExpire + ")"
+                        );
+                        com.nhom12.gym.dao.HoaDonDAO.getInstance().them(hd);
+
                         displayMember(currentHoiVien);
                     }
                 }

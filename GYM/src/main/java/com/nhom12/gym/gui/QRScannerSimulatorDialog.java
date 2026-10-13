@@ -59,6 +59,11 @@ public class QRScannerSimulatorDialog extends JDialog {
         setLayout(new BorderLayout());
 
         initUI();
+        com.nhom12.gym.service.DataSyncManager.getInstance().addListener(evt -> {
+            if (evt.isAffecting(com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN)) {
+                napDuLieuHoiVienCSDL();
+            }
+        });
     }
 
     private void initUI() {
@@ -277,10 +282,10 @@ public class QRScannerSimulatorDialog extends JDialog {
         pnlList.setOpaque(false);
 
         pnlList.add(createCardItem("QR001", "Lê Anh Duy (VIP Diamond)", "Hợp lệ 100% - Mở cổng Flap Barrier xanh lá", new Color(16, 185, 129)));
-        pnlList.add(createCardItem("QR002", "Trần Thị Mai (Standard 1M)", "Gói tập hết hạn - Khóa cổng đỏ & hiện nút Gia Hạn", new Color(239, 68, 68)));
-        pnlList.add(createCardItem("QR003", "Hoàng Văn Bình (Thẻ VIP)", "Thẻ bị tạm khóa vi phạm nội quy - Từ chối check-in", new Color(245, 158, 11)));
-        pnlList.add(createCardItem("QR004", "Phạm Quốc Cường (Cơ sở 1)", "Sai chi nhánh (Đăng ký CN01 mang sang CN02 quét)", new Color(139, 92, 246)));
-        pnlList.add(createCardItem("VIP007", "Khách VIP Anh Đức (Chủ)", "Giảm giá 50% bảo mật nội bộ với nhân viên", new Color(14, 165, 233)));
+        pnlList.add(createCardItem("QR002", "Võ Lê Ngọc Hưng (CN02 - Tân Bình)", "Sai chi nhánh (Đăng ký CN02 quẹt tại CN01) - Khóa cổng", new Color(139, 92, 246)));
+        pnlList.add(createCardItem("QR003", "Võ Tấn Phát (Cơ bản 1M)", "Gói tập đã hết hạn - Khóa cổng đỏ & hiện nút Gia Hạn", new Color(239, 68, 68)));
+        pnlList.add(createCardItem("KHOA", "Trần Văn Khóa (Vi phạm)", "Thẻ bị tạm khóa vi phạm nội quy - Từ chối check-in", new Color(245, 158, 11)));
+        pnlList.add(createCardItem("VIP007", "Đỗ Minh Trí (Khách VIP Anh Đức)", "Giảm giá 50% bảo mật nội bộ & Check-in mọi cơ sở", new Color(14, 165, 233)));
         pnlList.add(createCardItem("PASS-8888", "Võ Hoàng Yến (Khách Vãng Lai)", "Vé lẻ 1 ngày (80k) xuất VietQR - Chỉ mở cổng 1 lần", new Color(217, 119, 6)));
 
         pnl.add(pnlList, BorderLayout.CENTER);

@@ -588,6 +588,25 @@ public class DangKyHoiVienPanel extends JPanel {
                             cal.add(Calendar.MONTH, currentMonths);
                             hv.setNgayHetHan(cal.getTime());
                             hoiVienDAO.them(hv);
+
+                            // Đồng bộ tạo Hóa đơn vào HoaDonDAO cho toàn hệ thống
+                            String maHD = "HD" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+                            com.nhom12.gym.entity.HoaDon hd = new com.nhom12.gym.entity.HoaDon(
+                                    maHD,
+                                    finalNextId,
+                                    name,
+                                    "Đăng ký mới " + pkgName,
+                                    displayGiaGoc,
+                                    displayGiamGia,
+                                    finalPrice,
+                                    cbPayment.getSelectedItem().toString(),
+                                    Auth.tenDangNhap != null ? Auth.tenDangNhap : "letan1",
+                                    cbBranch.getSelectedItem().toString(),
+                                    new Date(),
+                                    "Đã thanh toán",
+                                    "Đăng ký thẻ mới thành công"
+                            );
+                            com.nhom12.gym.dao.HoaDonDAO.getInstance().them(hd);
                         } catch (Exception ignored) {
                         }
 

@@ -1,11 +1,17 @@
 package com.nhom12.gym.gui.panels;
 
+import com.nhom12.gym.dao.DangKyLopDAO;
+import com.nhom12.gym.dao.LopHocDAO;
+import com.nhom12.gym.entity.DangKyLop;
+import com.nhom12.gym.entity.LopHoc;
+import com.nhom12.gym.service.DataSyncManager;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -18,6 +24,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 public class LichDayHLVPanel extends JPanel {
+    private final LopHocDAO lopHocDAO = new LopHocDAO();
+    private final DangKyLopDAO dangKyLopDAO = new DangKyLopDAO();
+
     private JTable classTable;
     private DefaultTableModel classModel;
     private JTable studentTable;
@@ -25,6 +34,8 @@ public class LichDayHLVPanel extends JPanel {
     private JButton btnDiemDanh;
     private JButton btnDiemDanhAll;
     private JLabel lblClassTitle;
+
+    private String currentMaLop = "";
 
     public LichDayHLVPanel() {
         this.setLayout(new BorderLayout(15, 15));
@@ -45,7 +56,7 @@ public class LichDayHLVPanel extends JPanel {
         this.add(headerPanel, BorderLayout.NORTH);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setDividerLocation(520);
+        splitPane.setDividerLocation(540);
         splitPane.setDividerSize(6);
         splitPane.setOpaque(false);
         splitPane.setBorder(null);
@@ -58,19 +69,13 @@ public class LichDayHLVPanel extends JPanel {
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
 
-        JLabel lblLeftHeader = new JLabel("Lịch Dạy Hôm Nay Của Bạn");
+        JLabel lblLeftHeader = new JLabel("Danh Sách Các Ca Lớp Học Nhóm (Đang Vận Hành)");
         lblLeftHeader.setFont(new Font("Segoe UI", Font.BOLD, 15));
         lblLeftHeader.setForeground(new Color(30, 41, 59));
         leftPanel.add(lblLeftHeader, BorderLayout.NORTH);
 
-        String[] classCols = new String[]{"Ca Dạy", "Tên Lớp", "Phòng", "Sĩ Số"};
-        Object[][] classData = new Object[][]{
-                {"07:00 - 08:30", "Yoga Cơ Bản", "Phòng 01", "15/20"},
-                {"09:00 - 10:30", "Zumba Dance", "Phòng 02", "18/25"},
-                {"15:00 - 16:30", "Boxing PT 1-1", "Sàn Đấu", "1/1"},
-                {"17:30 - 19:00", "Cardio Đốt Mỡ", "Phòng 01", "22/30"}
-        };
-        classModel = new DefaultTableModel(classData, classCols) {
+        String[] classCols = new String[]{"Mã Lớp", "Tên Lớp", "HLV Phụ Trách", "Lịch Học", "Sĩ Số"};
+        classModel = new DefaultTableModel(classCols, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
                 return false;
@@ -79,7 +84,7 @@ public class LichDayHLVPanel extends JPanel {
 
         classTable = new JTable(classModel);
         classTable.setRowHeight(40);
-        classTable.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        classTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         classTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         classTable.getTableHeader().setBackground(new Color(241, 245, 249));
         classTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -94,20 +99,13 @@ public class LichDayHLVPanel extends JPanel {
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
 
-        lblClassTitle = new JLabel("Danh Sách Học Viên Lớp: Yoga Cơ Bản");
+        lblClassTitle = new JLabel("Danh Sách Học Viên Của Lớp");
         lblClassTitle.setFont(new Font("Segoe UI", Font.BOLD, 15));
         lblClassTitle.setForeground(new Color(30, 41, 59));
         rightPanel.add(lblClassTitle, BorderLayout.NORTH);
 
-        String[] studentCols = new String[]{"Mã HV", "Tên Học Viên", "Trạng Thái Điểm Danh"};
-        Object[][] studentData = new Object[][]{
-                {"HV001", "Nguyễn Văn Tuấn", "Chưa điểm danh"},
-                {"HV005", "Trần Thu Hà", "Đã có mặt ✔"},
-                {"HV012", "Lê Hoàng Phúc", "Chưa điểm danh"},
-                {"HV022", "Lê Thị Lan", "Đã có mặt ✔"},
-                {"HV041", "Phạm Trọng Thủy", "Chưa điểm danh"}
-        };
-        studentModel = new DefaultTableModel(studentData, studentCols) {
+        String[] studentCols = new String[]{"ID ĐK", "Mã HV", "Tên Học Viên", "Trạng Thái Điểm Danh"};
+        studentModel = new DefaultTableModel(studentCols, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
                 return false;
@@ -147,29 +145,103 @@ public class LichDayHLVPanel extends JPanel {
         // Action Listeners
         classTable.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && classTable.getSelectedRow() != -1) {
-                String className = classModel.getValueAt(classTable.getSelectedRow(), 1).toString();
-                lblClassTitle.setText("Danh Sách Học Viên Lớp: " + className);
+                int row = classTable.getSelectedRow();
+                String maLop = classModel.getValueAt(row, 0).toString();
+                String tenLop = classModel.getValueAt(row, 1).toString();
+                currentMaLop = maLop;
+                lblClassTitle.setText("Danh Sách Học Viên Lớp: " + tenLop + " (" + maLop + ")");
+                loadStudentsForClass(maLop);
             }
         });
 
-        btnDiemDanh.addActionListener(e -> {
-            int sel = studentTable.getSelectedRow();
-            if (sel == -1) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn học viên trong danh sách để điểm danh!", "Thông báo", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            String cur = studentModel.getValueAt(sel, 2).toString();
-            String nxt = cur.contains("Đã có mặt") ? "Chưa điểm danh" : "Đã có mặt ✔";
-            studentModel.setValueAt(nxt, sel, 2);
-            String name = studentModel.getValueAt(sel, 1).toString();
-            JOptionPane.showMessageDialog(this, "Đã cập nhật trạng thái của học viên [" + name + "] sang: " + nxt, "Điểm Danh Thành Công", JOptionPane.INFORMATION_MESSAGE);
-        });
+        btnDiemDanh.addActionListener(e -> xuLyDiemDanhChon());
+        btnDiemDanhAll.addActionListener(e -> xuLyDiemDanhTatCa());
 
-        btnDiemDanhAll.addActionListener(e -> {
-            for (int i = 0; i < studentModel.getRowCount(); i++) {
-                studentModel.setValueAt("Đã có mặt ✔", i, 2);
+        // Tải dữ liệu ban đầu
+        loadClasses();
+
+        // Lắng nghe sự kiện đồng bộ toàn hệ thống
+        DataSyncManager.addListener(type -> {
+            if (type == DataSyncManager.DataType.LOP_HOC || type == DataSyncManager.DataType.ALL) {
+                int selClass = classTable.getSelectedRow();
+                loadClasses();
+                if (selClass >= 0 && selClass < classTable.getRowCount()) {
+                    classTable.setRowSelectionInterval(selClass, selClass);
+                }
             }
-            JOptionPane.showMessageDialog(this, "Đã điểm danh CÓ MẶT cho toàn bộ " + studentModel.getRowCount() + " học viên trong lớp!", "Điểm Danh Toàn Bộ", JOptionPane.INFORMATION_MESSAGE);
         });
+    }
+
+    private void loadClasses() {
+        classModel.setRowCount(0);
+        List<LopHoc> classes = lopHocDAO.layTatCa();
+        if (classes != null) {
+            for (LopHoc lh : classes) {
+                classModel.addRow(new Object[]{
+                        lh.getMaLop(),
+                        lh.getTenLop(),
+                        lh.getHuanLuyenVien(),
+                        lh.getThoiGian(),
+                        lh.getSiSoHienTai() + " / " + lh.getSiSoToiDa()
+                });
+            }
+        }
+        if (classModel.getRowCount() > 0 && classTable.getSelectedRow() == -1) {
+            classTable.setRowSelectionInterval(0, 0);
+        }
+    }
+
+    private void loadStudentsForClass(String maLop) {
+        studentModel.setRowCount(0);
+        List<DangKyLop> list = dangKyLopDAO.layDanhSachTheoLop(maLop);
+        if (list != null && !list.isEmpty()) {
+            for (DangKyLop dk : list) {
+                studentModel.addRow(new Object[]{
+                        dk.getId(),
+                        "HV" + dk.getMaHoiVien(),
+                        dk.getTenHoiVien() != null ? dk.getTenHoiVien() : "Hội viên #" + dk.getMaHoiVien(),
+                        dk.getTrangThaiDiemDanh() != null ? dk.getTrangThaiDiemDanh() : "Chưa điểm danh"
+                });
+            }
+        } else {
+            studentModel.addRow(new Object[]{
+                    0, "---", "Chưa có học viên đăng ký lớp này", "---"
+            });
+        }
+    }
+
+    private void xuLyDiemDanhChon() {
+        int sel = studentTable.getSelectedRow();
+        if (sel == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 học viên trong danh sách để điểm danh!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Object idObj = studentModel.getValueAt(sel, 0);
+        int id = (idObj instanceof Number) ? ((Number) idObj).intValue() : Integer.parseInt(idObj.toString());
+        if (id <= 0) return;
+
+        String cur = studentModel.getValueAt(sel, 3).toString();
+        String nxt = cur.contains("Đã có mặt") ? "Chưa điểm danh" : "Đã có mặt ✔";
+
+        dangKyLopDAO.capNhatDiemDanh(id, nxt);
+        studentModel.setValueAt(nxt, sel, 3);
+        String name = studentModel.getValueAt(sel, 2).toString();
+        JOptionPane.showMessageDialog(this, "Đã cập nhật trạng thái điểm danh của học viên [" + name + "] sang: " + nxt, "Điểm Danh Thành Công", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void xuLyDiemDanhTatCa() {
+        if (studentModel.getRowCount() == 0) return;
+        int count = 0;
+        for (int i = 0; i < studentModel.getRowCount(); i++) {
+            Object idObj = studentModel.getValueAt(i, 0);
+            int id = (idObj instanceof Number) ? ((Number) idObj).intValue() : Integer.parseInt(idObj.toString());
+            if (id > 0) {
+                dangKyLopDAO.capNhatDiemDanh(id, "Đã có mặt ✔");
+                studentModel.setValueAt("Đã có mặt ✔", i, 3);
+                count++;
+            }
+        }
+        JOptionPane.showMessageDialog(this, "Đã điểm danh CÓ MẶT cho toàn bộ " + count + " học viên trong lớp!", "Điểm Danh Toàn Bộ", JOptionPane.INFORMATION_MESSAGE);
     }
 }

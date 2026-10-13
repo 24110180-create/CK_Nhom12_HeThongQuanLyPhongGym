@@ -1,17 +1,30 @@
 package com.nhom12.gym.gui.panels;
 
+import com.nhom12.gym.dao.DangKyLopDAO;
+import com.nhom12.gym.dao.LopHocDAO;
+import com.nhom12.gym.entity.DangKyLop;
+import com.nhom12.gym.entity.LopHoc;
+import com.nhom12.gym.service.DataSyncManager;
+import com.nhom12.gym.util.Auth;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
  * Giao diện Đặt Chỗ Lớp Học (Group Fitness) dành cho Hội Viên
+ * Kết nối dữ liệu thực tế và tự động đồng bộ thời gian thực với HLV & Lễ tân
  */
 public class HoiVienDatLopPanel extends JPanel {
+
+    private final LopHocDAO lopHocDAO = new LopHocDAO();
+    private final DangKyLopDAO dangKyLopDAO = new DangKyLopDAO();
 
     private final JTable table;
     private final DefaultTableModel model;
@@ -47,7 +60,7 @@ public class HoiVienDatLopPanel extends JPanel {
 
         JLabel lblF = new JLabel("Lọc bộ môn:");
         lblF.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        cbFilter = new JComboBox<>(new String[]{"Tất cả bộ môn", "Yoga Flow", "Zumba Dance", "Kick Boxing", "Pilates Core", "Spinning (Đạp xe)"});
+        cbFilter = new JComboBox<>(new String[]{"Tất cả bộ môn", "Yoga", "Zumba", "Boxing", "Cardio", "Pilates"});
         cbFilter.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         cbFilter.setPreferredSize(new Dimension(170, 36));
 
@@ -68,17 +81,7 @@ public class HoiVienDatLopPanel extends JPanel {
 
         // 2. DATA TABLE
         String[] cols = {"Mã Lớp", "Tên Lớp Học", "Bộ Môn", "Huấn Luyện Viên", "Thời Gian", "Phòng Tập", "Chỗ Đã Đặt", "Trạng Thái Của Bạn"};
-        Object[][] data = {
-                {"CL001", "Morning Sunrise Yoga", "Yoga Flow", "HLV Nguyễn Thu Hà", "Thứ Hai • 06:30 - 07:30", "Studio Yoga A", "18/20", "Chưa đặt"},
-                {"CL002", "Zumba Cardio Party", "Zumba Dance", "HLV Carlos Martinez", "Thứ Hai • 18:00 - 19:00", "Studio Dance 1", "24/25", "Chưa đặt"},
-                {"CL003", "Kick Boxing Combat", "Kick Boxing", "HLV Trần Văn Dũng", "Thứ Ba • 17:30 - 18:30", "Khu Đấm Bốc B", "12/15", "Chưa đặt"},
-                {"CL004", "Pilates Core Reformer", "Pilates Core", "HLV Mai Thảo", "Thứ Ba • 19:00 - 20:00", "Studio Pilates", "8/10", "Chưa đặt"},
-                {"CL005", "Spinning RPM Express", "Spinning (Đạp xe)", "HLV Lê Duy Nam", "Thứ Tư • 18:00 - 18:45", "Phòng Đạp Xe", "15/18", "Chưa đặt"},
-                {"CL006", "Vinyasa Flow Advanced", "Yoga Flow", "HLV Nguyễn Thu Hà", "Thứ Năm • 07:00 - 08:00", "Studio Yoga A", "14/20", "Chưa đặt"},
-                {"CL007", "Body Combat Heavy", "Kick Boxing", "HLV Trần Văn Dũng", "Thứ Sáu • 18:00 - 19:15", "Khu Đấm Bốc B", "11/15", "Chưa đặt"}
-        };
-
-        model = new DefaultTableModel(data, cols) {
+        model = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int row, int col) {
                 return false;
@@ -119,7 +122,7 @@ public class HoiVienDatLopPanel extends JPanel {
         JPanel bottomBar = new JPanel(new BorderLayout(15, 0));
         bottomBar.setOpaque(false);
 
-        lblSummary = new JLabel("● Đang hiển thị " + model.getRowCount() + " lớp học khả dụng trong tuần");
+        lblSummary = new JLabel("● Đang hiển thị lớp học khả dụng trong tuần");
         lblSummary.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         lblSummary.setForeground(new Color(100, 116, 139));
         bottomBar.add(lblSummary, BorderLayout.WEST);
@@ -169,6 +172,14 @@ public class HoiVienDatLopPanel extends JPanel {
             }
             filterMyClasses();
         });
+
+        loadInitialData();
+
+        DataSyncManager.getInstance().addListener(evt -> {
+            if (evt.isAffecting(DataSyncManager.DataType.LOP_HOC)) {
+                loadInitialData();
+            }
+        });
     }
 
     private void xuLyDatCho() {
@@ -187,29 +198,26 @@ public class HoiVienDatLopPanel extends JPanel {
             return;
         }
 
-        myBookedClasses.add(classId);
-        table.setValueAt("✔ Đã giữ chỗ", row, 7);
+        String hoTen = Auth.hoTen != null ? Auth.hoTen : "Lê Anh Duy";
+        String sdt = Auth.soDienThoai != null ? Auth.soDienThoai : "0901234567";
+        int myId = 1;
 
-        // Update capacity string
-        String capStr = table.getValueAt(row, 6).toString();
-        String[] parts = capStr.split("/");
-        if (parts.length == 2) {
-            try {
-                int cur = Integer.parseInt(parts[0].trim()) + 1;
-                int max = Integer.parseInt(parts[1].trim());
-                table.setValueAt(cur + "/" + max, row, 6);
-            } catch (Exception ignored) {}
+        DangKyLop dk = new DangKyLop(0, classId, myId, hoTen, sdt, new Date(), "Chưa điểm danh", "Đặt chỗ qua App Hội Viên");
+        boolean ok = dangKyLopDAO.them(dk);
+        if (ok) {
+            myBookedClasses.add(classId);
+            loadInitialData();
+
+            JOptionPane.showMessageDialog(this,
+                    "<html><body style='width: 280px; padding: 5px;'>" +
+                    "<h3 style='color: #2563eb; margin: 0;'>ĐẶT CHỖ THÀNH CÔNG!</h3>" +
+                    "<p>Lớp: <b>" + className + "</b></p>" +
+                    "<p style='color: #10b981;'>Hệ thống đã tự động đồng bộ sang HLV và Lễ Tân phòng gym.</p>" +
+                    "</body></html>",
+                    "Xác Nhận Đặt Chỗ", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Lỗi khi lưu đăng ký lớp vào hệ thống!", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
-
-        JOptionPane.showMessageDialog(this,
-                "<html><body style='width: 280px; padding: 5px;'>" +
-                "<h3 style='color: #2563eb; margin: 0;'>ĐẶT CHỖ THÀNH CÔNG!</h3>" +
-                "<p>Lớp: <b>" + className + "</b></p>" +
-                "<p>Thời gian: <b>" + table.getValueAt(row, 4) + "</b></p>" +
-                "<p>Phòng: <b>" + table.getValueAt(row, 5) + "</b></p>" +
-                "<p style='color: #10b981;'>Vui lòng đến trước 10 phút để chuẩn bị thảm và trang phục.</p>" +
-                "</body></html>",
-                "Xác Nhận Đặt Chỗ", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void xuLyHuyDatCho() {
@@ -232,18 +240,10 @@ public class HoiVienDatLopPanel extends JPanel {
                 "Xác nhận hủy", JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
+            int myId = 1;
+            dangKyLopDAO.xoaTheoLopVaHoiVien(classId, myId);
             myBookedClasses.remove(classId);
-            table.setValueAt("Chưa đặt", row, 7);
-
-            String capStr = table.getValueAt(row, 6).toString();
-            String[] parts = capStr.split("/");
-            if (parts.length == 2) {
-                try {
-                    int cur = Math.max(0, Integer.parseInt(parts[0].trim()) - 1);
-                    int max = Integer.parseInt(parts[1].trim());
-                    table.setValueAt(cur + "/" + max, row, 6);
-                } catch (Exception ignored) {}
-            }
+            loadInitialData();
 
             JOptionPane.showMessageDialog(this, "Đã hủy giữ chỗ thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -251,17 +251,37 @@ public class HoiVienDatLopPanel extends JPanel {
 
     private void loadInitialData() {
         model.setRowCount(0);
-        Object[][] data = {
-                {"CL001", "Morning Sunrise Yoga", "Yoga Flow", "HLV Nguyễn Thu Hà", "Thứ Hai • 06:30 - 07:30", "Studio Yoga A", "18/20", myBookedClasses.contains("CL001") ? "✔ Đã giữ chỗ" : "Chưa đặt"},
-                {"CL002", "Zumba Cardio Party", "Zumba Dance", "HLV Carlos Martinez", "Thứ Hai • 18:00 - 19:00", "Studio Dance 1", "24/25", myBookedClasses.contains("CL002") ? "✔ Đã giữ chỗ" : "Chưa đặt"},
-                {"CL003", "Kick Boxing Combat", "Kick Boxing", "HLV Trần Văn Dũng", "Thứ Ba • 17:30 - 18:30", "Khu Đấm Bốc B", "12/15", myBookedClasses.contains("CL003") ? "✔ Đã giữ chỗ" : "Chưa đặt"},
-                {"CL004", "Pilates Core Reformer", "Pilates Core", "HLV Mai Thảo", "Thứ Ba • 19:00 - 20:00", "Studio Pilates", "8/10", myBookedClasses.contains("CL004") ? "✔ Đã giữ chỗ" : "Chưa đặt"},
-                {"CL005", "Spinning RPM Express", "Spinning (Đạp xe)", "HLV Lê Duy Nam", "Thứ Tư • 18:00 - 18:45", "Phòng Đạp Xe", "15/18", myBookedClasses.contains("CL005") ? "✔ Đã giữ chỗ" : "Chưa đặt"},
-                {"CL006", "Vinyasa Flow Advanced", "Yoga Flow", "HLV Nguyễn Thu Hà", "Thứ Năm • 07:00 - 08:00", "Studio Yoga A", "14/20", myBookedClasses.contains("CL006") ? "✔ Đã giữ chỗ" : "Chưa đặt"},
-                {"CL007", "Body Combat Heavy", "Kick Boxing", "HLV Trần Văn Dũng", "Thứ Sáu • 18:00 - 19:15", "Khu Đấm Bốc B", "11/15", myBookedClasses.contains("CL007") ? "✔ Đã giữ chỗ" : "Chưa đặt"}
-        };
-        for (Object[] r : data) {
-            model.addRow(r);
+        myBookedClasses.clear();
+        String hoTen = Auth.hoTen != null ? Auth.hoTen : "Lê Anh Duy";
+        int myId = 1;
+
+        List<LopHoc> list = lopHocDAO.layTatCa();
+        if (list != null) {
+            for (LopHoc lh : list) {
+                boolean booked = dangKyLopDAO.daDangKy(lh.getMaLop(), myId);
+                if (!booked) {
+                    List<DangKyLop> dks = dangKyLopDAO.layDanhSachTheoLop(lh.getMaLop());
+                    for (DangKyLop d : dks) {
+                        if (d.getTenHoiVien() != null && d.getTenHoiVien().equalsIgnoreCase(hoTen)) {
+                            booked = true;
+                            break;
+                        }
+                    }
+                }
+                if (booked) {
+                    myBookedClasses.add(lh.getMaLop());
+                }
+                model.addRow(new Object[]{
+                        lh.getMaLop(),
+                        lh.getTenLop(),
+                        lh.getBoMon() != null ? lh.getBoMon() : "Gym",
+                        lh.getHuanLuyenVien() != null ? lh.getHuanLuyenVien() : "HLV Chuyên Nghiệp",
+                        lh.getThoiGian() != null ? lh.getThoiGian() : "08:00 - 09:00",
+                        lh.getPhongTap() != null ? lh.getPhongTap() : "Studio 1",
+                        lh.getSiSoHienTai() + "/" + lh.getSiSoToiDa(),
+                        booked ? "✔ Đã giữ chỗ" : "Chưa đặt"
+                });
+            }
         }
         lblSummary.setText("● Đang hiển thị " + model.getRowCount() + " lớp học khả dụng trong tuần");
     }
@@ -270,7 +290,7 @@ public class HoiVienDatLopPanel extends JPanel {
         loadInitialData();
         for (int i = model.getRowCount() - 1; i >= 0; i--) {
             String s = model.getValueAt(i, 2).toString();
-            if (!s.equalsIgnoreCase(subject)) {
+            if (!s.toLowerCase().contains(subject.toLowerCase())) {
                 model.removeRow(i);
             }
         }

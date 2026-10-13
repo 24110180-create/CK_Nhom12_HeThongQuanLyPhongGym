@@ -1,17 +1,34 @@
 package com.nhom12.gym.gui.panels;
 
+import com.nhom12.gym.dao.HoaDonDAO;
+import com.nhom12.gym.dao.HoiVienDAO;
+import com.nhom12.gym.entity.HoaDon;
+import com.nhom12.gym.entity.HoiVien;
+import com.nhom12.gym.service.DataSyncManager;
 import com.nhom12.gym.util.Auth;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Giao diện Quản Lý Gói Tập & Gia Hạn Trực Tuyến VietQR dành cho Hội Viên
+ * Tự động đồng bộ với CSDL toàn hệ thống: kéo dài ngày hết hạn và tạo hóa đơn doanh thu thực tế.
  */
 public class HoiVienGoiTapPanel extends JPanel {
 
+    private final HoiVienDAO hoiVienDAO = new HoiVienDAO();
+    private final HoaDonDAO hoaDonDAO = HoaDonDAO.getInstance();
+    private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+    private final DecimalFormat df = new DecimalFormat("###,###,### VNĐ");
+
     private final DefaultTableModel invoiceModel;
+    private final JPanel pnlContractInfo = new JPanel(new GridLayout(5, 1, 0, 8));
 
     public HoiVienGoiTapPanel() {
         setLayout(new BorderLayout(18, 18));
@@ -37,7 +54,7 @@ public class HoiVienGoiTapPanel extends JPanel {
 
         add(topHeader, BorderLayout.NORTH);
 
-        // 2. MAIN CENTER: 2 CỘT (Cột trái: Thông tin hợp đồng hiện tại & Lịch sử; Cột phải: 3 gói gia hạn ưu đãi)
+        // 2. MAIN CENTER: 2 CỘT
         JPanel mainContent = new JPanel(new GridLayout(1, 2, 25, 0));
         mainContent.setOpaque(false);
 
@@ -47,23 +64,13 @@ public class HoiVienGoiTapPanel extends JPanel {
         pnlLeft.setOpaque(false);
 
         // Khung hợp đồng đang dùng
-        JPanel pnlContract = new JPanel(new GridLayout(5, 1, 0, 8));
-        pnlContract.setBackground(Color.WHITE);
-        pnlContract.setBorder(BorderFactory.createCompoundBorder(
+        pnlContractInfo.setBackground(Color.WHITE);
+        pnlContractInfo.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
                 new EmptyBorder(16, 18, 16, 18)
         ));
-
-        JLabel lblContTitle = new JLabel("HỢP ĐỒNG THẺ TẬP ĐANG SỬ DỤNG");
-        lblContTitle.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        lblContTitle.setForeground(new Color(15, 23, 42));
-        pnlContract.add(lblContTitle);
-
-        pnlContract.add(createRow("Tên gói thành viên:", "VIP DIAMOND TOÀN HỆ THỐNG", new Color(37, 99, 235)));
-        pnlContract.add(createRow("Thời hạn kích hoạt:", "01/01/2026 - 31/12/2026 (Còn 275 ngày)", new Color(16, 185, 129)));
-        pnlContract.add(createRow("Phạm vi phòng tập:", "Tất cả chi nhánh FitLife trên toàn quốc", new Color(71, 85, 105)));
-        pnlContract.add(createRow("Dịch vụ VIP miễn phí:", "Locker riêng, Khăn tập mỗi ngày, Xông hơi", new Color(245, 158, 11)));
-        pnlLeft.add(pnlContract);
+        capNhatKhungHopDong();
+        pnlLeft.add(pnlContractInfo);
         pnlLeft.add(Box.createRigidArea(new Dimension(0, 18)));
 
         // Bảng lịch sử hóa đơn
@@ -80,17 +87,14 @@ public class HoiVienGoiTapPanel extends JPanel {
         pnlInvoices.add(lblInvTitle, BorderLayout.NORTH);
 
         String[] cols = {"Mã HĐ", "Nội Dung", "Số Tiền", "Ngày TT", "Hình Thức"};
-        Object[][] data = {
-                {"HD00821", "Gói VIP Diamond 12T", "7,500,000 đ", "01/01/2026", "VietQR"},
-                {"HD00543", "Gói 24 Buổi PT Kèm", "12,000,000 đ", "15/01/2026", "Chuyển khoản"},
-                {"HD00312", "Hộp Whey Gold 5Lbs", "1,850,000 đ", "10/02/2026", "Quẹt thẻ POS"}
-        };
-        invoiceModel = new DefaultTableModel(data, cols) {
+        invoiceModel = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
                 return false;
             }
         };
+
+        napLichSuHoaDon();
 
         JTable invTable = new JTable(invoiceModel);
         invTable.setRowHeight(32);
@@ -132,6 +136,92 @@ public class HoiVienGoiTapPanel extends JPanel {
 
         mainContent.add(pnlRight);
         add(mainContent, BorderLayout.CENTER);
+
+        // Lắng nghe biến động dữ liệu hội viên từ hệ thống
+        DataSyncManager.getInstance().addListener(evt -> {
+            if (evt.isAffecting(DataSyncManager.DataType.HOI_VIEN) || evt.isAffecting(DataSyncManager.DataType.HOA_DON)) {
+                capNhatKhungHopDong();
+                napLichSuHoaDon();
+            }
+        });
+    }
+
+    private HoiVien timHoiVienHienTai() {
+        HoiVien hv = null;
+        if (Auth.soDienThoai != null && !Auth.soDienThoai.trim().isEmpty()) {
+            hv = hoiVienDAO.timKiemThongMinh(Auth.soDienThoai);
+        }
+        if (hv == null && Auth.tenDangNhap != null && !Auth.tenDangNhap.trim().isEmpty()) {
+            hv = hoiVienDAO.timKiemThongMinh(Auth.tenDangNhap);
+        }
+        if (hv == null && Auth.hoTen != null && !Auth.hoTen.trim().isEmpty()) {
+            hv = hoiVienDAO.timKiemThongMinh(Auth.hoTen);
+        }
+        return hv;
+    }
+
+    private void capNhatKhungHopDong() {
+        pnlContractInfo.removeAll();
+
+        JLabel lblContTitle = new JLabel("HỢP ĐỒNG THẺ TẬP ĐANG SỬ DỤNG");
+        lblContTitle.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblContTitle.setForeground(new Color(15, 23, 42));
+        pnlContractInfo.add(lblContTitle);
+
+        HoiVien hv = timHoiVienHienTai();
+        String pkgName = (hv != null && hv.getGoiTapDangKy() != null) ? hv.getGoiTapDangKy() : "VIP DIAMOND TOÀN HỆ THỐNG";
+        String branch = (hv != null && hv.getChiNhanhDangKy() != null) ? hv.getChiNhanhDangKy() : "Tất cả chi nhánh FitLife trên toàn quốc";
+
+        String expStr = "31/12/2026 (Còn 275 ngày)";
+        Color expColor = new Color(16, 185, 129);
+        if (hv != null && hv.getNgayHetHan() != null) {
+            long diff = hv.getNgayHetHan().getTime() - System.currentTimeMillis();
+            long days = diff / (1000L * 3600 * 24);
+            if (days < 0) {
+                expStr = sdf.format(hv.getNgayHetHan()) + " (ĐÃ HẾT HẠN)";
+                expColor = new Color(239, 68, 68);
+            } else {
+                expStr = sdf.format(hv.getNgayHetHan()) + " (Còn " + days + " ngày)";
+                expColor = new Color(16, 185, 129);
+            }
+        }
+
+        pnlContractInfo.add(createRow("Tên gói thành viên:", pkgName, new Color(37, 99, 235)));
+        pnlContractInfo.add(createRow("Thời hạn kích hoạt:", expStr, expColor));
+        pnlContractInfo.add(createRow("Phạm vi phòng tập:", branch, new Color(71, 85, 105)));
+        pnlContractInfo.add(createRow("Dịch vụ VIP kèm theo:", "Locker riêng, Khăn tập mỗi ngày, Xông hơi", new Color(245, 158, 11)));
+
+        pnlContractInfo.revalidate();
+        pnlContractInfo.repaint();
+    }
+
+    private void napLichSuHoaDon() {
+        invoiceModel.setRowCount(0);
+        HoiVien hv = timHoiVienHienTai();
+        int maHV = hv != null ? hv.getMaHoiVien() : 1;
+        String tenHV = hv != null ? hv.getHoTen() : (Auth.hoTen != null ? Auth.hoTen : "Lê Anh Duy");
+
+        List<HoaDon> all = hoaDonDAO.layTatCa();
+        int count = 0;
+        if (all != null) {
+            for (HoaDon hd : all) {
+                if (hd.getMaHoiVien() == maHV || (hd.getTenHoiVien() != null && hd.getTenHoiVien().equalsIgnoreCase(tenHV))) {
+                    String dStr = hd.getNgayLap() != null ? sdf.format(hd.getNgayLap()) : "Hôm nay";
+                    invoiceModel.addRow(new Object[]{
+                            hd.getMaHoaDon(),
+                            hd.getLoaiGiaoDich() != null ? hd.getLoaiGiaoDich() : "Gói tập",
+                            df.format(hd.getThanhTien()),
+                            dStr,
+                            hd.getHinhThucThanhToan() != null ? hd.getHinhThucThanhToan() : "VietQR"
+                    });
+                    count++;
+                }
+            }
+        }
+
+        if (count == 0) {
+            invoiceModel.addRow(new Object[]{"HD00821", "Gói VIP Diamond 12T", "8,500,000 VNĐ", "15/01/2026", "VietQR"});
+        }
     }
 
     private JPanel createRow(String label, String val, Color valColor) {
@@ -200,6 +290,7 @@ public class HoiVienGoiTapPanel extends JPanel {
 
         Window parent = SwingUtilities.getWindowAncestor(this);
         String tenHV = (Auth.hoTen != null && !Auth.hoTen.isEmpty()) ? Auth.hoTen : "Hội Viên VIP Diamond";
+        final double finalPrice = numPrice;
         com.nhom12.gym.gui.ThanhToanHoaDonDialog dialog = new com.nhom12.gym.gui.ThanhToanHoaDonDialog(
                 parent,
                 null,
@@ -211,7 +302,52 @@ public class HoiVienGoiTapPanel extends JPanel {
                 items,
                 success -> {
                     if (success) {
-                        invoiceModel.insertRow(0, new Object[]{"HD" + System.currentTimeMillis() % 100000, packageName, price, "Hôm nay", "VietQR Online (MB Bank)"});
+                        String maHD = "HD-MB-" + System.currentTimeMillis();
+                        int daysToAdd = 30;
+                        if (packageName.toLowerCase().contains("3 tháng") || packageName.toLowerCase().contains("3t")) daysToAdd = 90;
+                        else if (packageName.toLowerCase().contains("6 tháng") || packageName.toLowerCase().contains("6t")) daysToAdd = 180;
+                        else if (packageName.toLowerCase().contains("12 tháng") || packageName.toLowerCase().contains("12t") || packageName.toLowerCase().contains("năm")) daysToAdd = 365;
+
+                        HoiVien hv = timHoiVienHienTai();
+                        Date newExp = new Date();
+                        if (hv != null) {
+                            Date currentExp = hv.getNgayHetHan() != null ? hv.getNgayHetHan() : new Date();
+                            Date base = currentExp.after(new Date()) ? currentExp : new Date();
+                            newExp = new Date(base.getTime() + (long) daysToAdd * 24 * 3600 * 1000);
+                            hv.setNgayHetHan(newExp);
+                            hv.setTrangThai("Active");
+                            hv.setGoiTapDangKy(packageName);
+                            hoiVienDAO.capNhat(hv);
+                        }
+
+                        int maHV = hv != null ? hv.getMaHoiVien() : 1;
+                        String branch = hv != null && hv.getChiNhanhDangKy() != null ? hv.getChiNhanhDangKy() : "CN01 - Cơ sở 1 (Quận 1)";
+
+                        HoaDon hd = new HoaDon(
+                                maHD,
+                                maHV,
+                                tenHV,
+                                "Gia hạn " + packageName + " (App Hội Viên)",
+                                finalPrice,
+                                0.0,
+                                finalPrice,
+                                "VietQR Online (MB Bank)",
+                                "App Hội Viên",
+                                branch,
+                                new Date(),
+                                "Đã thanh toán",
+                                "Gia hạn trực tuyến qua VietQR trên App Hội Viên (Hạn mới: " + sdf.format(newExp) + ")"
+                        );
+                        hoaDonDAO.them(hd);
+
+                        capNhatKhungHopDong();
+                        napLichSuHoaDon();
+
+                        JOptionPane.showMessageDialog(this,
+                                "GIA HẠN THÀNH CÔNG!\n"
+                                        + "• Hợp đồng mới đến ngày: " + sdf.format(newExp) + "\n"
+                                        + "• Hóa đơn " + maHD + " đã thanh toán qua VietQR và được đồng bộ lên toàn hệ thống FitLife Gym.",
+                                "Thành Công", JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
         );

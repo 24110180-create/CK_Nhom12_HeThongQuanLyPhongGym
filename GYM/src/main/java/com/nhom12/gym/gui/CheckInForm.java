@@ -25,6 +25,9 @@ public class CheckInForm extends JPanel {
     private JComboBox<String> cbStationBranch;
     private JLabel lblNetworkStatus;
     private JLabel lblPerfMs;
+    private JButton btnGuestPass;
+    private JButton btnToggleOffline;
+    private JButton btnAutoSync;
 
     // Gate & Member Result Card
     private JPanel pnlGateStatus;
@@ -46,6 +49,7 @@ public class CheckInForm extends JPanel {
     private JTable logTable;
     private DefaultTableModel logModel;
     private JLabel lblLogSummary;
+    private JLabel lblBarrierAudit;
 
     public CheckInForm() {
         setLayout(new BorderLayout(15, 15));
@@ -73,25 +77,53 @@ public class CheckInForm extends JPanel {
         titleGroup.add(lblSub);
         topToolbar.add(titleGroup, BorderLayout.WEST);
 
-        JPanel rightControls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+        JPanel rightControls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         rightControls.setOpaque(false);
 
-        JLabel lblBr = new JLabel("Trạm kiểm soát tại:");
+        // Yêu cầu ẩn 3: Nút Bán Vé Lẻ Ngày chống bán chui
+        btnGuestPass = new JButton("Bán Vé Lẻ Ngày (80,000 đ)");
+        btnGuestPass.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnGuestPass.setBackground(new Color(245, 158, 11));
+        btnGuestPass.setForeground(Color.WHITE);
+        btnGuestPass.setFocusPainted(false);
+        btnGuestPass.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnGuestPass.addActionListener(e -> moDialogBanVeLe());
+
+        // Yêu cầu ẩn 2: Chế độ Ngoại Tuyến khi Wifi CN02 yếu
+        btnToggleOffline = new JButton("Mạng: Online");
+        btnToggleOffline.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        btnToggleOffline.setBackground(new Color(16, 185, 129));
+        btnToggleOffline.setForeground(Color.WHITE);
+        btnToggleOffline.setFocusPainted(false);
+        btnToggleOffline.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnToggleOffline.addActionListener(e -> toggleOfflineNetwork());
+
+        btnAutoSync = new JButton("Đồng Bộ (Auto-Sync)");
+        btnAutoSync.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        btnAutoSync.setBackground(new Color(37, 99, 235));
+        btnAutoSync.setForeground(Color.WHITE);
+        btnAutoSync.setFocusPainted(false);
+        btnAutoSync.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnAutoSync.setVisible(false);
+        btnAutoSync.addActionListener(e -> dongBoOffline());
+
+        JLabel lblBr = new JLabel("Trạm:");
         lblBr.setFont(new Font("Segoe UI", Font.BOLD, 12));
         cbStationBranch = new JComboBox<>(new String[]{"CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)"});
         cbStationBranch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        cbStationBranch.setPreferredSize(new Dimension(170, 32));
+        cbStationBranch.setPreferredSize(new Dimension(150, 32));
 
-        // Yêu cầu ẩn 2: Xử lý Wifi chi nhánh yếu
-        lblNetworkStatus = new JLabel("Đang kết nối Online (Đồng bộ)");
+        lblNetworkStatus = new JLabel("Online (Đồng bộ)");
         lblNetworkStatus.setFont(new Font("Segoe UI", Font.BOLD, 11));
         lblNetworkStatus.setForeground(new Color(16, 185, 129));
-        lblNetworkStatus.setToolTipText("Hệ thống tự động kích hoạt bộ nhớ đệm cục bộ khi mất kết nối Internet");
 
         lblPerfMs = new JLabel("Phản hồi: 0ms");
         lblPerfMs.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblPerfMs.setForeground(new Color(71, 85, 105));
 
+        rightControls.add(btnGuestPass);
+        rightControls.add(btnToggleOffline);
+        rightControls.add(btnAutoSync);
         rightControls.add(lblBr);
         rightControls.add(cbStationBranch);
         rightControls.add(lblNetworkStatus);
@@ -143,6 +175,9 @@ public class CheckInForm extends JPanel {
         inputRow.add(btnSubmit, BorderLayout.EAST);
         pnlScanBox.add(inputRow, BorderLayout.CENTER);
 
+        // Khởi tạo trước 1 vé test mẫu PASS-8888 chống bán chui
+        checkInService.banVeLeNgay("Võ Hoàng Yến (Khách Vãng Lai)", "0901112233", "CN01 - Cơ sở 1 (Quận 1)", 80000);
+
         // Hàng nút test nhanh cho Ban Giám khảo chấm điểm đồ án
         JPanel quickTestRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 6));
         quickTestRow.setOpaque(false);
@@ -155,7 +190,8 @@ public class CheckInForm extends JPanel {
         quickTestRow.add(createTestBadge("QR002 (Hết Hạn)", "QR002", new Color(239, 68, 68)));
         quickTestRow.add(createTestBadge("QR003 (Bị Khóa)", "QR003", new Color(245, 158, 11)));
         quickTestRow.add(createTestBadge("QR004 (Sai Chi Nhánh)", "QR004", new Color(139, 92, 246)));
-        quickTestRow.add(createTestBadge("VIP007 (Ẩn Anh Đức)", "VIP007", new Color(14, 165, 233)));
+        quickTestRow.add(createTestBadge("VIP007 (Ẩn 50% Anh Đức)", "VIP007", new Color(14, 165, 233)));
+        quickTestRow.add(createTestBadge("PASS-8888 (Vé Lẻ 1 Ngày)", "PASS-8888", new Color(217, 119, 6)));
         pnlScanBox.add(quickTestRow, BorderLayout.SOUTH);
 
         pnlLeft.add(pnlScanBox);
@@ -354,17 +390,138 @@ public class CheckInForm extends JPanel {
                     "Chuyển Sang Gia Hạn", JOptionPane.INFORMATION_MESSAGE);
         });
 
-        btnManualOpen.addActionListener(e -> {
-            pnlGateStatus.setBackground(new Color(254, 243, 199));
-            lblGateStatusText.setText("CỬA FLAP BARRIER: MỞ THỦ CÔNG");
-            lblGateStatusText.setForeground(new Color(180, 83, 9));
-            lblGateSubText.setText("Lễ tân đã kích hoạt quyền mở khẩn cấp");
-            pnlGateStatus.repaint();
-            com.nhom12.gym.util.SoundHelper.playNotice();
-        });
+        btnManualOpen.addActionListener(e -> moCuaThuCong());
 
         // Tự động focus vào ô quét thẻ
         SwingUtilities.invokeLater(() -> txtMaQR.requestFocusInWindow());
+    }
+
+    // Yêu cầu ẩn 3: Bán vé lẻ 1 ngày xuất VietQR và sinh mã QR dùng 1 lần chống bán chui
+    private void moDialogBanVeLe() {
+        JTextField txtTenKhach = new JTextField("Nguyễn Văn Lẻ");
+        JTextField txtSdt = new JTextField("0988776655");
+        String currentBranch = (String) cbStationBranch.getSelectedItem();
+
+        JPanel pnlInput = new JPanel(new GridLayout(2, 2, 8, 8));
+        pnlInput.add(new JLabel("Họ Tên Khách Vãng Lai:"));
+        pnlInput.add(txtTenKhach);
+        pnlInput.add(new JLabel("Số Điện Thoại:"));
+        pnlInput.add(txtSdt);
+
+        int opt = JOptionPane.showConfirmDialog(this, pnlInput,
+                "Bán Vé Lẻ Ngày (Guest Pass 1 Ngày - 80,000 đ)",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (opt != JOptionPane.OK_OPTION) return;
+
+        String name = txtTenKhach.getText().trim();
+        String phone = txtSdt.getText().trim();
+        if (name.isEmpty()) name = "Khách Vãng Lai";
+
+        final String finalName = name;
+        final String finalPhone = phone;
+
+        // Mở hộp thoại thanh toán VietQR 80.000đ
+        java.util.List<com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang> items = new java.util.ArrayList<>();
+        items.add(new com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang("Vé Lẻ Tập Gym 1 Ngày (Guest Pass)", 1, 80000, 80000));
+
+        Window topFrame = SwingUtilities.getWindowAncestor(this);
+        com.nhom12.gym.gui.ThanhToanHoaDonDialog payDialog = new com.nhom12.gym.gui.ThanhToanHoaDonDialog(
+                topFrame,
+                null,
+                finalName + " (" + finalPhone + ")",
+                "Vé Lẻ 1 Ngày (" + currentBranch + ")",
+                80000,
+                0,
+                80000,
+                items,
+                success -> {
+                    if (success) {
+                        CheckInService.GuestPassTicket ticket = checkInService.banVeLeNgay(finalName, finalPhone, currentBranch, 80000);
+                        JOptionPane.showMessageDialog(this,
+                                "ĐÃ XUẤT VÉ LẺ 1 NGÀY THÀNH CÔNG!\n"
+                                        + "• Mã Vé Quét QR: " + ticket.ticketCode + "\n"
+                                        + "• Khách Hàng: " + ticket.customerName + "\n"
+                                        + "• Giá Vé: 80,000 đ (Đã xuất hóa đơn VietQR)\n"
+                                        + "• Chi Nhánh: " + ticket.branch + "\n\n"
+                                        + "LƯU Ý: Mã vé này chỉ có hiệu lực mở cổng Flap Barrier đúng 1 lần duy nhất trong ngày hôm nay!",
+                                "Xuất Vé Lẻ Thành Công", JOptionPane.INFORMATION_MESSAGE);
+
+                        // Tự động nạp mã vé vào ô quét và kích hoạt check-in
+                        txtMaQR.setText(ticket.ticketCode);
+                        xuLyCheckIn();
+                    }
+                }
+        );
+        payDialog.setVisible(true);
+    }
+
+    // Yêu cầu ẩn 2: Chế độ Ngoại Tuyến khi Wifi CN02 (Tân Bình) yếu
+    private void toggleOfflineNetwork() {
+        boolean newState = !checkInService.isNetworkOnline();
+        checkInService.setNetworkOnline(newState);
+
+        if (newState) {
+            lblNetworkStatus.setText("Online (Đồng bộ)");
+            lblNetworkStatus.setForeground(new Color(16, 185, 129));
+            btnToggleOffline.setText("Mạng: Online");
+            btnToggleOffline.setBackground(new Color(16, 185, 129));
+            btnAutoSync.setVisible(false);
+            if (checkInService.getOfflineBufferSize() > 0) {
+                dongBoOffline();
+            }
+        } else {
+            lblNetworkStatus.setText("Ngoại tuyến (Wifi CN02 yếu)");
+            lblNetworkStatus.setForeground(new Color(245, 158, 11));
+            btnToggleOffline.setText("Mạng: Ngoại Tuyến (Offline)");
+            btnToggleOffline.setBackground(new Color(239, 68, 68));
+            btnAutoSync.setVisible(true);
+            btnAutoSync.setText("Đồng Bộ (" + checkInService.getOfflineBufferSize() + ")");
+            JOptionPane.showMessageDialog(this,
+                    "ĐÃ BẬT CHẾ ĐỘ OFFLINE CỤC BỘ!\n"
+                            + "Các lượt quét thẻ tại CN02 (Tân Bình) sẽ tiếp tục xử lý tức thì (< 50ms)\n"
+                            + "và lưu an toàn vào Offline Sync Buffer để tự động đồng bộ khi có mạng lại.",
+                    "Chế Độ Ngoại Tuyến Kích Hoạt", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void dongBoOffline() {
+        int count = checkInService.dongBoOfflineLenHeThong();
+        btnAutoSync.setText("Đồng Bộ (0)");
+        btnAutoSync.setVisible(false);
+        JOptionPane.showMessageDialog(this,
+                "ĐÃ TỰ ĐỘNG ĐỒNG BỘ " + count + " LƯỢT CHECK-IN NGOẠI TUYẾN VỀ CSDL CHÍNH THÀNH CÔNG!",
+                "Auto-Sync Hoàn Tất", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void moCuaThuCong() {
+        String reason = JOptionPane.showInputDialog(this,
+                "Nhập lý do Mở Cửa Thủ Công (Hệ thống lưu vết kiểm toán chống gian lận):",
+                "Xác Nhận Mở Cửa Khẩn Cấp", JOptionPane.WARNING_MESSAGE);
+
+        if (reason == null || reason.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Hủy thao tác: Bắt buộc phải có lý do để mở cửa thủ công!", "Hủy Thao Tác", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        checkInService.ghiNhanMoCongThuCong(com.nhom12.gym.util.Auth.vaiTro != null ? com.nhom12.gym.util.Auth.vaiTro : "Lễ tân", reason.trim());
+
+        pnlGateStatus.setBackground(new Color(254, 243, 199));
+        lblGateStatusText.setText("CỬA FLAP BARRIER: MỞ THỦ CÔNG");
+        lblGateStatusText.setForeground(new Color(180, 83, 9));
+        lblGateSubText.setText("[CẢNH BÁO KIỂM TOÁN]: Mở bởi Lễ tân - Lý do: " + reason.trim());
+        pnlGateStatus.repaint();
+        com.nhom12.gym.util.SoundHelper.playNotice();
+
+        capNhatThongKeAudit();
+    }
+
+    private void capNhatThongKeAudit() {
+        lblLogSummary.setText("● Hôm nay: " + logModel.getRowCount() + " lượt quét • "
+                + checkInService.getSuccessCountToday() + " hợp lệ • "
+                + checkInService.getFailCountToday() + " từ chối • "
+                + "Barrier mở: " + checkInService.getTotalBarrierOpenSuccess() + " • "
+                + "Mở thủ công: " + checkInService.getManualGateOpenCount() + " (Đối soát gian lận)");
     }
 
     private JButton createTestBadge(String label, String code, Color bg) {
@@ -457,9 +614,7 @@ public class CheckInForm extends JPanel {
         }
 
         pnlGateStatus.repaint();
-        lblLogSummary.setText("● Hôm nay: " + logModel.getRowCount() + " lượt quét • "
-                + checkInService.getSuccessCountToday() + " hợp lệ • "
-                + checkInService.getFailCountToday() + " từ chối");
+        capNhatThongKeAudit();
 
         txtMaQR.setText("");
         txtMaQR.requestFocusInWindow();

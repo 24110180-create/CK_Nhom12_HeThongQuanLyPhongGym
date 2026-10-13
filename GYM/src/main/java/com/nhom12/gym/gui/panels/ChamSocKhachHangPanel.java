@@ -118,7 +118,7 @@ public class ChamSocKhachHangPanel extends JPanel {
         txtMessage.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         txtMessage.setLineWrap(true);
         txtMessage.setWrapStyleWord(true);
-        txtMessage.setText("FitLife Gym thông báo: Gói tập của quý khách sắp hết hạn trong vài ngày tới.\nHiện đang có ưu đãi GIẢM 20% khi gia hạn ngay hôm nay (Mã ưu đãi: SUMMER26).\nVui lòng liên hệ quầy Lễ tân hoặc Hotline 1900 1234 để được hỗ trợ.\nTrân trọng cảm ơn quý khách!");
+        txtMessage.setText("FitLife GYM thông báo: Gói tập của quý khách sắp hết hạn trong vài ngày tới.\nVui lòng liên hệ quầy Lễ tân hoặc Hotline 1900 1234 để được hỗ trợ gia hạn và tư vấn lịch tập.\nTrân trọng cảm ơn quý khách!");
         rightPanel.add(new JScrollPane(txtMessage), BorderLayout.CENTER);
 
         JPanel btnPanel = new JPanel(new GridLayout(1, 2, 10, 0));

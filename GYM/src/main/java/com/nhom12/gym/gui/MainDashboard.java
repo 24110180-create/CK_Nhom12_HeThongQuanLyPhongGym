@@ -135,7 +135,7 @@ public class MainDashboard extends JFrame {
         p2.items.add(new OwnerModuleItem("Quầy Bán Hàng POS", "Bán nước giải khát, whey, đồ tập", () -> new BanHangPOSPanel()));
         p2.items.add(new OwnerModuleItem("Quản Lý Kho Hàng", "Kiểm kê xuất nhập tồn kho", () -> new QuanLyKhoHangPanel()));
         p2.items.add(new OwnerModuleItem("Quản Lý Tủ Locker", "Tủ đồ cá nhân thông minh", () -> new QuanLyLockerPanel()));
-        p2.items.add(new OwnerModuleItem("Quản Lý Khuyến Mãi", "Mã khuyến mãi & chiết khấu", () -> new QuanLyKhuyenMaiPanel()));
+        p2.items.add(new OwnerModuleItem("Kiểm Soát & Yêu Cầu Ẩn", "Bảo mật VIP 50% • Offline CN02 • Chống bán chui", () -> new QuanLyKhuyenMaiPanel()));
         p2.items.add(new OwnerModuleItem("Chăm Sóc Khách Hàng", "Nhắc hạn tự động Zalo/SMS", () -> new ChamSocKhachHangPanel()));
         p2.items.add(new OwnerModuleItem("Khảo Sát & Phản Hồi", "Khảo sát ý kiến hội viên", () -> new QuanLyPhanHoiPanel()));
         ownerPillars.add(p2);

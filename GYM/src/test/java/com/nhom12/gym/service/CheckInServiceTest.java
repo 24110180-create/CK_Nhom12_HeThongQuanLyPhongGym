@@ -103,4 +103,65 @@ public class CheckInServiceTest {
         CheckInService.CheckInResult res = checkInService.thucHienCheckIn("TUAN", "CN01 - Quận 1");
         assertTrue(res.responseTimeMs < 200, "Thời gian xử lý check-in phải dưới 200ms để không gây nghẽn flap barrier (thực tế: " + res.responseTimeMs + "ms)");
     }
+
+    @Test
+    @DisplayName("Yêu Cầu Ẩn 3: Vé lẻ 1 ngày (Guest Pass) - Mở cổng 1 lần duy nhất và chặn vào chui lần 2")
+    void testYeuCauAn3_VeLeMotNgay_GuestPass() {
+        CheckInService.GuestPassTicket ticket = checkInService.banVeLeNgay("Khách Kiểm Thử", "0909123456", "CN01 - Cơ sở 1 (Quận 1)", 80000);
+        assertNotNull(ticket);
+        assertTrue(ticket.ticketCode.startsWith("PASS-"));
+
+        // Lần 1: Quét mã vé lẻ hợp lệ -> Cửa Flap Barrier mở
+        CheckInService.CheckInResult res1 = checkInService.thucHienCheckIn(ticket.ticketCode, "CN01 - Cơ sở 1 (Quận 1)");
+        assertTrue(res1.success, "Vé lẻ 1 ngày hợp lệ phải mở cửa được");
+        assertEquals("OPEN", res1.gateStatus);
+
+        // Lần 2: Quét lại mã vé lẻ đã dùng -> Phải bị từ chối chống bán chui / vào chui
+        CheckInService.CheckInResult res2 = checkInService.thucHienCheckIn(ticket.ticketCode, "CN01 - Cơ sở 1 (Quận 1)");
+        assertFalse(res2.success, "Vé lẻ đã sử dụng không được phép mở cửa lần thứ 2");
+        assertEquals("LOCKED", res2.gateStatus);
+        assertTrue(res2.lyDoTuChoi.contains("đã sử dụng") || res2.message.contains("ĐÃ SỬ DỤNG"));
+    }
+
+    @Test
+    @DisplayName("Yêu Cầu Ẩn 2: Wifi CN02 yếu - Đệm ngoại tuyến OfflineSyncBuffer và Auto-Sync khi có mạng")
+    void testYeuCauAn2_OfflineBufferVaAutoSync() {
+        // Mô phỏng mất mạng tại CN02 (Tân Bình)
+        checkInService.setNetworkOnline(false);
+        assertFalse(checkInService.isNetworkOnline());
+
+        int initialBuffer = checkInService.getOfflineBufferSize();
+        CheckInService.CheckInResult res = checkInService.thucHienCheckIn("TUAN", "CN02 - Cơ sở 2 (Tân Bình)");
+        assertTrue(res.success, "Chế độ offline vẫn phải check-in thành công");
+        assertEquals(initialBuffer + 1, checkInService.getOfflineBufferSize(), "Phải đệm vào OfflineSyncBuffer");
+
+        // Khôi phục mạng và tự động đồng bộ (Auto-Sync)
+        checkInService.setNetworkOnline(true);
+        int synced = checkInService.dongBoOfflineLenHeThong();
+        assertTrue(synced >= 1, "Phải đồng bộ thành công các bản ghi trong hàng đợi");
+        assertEquals(0, checkInService.getOfflineBufferSize(), "Hàng đợi đệm phải được xóa sạch sau khi sync");
+    }
+
+    @Test
+    @DisplayName("Yêu Cầu Ẩn 1: VIP 50% Anh Đức - Lễ tân hoàn toàn không thấy giá gốc & không thấy chiết khấu 50%")
+    void testYeuCauAn1_VipPolicyService_BaoMatGiaThuc() {
+        VipPolicyService vipService = VipPolicyService.getInstance();
+        double giaGoc = 6000000; // Gói 12 tháng 6.000.000 đ
+
+        // Lễ tân tra cứu khách VIP của Anh Đức (Đỗ Minh Trí - VIP007)
+        VipPolicyService.ThongTinGiaHienThi infoLeTan = vipService.tinhGiaTheoPhanQuyen("Lễ tân", "0909998877", "Đỗ Minh Trí", "VIP007", giaGoc);
+        assertTrue(infoLeTan.isVipDacQuyen);
+        assertEquals(3000000, infoLeTan.soTienThucThu, "Số tiền thực thu phải là 50% (3 triệu)");
+        assertEquals(3000000, infoLeTan.giaGoc, "Giá gốc hiển thị cho Lễ tân phải bị tráo thành giá thực thu để giấu giá thực!");
+        assertEquals(0, infoLeTan.soTienGiam, "Số tiền giảm hiển thị cho Lễ tân phải bằng 0 để giấu dòng chiết khấu");
+        assertFalse(infoLeTan.choPhepNhanVienThayGiaGoc, "Phải chặn quyền xem giá gốc đối với Lễ tân");
+
+        // Chủ phòng tập (Anh Đức) tra cứu
+        VipPolicyService.ThongTinGiaHienThi infoChu = vipService.tinhGiaTheoPhanQuyen("Chủ", "0909998877", "Đỗ Minh Trí", "VIP007", giaGoc);
+        assertTrue(infoChu.isVipDacQuyen);
+        assertEquals(6000000, infoChu.giaGoc, "Chủ phải thấy đầy đủ giá niêm yết gốc 6 triệu");
+        assertEquals(3000000, infoChu.soTienGiam, "Chủ phải thấy rõ chiết khấu 3 triệu");
+        assertEquals(3000000, infoChu.soTienThucThu, "Chủ phải thấy rõ số tiền thực thu");
+        assertTrue(infoChu.choPhepNhanVienThayGiaGoc);
+    }
 }

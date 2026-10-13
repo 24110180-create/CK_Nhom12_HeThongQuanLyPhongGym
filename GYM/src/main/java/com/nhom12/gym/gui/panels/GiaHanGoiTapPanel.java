@@ -6,6 +6,7 @@ import com.nhom12.gym.dao.HoiVienDAO;
 import com.nhom12.gym.entity.GoiTap;
 import com.nhom12.gym.entity.HoaDon;
 import com.nhom12.gym.entity.HoiVien;
+import com.nhom12.gym.service.VipPolicyService;
 import com.nhom12.gym.util.Auth;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -47,8 +48,7 @@ public class GiaHanGoiTapPanel extends JPanel {
     private JComboBox<String> cbGoi;
     private JTextField txtNgay;
     private JComboBox<String> cbThanhToan;
-    private JTextField txtVoucher;
-    private JButton btnApplyVoucher;
+    private JLabel lblVipPolicyNotice;
     private JLabel lblThanhTien;
 
     private JButton btnCancel;
@@ -57,7 +57,6 @@ public class GiaHanGoiTapPanel extends JPanel {
     // Hội viên đang được chọn thực tế từ hệ thống
     private HoiVien currentHoiVien = null;
     private long basePrice = 2500000;
-    private int discountPercent = 0;
 
     public GiaHanGoiTapPanel() {
         this.setLayout(new BorderLayout(15, 15));
@@ -173,26 +172,20 @@ public class GiaHanGoiTapPanel extends JPanel {
         cbThanhToan.setFont(fontInput);
         formPanel.add(cbThanhToan, gbc);
 
-        // Voucher Coupon
+        // VIP Policy Notice (Yêu Cầu Ẩn 1: Bảo mật giá thực với Lễ tân)
         r++; gbc.gridx = 0; gbc.gridy = r; gbc.weightx = 0.25;
-        JLabel lVoucher = new JLabel("Mã Ưu Đãi / Voucher:"); lVoucher.setFont(fontLabel);
-        formPanel.add(lVoucher, gbc);
+        JLabel lPolicy = new JLabel("Chính Sách Khách Hàng:"); lPolicy.setFont(fontLabel);
+        formPanel.add(lPolicy, gbc);
 
         gbc.gridx = 1; gbc.weightx = 0.75;
-        JPanel vSub = new JPanel(new BorderLayout(8, 0));
-        vSub.setOpaque(false);
-        txtVoucher = new JTextField("SUMMER26");
-        txtVoucher.setFont(fontInput);
-        btnApplyVoucher = new JButton("Áp Dụng Mã");
-        btnApplyVoucher.setBackground(new Color(245, 158, 11));
-        btnApplyVoucher.setForeground(Color.WHITE);
-        vSub.add(txtVoucher, BorderLayout.CENTER);
-        vSub.add(btnApplyVoucher, BorderLayout.EAST);
-        formPanel.add(vSub, gbc);
+        lblVipPolicyNotice = new JLabel("Hội phí tiêu chuẩn niêm yết");
+        lblVipPolicyNotice.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        lblVipPolicyNotice.setForeground(new Color(100, 116, 139));
+        formPanel.add(lblVipPolicyNotice, gbc);
 
         // Total Cost Display
         r++; gbc.gridx = 0; gbc.gridy = r; gbc.weightx = 0.25;
-        JLabel lTotal = new JLabel("Thành Tiền Sau Giảm:"); lTotal.setFont(fontLabel);
+        JLabel lTotal = new JLabel("Thành Tiền Thanh Toán:"); lTotal.setFont(fontLabel);
         formPanel.add(lTotal, gbc);
 
         gbc.gridx = 1; gbc.weightx = 0.75;
@@ -231,7 +224,6 @@ public class GiaHanGoiTapPanel extends JPanel {
         btnSearch.addActionListener(e -> actionSearch());
         txtSearch.addActionListener(e -> actionSearch());
         cbGoi.addActionListener(e -> updatePrice());
-        btnApplyVoucher.addActionListener(e -> applyVoucher());
         btnCancel.addActionListener(e -> resetForm());
         btnConfirm.addActionListener(e -> confirmRenewal());
 
@@ -296,6 +288,8 @@ public class GiaHanGoiTapPanel extends JPanel {
             lblCurrentStatus.setText("Chưa kích hoạt hạn thẻ");
             lblCurrentStatus.setForeground(new Color(245, 158, 11));
         }
+
+        updatePrice();
     }
 
     private void actionSearch() {
@@ -336,26 +330,25 @@ public class GiaHanGoiTapPanel extends JPanel {
             basePrice = 500000;
         }
 
-        long finalPrice = basePrice - (basePrice * discountPercent / 100);
-        lblThanhTien.setText(df.format(finalPrice));
-    }
+        String sdt = currentHoiVien != null ? currentHoiVien.getSoDienThoai() : "";
+        String hoTen = currentHoiVien != null ? currentHoiVien.getHoTen() : "";
+        String maQR = currentHoiVien != null ? currentHoiVien.getMaTheQR() : "";
+        String currentRole = Auth.vaiTro != null ? Auth.vaiTro : "Lễ tân";
 
-    private void applyVoucher() {
-        String code = txtVoucher.getText().trim();
-        if ("SUMMER26".equalsIgnoreCase(code)) {
-            discountPercent = 20;
-            JOptionPane.showMessageDialog(this, "Áp dụng thành công Voucher SUMMER26: Giảm 20%!", "Khuyến Mãi", JOptionPane.INFORMATION_MESSAGE);
-        } else if ("VIPMEMBER".equalsIgnoreCase(code)) {
-            discountPercent = 30;
-            JOptionPane.showMessageDialog(this, "Áp dụng thành công Voucher VIPMEMBER: Giảm 30%!", "Khuyến Mãi", JOptionPane.INFORMATION_MESSAGE);
-        } else if (code.isEmpty()) {
-            discountPercent = 0;
-            JOptionPane.showMessageDialog(this, "Đã hủy áp dụng mã voucher.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            discountPercent = 0;
-            JOptionPane.showMessageDialog(this, "Mã voucher không hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        VipPolicyService.ThongTinGiaHienThi giaInfo = VipPolicyService.getInstance().tinhGiaTheoPhanQuyen(
+                currentRole, sdt, hoTen, maQR, basePrice);
+
+        lblThanhTien.setText(df.format(giaInfo.soTienThucThu));
+
+        if (lblVipPolicyNotice != null) {
+            if (giaInfo.isVipDacQuyen) {
+                lblVipPolicyNotice.setText(giaInfo.moTaGiaHienThi);
+                lblVipPolicyNotice.setForeground(new Color(16, 185, 129));
+            } else {
+                lblVipPolicyNotice.setText("Hội phí tiêu chuẩn niêm yết");
+                lblVipPolicyNotice.setForeground(new Color(100, 116, 139));
+            }
         }
-        updatePrice();
     }
 
     private void confirmRenewal() {
@@ -387,12 +380,23 @@ public class GiaHanGoiTapPanel extends JPanel {
         String newExpire = sdf.format(newExpireDate);
 
         // Cập nhật thực tế cho Hội Viên
-        long finalPrice = basePrice - (basePrice * discountPercent / 100);
+        String sdt = currentHoiVien.getSoDienThoai();
+        String hoTen = currentHoiVien.getHoTen();
+        String maQR = currentHoiVien.getMaTheQR();
+        String currentRole = Auth.vaiTro != null ? Auth.vaiTro : "Lễ tân";
+
+        VipPolicyService.ThongTinGiaHienThi giaInfo = VipPolicyService.getInstance().tinhGiaTheoPhanQuyen(
+                currentRole, sdt, hoTen, maQR, basePrice);
+
+        double displayGiaGoc = giaInfo.giaGoc;
+        double displayGiamGia = giaInfo.soTienGiam;
+        double finalPrice = giaInfo.soTienThucThu;
+
         String maHD = "HD" + (System.currentTimeMillis() % 1000000);
-        String pkgName = cbGoi.getSelectedItem().toString();
+        String pkgName = cbGoi.getSelectedItem() != null ? cbGoi.getSelectedItem().toString() : "Gói tập";
 
         java.util.List<com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang> items = new java.util.ArrayList<>();
-        items.add(new com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang("Gia hạn " + pkgName + " (Hạn mới: " + newExpire + ")", 1, basePrice, finalPrice));
+        items.add(new com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang("Gia hạn " + pkgName + " (Hạn mới: " + newExpire + ")", 1, displayGiaGoc, finalPrice));
 
         Window parent = SwingUtilities.getWindowAncestor(this);
         com.nhom12.gym.gui.ThanhToanHoaDonDialog dialog = new com.nhom12.gym.gui.ThanhToanHoaDonDialog(
@@ -400,14 +404,15 @@ public class GiaHanGoiTapPanel extends JPanel {
                 maHD,
                 currentHoiVien.getHoTen() + " (" + currentHoiVien.getMaTheQR() + ")",
                 "Gia hạn " + pkgName,
-                basePrice,
-                basePrice * discountPercent / 100,
+                displayGiaGoc,
+                displayGiamGia,
                 finalPrice,
                 items,
                 success -> {
                     if (success) {
                         currentHoiVien.setNgayHetHan(newExpireDate);
-                        currentHoiVien.setTrangThai("Active");
+                        currentHoiVien.setTrangThai("Hoạt động");
+                        currentHoiVien.setSoTienDaThanhToan(finalPrice);
                         hoiVienDAO.capNhat(currentHoiVien);
                         displayMember(currentHoiVien);
                     }
@@ -418,8 +423,6 @@ public class GiaHanGoiTapPanel extends JPanel {
 
     private void resetForm() {
         txtSearch.setText("");
-        txtVoucher.setText("");
-        discountPercent = 0;
         cbGoi.setSelectedIndex(0);
         cbThanhToan.setSelectedIndex(0);
         txtNgay.setText(sdf.format(new Date()));

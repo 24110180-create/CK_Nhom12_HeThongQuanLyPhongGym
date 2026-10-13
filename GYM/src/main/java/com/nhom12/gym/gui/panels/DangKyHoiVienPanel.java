@@ -1,12 +1,13 @@
 package com.nhom12.gym.gui.panels;
 
 import com.nhom12.gym.gui.GuiMaQRDialog;
-
 import com.nhom12.gym.dao.GoiTapDAO;
 import com.nhom12.gym.dao.HoiVienDAO;
 import com.nhom12.gym.entity.GoiTap;
 import com.nhom12.gym.entity.HoiVien;
 import com.nhom12.gym.entity.TaiKhoan;
+import com.nhom12.gym.service.VipPolicyService;
+import com.nhom12.gym.util.Auth;
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -15,6 +16,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 public class DangKyHoiVienPanel extends JPanel {
     private final HoiVienDAO hoiVienDAO = new HoiVienDAO();
@@ -35,13 +38,11 @@ public class DangKyHoiVienPanel extends JPanel {
     private JTextField txtStartDate;
     private JComboBox<String> cbTrainer;
     private JComboBox<String> cbPayment;
-    private JTextField txtVoucher;
-    private JButton btnApplyVoucher;
+    private JLabel lblVipPolicyNotice;
     private JCheckBox chkCreateAppAccount;
 
     private JLabel lblTotalCost;
     private long currentPrice = 500000;
-    private int discountPercent = 0;
 
     // Card Preview Components
     private JLabel lblCardName;
@@ -167,28 +168,25 @@ public class DangKyHoiVienPanel extends JPanel {
         gbc.gridy = r++;
         formGrid.add(rowDatePT, gbc);
 
-        // Payment & Voucher
-        JPanel rowPayVoucher = new JPanel(new BorderLayout(10, 0));
-        rowPayVoucher.setOpaque(false);
+        // Payment & VIP Policy (Chính sách VIP bảo mật giá thực theo Yêu Cầu Ẩn 1)
+        JPanel rowPayPolicy = new JPanel(new GridLayout(1, 2, 10, 0));
+        rowPayPolicy.setOpaque(false);
         JPanel pPay = new JPanel(new BorderLayout(0, 3)); pPay.setOpaque(false);
         JLabel lPay = new JLabel("Hình Thức Thanh Toán:"); lPay.setFont(fontLabel);
         cbPayment = new JComboBox<>(new String[]{"Tiền mặt", "Chuyển khoản (VietQR)", "Quẹt thẻ POS"}); cbPayment.setFont(fontInput);
         pPay.add(lPay, BorderLayout.NORTH); pPay.add(cbPayment, BorderLayout.CENTER);
 
-        JPanel pVoucher = new JPanel(new BorderLayout(0, 3)); pVoucher.setOpaque(false);
-        JLabel lVoucher = new JLabel("Mã Giảm Giá (Voucher):"); lVoucher.setFont(fontLabel);
-        JPanel vSub = new JPanel(new BorderLayout(5, 0)); vSub.setOpaque(false);
-        txtVoucher = new JTextField("SUMMER26"); txtVoucher.setFont(fontInput);
-        btnApplyVoucher = new JButton("Áp Dụng");
-        btnApplyVoucher.setBackground(new Color(245, 158, 11));
-        btnApplyVoucher.setForeground(Color.WHITE);
-        vSub.add(txtVoucher, BorderLayout.CENTER); vSub.add(btnApplyVoucher, BorderLayout.EAST);
-        pVoucher.add(lVoucher, BorderLayout.NORTH); pVoucher.add(vSub, BorderLayout.CENTER);
+        JPanel pPolicy = new JPanel(new BorderLayout(0, 3)); pPolicy.setOpaque(false);
+        JLabel lPolicy = new JLabel("Chính Sách Khách Hàng:"); lPolicy.setFont(fontLabel);
+        lblVipPolicyNotice = new JLabel("Hội phí tiêu chuẩn niêm yết");
+        lblVipPolicyNotice.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblVipPolicyNotice.setForeground(new Color(100, 116, 139));
+        pPolicy.add(lPolicy, BorderLayout.NORTH); pPolicy.add(lblVipPolicyNotice, BorderLayout.CENTER);
 
-        rowPayVoucher.add(pPay, BorderLayout.WEST);
-        rowPayVoucher.add(pVoucher, BorderLayout.CENTER);
+        rowPayPolicy.add(pPay);
+        rowPayPolicy.add(pPolicy);
         gbc.gridy = r++;
-        formGrid.add(rowPayVoucher, gbc);
+        formGrid.add(rowPayPolicy, gbc);
 
         // Total Cost Bar
         JPanel totalBar = new JPanel(new BorderLayout());
@@ -404,7 +402,15 @@ public class DangKyHoiVienPanel extends JPanel {
         // Live calculation & card update listeners
         loadPackageList();
         cbPackage.addActionListener(e -> updateCalculations());
-        btnApplyVoucher.addActionListener(e -> applyVoucher());
+
+        DocumentListener liveTextListener = new DocumentListener() {
+            @Override public void insertUpdate(DocumentEvent e) { updateCalculations(); }
+            @Override public void removeUpdate(DocumentEvent e) { updateCalculations(); }
+            @Override public void changedUpdate(DocumentEvent e) { updateCalculations(); }
+        };
+        txtFullName.getDocument().addDocumentListener(liveTextListener);
+        txtPhone.getDocument().addDocumentListener(liveTextListener);
+
         btnReset.addActionListener(e -> resetForm());
         btnSubmit.addActionListener(e -> submitRegistration());
         btnPrintCard.addActionListener(e -> printCard());
@@ -445,8 +451,24 @@ public class DangKyHoiVienPanel extends JPanel {
             currentMonths = 1;
         }
 
-        long finalPrice = currentPrice - (currentPrice * discountPercent / 100);
-        lblTotalCost.setText(df.format(finalPrice));
+        String phone = txtPhone != null ? txtPhone.getText().trim() : "";
+        String name = txtFullName != null ? txtFullName.getText().trim() : "";
+        String currentRole = Auth.vaiTro != null ? Auth.vaiTro : "Lễ tân";
+
+        VipPolicyService.ThongTinGiaHienThi giaInfo = VipPolicyService.getInstance().tinhGiaTheoPhanQuyen(
+                currentRole, phone, name, null, currentPrice);
+
+        lblTotalCost.setText(df.format(giaInfo.soTienThucThu));
+
+        if (lblVipPolicyNotice != null) {
+            if (giaInfo.isVipDacQuyen) {
+                lblVipPolicyNotice.setText(giaInfo.moTaGiaHienThi);
+                lblVipPolicyNotice.setForeground(new Color(16, 185, 129));
+            } else {
+                lblVipPolicyNotice.setText("Hội phí tiêu chuẩn niêm yết");
+                lblVipPolicyNotice.setForeground(new Color(100, 116, 139));
+            }
+        }
 
         // Update card preview
         lblCardPackage.setText("Gói: " + pkgTitle);
@@ -463,27 +485,6 @@ public class DangKyHoiVienPanel extends JPanel {
         if (cbBranch != null && cbBranch.getSelectedItem() != null) {
             lblCardBranch.setText(cbBranch.getSelectedItem().toString());
         }
-    }
-
-    private void applyVoucher() {
-        String code = txtVoucher.getText().trim();
-        if ("SUMMER26".equalsIgnoreCase(code)) {
-            discountPercent = 20;
-            JOptionPane.showMessageDialog(this, "Áp dụng thành công Voucher SUMMER26: Giảm 20%!", "Khuyến Mãi", JOptionPane.INFORMATION_MESSAGE);
-        } else if ("NEWBIE50".equalsIgnoreCase(code)) {
-            discountPercent = 50;
-            JOptionPane.showMessageDialog(this, "Áp dụng thành công Voucher NEWBIE50: Giảm 50%!", "Khuyến Mãi", JOptionPane.INFORMATION_MESSAGE);
-        } else if ("VIPMEMBER".equalsIgnoreCase(code)) {
-            discountPercent = 30;
-            JOptionPane.showMessageDialog(this, "Áp dụng thành công Voucher VIPMEMBER: Giảm 30%!", "Khuyến Mãi", JOptionPane.INFORMATION_MESSAGE);
-        } else if (code.isEmpty()) {
-            discountPercent = 0;
-            JOptionPane.showMessageDialog(this, "Đã hủy áp dụng mã giảm giá.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            discountPercent = 0;
-            JOptionPane.showMessageDialog(this, "Mã voucher không hợp lệ hoặc đã hết hạn!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-        }
-        updateCalculations();
     }
 
     private void submitRegistration() {
@@ -515,10 +516,17 @@ public class DangKyHoiVienPanel extends JPanel {
         lblCardCode.setText(code);
         lblCardPhone.setText("SĐT: " + phone);
 
-        double finalPrice = currentPrice - (currentPrice * discountPercent / 100);
-        String pkgName = cbPackage.getSelectedItem().toString();
+        String currentRole = Auth.vaiTro != null ? Auth.vaiTro : "Lễ tân";
+        VipPolicyService.ThongTinGiaHienThi giaInfo = VipPolicyService.getInstance().tinhGiaTheoPhanQuyen(
+                currentRole, phone, name, code, currentPrice);
+
+        double displayGiaGoc = giaInfo.giaGoc;
+        double displayGiamGia = giaInfo.soTienGiam;
+        double finalPrice = giaInfo.soTienThucThu;
+
+        String pkgName = cbPackage.getSelectedItem() != null ? cbPackage.getSelectedItem().toString() : "Gói tập";
         java.util.List<com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang> items = new java.util.ArrayList<>();
-        items.add(new com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang("Đăng ký mới " + pkgName, 1, currentPrice, finalPrice));
+        items.add(new com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang("Đăng ký mới " + pkgName, 1, displayGiaGoc, finalPrice));
 
         final String finalCode = code;
         final int finalNextId = nextId;
@@ -529,8 +537,8 @@ public class DangKyHoiVienPanel extends JPanel {
                 null,
                 name + " (" + code + ")",
                 "Đăng ký " + pkgName,
-                currentPrice,
-                currentPrice * discountPercent / 100,
+                displayGiaGoc,
+                displayGiamGia,
                 finalPrice,
                 items,
                 success -> {
@@ -601,12 +609,10 @@ public class DangKyHoiVienPanel extends JPanel {
         txtBirth.setText("15/05/2000");
         cbGender.setSelectedIndex(0);
         cbBranch.setSelectedIndex(0);
-        cbPackage.setSelectedIndex(1);
+        cbPackage.setSelectedIndex(0);
         txtStartDate.setText(new SimpleDateFormat("dd/MM/yyyy").format(new Date()));
         cbTrainer.setSelectedIndex(0);
         cbPayment.setSelectedIndex(0);
-        txtVoucher.setText("");
-        discountPercent = 0;
         updateCalculations();
         lblCardName.setText("NGUYỄN VĂN A");
         lblCardPhone.setText("SĐT: 0901 234 567");

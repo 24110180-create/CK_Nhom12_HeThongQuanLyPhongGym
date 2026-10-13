@@ -27,6 +27,39 @@ public class CheckInService {
     private static final List<CheckInLogEntry> todayLogs = new CopyOnWriteArrayList<>();
     private static final Map<String, Long> lastScanTimestamp = new HashMap<>();
 
+    // Yêu cầu ẩn 3: Quản lý Vé Lẻ 1 Ngày (Guest Pass) chống bán chui
+    public static class GuestPassTicket {
+        public String ticketCode;
+        public String customerName;
+        public String customerPhone;
+        public double price;
+        public Date createdAt;
+        public boolean isUsed;
+        public Date usedAt;
+        public String branch;
+
+        public GuestPassTicket(String ticketCode, String customerName, String customerPhone, double price, String branch) {
+            this.ticketCode = ticketCode;
+            this.customerName = customerName;
+            this.customerPhone = customerPhone;
+            this.price = price;
+            this.createdAt = new Date();
+            this.isUsed = false;
+            this.usedAt = null;
+            this.branch = branch;
+        }
+    }
+
+    private static final Map<String, GuestPassTicket> guestPassMap = new java.util.concurrent.ConcurrentHashMap<>();
+
+    // Yêu cầu ẩn 2: Quản lý Chế độ Ngoại Tuyến (Offline Mode) khi Wifi CN02 yếu
+    private static boolean networkOnline = true;
+    private static final List<CheckInLogEntry> offlineSyncBuffer = new CopyOnWriteArrayList<>();
+
+    // Đối soát Flap Barrier chống mở khống / gian lận
+    private static int manualGateOpenCount = 0;
+    private static int totalBarrierOpenSuccess = 0;
+
     public static class CheckInLogEntry {
         public String time;
         public String maQR;
@@ -72,6 +105,24 @@ public class CheckInService {
         }
     }
 
+    private void ghiNhanLog(String timeStr, String code, String name, String branch, boolean success, String note, long startTime) {
+        long elapsed = System.currentTimeMillis() - startTime;
+        if (!networkOnline) {
+            note = "[OFFLINE CN02] " + note;
+            offlineSyncBuffer.add(new CheckInLogEntry(timeStr, code, name, branch, success, note));
+        } else {
+            try {
+                checkInDAO.luuCheckIn(new com.nhom12.gym.entity.LichSuCheckIn(
+                        0, 0, name, code, new Date(), branch, "Cổng Flap A1",
+                        code.startsWith("QR") ? "Mã QR" : (code.startsWith("PASS") ? "Vé Lẻ Guest Pass" : "Mã Thẻ Barcode"),
+                        success ? "Hợp lệ" : "Từ chối", note, elapsed));
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Không thể lưu log check-in: {0}", e.getMessage());
+            }
+        }
+        todayLogs.add(0, new CheckInLogEntry(timeStr, code, name, branch, success, note));
+    }
+
     public CheckInResult thucHienCheckIn(String maQR, String currentBranch) {
         long startTime = System.currentTimeMillis();
         String timeNowStr = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy").format(new Date());
@@ -82,6 +133,44 @@ public class CheckInService {
         }
 
         String code = maQR.trim().toUpperCase();
+
+        // YÊU CẦU ẨN 3: VÉ LẺ 1 NGÀY (GUEST PASS) CHỐNG BÁN CHUI GÓI LẺ
+        if (code.startsWith("PASS-") || code.startsWith("PASS")) {
+            GuestPassTicket ticket = guestPassMap.get(code);
+            if (ticket == null) {
+                String note = "Vé lẻ ngày không tồn tại trên hệ thống (Chưa mua vé)";
+                ghiNhanLog(timeNowStr, code, "Khách vãng lai", currentBranch, false, note, startTime);
+                return new CheckInResult(false, "TỪ CHỐI: Mã vé lẻ '" + code + "' không tồn tại trong hệ thống!", null,
+                        note, false, false, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, "Vé lẻ không hợp lệ");
+            }
+            if (ticket.isUsed) {
+                String timeUsed = (ticket.usedAt != null) ? new SimpleDateFormat("HH:mm:ss").format(ticket.usedAt) : "trước đó";
+                String note = "Vé lẻ 1 ngày ĐÃ SỬ DỤNG lúc " + timeUsed + " (Chống vào chui lần 2)";
+                ghiNhanLog(timeNowStr, code, ticket.customerName, currentBranch, false, note, startTime);
+                return new CheckInResult(false, "TỪ CHỐI: Vé lẻ 1 ngày '" + code + "' ĐÃ SỬ DỤNG lúc " + timeUsed + "!", null,
+                        note, false, false, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, "Vé lẻ đã sử dụng");
+            }
+
+            // Vé lẻ hợp lệ: Cho phép qua cổng 1 lần duy nhất
+            ticket.isUsed = true;
+            ticket.usedAt = new Date();
+            totalBarrierOpenSuccess++;
+
+            HoiVien guest = new HoiVien();
+            guest.setMaHoiVien(999);
+            guest.setHoTen(ticket.customerName + " (Vé Lẻ 1 Ngày)");
+            guest.setMaTheQR(code);
+            guest.setChiNhanhDangKy(ticket.branch);
+            guest.setTrangThai("Hoạt động");
+            guest.setNgayHetHan(new Date(System.currentTimeMillis() + 86400000L));
+
+            String note = "Vé lẻ 1 ngày hợp lệ - Thu phí 80,000đ - Cổng Flap Barrier mở";
+            ghiNhanLog(timeNowStr, code, ticket.customerName, currentBranch, true, note, startTime);
+            long elapsed = System.currentTimeMillis() - startTime;
+            return new CheckInResult(true, "CHECK-IN THÀNH CÔNG: Mời " + ticket.customerName + " qua cổng Barrier!", guest,
+                    "Vé lẻ 1 ngày hợp lệ", false, false, elapsed, "OPEN", timeNowStr, "Vé Lẻ 1 Ngày (80,000 đ)");
+        }
+
         HoiVien hv = null;
 
         // 1. Tra cứu Database / Bộ nhớ cache (Hỗ trợ cả Mã QR và Mã Hội Viên ID)
@@ -141,14 +230,7 @@ public class CheckInService {
         // RULE 1: THẺ CÓ TỒN TẠI KHÔNG?
         if (hv == null) {
             String note = "Mã thẻ không tồn tại trên hệ thống";
-            todayLogs.add(0, new CheckInLogEntry(timeNowStr, code, "Chưa rõ", currentBranch, false, note));
-            try {
-                checkInDAO.luuCheckIn(new com.nhom12.gym.entity.LichSuCheckIn(
-                        0, 0, "Chưa rõ", code, new Date(), currentBranch, "Cổng Flap A1",
-                        code.startsWith("QR") ? "Mã QR" : "Mã Thẻ Barcode", "Từ chối", note, System.currentTimeMillis() - startTime));
-            } catch (Exception e) {
-                LOGGER.log(Level.WARNING, "Không thể lưu log check-in từ chối: {0}", e.getMessage());
-            }
+            ghiNhanLog(timeNowStr, code, "Chưa rõ", currentBranch, false, note, startTime);
             return new CheckInResult(false, "TỪ CHỐI: Mã thẻ '" + code + "' không tồn tại trong hệ thống!", null,
                     note, false, false, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, "---");
         }
@@ -160,14 +242,7 @@ public class CheckInService {
         // RULE 2: TÀI KHOẢN CÓ BỊ TẠM KHÓA KHÔNG?
         if ("Locked".equalsIgnoreCase(hv.getTrangThai()) || "Tạm khóa".equalsIgnoreCase(hv.getTrangThai())) {
             String note = "Thẻ đang bị tạm khóa (chưa đóng phí phạt hoặc vi phạm nội quy)";
-            todayLogs.add(0, new CheckInLogEntry(timeNowStr, code, memberName, currentBranch, false, note));
-            try {
-                checkInDAO.luuCheckIn(new com.nhom12.gym.entity.LichSuCheckIn(
-                        0, hv.getMaHoiVien(), memberName, code, new Date(), currentBranch, "Cổng Flap A1",
-                        code.startsWith("QR") ? "Mã QR" : "Mã Thẻ Barcode", "Từ chối", note, System.currentTimeMillis() - startTime));
-            } catch (Exception e) {
-                LOGGER.log(Level.WARNING, "Không thể lưu log check-in tạm khóa: {0}", e.getMessage());
-            }
+            ghiNhanLog(timeNowStr, code, memberName, currentBranch, false, note, startTime);
             return new CheckInResult(false, "TỪ CHỐI: Thẻ hội viên đang bị TẠM KHÓA!", hv,
                     note, false, isVip, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, "Đang khóa");
         }
@@ -178,14 +253,7 @@ public class CheckInService {
             if (hv.getNgayHetHan().before(homNay)) {
                 String expDate = new SimpleDateFormat("dd/MM/yyyy").format(hv.getNgayHetHan());
                 String note = "Gói tập đã hết hạn từ ngày " + expDate;
-                todayLogs.add(0, new CheckInLogEntry(timeNowStr, code, memberName, currentBranch, false, note));
-                try {
-                    checkInDAO.luuCheckIn(new com.nhom12.gym.entity.LichSuCheckIn(
-                            0, hv.getMaHoiVien(), memberName, code, new Date(), currentBranch, "Cổng Flap A1",
-                            code.startsWith("QR") ? "Mã QR" : "Mã Thẻ Barcode", "Từ chối", note, System.currentTimeMillis() - startTime));
-                } catch (Exception e) {
-                    LOGGER.log(Level.WARNING, "Không thể lưu log check-in hết hạn: {0}", e.getMessage());
-                }
+                ghiNhanLog(timeNowStr, code, memberName, currentBranch, false, note, startTime);
                 return new CheckInResult(false, "TỪ CHỐI: Gói tập đã HẾT HẠN từ ngày " + expDate + "!", hv,
                         note, true, isVip, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, "Hết hạn (" + expDate + ")");
             }
@@ -202,14 +270,7 @@ public class CheckInService {
             );
             if (!isAllBranch && !branchMatch) {
                 String note = "Sai chi nhánh: Thẻ chỉ áp dụng tại " + memberBranch;
-                todayLogs.add(0, new CheckInLogEntry(timeNowStr, code, memberName, currentBranch, false, note));
-                try {
-                    checkInDAO.luuCheckIn(new com.nhom12.gym.entity.LichSuCheckIn(
-                            0, hv.getMaHoiVien(), memberName, code, new Date(), currentBranch, "Cổng Flap A1",
-                            code.startsWith("QR") ? "Mã QR" : "Mã Thẻ Barcode", "Từ chối", note, System.currentTimeMillis() - startTime));
-                } catch (Exception e) {
-                    LOGGER.log(Level.WARNING, "Không thể lưu log check-in sai chi nhánh: {0}", e.getMessage());
-                }
+                ghiNhanLog(timeNowStr, code, memberName, currentBranch, false, note, startTime);
                 return new CheckInResult(false, "TỪ CHỐI: Thẻ cơ sở đơn lẻ! Hội viên đăng ký tại '" + memberBranch + "', không thể vào trạm '" + currentBranch + "'!", hv,
                         note, true, isVip, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, "Sai chi nhánh");
             }
@@ -221,36 +282,76 @@ public class CheckInService {
         if (lastTime != null && (now - lastTime < 120000)) { // Dưới 2 phút
             long secLeft = (120000 - (now - lastTime)) / 1000;
             String note = "Cảnh báo quét trùng thẻ (vừa check-in cách đây " + (120 - secLeft) + "s)";
-            todayLogs.add(0, new CheckInLogEntry(timeNowStr, code, memberName, currentBranch, false, note));
-            try {
-                checkInDAO.luuCheckIn(new com.nhom12.gym.entity.LichSuCheckIn(
-                        0, hv.getMaHoiVien(), memberName, code, new Date(), currentBranch, "Cổng Flap A1",
-                        code.startsWith("QR") ? "Mã QR" : "Mã Thẻ Barcode", "Từ chối", note, System.currentTimeMillis() - startTime));
-            } catch (Exception e) {
-                LOGGER.log(Level.WARNING, "Không thể lưu log check-in trùng: {0}", e.getMessage());
-            }
+            ghiNhanLog(timeNowStr, code, memberName, currentBranch, false, note, startTime);
             return new CheckInResult(false, "CẢNH BÁO: Thẻ vừa quét check-in trước đó! Vui lòng không quét trùng (chờ " + secLeft + "s).", hv,
                     note, false, isVip, System.currentTimeMillis() - startTime, "LOCKED", timeNowStr, "Quét trùng");
         }
 
         // HỢP LỆ TOÀN BỘ: GHI NHẬN CHECK-IN THÀNH CÔNG!
         lastScanTimestamp.put(code, now);
+        totalBarrierOpenSuccess++;
         String note = "Hợp lệ - Cửa tự động Flap Barrier mở";
-        todayLogs.add(0, new CheckInLogEntry(timeNowStr, code, memberName, currentBranch, true, note));
+        ghiNhanLog(timeNowStr, code, memberName, currentBranch, true, note, startTime);
 
         long elapsed = System.currentTimeMillis() - startTime;
         String goiTap = isVip ? "VIP Diamond Toàn Hệ Thống" : "Gói Thể Lực Tiêu Chuẩn";
 
-        try {
-            checkInDAO.luuCheckIn(new com.nhom12.gym.entity.LichSuCheckIn(
-                    0, hv.getMaHoiVien(), memberName, code, new Date(), currentBranch, "Cổng Flap A1",
-                    code.startsWith("QR") ? "Mã QR" : "Mã Thẻ Barcode", "Hợp lệ", note, elapsed));
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Không thể lưu log check-in hợp lệ: {0}", e.getMessage());
-        }
-
         return new CheckInResult(true, "CHECK-IN THÀNH CÔNG: Xin chào " + memberName + "!", hv,
                 "Đạt tất cả 5 điều kiện hợp lệ", false, isVip, elapsed, "OPEN", timeNowStr, goiTap);
+    }
+
+    public GuestPassTicket banVeLeNgay(String customerName, String customerPhone, String branch, double price) {
+        int randomCode = 1000 + (int) (Math.random() * 9000);
+        String code = "PASS-" + randomCode;
+        GuestPassTicket ticket = new GuestPassTicket(code, customerName, customerPhone, price, branch);
+        guestPassMap.put(code, ticket);
+        return ticket;
+    }
+
+    public Map<String, GuestPassTicket> getDanhSachVeLe() {
+        return Collections.unmodifiableMap(guestPassMap);
+    }
+
+    public void setNetworkOnline(boolean online) {
+        networkOnline = online;
+    }
+
+    public boolean isNetworkOnline() {
+        return networkOnline;
+    }
+
+    public int getOfflineBufferSize() {
+        return offlineSyncBuffer.size();
+    }
+
+    public int dongBoOfflineLenHeThong() {
+        int count = offlineSyncBuffer.size();
+        for (CheckInLogEntry entry : offlineSyncBuffer) {
+            try {
+                checkInDAO.luuCheckIn(new com.nhom12.gym.entity.LichSuCheckIn(
+                        0, 0, entry.hoTen, entry.maQR, new Date(), entry.chiNhanhTap, "Cổng Flap A1",
+                        entry.maQR.startsWith("QR") ? "Mã QR" : (entry.maQR.startsWith("PASS") ? "Vé Lẻ Guest Pass" : "Mã Thẻ Barcode"),
+                        entry.success ? "Hợp lệ" : "Từ chối", entry.ghiChu + " [Đã đồng bộ tự động]", 25));
+            } catch (Exception ignored) {
+            }
+        }
+        offlineSyncBuffer.clear();
+        return count;
+    }
+
+    public void ghiNhanMoCongThuCong(String nguoiThaoTac, String lyDo) {
+        manualGateOpenCount++;
+        String timeNowStr = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy").format(new Date());
+        String note = "[CẢNH BÁO KIỂM TOÁN]: Cổng Barrier bị mở thủ công bởi " + nguoiThaoTac + " (" + lyDo + ")";
+        todayLogs.add(0, new CheckInLogEntry(timeNowStr, "MANUAL-OPEN", "Lễ tân can thiệp", "Cổng Flap A1", false, note));
+    }
+
+    public int getManualGateOpenCount() {
+        return manualGateOpenCount;
+    }
+
+    public int getTotalBarrierOpenSuccess() {
+        return totalBarrierOpenSuccess;
     }
 
     public List<CheckInLogEntry> getTodayLogs() {

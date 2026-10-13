@@ -261,7 +261,7 @@ Dành cho Thầy/Cô chấm điểm source code, xem cấu trúc package và deb
 | **`admin`** | **`123456`** | **Chủ Hệ Thống** | **Executive Cockpit 5 Trụ Cột:** Báo cáo doanh thu 2 cơ sở (Quận 1, Tân Bình), Biểu đồ lưu lượng Heatmap (06:00 - 22:00), Live KPI tài chính, Quản lý tài khoản, Bảo mật giá ẩn của VIP. |
 | **`letan1`** | **`123456`** | **Lễ Tân** | **Front-Desk Workstation:** Trạm Check-in âm thanh Honeywell, Bán hàng POS xuất bill, Đăng ký hội viên mới, Gia hạn gói tập, Quản lý sơ đồ 20 tủ Locker, Nhắc hạn SMS/Zalo. |
 | **`hlv1`** | **`123456`** | **Huấn Luyện Viên** | **Trainer Studio:** Lịch dạy các lớp Yoga/Zumba/Kickboxing, Điểm danh học viên lớp học, Sổ tay theo dõi tiến độ PT 1:1, Đo đạc và phân tích chỉ số InBody. |
-| **`quanly1`** | **`123456`** | **Quản Lý Chi Nhánh** | **Operations Center:** Giám sát sức chứa phòng tập, Bảng xếp ca trực tuần cho nhân viên, Quản lý kho hàng tồn kho, Quản lý bảo trì thiết bị máy móc. |
+| **`quanly1`** | **`123456`** | **Quản Lý Chi Nhánh** | **Operations Center:** Giám sát sức chứa phòng tập, Bảng xếp ca trực tuần cho nhân viên, Quản lý kho hàng tồn kho, Theo dõi vận hành cơ sở. |
 | **`hoivien1`** | **`123456`** | **Hội Viên VIP** | **Member VIP Portal:** Thẻ điện tử hiển thị mã QR định danh, Đặt chỗ lớp học theo lịch, Xem biểu đồ thể trạng InBody, Gia hạn gói tập bằng quét mã VietQR. |
 
 ---

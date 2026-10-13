@@ -21,7 +21,7 @@
    - **Chủ phòng**: Giao diện **Executive Command Cockpit** cao cấp với thanh menu 2 tầng (Dual-Tier Command Ribbon gồm 5 Trụ cột chiến lược), dải Live KPI tài chính/hội viên thời gian thực, không gian làm việc nhúng trực tiếp toàn cảnh (Panoramic Embedded Workspace) và tùy chọn chuyển chế độ Lưới Ma Trận (Grid Matrix).
    - **Lễ tân**: Trạm vận hành Front-Desk (Check-in thẻ/QR, Đăng ký thẻ mới, Gia hạn gói tập, Tủ đồ Locker, CSKH, Quản lý tài khoản App).
    - **HLV (Coach)**: Trainer Studio (Lịch dạy, Điểm danh lớp, Đo InBody, Sổ tay PR).
-   - **Quản lý chi nhánh**: Operations Center (Tổng quan vận hành, Báo cáo doanh số 2 cơ sở, Phân ca trực, Quản lý bảo trì thiết bị).
+   - **Quản lý chi nhánh**: Operations Center (Tổng quan vận hành, Báo cáo doanh số 2 cơ sở, Phân ca trực, Quản lý kho hàng).
    - **Hội viên (Member VIP)**: Cổng thông tin thẻ điện tử, check-in QR, xem lịch lớp, theo dõi InBody, gia hạn VietQR.
 
 ### B. Ngoài Scope (Đã Quy Định Rõ Trong Đề Cương):

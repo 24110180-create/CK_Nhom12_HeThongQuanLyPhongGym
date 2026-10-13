@@ -26,7 +26,7 @@
 5. [Hướng Dẫn Dành Cho Quản Lý Chi Nhánh (Operations Center)](#5-hướng-dẫn-dành-cho-quản-lý-chi-nhánh-operations-center)
    - 5.1. Giám Sát Sức Chứa Phòng Tập & Tỷ Lệ Lấp Đầy
    - 5.2. Bảng Xếp Ca Trực Tuần Cho Nhân Sự
-   - 5.3. Quản Lý Kho Hàng & Thiết Bị Máy Móc
+   - 5.3. Quản Lý Kho Hàng & Vật Phẩm Tồn Kho
 6. [Hướng Dẫn Dành Cho Hội Viên (Member VIP Portal)](#6-hướng-dẫn-dành-cho-hội-viên-member-vip-portal)
    - 6.1. Thẻ Điện Tử & Check-In QR Cá Nhân
    - 6.2. Đặt Chỗ Lớp Học Theo Thời Khóa Biểu
@@ -65,7 +65,7 @@ Giao diện của Chủ phòng tập được thiết kế theo phong cách **Ex
   - **Trụ cột 2: Vận Hành Phòng Tập:** Trạm kiểm soát check-in, quản lý danh bạ hội viên, hợp đồng và lịch lớp.
   - **Trụ cột 3: Kinh Doanh & Dịch Vụ:** Quầy bán hàng POS, quản lý kho hàng, sơ đồ tủ locker và CSKH.
   - **Trụ cột 4: Huấn Luyện Viên:** Quản lý chỉ số InBody, sổ tay PT 1:1 và hồ sơ học viên.
-  - **Trụ cột 5: Quản Trị Hệ Thống:** Quản lý nhân sự, phân ca trực, quản lý thiết bị và phân quyền bảo mật.
+  - **Trụ cột 5: Quản Trị Hệ Thống:** Quản lý nhân sự, phân ca trực, tài khoản app và phân quyền bảo mật.
 - **Tầng 2 (Dải Module Nhanh):** Hiển thị các tính năng chi tiết thuộc trụ cột đang chọn, cho phép chuyển đổi tức thì chỉ với một cú nhấp chuột.
 - **Dải Live KPI Thời Gian Thực:**
   - **Doanh Số Hôm Nay:** Tổng số tiền thu được từ đăng ký gói, gia hạn và bán lẻ POS trong ngày.
@@ -279,9 +279,8 @@ Dành cho quản lý cơ sở chịu trách nhiệm điều phối nhân sự v�
    - **Ca Tối / Đóng cửa (21:30 - 22:30):** Kiểm kê kho và niêm phong cửa.
 4. Bấm **Xuất Lịch Trực Ra File Excel** để gửi vào nhóm thông báo chung.
 
-### 5.3. Quản Lý Kho Hàng & Thiết Bị Máy Móc
+### 5.3. Quản Lý Kho Hàng & Vật Phẩm Tồn Kho
 - **Kho hàng:** Quản lý số lượng tồn kho của các mặt hàng nước uống và thực phẩm bổ sung. Hệ thống tự động cảnh báo khi tồn kho dưới 5 đơn vị.
-- **Thiết bị phòng tập:** Theo dõi danh sách giàn tạ, máy khối, máy chạy bộ cardio, nhật ký bảo dưỡng định kỳ và ghi chú báo hỏng để kỹ thuật viên sửa chữa kịp thời.
 
 ---
 

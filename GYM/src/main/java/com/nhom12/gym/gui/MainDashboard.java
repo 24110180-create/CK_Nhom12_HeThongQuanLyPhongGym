@@ -137,7 +137,6 @@ public class MainDashboard extends JFrame {
         OwnerPillar p4 = new OwnerPillar("Quản Trị Hệ Thống", new Color(236, 72, 153));
         p4.items.add(new OwnerModuleItem("Quản Lý Nhân Sự", "Danh sách HLV & nhân viên", () -> new QuanLyNhanSuPanel()));
         p4.items.add(new OwnerModuleItem("Tài Khoản App Hội Viên", "Cấp & quản lý tài khoản app", () -> new QuanLyTaiKhoanAppPanel()));
-        p4.items.add(new OwnerModuleItem("Quản Lý Thiết Bị", "Bảo dưỡng máy móc & giàn tạ", () -> new QuanLyThietBiPanel()));
         p4.items.add(new OwnerModuleItem("Phân Ca Làm Việc", "Xếp lịch làm việc theo tuần", () -> new PhanCaLamViecPanel()));
         p4.items.add(new OwnerModuleItem("Phân Quyền Người Dùng", "Quản trị quyền 5 vai trò", () -> new PhanQuyenPanel()));
         p4.items.add(new OwnerModuleItem("Cài Đặt Chung", "Thông tin phòng & đa cơ sở", () -> new CaiDatHeThongPanel()));
@@ -785,7 +784,6 @@ public class MainDashboard extends JFrame {
         addSidebarItem(menuContainer, "Lịch Trực & Phân Ca", "Xếp ca làm việc nhân viên", () -> new PhanCaLamViecPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Nhân Sự", "Danh sách HLV & Lễ tân", () -> new QuanLyNhanSuPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Kho Hàng", "Tồn kho thực phẩm & đồ uống", () -> new QuanLyKhoHangPanel(), accent, false);
-        addSidebarItem(menuContainer, "Quản Lý Thiết Bị Máy", "Bảo trì giàn tạ & máy chạy", () -> new QuanLyThietBiPanel(), accent, false);
         addSidebarItem(menuContainer, "Lịch Sử Giao Dịch", "Nhật ký hóa đơn toàn viện", () -> new LichSuGiaoDichPanel(), accent, false);
         addSidebarItem(menuContainer, "Đánh Giá & Phản Hồi", "Góp ý từ hội viên", () -> new QuanLyPhanHoiPanel(), accent, false);
     }

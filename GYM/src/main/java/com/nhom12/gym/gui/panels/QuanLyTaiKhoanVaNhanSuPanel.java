@@ -1,8 +1,6 @@
 package com.nhom12.gym.gui.panels;
 
-import com.nhom12.gym.dao.HoiVienDAO;
 import com.nhom12.gym.dao.TaiKhoanDAO;
-import com.nhom12.gym.entity.HoiVien;
 import com.nhom12.gym.entity.TaiKhoan;
 import com.nhom12.gym.gui.DangKyTaiKhoanDialog;
 import com.nhom12.gym.util.ExcelExportHelper;
@@ -17,29 +15,28 @@ import java.util.List;
 
 /**
  * Màn hình Quản Trị Tài Khoản Toàn Chuỗi Dành Riêng Cho Chủ Phòng (Anh Đức)
- * Phân chia quản lý rõ ràng cho 4 lực lượng:
- * 1. Lễ Tân
- * 2. Huấn Luyện Viên (HLV)
- * 3. Quản Lý Chi Nhánh
- * 4. Hội Viên (VIP Members)
+ * Phân chia quản lý rõ ràng cho 4 lực lượng nhân sự nội bộ:
+ * 1. Lễ Tân (Chị Linh)
+ * 2. Huấn Luyện Viên (HLV - Anh Tuấn)
+ * 3. Quản Lý Chi Nhánh (Anh Sơn)
+ * 4. Ban Quản Trị / Chủ Phòng (Anh Đức)
  * Tích hợp chức năng Thêm, Sửa, Xóa, Reset Mật Khẩu, Khóa/Mở Khóa
  * và cam kết 100% các tài khoản sau khi tạo đều đăng nhập được vào ứng dụng!
  */
 public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
 
     private final TaiKhoanDAO taiKhoanDAO = new TaiKhoanDAO();
-    private final HoiVienDAO hoiVienDAO = new HoiVienDAO();
 
     private final JTabbedPane tabbedPane = new JTabbedPane();
     private DefaultTableModel modelReceptionist;
     private DefaultTableModel modelTrainer;
     private DefaultTableModel modelManager;
-    private DefaultTableModel modelMember;
+    private DefaultTableModel modelOwner;
 
     private JTable tableReceptionist;
     private JTable tableTrainer;
     private JTable tableManager;
-    private JTable tableMember;
+    private JTable tableOwner;
 
     private final JLabel lblSummaryStats = new JLabel();
 
@@ -67,7 +64,7 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 20));
         lblTitle.setForeground(new Color(15, 23, 42));
 
-        JLabel lblSub = new JLabel("Quản lý tài khoản đăng nhập của 4 lực lượng: Lễ Tân • HLV • Quản Lý • Hội Viên (Cơ sở 1 & Cơ sở 2)");
+        JLabel lblSub = new JLabel("Quản lý tài khoản đăng nhập của 4 vai trò nhân sự: Lễ Tân • HLV • Quản Lý • Chủ Phòng Tập");
         lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         lblSub.setForeground(new Color(100, 116, 139));
 
@@ -120,12 +117,11 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
         pnlTop.add(pnlActions);
         add(pnlTop, BorderLayout.NORTH);
 
-        // --- 2. TABBED PANE 4 VAI TRÒ ---
+        // --- 2. TABBED PANE 4 VAI TRÒ NHÂN SỰ NỘI BỘ ---
         tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 13));
         tabbedPane.setBackground(Color.WHITE);
 
         String[] colsStaff = {"Tên Đăng Nhập", "Họ Và Tên Nhân Sự", "Vai Trò", "Chi Nhánh Trực Ca", "Mật Khẩu", "Trạng Thái"};
-        String[] colsMember = {"Tên Đăng Nhập (SĐT)", "Họ Tên Hội Viên", "Vai Trò", "Chi Nhánh Đăng Ký", "Mã Thẻ QR", "Gói Tập Sở Hữu", "Trạng Thái"};
 
         modelReceptionist = new DefaultTableModel(colsStaff, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
@@ -142,15 +138,15 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
         };
         tableManager = createStyledTable(modelManager);
 
-        modelMember = new DefaultTableModel(colsMember, 0) {
+        modelOwner = new DefaultTableModel(colsStaff, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
-        tableMember = createStyledTable(modelMember);
+        tableOwner = createStyledTable(modelOwner);
 
-        tabbedPane.addTab("  1. Nhân Sự Lễ Tân  ", createTableScrollPane(tableReceptionist));
-        tabbedPane.addTab("  2. Đội Ngũ Huấn Luyện Viên (HLV)  ", createTableScrollPane(tableTrainer));
-        tabbedPane.addTab("  3. Quản Lý Chi Nhánh  ", createTableScrollPane(tableManager));
-        tabbedPane.addTab("  4. Tài Khoản Hội Viên App  ", createTableScrollPane(tableMember));
+        tabbedPane.addTab("  1. Nhân Sự Lễ Tân (Chị Linh)  ", createTableScrollPane(tableReceptionist));
+        tabbedPane.addTab("  2. Đội Ngũ Huấn Luyện Viên (Anh Tuấn)  ", createTableScrollPane(tableTrainer));
+        tabbedPane.addTab("  3. Quản Lý Chi Nhánh (Anh Sơn)  ", createTableScrollPane(tableManager));
+        tabbedPane.addTab("  4. Ban Quản Trị / Chủ Phòng (Anh Đức)  ", createTableScrollPane(tableOwner));
 
         add(tabbedPane, BorderLayout.CENTER);
 
@@ -200,10 +196,10 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
         modelReceptionist.setRowCount(0);
         modelTrainer.setRowCount(0);
         modelManager.setRowCount(0);
-        modelMember.setRowCount(0);
+        modelOwner.setRowCount(0);
 
         List<TaiKhoan> list = taiKhoanDAO.layTatCa();
-        int countLT = 0, countHLV = 0, countQL = 0, countHV = 0;
+        int countLT = 0, countHLV = 0, countQL = 0, countChu = 0;
 
         for (TaiKhoan tk : list) {
             String role = tk.getVaiTro() != null ? tk.getVaiTro() : "";
@@ -219,24 +215,21 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
                 modelTrainer.addRow(new Object[]{
                         tk.getTenDangNhap(), tk.getHoTen(), "HLV", branch, "••••••", "Đang hoạt động"
                 });
-            } else if ("Quản lý".equalsIgnoreCase(role) || "Chủ".equalsIgnoreCase(role)) {
+            } else if ("Quản lý".equalsIgnoreCase(role)) {
                 countQL++;
                 modelManager.addRow(new Object[]{
-                        tk.getTenDangNhap(), tk.getHoTen(), role, branch, "••••••", "Đang hoạt động"
+                        tk.getTenDangNhap(), tk.getHoTen(), "Quản lý", branch, "••••••", "Đang hoạt động"
                 });
-            } else {
-                countHV++;
-                HoiVien hv = hoiVienDAO.timKiemThongMinh(tk.getTenDangNhap());
-                String code = (hv != null && hv.getMaTheQR() != null) ? hv.getMaTheQR() : "HV - Chờ cấp";
-                String pkg = (hv != null && hv.getGoiTapDangKy() != null) ? hv.getGoiTapDangKy() : "Gói Tiêu Chuẩn";
-                modelMember.addRow(new Object[]{
-                        tk.getTenDangNhap(), tk.getHoTen(), "Hội viên", branch, code, pkg, "Đang hoạt động"
+            } else if ("Chủ".equalsIgnoreCase(role)) {
+                countChu++;
+                modelOwner.addRow(new Object[]{
+                        tk.getTenDangNhap(), tk.getHoTen(), "Chủ", branch, "••••••", "Đang hoạt động"
                 });
             }
         }
 
-        lblSummaryStats.setText(String.format("● Tổng quân số: %d Lễ tân • %d HLV • %d Quản lý/Chủ • %d Hội viên VIP (Tổng: %d tài khoản)",
-                countLT, countHLV, countQL, countHV, list.size()));
+        lblSummaryStats.setText(String.format("● Tổng quân số nội bộ: %d Lễ tân • %d HLV • %d Quản lý • %d Chủ phòng (Tổng: %d tài khoản)",
+                countLT, countHLV, countQL, countChu, countLT + countHLV + countQL + countChu));
     }
 
     private void moDialogThemTaiKhoan() {
@@ -305,6 +298,6 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
         if (idx == 0) return tableReceptionist;
         if (idx == 1) return tableTrainer;
         if (idx == 2) return tableManager;
-        return tableMember;
+        return tableOwner;
     }
 }

@@ -156,17 +156,11 @@ public class LoginForm extends JFrame {
         rightPanel.add(btnLogin);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 12)));
 
-        // Nút liên kết Đăng ký tài khoản nội bộ (4 vai trò nhân sự: Lễ tân, HLV, Quản lý, Chủ phòng)
-        JButton btnRegisterApp = new JButton("Bạn là nhân sự mới? Đăng ký tài khoản nội bộ tại đây!");
-        btnRegisterApp.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnRegisterApp.setForeground(new Color(2, 132, 199));
-        btnRegisterApp.setBorderPainted(false);
-        btnRegisterApp.setContentAreaFilled(false);
-        btnRegisterApp.setFocusPainted(false);
-        btnRegisterApp.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnRegisterApp.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnRegisterApp.addActionListener(e -> moDialogDangKyTheoRole());
-        rightPanel.add(btnRegisterApp);
+        JLabel lblSecNote = new JLabel("🔒 Hệ thống quản trị nội bộ. Tài khoản do Chủ phòng tập (Anh Đức) cấp phát.");
+        lblSecNote.setFont(new Font("Segoe UI", Font.ITALIC, 11));
+        lblSecNote.setForeground(new Color(148, 163, 184));
+        lblSecNote.setAlignmentX(Component.LEFT_ALIGNMENT);
+        rightPanel.add(lblSecNote);
 
         mainContainer.add(leftPanel);
         mainContainer.add(rightPanel);
@@ -175,13 +169,6 @@ public class LoginForm extends JFrame {
         btnLogin.addActionListener(e -> xuLyDangNhap());
         txtPass.addActionListener(e -> xuLyDangNhap());
         txtUser.addActionListener(e -> xuLyDangNhap());
-    }
-
-    private void moDialogDangKyTheoRole() {
-        new DangKyTaiKhoanDialog(this, (u, p) -> {
-            txtUser.setText(u);
-            txtPass.setText(p);
-        }).setVisible(true);
     }
 
     private final com.nhom12.gym.service.AuthService authService = new com.nhom12.gym.service.AuthService();

@@ -49,7 +49,7 @@ Mật khẩu mặc định cho tất cả tài khoản nhân sự: **123456**
 1. **Chủ phòng tập (Anh Đức)** - Tài khoản: `admin` / Mật khẩu: `123456`
    - Đăng nhập để xem các báo cáo tổng hợp: doanh thu theo ngày/tuần/tháng, doanh thu từng chi nhánh (CN01, CN02) và tần suất sử dụng phòng tập.
    - Xem danh sách cảnh báo tự động các hội viên sắp hết hạn trong vòng 7 ngày tới để chăm sóc khách hàng.
-   - Quản trị nhân sự: theo dõi, quản lý lịch làm việc của 4 nhân viên và các huấn luyện viên.
+   - Quản trị nhân sự & đội ngũ toàn chuỗi: thêm/bớt/sửa nhân sự, phân cơ sở công tác (CN01 & CN02), phân ca trực, khóa/mở khóa tài khoản, cấp lại mật khẩu (123456), theo dõi quỹ lương & thưởng KPI tự động, xuất bảng lương ra Excel.
    - Cấu hình và xem giá thực tế của các hội viên VIP (chính sách giảm 50% theo yêu cầu bảo mật).
 
 2. **Lễ tân (Chị Linh)** - Tài khoản: `letan1` (CN01) hoặc `letan2` (CN02) / Mật khẩu: `123456`

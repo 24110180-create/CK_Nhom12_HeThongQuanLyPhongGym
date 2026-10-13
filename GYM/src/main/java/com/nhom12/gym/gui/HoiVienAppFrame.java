@@ -7,23 +7,28 @@ import com.nhom12.gym.util.Auth;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
- * Ứng Dụng Riêng Biệt Dành Riêng Cho Hội Viên FitLife Gym (FitLife Member Portal)
- * Tách biệt hoàn toàn với hệ thống quản trị nội bộ của nhân viên:
+ * ỨNG DỤNG RIÊNG BIỆT CHO HỘI VIÊN FITLIFE GYM (FITLIFE MEMBER PORTAL)
+ * Thiết kế chuẩn Sidebar Dọc (Vertical Menu Layout) bên trái:
  * 1. Thẻ Hội Viên Điện Tử & Mã QR Check-in Tự Động
- * 2. Đặt Chỗ Lớp Học Nhóm (Group Fitness: Yoga, Zumba, Boxing...)
+ * 2. Đặt Chỗ Lớp Học Nhóm (Yoga, Zumba, Boxing...)
  * 3. Lịch Tập Huấn Luyện Viên Cá Nhân (PT 1:1)
- * 4. Theo Dõi Chỉ Số Cơ Thể InBody (Cơ, Mỡ, BMI, BMR)
+ * 4. Theo Dõi Chỉ Số Cơ Thể InBody (Cơ, Mỡ, BMI)
  * 5. Quản Lý Gói Tập & Thanh Toán Gia Hạn VietQR
- * 6. Đánh Giá & Góp Ý Chất Lượng Dịch Vụ
+ * 6. Đánh Giá & Góp Ý Dịch Vụ
  */
 public class HoiVienAppFrame extends JFrame {
 
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel contentArea = new JPanel(cardLayout);
-    private final JPanel pnlTabBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
-    private JButton btnActiveTab = null;
+    private final List<SidebarMenuItem> sidebarMenuItems = new ArrayList<>();
+    private JLabel lblWorkspaceTitle;
+    private JLabel lblWorkspaceBreadcrumb;
 
     private static final String TAB_CARD_QR = "TAB_CARD_QR";
     private static final String TAB_CLASS = "TAB_CLASS";
@@ -32,8 +37,14 @@ public class HoiVienAppFrame extends JFrame {
     private static final String TAB_PACKAGE = "TAB_PACKAGE";
     private static final String TAB_FEEDBACK = "TAB_FEEDBACK";
 
+    public static class SidebarMenuItem {
+        public JButton button;
+        public String title;
+        public String subtitle;
+        public String cardKey;
+    }
+
     public HoiVienAppFrame() {
-        // Thiết lập vai trò hội viên mặc định nếu chưa đăng nhập
         if (Auth.vaiTro == null || Auth.vaiTro.trim().isEmpty()) {
             Auth.vaiTro = "Hội viên";
             Auth.hoTen = "Nguyễn Văn An";
@@ -42,8 +53,8 @@ public class HoiVienAppFrame extends JFrame {
         }
 
         setTitle("FITLIFE MEMBER - CỔNG THÀNH VIÊN ĐIỆN TỬ (" + Auth.hoTen + ")");
-        setSize(1180, 780);
-        setMinimumSize(new Dimension(1000, 680));
+        setSize(1350, 820);
+        setMinimumSize(new Dimension(1050, 680));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -54,52 +65,101 @@ public class HoiVienAppFrame extends JFrame {
         JPanel root = new JPanel(new BorderLayout());
         root.setBackground(new Color(248, 250, 252));
 
-        // 1. TOP HEADER BRAND & MEMBER PROFILE
-        JPanel topHeader = new JPanel(new BorderLayout(15, 0));
-        topHeader.setBackground(new Color(15, 23, 42)); // Slate 900 Đẳng Cấp
-        topHeader.setPreferredSize(new Dimension(0, 62));
-        topHeader.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(30, 41, 59)),
-                new EmptyBorder(0, 24, 0, 24)
-        ));
+        Color accentColor = new Color(234, 179, 8); // Vàng Gold
+        String memberName = (Auth.hoTen != null && !Auth.hoTen.isEmpty()) ? Auth.hoTen : "Nguyễn Văn An";
+        String memberPhone = (Auth.soDienThoai != null && !Auth.soDienThoai.isEmpty()) ? Auth.soDienThoai : "0901234567";
 
-        // Trái: Thương hiệu FitLife Member App
-        JPanel brandLeft = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 14));
-        brandLeft.setOpaque(false);
+        // --- A. SIDEBAR DỌC BÊN TRÁI (275px) ---
+        JPanel sidebar = new JPanel(new BorderLayout());
+        sidebar.setBackground(new Color(15, 23, 42)); // Slate 900
+        sidebar.setPreferredSize(new Dimension(275, 0));
+        sidebar.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(30, 41, 59)));
+
+        // Sidebar Top: Thương hiệu & Hồ sơ Hội Viên
+        JPanel sidebarTop = new JPanel();
+        sidebarTop.setLayout(new BoxLayout(sidebarTop, BoxLayout.Y_AXIS));
+        sidebarTop.setOpaque(false);
+        sidebarTop.setBorder(new EmptyBorder(20, 18, 12, 18));
 
         JLabel lblBrand = new JLabel("FITLIFE MEMBER");
-        lblBrand.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblBrand.setFont(new Font("Segoe UI", Font.BOLD, 22));
         lblBrand.setForeground(Color.WHITE);
+        lblBrand.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel lblDivider = new JLabel("|");
-        lblDivider.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        lblDivider.setForeground(new Color(71, 85, 105));
+        JLabel lblBadge = new JLabel("  VIP DIAMOND MEMBER  ");
+        lblBadge.setFont(new Font("Segoe UI", Font.BOLD, 10));
+        lblBadge.setForeground(new Color(15, 23, 42));
+        lblBadge.setBackground(accentColor);
+        lblBadge.setOpaque(true);
+        lblBadge.setBorder(BorderFactory.createEmptyBorder(3, 6, 3, 6));
+        lblBadge.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel lblSub = new JLabel("Cổng Thành Viên Thông Minh");
-        lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        lblSub.setForeground(new Color(148, 163, 184));
+        // Box hồ sơ hội viên
+        JPanel profileBox = new JPanel(new BorderLayout(12, 0));
+        profileBox.setBackground(new Color(30, 41, 59));
+        profileBox.setBorder(new EmptyBorder(10, 12, 10, 12));
+        profileBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel lblVipBadge = new JLabel(" VIP DIAMOND ");
-        lblVipBadge.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        lblVipBadge.setOpaque(true);
-        lblVipBadge.setBackground(new Color(234, 179, 8)); // Vàng Gold
-        lblVipBadge.setForeground(new Color(15, 23, 42));
-        lblVipBadge.setBorder(new EmptyBorder(2, 6, 2, 6));
+        JLabel lblAvatar = new JLabel("HV", SwingConstants.CENTER);
+        lblAvatar.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblAvatar.setForeground(new Color(15, 23, 42));
+        lblAvatar.setBackground(accentColor);
+        lblAvatar.setOpaque(true);
+        lblAvatar.setPreferredSize(new Dimension(38, 38));
 
-        brandLeft.add(lblBrand);
-        brandLeft.add(lblDivider);
-        brandLeft.add(lblSub);
-        brandLeft.add(lblVipBadge);
-        topHeader.add(brandLeft, BorderLayout.WEST);
+        JPanel profileText = new JPanel(new GridLayout(3, 1, 0, 2));
+        profileText.setOpaque(false);
 
-        // Phải: Thông tin hội viên & Nút Đăng xuất
-        JPanel userRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 14));
-        userRight.setOpaque(false);
+        JLabel lblStaff = new JLabel(memberName);
+        lblStaff.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        lblStaff.setForeground(new Color(241, 245, 249));
 
-        String memberName = (Auth.hoTen != null && !Auth.hoTen.isEmpty()) ? Auth.hoTen : "Hội Viên VIP";
-        JLabel lblUserGreeting = new JLabel("Xin chào, " + memberName);
-        lblUserGreeting.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        lblUserGreeting.setForeground(new Color(241, 245, 249));
+        JLabel lblShift = new JLabel("Thành viên VIP • Kích hoạt");
+        lblShift.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        lblShift.setForeground(new Color(52, 211, 153));
+
+        JLabel lblPhone = new JLabel("SĐT: " + memberPhone);
+        lblPhone.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        lblPhone.setForeground(new Color(148, 163, 184));
+
+        profileText.add(lblStaff);
+        profileText.add(lblShift);
+        profileText.add(lblPhone);
+        profileBox.add(lblAvatar, BorderLayout.WEST);
+        profileBox.add(profileText, BorderLayout.CENTER);
+
+        sidebarTop.add(lblBrand);
+        sidebarTop.add(Box.createRigidArea(new Dimension(0, 6)));
+        sidebarTop.add(lblBadge);
+        sidebarTop.add(Box.createRigidArea(new Dimension(0, 14)));
+        sidebarTop.add(profileBox);
+        sidebar.add(sidebarTop, BorderLayout.NORTH);
+
+        // Sidebar Center: Menu cuộn dọc
+        JPanel menuContainer = new JPanel();
+        menuContainer.setLayout(new BoxLayout(menuContainer, BoxLayout.Y_AXIS));
+        menuContainer.setOpaque(false);
+        menuContainer.setBorder(new EmptyBorder(8, 10, 8, 10));
+
+        JScrollPane scrollMenu = new JScrollPane(menuContainer);
+        scrollMenu.setBorder(null);
+        scrollMenu.setOpaque(false);
+        scrollMenu.getViewport().setOpaque(false);
+        scrollMenu.getVerticalScrollBar().setUnitIncrement(14);
+        sidebar.add(scrollMenu, BorderLayout.CENTER);
+
+        // Thêm 6 mục menu dọc cho Hội viên
+        addSidebarItem(menuContainer, "Thẻ VIP & Check-in QR", "Mã thẻ cá nhân & cửa flap barrier", TAB_CARD_QR, accentColor, true);
+        addSidebarItem(menuContainer, "Đặt Chỗ Lớp Học", "Lớp Yoga, Zumba, Boxing", TAB_CLASS, accentColor, false);
+        addSidebarItem(menuContainer, "Lịch Tập Với PT", "Số buổi kèm & kỷ lục tạ PR", TAB_PT, accentColor, false);
+        addSidebarItem(menuContainer, "Chỉ Số Cơ Thể InBody", "Theo dõi cơ, mỡ, BMI cá nhân", TAB_INBODY, accentColor, false);
+        addSidebarItem(menuContainer, "Gói Tập & Gia Hạn", "Hợp đồng & thanh toán VietQR", TAB_PACKAGE, accentColor, false);
+        addSidebarItem(menuContainer, "Đánh Giá & Góp Ý", "Chấm điểm dịch vụ phòng gym", TAB_FEEDBACK, accentColor, false);
+
+        // Sidebar Bottom: Đổi mật khẩu & Đăng xuất
+        JPanel sidebarBottom = new JPanel(new GridLayout(2, 1, 0, 8));
+        sidebarBottom.setOpaque(false);
+        sidebarBottom.setBorder(new EmptyBorder(12, 14, 16, 14));
 
         JButton btnChangePass = new JButton("Đổi Mật Khẩu");
         btnChangePass.setFont(new Font("Segoe UI", Font.PLAIN, 12));
@@ -111,10 +171,14 @@ public class HoiVienAppFrame extends JFrame {
 
         JButton btnLogout = new JButton("Đăng Xuất");
         btnLogout.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnLogout.setBackground(new Color(220, 38, 38));
-        btnLogout.setForeground(Color.WHITE);
+        btnLogout.setBackground(new Color(30, 41, 59));
+        btnLogout.setForeground(new Color(248, 113, 113));
         btnLogout.setFocusPainted(false);
         btnLogout.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnLogout.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(239, 68, 68), 1),
+                new EmptyBorder(5, 12, 5, 12)
+        ));
         btnLogout.addActionListener(e -> {
             int opt = JOptionPane.showConfirmDialog(this,
                     "Bạn có chắc chắn muốn đăng xuất khỏi Ứng dụng Hội viên FitLife?",
@@ -126,35 +190,51 @@ public class HoiVienAppFrame extends JFrame {
             }
         });
 
-        userRight.add(lblUserGreeting);
-        userRight.add(btnChangePass);
-        userRight.add(btnLogout);
-        topHeader.add(userRight, BorderLayout.EAST);
+        sidebarBottom.add(btnChangePass);
+        sidebarBottom.add(btnLogout);
+        sidebar.add(sidebarBottom, BorderLayout.SOUTH);
 
-        // 2. SUB NAVIGATION BAR (THANH TAB CHUYÊN DỤNG CHO HỘI VIÊN)
-        JPanel navContainer = new JPanel(new BorderLayout());
-        navContainer.setBackground(Color.WHITE);
-        navContainer.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(226, 232, 240)));
+        root.add(sidebar, BorderLayout.WEST);
 
-        pnlTabBar.setOpaque(false);
-        pnlTabBar.setBorder(new EmptyBorder(4, 16, 4, 16));
+        // --- B. MAIN WORKSPACE BÊN PHẢI ---
+        JPanel mainArea = new JPanel(new BorderLayout());
+        mainArea.setBackground(new Color(248, 250, 252));
 
-        themTabButton("Thẻ VIP & Check-in QR", TAB_CARD_QR, true);
-        themTabButton("Đặt Chỗ Lớp Học", TAB_CLASS, false);
-        themTabButton("Lịch Tập Với PT", TAB_PT, false);
-        themTabButton("Chỉ Số Cơ Thể InBody", TAB_INBODY, false);
-        themTabButton("Gói Tập & Gia Hạn", TAB_PACKAGE, false);
-        themTabButton("Đánh Giá & Góp Ý", TAB_FEEDBACK, false);
+        // Workspace Top Header
+        JPanel workspaceHeader = new JPanel(new BorderLayout());
+        workspaceHeader.setBackground(Color.WHITE);
+        workspaceHeader.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(226, 232, 240)),
+                new EmptyBorder(12, 24, 12, 24)
+        ));
 
-        navContainer.add(pnlTabBar, BorderLayout.CENTER);
+        JPanel headerLeft = new JPanel(new GridLayout(2, 1, 0, 2));
+        headerLeft.setOpaque(false);
+        lblWorkspaceTitle = new JLabel("THẺ VIP & CHECK-IN QR");
+        lblWorkspaceTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblWorkspaceTitle.setForeground(new Color(15, 23, 42));
 
-        // Gom Top Header và Nav Container vào Top Panel
-        JPanel topGroup = new JPanel(new BorderLayout());
-        topGroup.add(topHeader, BorderLayout.NORTH);
-        topGroup.add(navContainer, BorderLayout.SOUTH);
-        root.add(topGroup, BorderLayout.NORTH);
+        lblWorkspaceBreadcrumb = new JLabel("Cổng Hội Viên > Thẻ VIP & Check-in QR");
+        lblWorkspaceBreadcrumb.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        lblWorkspaceBreadcrumb.setForeground(new Color(100, 116, 139));
 
-        // 3. MAIN CENTER CONTENT AREA (CARD LAYOUT CHỨA 6 PANEL ĐẶC THÙ)
+        headerLeft.add(lblWorkspaceTitle);
+        headerLeft.add(lblWorkspaceBreadcrumb);
+        workspaceHeader.add(headerLeft, BorderLayout.WEST);
+
+        JPanel headerRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        headerRight.setOpaque(false);
+
+        String today = new SimpleDateFormat("EEEE, dd/MM/yyyy").format(new Date());
+        JLabel lblDate = new JLabel(today);
+        lblDate.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        lblDate.setForeground(new Color(71, 85, 105));
+        headerRight.add(lblDate);
+        workspaceHeader.add(headerRight, BorderLayout.EAST);
+
+        mainArea.add(workspaceHeader, BorderLayout.NORTH);
+
+        // Content Area CardLayout
         contentArea.setOpaque(false);
         contentArea.add(new HoiVienTheDienTuPanel(), TAB_CARD_QR);
         contentArea.add(new HoiVienDatLopPanel(), TAB_CLASS);
@@ -163,54 +243,95 @@ public class HoiVienAppFrame extends JFrame {
         contentArea.add(new HoiVienGoiTapPanel(), TAB_PACKAGE);
         contentArea.add(new HoiVienGopYPanel(), TAB_FEEDBACK);
 
-        root.add(contentArea, BorderLayout.CENTER);
+        mainArea.add(contentArea, BorderLayout.CENTER);
+        root.add(mainArea, BorderLayout.CENTER);
 
         setContentPane(root);
     }
 
-    private void themTabButton(String title, String cardKey, boolean isDefault) {
-        JButton btn = new JButton(title);
-        btn.setFont(new Font("Segoe UI", isDefault ? Font.BOLD : Font.PLAIN, 13));
+    private void addSidebarItem(JPanel container, String title, String subtitle, String cardKey, Color accent, boolean isDefault) {
+        SidebarMenuItem item = new SidebarMenuItem();
+        item.title = title;
+        item.subtitle = subtitle;
+        item.cardKey = cardKey;
+
+        JButton btn = new JButton() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (Boolean.TRUE.equals(getClientProperty("active"))) {
+                    Graphics2D g2 = (Graphics2D) g.create();
+                    g2.setColor(accent);
+                    g2.fillRect(0, 0, 4, getHeight());
+                    g2.dispose();
+                }
+            }
+        };
+        btn.setLayout(new BorderLayout(10, 0));
+        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 46));
+        btn.setPreferredSize(new Dimension(255, 46));
         btn.setFocusPainted(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setBorder(new EmptyBorder(8, 14, 8, 14));
+
+        JPanel textPanel = new JPanel(new GridLayout(2, 1, 0, 1));
+        textPanel.setOpaque(false);
+        JLabel lblMain = new JLabel(title);
+        lblMain.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblMain.setForeground(new Color(226, 232, 240));
+
+        JLabel lblSub = new JLabel(subtitle);
+        lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        lblSub.setForeground(new Color(148, 163, 184));
+
+        textPanel.add(lblMain);
+        textPanel.add(lblSub);
+        btn.add(textPanel, BorderLayout.CENTER);
+
+        item.button = btn;
+        sidebarMenuItems.add(item);
+
+        btn.addActionListener(e -> selectSidebarItem(item, accent));
+
+        java.awt.event.MouseAdapter ma = new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                selectSidebarItem(item, accent);
+            }
+        };
+        textPanel.addMouseListener(ma);
+        lblMain.addMouseListener(ma);
+        lblSub.addMouseListener(ma);
+
+        container.add(btn);
+        container.add(Box.createRigidArea(new Dimension(0, 3)));
 
         if (isDefault) {
-            btnActiveTab = btn;
-            setButtonActiveStyle(btn);
+            selectSidebarItem(item, accent);
         } else {
-            setButtonInactiveStyle(btn);
+            setButtonState(btn, false);
+        }
+    }
+
+    private void selectSidebarItem(SidebarMenuItem selectedItem, Color accent) {
+        for (SidebarMenuItem item : sidebarMenuItems) {
+            boolean isSel = (item == selectedItem);
+            setButtonState(item.button, isSel);
         }
 
-        btn.addActionListener(e -> {
-            if (btnActiveTab != null) {
-                setButtonInactiveStyle(btnActiveTab);
-            }
-            btnActiveTab = btn;
-            setButtonActiveStyle(btn);
-            cardLayout.show(contentArea, cardKey);
-        });
-
-        pnlTabBar.add(btn);
+        lblWorkspaceTitle.setText(selectedItem.title.toUpperCase());
+        lblWorkspaceBreadcrumb.setText("Cổng Hội Viên > " + selectedItem.title + " (" + selectedItem.subtitle + ")");
+        cardLayout.show(contentArea, selectedItem.cardKey);
     }
 
-    private void setButtonActiveStyle(JButton btn) {
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btn.setBackground(new Color(238, 242, 255)); // Indigo nhạt
-        btn.setForeground(new Color(67, 56, 202));   // Indigo 700
-        btn.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(199, 210, 254), 1),
-                new EmptyBorder(6, 16, 6, 16)
-        ));
-    }
-
-    private void setButtonInactiveStyle(JButton btn) {
-        btn.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        btn.setBackground(Color.WHITE);
-        btn.setForeground(new Color(71, 85, 105));
-        btn.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(241, 245, 249), 1),
-                new EmptyBorder(6, 16, 6, 16)
-        ));
+    private void setButtonState(JButton btn, boolean active) {
+        btn.putClientProperty("active", active);
+        if (active) {
+            btn.setBackground(new Color(30, 41, 59));
+        } else {
+            btn.setBackground(new Color(15, 23, 42));
+        }
+        btn.repaint();
     }
 
     private void moDialogDoiMatKhau() {
@@ -247,7 +368,7 @@ public class HoiVienAppFrame extends JFrame {
 
     public static void main(String[] args) {
         try {
-            UIManager.put("Button.arc", 10);
+            UIManager.put("Button.arc", 8);
             UIManager.put("Component.arc", 8);
             UIManager.put("TextComponent.arc", 8);
             UIManager.setLookAndFeel(new FlatLightLaf());

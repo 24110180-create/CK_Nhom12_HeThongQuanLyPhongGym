@@ -31,9 +31,9 @@
 8. **Màn hình Đăng Ký Tài Khoản Chọn Role (`DangKyTaiKhoanDialog`)**:
    - Cho phép người dùng trực tiếp chọn 1 trong 5 vai trò (Hội viên, Lễ tân, HLV, Quản lý, Chủ phòng) qua giao diện thẻ trực quan.
    - Tài khoản đăng ký mới tự động kích hoạt và đăng nhập được ngay lập tức vào đúng không gian làm việc của vai trò tương ứng.
-9. **Đồng bộ chuẩn giao diện Dual-Tier Horizontal Ribbon cho mọi vai trò**:
-   - Tầng 1: Top Navbar Slate 900 (`#0F172A`) với logo FitLife Gym, nút Quét Mã Check-in, Dropdown chuyển "Góc nhìn", Tên người dùng và nút Đăng xuất.
-   - Tầng 2: Sub-Navbar Ribbon nền trắng viền xám (`#E2E8F0`) chứa các tab chức năng dạng gạch chân chỉ báo màu vai trò, Dropdown lọc Chi nhánh và nút Làm mới.
+9. **Đồng bộ chuẩn giao diện Menu Dọc (Vertical Sidebar Layout) cho mọi vai trò**:
+   - Sidebar bên trái: Rộng 275px màu Slate 900 (`#0F172A`) chứa Logo FitLife Gym, Huy hiệu màu nhận diện vai trò, Thẻ thông tin cá nhân và Danh sách các mục menu xếp dọc xuống (kèm phụ đề nghiệp vụ, hiệu ứng gạch đứng 4px khi active).
+   - Header đỉnh bên phải: Nền trắng viền xám chứa Tiêu đề mô-đun, Breadcrumb, Nút Quét Mã Check-in (Emerald 500), Dropdown chuyển "Góc nhìn" (5 vai trò), Dropdown Chi nhánh và Ngày giờ hệ thống.
 
 ### B. Phân Tách 2 Ứng Dụng Độc Lập (Admin Suite vs FitLife Member App):
 - **Hệ thống Quản Trị Chuỗi Gym (`App.java` / `Chay_HeThong_FitLife.bat`)**: Dành riêng cho Chủ phòng, Lễ tân trạm Check-in, Huấn luyện viên, Quản lý chi nhánh.

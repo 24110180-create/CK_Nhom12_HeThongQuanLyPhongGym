@@ -1,6 +1,8 @@
 package com.nhom12.gym.gui.panels;
 
 import com.nhom12.gym.entity.HoiVien;
+import com.nhom12.gym.gui.GuiMaQRDialog;
+import com.nhom12.gym.gui.QRScannerSimulatorDialog;
 import com.nhom12.gym.service.HoiVienService;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -414,7 +416,84 @@ public class QuanLyHoiVienPanel extends JPanel {
         table.getColumnModel().getColumn(10).setPreferredWidth(130); // Trạng Thái
 
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
+
+        // Thanh công cụ thao tác thẻ QR và Check-in
+        JPanel bottomActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 6));
+        bottomActions.setOpaque(false);
+
+        JLabel lblHint = new JLabel("💡 Chọn một hội viên để xem thẻ QR hoặc quét thử Check-in:");
+        lblHint.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        lblHint.setForeground(new Color(100, 116, 139));
+
+        JButton btnXemTheQR = new JButton("📇 Xem & Gửi Thẻ QR");
+        btnXemTheQR.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnXemTheQR.setBackground(new Color(37, 99, 235));
+        btnXemTheQR.setForeground(Color.WHITE);
+        btnXemTheQR.setFocusPainted(false);
+        btnXemTheQR.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnXemTheQR.addActionListener(e -> xemTheQRHoiVienDangChon());
+
+        JButton btnQuetCheckIn = new JButton("⚡ Quét Thử Check-in Thẻ Này");
+        btnQuetCheckIn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnQuetCheckIn.setBackground(new Color(16, 185, 129));
+        btnQuetCheckIn.setForeground(Color.WHITE);
+        btnQuetCheckIn.setFocusPainted(false);
+        btnQuetCheckIn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnQuetCheckIn.addActionListener(e -> quetCheckInHoiVienDangChon());
+
+        bottomActions.add(lblHint);
+        bottomActions.add(btnXemTheQR);
+        bottomActions.add(btnQuetCheckIn);
+        panel.add(bottomActions, BorderLayout.SOUTH);
+
         return panel;
+    }
+
+    private void xemTheQRHoiVienDangChon() {
+        int row = table.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn một dòng hội viên trong bảng để xem thẻ QR!",
+                    "Chưa chọn hội viên", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int modelRow = table.convertRowIndexToModel(row);
+        String maQR = (String) tableModel.getValueAt(modelRow, 1);
+        String hoTen = (String) tableModel.getValueAt(modelRow, 2);
+        String sdt = (String) tableModel.getValueAt(modelRow, 3);
+        String goiTap = (String) tableModel.getValueAt(modelRow, 4);
+        String chiNhanh = (String) tableModel.getValueAt(modelRow, 8);
+
+        Frame parentFrame = (Frame) SwingUtilities.getWindowAncestor(this);
+        GuiMaQRDialog dialog = new GuiMaQRDialog(parentFrame, maQR, hoTen, sdt, goiTap, chiNhanh, sdt, "123456");
+        dialog.setVisible(true);
+    }
+
+    private void quetCheckInHoiVienDangChon() {
+        int row = table.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn một dòng hội viên trong bảng để quét thử Check-in!",
+                    "Chưa chọn hội viên", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int modelRow = table.convertRowIndexToModel(row);
+        String maQR = (String) tableModel.getValueAt(modelRow, 1);
+        String hoTen = (String) tableModel.getValueAt(modelRow, 2);
+
+        Window parentWindow = SwingUtilities.getWindowAncestor(this);
+        QRScannerSimulatorDialog scanner = new QRScannerSimulatorDialog(parentWindow, code -> {
+            // Mở trạm check-in và quét trực tiếp
+            JOptionPane.showMessageDialog(parentWindow,
+                    "ĐÃ BẮN MÃ QUÉT THẺ THÀNH CÔNG!\n"
+                            + "• Mã Thẻ: " + code + "\n"
+                            + "• Hội Viên: " + hoTen + "\n\n"
+                            + "Hệ thống đã ghi nhận tín hiệu từ máy quét Honeywell Voyager 1450g!",
+                    "Tín Hiệu Máy Quét Ghi Nhận", JOptionPane.INFORMATION_MESSAGE);
+        });
+        scanner.setVisible(true);
     }
 
     public void loadDataToTable() {

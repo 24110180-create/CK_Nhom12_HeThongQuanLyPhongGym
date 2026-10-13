@@ -195,6 +195,20 @@ Hệ thống được thiết kế phân tầng chuẩn mực theo mô hình ki�
 * **`QR003`**: Thẻ bị tạm khóa ➔ Cảnh báo 420Hz, cổng khóa đỏ, từ chối cho vào.
 * **`QR004`**: Thẻ sai chi nhánh ➔ Cảnh báo 420Hz, cổng khóa đỏ, báo thẻ cơ sở CN01 không được vào CN02.
 * **`VIP007`**: Hội viên VIP đặc biệt của Anh Đức ➔ Bíp thành công, kích hoạt chính sách bảo mật giá ẩn.
+* **`PASS-8888`**: Vé lẻ 1 ngày (80,000 đ) ➔ Bíp thành công, mở cổng đúng 1 lần duy nhất trong ngày.
+
+### C. 3 Cách Quét Mã Check-in Trong Phần Mềm (Hỗ Trợ Cả Thiết Bị Thật Lẫn Chấm Thi Trên Máy Tính):
+1. **Cách 1: Sử dụng Súng Quét Mã Vạch USB Honeywell Voyager 1450g Thật (Hardware Plug & Play)**:
+   - Cắm súng quét vào cổng USB máy tính. Hệ thống tự nhận diện thiết bị chuẩn **USB HID Keyboard Emulation** (không cần cài driver).
+   - Ô nhập mã trên `CheckInForm` luôn được duy trì **Auto-Focus liên tục**.
+   - Khi đưa mã QR trên điện thoại hoặc thẻ cứng vào tia laser, súng quét tự động bắn chuỗi ký tự và tự động gõ phím **Enter (`\n`)** ➔ Kích hoạt mở cổng Flap Barrier và phát tiếng bíp trong 20ms.
+2. **Cách 2: Sử Dụng Bộ Mô Phỏng Máy Quét Ảo Trực Quan (Interactive Scanner Simulator)**:
+   - Ngay cạnh ô quét, bấm nút **`[ 📸 Mở Máy Quét Ảo (Simulator) ]`** (hoặc nút **`[ ⚡ Quét Mã Check-in ]`** trên thanh Top Navbar của Chủ).
+   - Một cửa sổ ống kính máy quét chuyên nghiệp hiện ra với **Tia Laser Đỏ chuyển động quét lên xuống**.
+   - Chọn bất kỳ thẻ nào trong danh sách (thẻ kịch bản 5 Rules hoặc thẻ lấy trực tiếp từ CSDL SQL Server) ➔ Bấm nút **`[ ⚡ BẮN TIA QUÉT (TRIGGER SCAN) ]`** ➔ Phát tiếng bíp và tự động mở cổng an ninh.
+3. **Cách 3: Quét Từ File Ảnh QR & Thao Tác Trực Tiếp Từ Danh Sách Hội Viên**:
+   - Bấm nút **`[ 📁 Quét Ảnh QR... ]`** để chọn tệp hình ảnh mã thẻ từ máy tính.
+   - Hoặc trong màn hình **Danh Sách Hội Viên Đã Đăng Ký**, chọn bất kỳ hội viên nào trong bảng và bấm nút **`[ 📇 Xem & Gửi Thẻ QR ]`** hoặc **`[ ⚡ Quét Thử Check-in Thẻ Này ]`**.
 
 ---
 

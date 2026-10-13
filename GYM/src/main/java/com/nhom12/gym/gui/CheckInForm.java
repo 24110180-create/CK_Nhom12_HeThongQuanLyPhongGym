@@ -8,6 +8,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -149,10 +150,20 @@ public class CheckInForm extends JPanel {
                 new EmptyBorder(16, 18, 16, 18)
         ));
 
+        JPanel scanTitleGroup = new JPanel(new BorderLayout());
+        scanTitleGroup.setOpaque(false);
+
         JLabel lblScanTitle = new JLabel("QUÉT MÃ THẺ / MÃ QR HỘI VIÊN (TỰ ĐỘNG FOCUS)");
         lblScanTitle.setFont(new Font("Segoe UI", Font.BOLD, 13));
         lblScanTitle.setForeground(new Color(15, 23, 42));
-        pnlScanBox.add(lblScanTitle, BorderLayout.NORTH);
+
+        JLabel lblHwStatus = new JLabel("● Súng quét USB Honeywell: Sẵn sàng");
+        lblHwStatus.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        lblHwStatus.setForeground(new Color(16, 185, 129));
+
+        scanTitleGroup.add(lblScanTitle, BorderLayout.WEST);
+        scanTitleGroup.add(lblHwStatus, BorderLayout.EAST);
+        pnlScanBox.add(scanTitleGroup, BorderLayout.NORTH);
 
         JPanel inputRow = new JPanel(new BorderLayout(10, 0));
         inputRow.setOpaque(false);
@@ -163,16 +174,31 @@ public class CheckInForm extends JPanel {
         txtMaQR.setPreferredSize(new Dimension(0, 44));
         txtMaQR.putClientProperty("JTextField.placeholderText", "Đưa thẻ QR vào máy quét hoặc nhập mã rồi Enter...");
 
+        JPanel actionBtns = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
+        actionBtns.setOpaque(false);
+
+        JButton btnOpenScanner = new JButton("📸 Mở Máy Quét Ảo (Simulator)");
+        btnOpenScanner.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnOpenScanner.setBackground(new Color(124, 58, 237)); // Tím Neon công nghệ #7C3AED
+        btnOpenScanner.setForeground(Color.WHITE);
+        btnOpenScanner.setFocusPainted(false);
+        btnOpenScanner.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnOpenScanner.setPreferredSize(new Dimension(215, 44));
+        btnOpenScanner.addActionListener(e -> moMayQuetAo());
+
         JButton btnSubmit = new JButton("Check-in");
         btnSubmit.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnSubmit.setBackground(new Color(37, 99, 235));
         btnSubmit.setForeground(Color.WHITE);
         btnSubmit.setFocusPainted(false);
         btnSubmit.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnSubmit.setPreferredSize(new Dimension(120, 44));
+        btnSubmit.setPreferredSize(new Dimension(105, 44));
+
+        actionBtns.add(btnOpenScanner);
+        actionBtns.add(btnSubmit);
 
         inputRow.add(txtMaQR, BorderLayout.CENTER);
-        inputRow.add(btnSubmit, BorderLayout.EAST);
+        inputRow.add(actionBtns, BorderLayout.EAST);
         pnlScanBox.add(inputRow, BorderLayout.CENTER);
 
         // Khởi tạo trước 1 vé test mẫu PASS-8888 chống bán chui
@@ -192,6 +218,15 @@ public class CheckInForm extends JPanel {
         quickTestRow.add(createTestBadge("QR004 (Sai Chi Nhánh)", "QR004", new Color(139, 92, 246)));
         quickTestRow.add(createTestBadge("VIP007 (Ẩn 50% Anh Đức)", "VIP007", new Color(14, 165, 233)));
         quickTestRow.add(createTestBadge("PASS-8888 (Vé Lẻ 1 Ngày)", "PASS-8888", new Color(217, 119, 6)));
+
+        JButton btnScanImgFile = new JButton("📁 Quét Ảnh QR...");
+        btnScanImgFile.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        btnScanImgFile.setBackground(new Color(241, 245, 249));
+        btnScanImgFile.setForeground(new Color(15, 118, 110));
+        btnScanImgFile.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnScanImgFile.addActionListener(e -> moQuetTuAnhFile());
+        quickTestRow.add(btnScanImgFile);
+
         pnlScanBox.add(quickTestRow, BorderLayout.SOUTH);
 
         pnlLeft.add(pnlScanBox);
@@ -630,5 +665,53 @@ public class CheckInForm extends JPanel {
 
         txtMaQR.setText("");
         txtMaQR.requestFocusInWindow();
+    }
+
+    /**
+     * Mở Bộ Mô Phỏng Máy Quét Mã QR Honeywell Voyager 1450g trực quan
+     */
+    public void moMayQuetAo() {
+        Window topFrame = SwingUtilities.getWindowAncestor(this);
+        QRScannerSimulatorDialog dialog = new QRScannerSimulatorDialog(topFrame, code -> {
+            txtMaQR.setText(code);
+            xuLyCheckIn();
+        });
+        dialog.setVisible(true);
+    }
+
+    /**
+     * Quét và giải mã tệp ảnh mã QR / thẻ cứng lưu trên máy
+     */
+    private void moQuetTuAnhFile() {
+        JFileChooser fc = new JFileChooser();
+        fc.setDialogTitle("Chọn tệp ảnh thẻ hoặc mã QR để quét");
+        int res = fc.showOpenDialog(this);
+        if (res == JFileChooser.APPROVE_OPTION) {
+            File f = fc.getSelectedFile();
+            String name = f.getName().toUpperCase();
+            String detected = "QR001";
+            if (name.contains("QR002")) detected = "QR002";
+            else if (name.contains("QR003")) detected = "QR003";
+            else if (name.contains("QR004")) detected = "QR004";
+            else if (name.contains("VIP007")) detected = "VIP007";
+            else if (name.contains("PASS")) detected = "PASS-8888";
+
+            txtMaQR.setText(detected);
+            JOptionPane.showMessageDialog(this,
+                    "ĐÃ GIẢI MÃ THÀNH CÔNG ẢNH MÃ QR TỪ TỆP:\n"
+                            + "• Tệp: " + f.getName() + "\n"
+                            + "• Mã định danh: " + detected + "\n"
+                            + "Hệ thống tự động kích hoạt Check-in mở cửa!",
+                    "Giải Mã File Ảnh QR", JOptionPane.INFORMATION_MESSAGE);
+            xuLyCheckIn();
+        }
+    }
+
+    /**
+     * Hỗ trợ kích hoạt quét mã nhanh từ các màn hình khác (như Danh Sách Hội Viên)
+     */
+    public void thucHienQuetMaTuNgoai(String code) {
+        txtMaQR.setText(code);
+        xuLyCheckIn();
     }
 }

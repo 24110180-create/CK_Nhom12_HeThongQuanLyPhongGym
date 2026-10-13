@@ -44,7 +44,11 @@ public class MainDashboard extends JFrame {
     }
 
     public MainDashboard() {
-        this.currentRole = (Auth.vaiTro != null && !Auth.vaiTro.trim().isEmpty()) ? Auth.vaiTro : "Chủ";
+        this((Auth.vaiTro != null && !Auth.vaiTro.trim().isEmpty()) ? Auth.vaiTro : "Chủ");
+    }
+
+    public MainDashboard(String initialRole) {
+        this.currentRole = (initialRole != null && !initialRole.trim().isEmpty()) ? initialRole : "Chủ";
         setTitle("FitLife Gym Management - " + getRoleDisplayName(currentRole));
         setSize(1400, 850);
         setMinimumSize(new Dimension(1100, 700));

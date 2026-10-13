@@ -4,6 +4,7 @@ import com.nhom12.gym.dao.HoiVienDAO;
 import com.nhom12.gym.dao.TaiKhoanDAO;
 import com.nhom12.gym.entity.HoiVien;
 import com.nhom12.gym.entity.TaiKhoan;
+import com.nhom12.gym.util.Auth;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -13,161 +14,244 @@ import java.util.Date;
 import java.util.function.BiConsumer;
 
 /**
- * Màn hình Đăng Ký Tài Khoản Đa Vai Trò (Multi-Role Registration Dialog)
- * Cho phép người dùng chọn vai trò (Hội viên, Lễ tân, HLV, Quản lý, Chủ phòng)
- * và tự tạo tài khoản mới để đăng nhập trực tiếp vào hệ thống FitLife Gym.
+ * MÀN HÌNH ĐĂNG KÝ TÀI KHOẢN PHÂN HỆ 4 VAI TRÒ
+ * Chia 4 vai trò rõ ràng, giao diện đồng bộ với nhận diện trong màn hình Chủ Phòng:
+ * 1. Trạm Lễ Tân & Bán Hàng (Emerald #10B981)
+ * 2. Không Gian Huấn Luyện Viên (Amber #F59E0B)
+ * 3. Điều Hành Quản Lý Chi Nhánh (Sky Blue #0EA5E9)
+ * 4. Cổng Dịch Vụ Hội Viên VIP (Gold #EAB308)
+ * Sau khi đăng ký thành công, cho phép khởi chạy thẳng App riêng của vai trò đó hoặc quay về màn hình đăng nhập.
  */
 public class DangKyTaiKhoanDialog extends JDialog {
 
-    private final JTextField txtUsername = new JTextField();
+    public static class RoleDefinition {
+        public final String roleKey;
+        public final String title;
+        public final String badge;
+        public final String description;
+        public final String appName;
+        public final Color color;
+        public final String initials;
+
+        public RoleDefinition(String roleKey, String title, String badge, String description, String appName, Color color, String initials) {
+            this.roleKey = roleKey;
+            this.title = title;
+            this.badge = badge;
+            this.description = description;
+            this.appName = appName;
+            this.color = color;
+            this.initials = initials;
+        }
+    }
+
+    private static final RoleDefinition[] ROLES = new RoleDefinition[]{
+            new RoleDefinition("Lễ tân", "TRẠM LỄ TÂN", "TRẠM VẬN HÀNH QUẦY",
+                    "Check-in thẻ, đăng ký khách, bán hàng POS, tủ locker", "App Trạm Lễ Tân", new Color(16, 185, 129), "LT"),
+            new RoleDefinition("HLV", "TRẠM HLV", "HUẤN LUYỆN VIÊN",
+                    "Theo dõi InBody, lịch dạy PT 1:1, giáo án học viên, điểm danh lớp", "App Huấn Luyện Viên", new Color(245, 158, 11), "PT"),
+            new RoleDefinition("Quản lý", "TRẠM QUẢN LÝ", "QUẢN LÝ CHI NHÁNH",
+                    "Xếp ca làm việc, kho hàng, kiểm toán số liệu & báo cáo cơ sở", "App Quản Lý Chi Nhánh", new Color(14, 165, 233), "QL"),
+            new RoleDefinition("Hội viên", "HỘI VIÊN VIP", "THÀNH VIÊN VIP",
+                    "Mã thẻ QR điện tử, đặt lịch tập cá nhân, đặt chỗ lớp Yoga/Boxing", "App Hội Viên VIP", new Color(234, 179, 8), "HV")
+    };
+
+    private RoleDefinition selectedRole = ROLES[0]; // Mặc định Trạm Lễ Tân
+
+    private final JPanel[] cardPanels = new JPanel[ROLES.length];
+    private final JLabel lblSelectedRoleBanner = new JLabel();
+    private final JButton btnSubmit = new JButton();
+
     private final JTextField txtFullName = new JTextField();
+    private final JTextField txtUsername = new JTextField();
     private final JPasswordField txtPassword = new JPasswordField();
     private final JPasswordField txtConfirmPassword = new JPasswordField();
     private final JComboBox<String> cbBranch = new JComboBox<>(new String[]{
             "CN01 - Cơ sở 1 (Quận 1)",
             "CN02 - Cơ sở 2 (Tân Bình)",
-            "Toàn hệ thống (VIP / Quản trị)"
+            "Toàn hệ thống (Hội viên VIP / Quản trị)"
     });
 
-    private String selectedRole = "Hội viên";
-    private final JPanel pnlRoleButtons = new JPanel(new GridLayout(1, 5, 8, 0));
-    private final JButton[] roleButtons = new JButton[5];
+    private final Frame parentFrame;
     private final BiConsumer<String, String> onSuccessCallback;
 
     public DangKyTaiKhoanDialog(Frame parent, BiConsumer<String, String> onSuccessCallback) {
-        super(parent, "ĐĂNG KÝ TÀI KHOẢN FITLIFE GYM - CHỌN VAI TRÒ", true);
+        super(parent, "ĐĂNG KÝ TÀI KHOẢN APP FITLIFE GYM - CHỌN 4 VAI TRÒ", true);
+        this.parentFrame = parent;
         this.onSuccessCallback = onSuccessCallback;
 
-        setSize(680, 620);
-        setMinimumSize(new Dimension(640, 580));
+        setSize(880, 680);
+        setMinimumSize(new Dimension(840, 650));
         setLocationRelativeTo(parent);
         setResizable(false);
 
         initUI();
+        updateRoleSelection();
     }
 
     private void initUI() {
         JPanel root = new JPanel(new BorderLayout());
-        root.setBackground(Color.WHITE);
+        root.setBackground(new Color(248, 250, 252));
 
-        // 1. TOP HEADER BANNER (Slate 900)
+        // --- 1. TOP HEADER BANNER (Slate 900) ---
         JPanel pnlHeader = new JPanel(new BorderLayout());
         pnlHeader.setBackground(new Color(15, 23, 42));
-        pnlHeader.setBorder(new EmptyBorder(20, 28, 20, 28));
+        pnlHeader.setBorder(new EmptyBorder(18, 28, 18, 28));
 
-        JPanel titleBox = new JPanel(new GridLayout(2, 1, 0, 4));
-        titleBox.setOpaque(false);
+        JPanel headerText = new JPanel(new GridLayout(2, 1, 0, 4));
+        headerText.setOpaque(false);
 
-        JLabel lblTitle = new JLabel("ĐĂNG KÝ TÀI KHOẢN HỆ THỐNG FITLIFE GYM");
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 19));
-        lblTitle.setForeground(Color.WHITE);
+        JLabel lblBrand = new JLabel("FITLIFE GYM MANAGEMENT • ĐĂNG KÝ TÀI KHOẢN THEO 4 VAI TRÒ");
+        lblBrand.setFont(new Font("Segoe UI", Font.BOLD, 17));
+        lblBrand.setForeground(Color.WHITE);
 
-        JLabel lblSub = new JLabel("Lựa chọn vai trò của bạn và thiết lập thông tin đăng nhập để truy cập ứng dụng");
+        JLabel lblSub = new JLabel("Hệ thống chia làm 4 trạm nghiệp vụ độc lập. Vui lòng bấm chọn vai trò của bạn để thiết lập tài khoản & khởi chạy ứng dụng tương ứng:");
         lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblSub.setForeground(new Color(148, 163, 184));
 
-        titleBox.add(lblTitle);
-        titleBox.add(lblSub);
-        pnlHeader.add(titleBox, BorderLayout.CENTER);
+        headerText.add(lblBrand);
+        headerText.add(lblSub);
+        pnlHeader.add(headerText, BorderLayout.CENTER);
         root.add(pnlHeader, BorderLayout.NORTH);
 
-        // 2. FORM BODY
+        // --- 2. BODY CONTAINER (CHỌN ROLE + FORM NHẬP LIỆU) ---
         JPanel pnlBody = new JPanel();
         pnlBody.setLayout(new BoxLayout(pnlBody, BoxLayout.Y_AXIS));
         pnlBody.setOpaque(false);
-        pnlBody.setBorder(new EmptyBorder(22, 32, 20, 32));
+        pnlBody.setBorder(new EmptyBorder(16, 24, 16, 24));
 
-        // PHẦN 1: CHỌN VAI TRÒ (ROLE SELECTOR)
-        JLabel lblRolePrompt = new JLabel("BƯỚC 1: BẤM CHỌN VAI TRÒ ĐĂNG KÝ (*):");
-        lblRolePrompt.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        lblRolePrompt.setForeground(new Color(30, 41, 59));
-        lblRolePrompt.setAlignmentX(Component.LEFT_ALIGNMENT);
-        pnlBody.add(lblRolePrompt);
+        // A. TIÊU ĐỀ BƯỚC 1: CHỌN 1 TRONG 4 VAI TRÒ
+        JLabel lblStep1 = new JLabel("BƯỚC 1: BẤM CHỌN VAI TRÒ BẠN MUỐN ĐĂNG KÝ (*):");
+        lblStep1.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblStep1.setForeground(new Color(30, 41, 59));
+        lblStep1.setAlignmentX(Component.LEFT_ALIGNMENT);
+        pnlBody.add(lblStep1);
         pnlBody.add(Box.createRigidArea(new Dimension(0, 8)));
 
-        pnlRoleButtons.setOpaque(false);
-        pnlRoleButtons.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
-        pnlRoleButtons.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // B. LƯỚI 4 THẺ VAI TRÒ (4 BENTO ROLE CARDS)
+        JPanel pnlRoleGrid = new JPanel(new GridLayout(1, 4, 10, 0));
+        pnlRoleGrid.setOpaque(false);
+        pnlRoleGrid.setMaximumSize(new Dimension(Integer.MAX_VALUE, 115));
+        pnlRoleGrid.setPreferredSize(new Dimension(830, 115));
+        pnlRoleGrid.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        String[] roles = {"Hội viên", "Lễ tân", "HLV", "Quản lý", "Chủ"};
-        String[] displayNames = {"Hội Viên", "Lễ Tân", "HLV / PT", "Quản Lý", "Chủ Phòng"};
+        for (int i = 0; i < ROLES.length; i++) {
+            final RoleDefinition def = ROLES[i];
+            final int index = i;
 
-        for (int i = 0; i < roles.length; i++) {
-            final String role = roles[i];
-            JButton btn = new JButton(displayNames[i]);
-            btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
-            btn.setFocusPainted(false);
-            btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            roleButtons[i] = btn;
+            JPanel card = new JPanel(new BorderLayout(8, 6));
+            card.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            card.setOpaque(true);
 
-            if (role.equals(selectedRole)) {
-                setRoleButtonSelected(btn, true);
-            } else {
-                setRoleButtonSelected(btn, false);
-            }
+            // Card Header: Initials Avatar + Badge
+            JPanel cardTop = new JPanel(new BorderLayout(6, 0));
+            cardTop.setOpaque(false);
 
-            btn.addActionListener(e -> {
-                selectedRole = role;
-                for (int j = 0; j < roles.length; j++) {
-                    setRoleButtonSelected(roleButtons[j], roles[j].equals(selectedRole));
+            JLabel lblInit = new JLabel(def.initials, SwingConstants.CENTER);
+            lblInit.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            lblInit.setForeground(Color.WHITE);
+            lblInit.setBackground(def.color);
+            lblInit.setOpaque(true);
+            lblInit.setPreferredSize(new Dimension(28, 28));
+
+            JLabel lblBadge = new JLabel(" " + def.badge + " ");
+            lblBadge.setFont(new Font("Segoe UI", Font.BOLD, 9));
+            lblBadge.setForeground(def.color);
+
+            cardTop.add(lblInit, BorderLayout.WEST);
+            cardTop.add(lblBadge, BorderLayout.CENTER);
+
+            // Card Center: Role Title + Short Description
+            JPanel cardCenter = new JPanel(new GridLayout(2, 1, 0, 2));
+            cardCenter.setOpaque(false);
+
+            JLabel lblTitle = new JLabel(def.title);
+            lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 13));
+            lblTitle.setForeground(new Color(15, 23, 42));
+
+            JLabel lblDesc = new JLabel("<html><span style='color: #64748b; font-size: 10px;'>" + def.description + "</span></html>");
+
+            cardCenter.add(lblTitle);
+            cardCenter.add(lblDesc);
+
+            card.add(cardTop, BorderLayout.NORTH);
+            card.add(cardCenter, BorderLayout.CENTER);
+
+            card.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent e) {
+                    selectedRole = def;
+                    updateRoleSelection();
                 }
             });
-            pnlRoleButtons.add(btn);
+
+            cardPanels[i] = card;
+            pnlRoleGrid.add(card);
         }
-        pnlBody.add(pnlRoleButtons);
-        pnlBody.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // PHẦN 2: THÔNG TIN ĐĂNG NHẬP
-        JLabel lblInfoPrompt = new JLabel("BƯỚC 2: NHẬP THÔNG TIN TÀI KHOẢN VÀ MẬT KHẨU (*):");
-        lblInfoPrompt.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        lblInfoPrompt.setForeground(new Color(30, 41, 59));
-        lblInfoPrompt.setAlignmentX(Component.LEFT_ALIGNMENT);
-        pnlBody.add(lblInfoPrompt);
-        pnlBody.add(Box.createRigidArea(new Dimension(0, 10)));
+        pnlBody.add(pnlRoleGrid);
+        pnlBody.add(Box.createRigidArea(new Dimension(0, 14)));
 
-        JPanel formGrid = new JPanel(new GridLayout(5, 2, 16, 12));
-        formGrid.setOpaque(false);
-        formGrid.setMaximumSize(new Dimension(Integer.MAX_VALUE, 210));
-        formGrid.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // C. BANNER THÔNG BÁO VAI TRÒ ĐANG CHỌN
+        lblSelectedRoleBanner.setOpaque(true);
+        lblSelectedRoleBanner.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblSelectedRoleBanner.setBorder(new EmptyBorder(7, 14, 7, 14));
+        lblSelectedRoleBanner.setMaximumSize(new Dimension(Integer.MAX_VALUE, 34));
+        lblSelectedRoleBanner.setAlignmentX(Component.LEFT_ALIGNMENT);
+        pnlBody.add(lblSelectedRoleBanner);
+        pnlBody.add(Box.createRigidArea(new Dimension(0, 12)));
+
+        // D. TIÊU ĐỀ BƯỚC 2: FORM NHẬP THÔNG TIN
+        JLabel lblStep2 = new JLabel("BƯỚC 2: THIẾT LẬP THÔNG TIN ĐĂNG NHẬP VÀ CƠ SỞ (*):");
+        lblStep2.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblStep2.setForeground(new Color(30, 41, 59));
+        lblStep2.setAlignmentX(Component.LEFT_ALIGNMENT);
+        pnlBody.add(lblStep2);
+        pnlBody.add(Box.createRigidArea(new Dimension(0, 8)));
+
+        // Form Fields (2 cột sạch sẽ)
+        JPanel formContainer = new JPanel(new GridLayout(5, 2, 14, 10));
+        formContainer.setOpaque(false);
+        formContainer.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
+        formContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         Font fontLabel = new Font("Segoe UI", Font.BOLD, 12);
         Font fontInput = new Font("Segoe UI", Font.PLAIN, 13);
 
         JLabel l1 = new JLabel("Họ Và Tên (*):"); l1.setFont(fontLabel);
         txtFullName.setFont(fontInput);
-        formGrid.add(l1); formGrid.add(txtFullName);
+        formContainer.add(l1); formContainer.add(txtFullName);
 
-        JLabel l2 = new JLabel("Tên Đăng Nhập / SĐT (*):"); l2.setFont(fontLabel);
+        JLabel l2 = new JLabel("Số Điện Thoại / Tên Đăng Nhập (*):"); l2.setFont(fontLabel);
         txtUsername.setFont(fontInput);
-        formGrid.add(l2); formGrid.add(txtUsername);
+        formContainer.add(l2); formContainer.add(txtUsername);
 
         JLabel l3 = new JLabel("Mật Khẩu (*):"); l3.setFont(fontLabel);
         txtPassword.setFont(fontInput);
-        formGrid.add(l3); formGrid.add(txtPassword);
+        formContainer.add(l3); formContainer.add(txtPassword);
 
         JLabel l4 = new JLabel("Xác Nhận Mật Khẩu (*):"); l4.setFont(fontLabel);
         txtConfirmPassword.setFont(fontInput);
-        formGrid.add(l4); formGrid.add(txtConfirmPassword);
+        formContainer.add(l4); formContainer.add(txtConfirmPassword);
 
-        JLabel l5 = new JLabel("Chi Nhánh Phụ Trách / Tập:"); l5.setFont(fontLabel);
+        JLabel l5 = new JLabel("Chi Nhánh Phụ Trách / Tập Luyện (*):"); l5.setFont(fontLabel);
         cbBranch.setFont(fontInput);
-        formGrid.add(l5); formGrid.add(cbBranch);
+        formContainer.add(l5); formContainer.add(cbBranch);
 
-        pnlBody.add(formGrid);
-        pnlBody.add(Box.createRigidArea(new Dimension(0, 14)));
+        pnlBody.add(formContainer);
+        pnlBody.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        JLabel lblNotice = new JLabel("<html><span style='color: #64748b; font-size: 11px;'>" +
-                "• Hội viên: Tự động cấp mã thẻ QR và gói trải nghiệm 1 tháng.<br>" +
-                "• Nhân viên (Lễ tân, HLV, Quản lý): Sẵn sàng ca trực tại chi nhánh đã chọn.<br>" +
-                "• Tài khoản đăng ký xong có thể đăng nhập ngay vào ứng dụng của vai trò đó.</span></html>");
-        lblNotice.setAlignmentX(Component.LEFT_ALIGNMENT);
-        pnlBody.add(lblNotice);
+        JLabel lblFootnote = new JLabel("<html><span style='color: #64748b; font-size: 11px;'>" +
+                "• <b>Đăng ký xong có thể chọn mở trực tiếp giao diện độc lập của vai trò đó ngay tức thì.</b><br>" +
+                "• Hội viên: Tự động cấp mã thẻ QR cá nhân và kích hoạt gói trải nghiệm thành viên VIP.<br>" +
+                "• Nhân sự (Lễ tân, HLV, Quản lý): Sẵn sàng ca trực tại cơ sở phân công, quản lý và vận hành thông suốt.</span></html>");
+        lblFootnote.setAlignmentX(Component.LEFT_ALIGNMENT);
+        pnlBody.add(lblFootnote);
 
         root.add(pnlBody, BorderLayout.CENTER);
 
-        // 3. BOTTOM BUTTONS BAR
-        JPanel pnlBottom = new JPanel(new FlowLayout(FlowLayout.RIGHT, 14, 15));
-        pnlBottom.setBackground(new Color(248, 250, 252));
+        // --- 3. BOTTOM ACTIONS BAR ---
+        JPanel pnlBottom = new JPanel(new FlowLayout(FlowLayout.RIGHT, 14, 12));
+        pnlBottom.setBackground(Color.WHITE);
         pnlBottom.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(226, 232, 240)));
 
         JButton btnCancel = new JButton("Hủy Bỏ");
@@ -175,13 +259,11 @@ public class DangKyTaiKhoanDialog extends JDialog {
         btnCancel.setPreferredSize(new Dimension(100, 38));
         btnCancel.addActionListener(e -> dispose());
 
-        JButton btnSubmit = new JButton("HOÀN TẤT ĐĂNG KÝ");
         btnSubmit.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btnSubmit.setBackground(new Color(37, 99, 235)); // Indigo / Blue 600
         btnSubmit.setForeground(Color.WHITE);
         btnSubmit.setFocusPainted(false);
         btnSubmit.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnSubmit.setPreferredSize(new Dimension(190, 38));
+        btnSubmit.setPreferredSize(new Dimension(280, 38));
         btnSubmit.addActionListener(e -> xuLyDangKy());
 
         pnlBottom.add(btnCancel);
@@ -191,21 +273,43 @@ public class DangKyTaiKhoanDialog extends JDialog {
         setContentPane(root);
     }
 
-    private void setRoleButtonSelected(JButton btn, boolean selected) {
-        if (selected) {
-            btn.setBackground(new Color(37, 99, 235));
-            btn.setForeground(Color.WHITE);
-            btn.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(29, 78, 216), 2),
-                    new EmptyBorder(8, 6, 8, 6)
-            ));
+    private void updateRoleSelection() {
+        for (int i = 0; i < ROLES.length; i++) {
+            RoleDefinition def = ROLES[i];
+            JPanel card = cardPanels[i];
+            boolean isSel = (def == selectedRole);
+
+            if (isSel) {
+                card.setBackground(Color.WHITE);
+                card.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(def.color, 2),
+                        new EmptyBorder(8, 10, 8, 10)
+                ));
+            } else {
+                card.setBackground(new Color(241, 245, 249));
+                card.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
+                        new EmptyBorder(9, 11, 9, 11)
+                ));
+            }
+            card.repaint();
+        }
+
+        // Cập nhật banner & nút bấm
+        lblSelectedRoleBanner.setBackground(new Color(selectedRole.color.getRed(), selectedRole.color.getGreen(), selectedRole.color.getBlue(), 28));
+        lblSelectedRoleBanner.setForeground(selectedRole.color.darker());
+        lblSelectedRoleBanner.setText("● ĐANG CHỌN: " + selectedRole.title + " (" + selectedRole.badge + ") • Khởi chạy: " + selectedRole.appName);
+
+        btnSubmit.setBackground(selectedRole.color);
+        btnSubmit.setText("ĐĂNG KÝ VÀ KHỞI CHẠY " + selectedRole.title);
+
+        // Gợi ý chi nhánh phù hợp
+        if ("Hội viên".equalsIgnoreCase(selectedRole.roleKey)) {
+            cbBranch.setSelectedIndex(2); // Toàn hệ thống
+        } else if ("Quản lý".equalsIgnoreCase(selectedRole.roleKey)) {
+            cbBranch.setSelectedIndex(1); // Tân Bình
         } else {
-            btn.setBackground(new Color(241, 245, 249));
-            btn.setForeground(new Color(51, 65, 85));
-            btn.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(203, 213, 225), 1),
-                    new EmptyBorder(8, 6, 8, 6)
-            ));
+            cbBranch.setSelectedIndex(0); // CN01
         }
     }
 
@@ -235,23 +339,26 @@ public class DangKyTaiKhoanDialog extends JDialog {
 
         TaiKhoanDAO tkDAO = new TaiKhoanDAO();
         if (tkDAO.timTheoTenDangNhap(username) != null) {
-            JOptionPane.showMessageDialog(this, "Tên đăng nhập '" + username + "' đã tồn tại trên hệ thống!\nVui lòng chọn tên đăng nhập khác hoặc số điện thoại của bạn.", "Trùng Tên Đăng Nhập", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Tên đăng nhập / Số điện thoại '" + username + "' đã tồn tại trên hệ thống!\n" +
+                    "Vui lòng chọn tên đăng nhập khác hoặc sử dụng số điện thoại của bạn.",
+                    "Trùng Tên Đăng Nhập", JOptionPane.WARNING_MESSAGE);
             txtUsername.requestFocus();
             return;
         }
 
         // Lưu tài khoản mới
-        TaiKhoan newAccount = new TaiKhoan(username, pass, selectedRole, fullName, branch);
+        TaiKhoan newAccount = new TaiKhoan(username, pass, selectedRole.roleKey, fullName, branch);
         boolean ok = tkDAO.them(newAccount);
 
         if (!ok) {
-            JOptionPane.showMessageDialog(this, "Không thể tạo tài khoản. Vui lòng thử lại!", "Lỗi Lưu Trữ", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Không thể tạo tài khoản. Vui lòng kiểm tra lại kết nối CSDL!", "Lỗi Lưu Trữ", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         // Nếu là Hội Viên: Tự động khởi tạo thêm hồ sơ HoiVien và mã thẻ QR
         String memberCode = "HV" + (System.currentTimeMillis() % 10000);
-        if ("Hội viên".equalsIgnoreCase(selectedRole)) {
+        if ("Hội viên".equalsIgnoreCase(selectedRole.roleKey)) {
             try {
                 HoiVienDAO hvDAO = new HoiVienDAO();
                 HoiVien hv = new HoiVien();
@@ -271,22 +378,47 @@ public class DangKyTaiKhoanDialog extends JDialog {
             } catch (Exception ignored) {}
         }
 
-        JOptionPane.showMessageDialog(this,
-                "<html><body style='width: 320px; padding: 5px;'>" +
-                "<h3 style='color: #10b981; margin: 0;'>ĐĂNG KÝ TÀI KHOẢN THÀNH CÔNG!</h3>" +
-                "<p>Họ tên: <b>" + fullName + "</b></p>" +
-                "<p>Tên đăng nhập: <b>" + username + "</b></p>" +
-                "<p>Vai trò: <b>" + selectedRole + "</b></p>" +
-                "<p>Chi nhánh: <b>" + branch + "</b></p>" +
-                ("Hội viên".equalsIgnoreCase(selectedRole) ? "<p>Mã thẻ QR cá nhân: <b>" + memberCode + "</b></p>" : "") +
-                "<p style='color: #3b82f6;'>Bạn có thể sử dụng tài khoản này để đăng nhập ngay vào ứng dụng!</p>" +
-                "</body></html>",
-                "Đăng Ký Thành Công", JOptionPane.INFORMATION_MESSAGE);
+        // Hộp thoại tùy chọn sau đăng ký thành công
+        String[] options = {"Khởi Chạy " + selectedRole.title + " Ngay", "Quay Lại Đăng Nhập"};
+        int choice = JOptionPane.showOptionDialog(this,
+                "<html><body style='width: 340px; padding: 4px;'>" +
+                        "<h3 style='color: " + toHexColor(selectedRole.color) + "; margin: 0;'>ĐĂNG KÝ TÀI KHOẢN THÀNH CÔNG!</h3>" +
+                        "<p>Họ tên: <b>" + fullName + "</b></p>" +
+                        "<p>Tài khoản: <b>" + username + "</b></p>" +
+                        "<p>Vai trò phân hệ: <b>" + selectedRole.title + " (" + selectedRole.badge + ")</b></p>" +
+                        "<p>Cơ sở hoạt động: <b>" + branch + "</b></p>" +
+                        ("Hội viên".equalsIgnoreCase(selectedRole.roleKey) ? "<p style='color: #10b981;'>Mã thẻ QR cá nhân: <b>" + memberCode + "</b></p>" : "") +
+                        "<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 8px 0;'/>" +
+                        "<p style='color: #0284c7; font-weight: bold;'>Bạn có muốn mở trực tiếp Ứng Dụng dành riêng cho " + selectedRole.title + " ngay bây giờ không?</p>" +
+                        "</body></html>",
+                "Đăng Ký Thành Công",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
 
-        if (onSuccessCallback != null) {
-            onSuccessCallback.accept(username, pass);
+        if (choice == 0) {
+            // MỞ THẲNG ỨNG DỤNG CHO VAI TRÒ ĐÓ!
+            Auth.setSession(newAccount, false);
+            dispose();
+            if (parentFrame != null) {
+                parentFrame.dispose();
+            }
+            SwingUtilities.invokeLater(() -> {
+                new MainDashboard(selectedRole.roleKey).setVisible(true);
+            });
+        } else {
+            // Quay về màn hình đăng nhập, điền sẵn thông tin
+            if (onSuccessCallback != null) {
+                onSuccessCallback.accept(username, pass);
+            }
+            dispose();
         }
+    }
 
-        dispose();
+    private String toHexColor(Color c) {
+        return String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
     }
 }

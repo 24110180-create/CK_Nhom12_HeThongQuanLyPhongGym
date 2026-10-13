@@ -156,8 +156,8 @@ public class LoginForm extends JFrame {
         rightPanel.add(btnLogin);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 12)));
 
-        // Nút liên kết Đăng ký App dành riêng cho Hội Viên
-        JButton btnRegisterApp = new JButton("Bạn là Hội viên mới? Đăng ký tài khoản App tại đây");
+        // Nút liên kết Đăng ký tài khoản (hỗ trợ chọn 4 vai trò: Lễ tân, HLV, Quản lý, Hội viên VIP)
+        JButton btnRegisterApp = new JButton("Bạn chưa có tài khoản? Đăng ký theo 4 vai trò tại đây!");
         btnRegisterApp.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnRegisterApp.setForeground(new Color(2, 132, 199));
         btnRegisterApp.setBorderPainted(false);
@@ -165,7 +165,7 @@ public class LoginForm extends JFrame {
         btnRegisterApp.setFocusPainted(false);
         btnRegisterApp.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnRegisterApp.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnRegisterApp.addActionListener(e -> moDialogDangKyAppHoiVien());
+        btnRegisterApp.addActionListener(e -> moDialogDangKyTheoRole());
         rightPanel.add(btnRegisterApp);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
@@ -192,99 +192,11 @@ public class LoginForm extends JFrame {
         txtUser.addActionListener(e -> xuLyDangNhap());
     }
 
-    private void moDialogDangKyAppHoiVien() {
-        JDialog dlg = new JDialog(this, "Đăng Ký Tài Khoản FitLife App Dành Cho Hội Viên", true);
-        dlg.setSize(480, 440);
-        dlg.setLocationRelativeTo(this);
-        dlg.setLayout(new BorderLayout());
-
-        JPanel form = new JPanel(new GridLayout(4, 2, 10, 14));
-        form.setBackground(Color.WHITE);
-        form.setBorder(new EmptyBorder(25, 25, 20, 25));
-
-        JTextField tfName = new JTextField();
-        JTextField tfPhone = new JTextField();
-        JPasswordField tfPass = new JPasswordField();
-        JComboBox<String> cbBr = new JComboBox<>(new String[]{
-                "CN01 - Cơ sở 1 (Quận 1)",
-                "CN02 - Cơ sở 2 (Tân Bình)"
-        });
-
-        form.add(new JLabel("Họ Và Tên (*):"));
-        form.add(tfName);
-        form.add(new JLabel("Số Điện Thoại (*):"));
-        form.add(tfPhone);
-        form.add(new JLabel("Mật Khẩu Đăng Nhập (*):"));
-        form.add(tfPass);
-        form.add(new JLabel("Chi Nhánh Đăng Ký:"));
-        form.add(cbBr);
-
-        JPanel bottomDlg = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 15));
-        bottomDlg.setBackground(Color.WHITE);
-
-        JButton btnSubmit = new JButton("Đăng Ký Ngay");
-        btnSubmit.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btnSubmit.setBackground(new Color(37, 99, 235));
-        btnSubmit.setForeground(Color.WHITE);
-
-        JButton btnCancel = new JButton("Hủy");
-        btnCancel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-
-        bottomDlg.add(btnCancel);
-        bottomDlg.add(btnSubmit);
-
-        btnCancel.addActionListener(ev -> dlg.dispose());
-        btnSubmit.addActionListener(ev -> {
-            String name = tfName.getText().trim();
-            String phone = tfPhone.getText().trim();
-            String pass = new String(tfPass.getPassword()).trim();
-            if (name.isEmpty() || phone.isEmpty() || pass.isEmpty()) {
-                JOptionPane.showMessageDialog(dlg, "Vui lòng nhập đầy đủ thông tin để đăng ký tài khoản!", "Thiếu thông tin", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            if (!phone.matches("^0(3|5|7|8|9)[0-9]{8}$")) {
-                JOptionPane.showMessageDialog(dlg, "Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 chữ số thuộc các đầu số nhà mạng Việt Nam (03, 05, 07, 08, 09).", "Lỗi Định Dạng", JOptionPane.WARNING_MESSAGE);
-                tfPhone.requestFocus();
-                return;
-            }
-
-            String code = "HV" + (System.currentTimeMillis() % 1000);
-
-            // Lưu tài khoản Hội viên vào hệ thống
-            try {
-                com.nhom12.gym.dao.TaiKhoanDAO dao = new com.nhom12.gym.dao.TaiKhoanDAO();
-                dao.them(new com.nhom12.gym.entity.TaiKhoan(phone, pass, "Hội viên", name));
-            } catch (Exception ignored) {}
-
-            try {
-                com.nhom12.gym.dao.HoiVienDAO hvDAO = new com.nhom12.gym.dao.HoiVienDAO();
-                com.nhom12.gym.entity.HoiVien hv = new com.nhom12.gym.entity.HoiVien();
-                hv.setHoTen(name);
-                hv.setSoDienThoai(phone);
-                hv.setMaTheQR(code);
-                hv.setChiNhanhDangKy((String) cbBr.getSelectedItem());
-                hv.setGoiTapDangKy("Gói Trải Nghiệm 1 Tháng");
-                hv.setNgayDangKy(new java.util.Date());
-                hv.setSoTienDaThanhToan(500000.0);
-                hv.setHinhThucThanhToan("Chuyển khoản (VietQR)");
-                hv.setTrangThai("Hoạt động");
-                java.util.Calendar c = java.util.Calendar.getInstance();
-                c.add(java.util.Calendar.MONTH, 1);
-                hv.setNgayHetHan(c.getTime());
-                hvDAO.them(hv);
-            } catch (Exception ignored) {}
-
-            txtUser.setText(phone);
-            txtPass.setText(pass);
-            dlg.dispose();
-
-            // Hiển thị ngay cửa sổ mã QR và thông tin tài khoản
-            new GuiMaQRDialog(this, code, name, phone, "Gói Đăng Ký Trực Tuyến", (String) cbBr.getSelectedItem(), phone, pass).setVisible(true);
-        });
-
-        dlg.add(form, BorderLayout.CENTER);
-        dlg.add(bottomDlg, BorderLayout.SOUTH);
-        dlg.setVisible(true);
+    private void moDialogDangKyTheoRole() {
+        new DangKyTaiKhoanDialog(this, (u, p) -> {
+            txtUser.setText(u);
+            txtPass.setText(p);
+        }).setVisible(true);
     }
 
     private final com.nhom12.gym.service.AuthService authService = new com.nhom12.gym.service.AuthService();

@@ -54,6 +54,7 @@ public class DangKyTaiKhoanDialog extends JDialog {
     private RoleDefinition selectedRole = ROLES[0]; // Mặc định Trạm Lễ Tân
 
     private final JPanel[] cardPanels = new JPanel[ROLES.length];
+    private final JPanel pnlSelectedRoleBanner = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 6));
     private final JLabel lblSelectedRoleBanner = new JLabel();
     private final JButton btnSubmit = new JButton();
 
@@ -75,10 +76,10 @@ public class DangKyTaiKhoanDialog extends JDialog {
         this.parentFrame = parent;
         this.onSuccessCallback = onSuccessCallback;
 
-        setSize(880, 680);
-        setMinimumSize(new Dimension(840, 650));
+        setSize(920, 720);
+        setMinimumSize(new Dimension(860, 680));
         setLocationRelativeTo(parent);
-        setResizable(false);
+        setResizable(true);
 
         initUI();
         updateRoleSelection();
@@ -91,7 +92,7 @@ public class DangKyTaiKhoanDialog extends JDialog {
         // --- 1. TOP HEADER BANNER (Slate 900) ---
         JPanel pnlHeader = new JPanel(new BorderLayout());
         pnlHeader.setBackground(new Color(15, 23, 42));
-        pnlHeader.setBorder(new EmptyBorder(18, 28, 18, 28));
+        pnlHeader.setBorder(new EmptyBorder(16, 28, 16, 28));
 
         JPanel headerText = new JPanel(new GridLayout(2, 1, 0, 4));
         headerText.setOpaque(false);
@@ -123,16 +124,15 @@ public class DangKyTaiKhoanDialog extends JDialog {
         pnlBody.add(lblStep1);
         pnlBody.add(Box.createRigidArea(new Dimension(0, 8)));
 
-        // B. LƯỚI 4 THẺ VAI TRÒ (4 BENTO ROLE CARDS)
+        // B. LƯỚI 4 THẺ VAI TRÒ (4 BENTO ROLE CARDS - TĂNG CHIỀU CAO TRÁNH MẤT CHỮ)
         JPanel pnlRoleGrid = new JPanel(new GridLayout(1, 4, 10, 0));
         pnlRoleGrid.setOpaque(false);
-        pnlRoleGrid.setMaximumSize(new Dimension(Integer.MAX_VALUE, 115));
-        pnlRoleGrid.setPreferredSize(new Dimension(830, 115));
+        pnlRoleGrid.setMaximumSize(new Dimension(Integer.MAX_VALUE, 130));
+        pnlRoleGrid.setPreferredSize(new Dimension(860, 130));
         pnlRoleGrid.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         for (int i = 0; i < ROLES.length; i++) {
             final RoleDefinition def = ROLES[i];
-            final int index = i;
 
             JPanel card = new JPanel(new BorderLayout(8, 6));
             card.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -156,17 +156,22 @@ public class DangKyTaiKhoanDialog extends JDialog {
             cardTop.add(lblInit, BorderLayout.WEST);
             cardTop.add(lblBadge, BorderLayout.CENTER);
 
-            // Card Center: Role Title + Short Description
-            JPanel cardCenter = new JPanel(new GridLayout(2, 1, 0, 2));
+            // Card Center: Role Title + Short Description (BoxLayout dọc thoáng)
+            JPanel cardCenter = new JPanel();
+            cardCenter.setLayout(new BoxLayout(cardCenter, BoxLayout.Y_AXIS));
             cardCenter.setOpaque(false);
 
             JLabel lblTitle = new JLabel(def.title);
             lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 13));
             lblTitle.setForeground(new Color(15, 23, 42));
+            lblTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            JLabel lblDesc = new JLabel("<html><span style='color: #64748b; font-size: 10px;'>" + def.description + "</span></html>");
+            JLabel lblDesc = new JLabel("<html><span style='color: #64748b; font-size: 10px; line-height: 1.25;'>" + def.description + "</span></html>");
+            lblDesc.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+            cardCenter.add(Box.createRigidArea(new Dimension(0, 3)));
             cardCenter.add(lblTitle);
+            cardCenter.add(Box.createRigidArea(new Dimension(0, 3)));
             cardCenter.add(lblDesc);
 
             card.add(cardTop, BorderLayout.NORTH);
@@ -185,15 +190,15 @@ public class DangKyTaiKhoanDialog extends JDialog {
         }
 
         pnlBody.add(pnlRoleGrid);
-        pnlBody.add(Box.createRigidArea(new Dimension(0, 14)));
+        pnlBody.add(Box.createRigidArea(new Dimension(0, 12)));
 
-        // C. BANNER THÔNG BÁO VAI TRÒ ĐANG CHỌN
-        lblSelectedRoleBanner.setOpaque(true);
+        // C. BANNER THÔNG BÁO VAI TRÒ ĐANG CHỌN (DÙNG JPANEL VỚI NỀN OPAQUE ĐẶC, CHỐNG ĐÈ CHỮ)
         lblSelectedRoleBanner.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        lblSelectedRoleBanner.setBorder(new EmptyBorder(7, 14, 7, 14));
-        lblSelectedRoleBanner.setMaximumSize(new Dimension(Integer.MAX_VALUE, 34));
-        lblSelectedRoleBanner.setAlignmentX(Component.LEFT_ALIGNMENT);
-        pnlBody.add(lblSelectedRoleBanner);
+        pnlSelectedRoleBanner.add(lblSelectedRoleBanner);
+        pnlSelectedRoleBanner.setOpaque(true);
+        pnlSelectedRoleBanner.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
+        pnlSelectedRoleBanner.setAlignmentX(Component.LEFT_ALIGNMENT);
+        pnlBody.add(pnlSelectedRoleBanner);
         pnlBody.add(Box.createRigidArea(new Dimension(0, 12)));
 
         // D. TIÊU ĐỀ BƯỚC 2: FORM NHẬP THÔNG TIN
@@ -207,7 +212,7 @@ public class DangKyTaiKhoanDialog extends JDialog {
         // Form Fields (2 cột sạch sẽ)
         JPanel formContainer = new JPanel(new GridLayout(5, 2, 14, 10));
         formContainer.setOpaque(false);
-        formContainer.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
+        formContainer.setMaximumSize(new Dimension(Integer.MAX_VALUE, 205));
         formContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         Font fontLabel = new Font("Segoe UI", Font.BOLD, 12);
@@ -243,7 +248,14 @@ public class DangKyTaiKhoanDialog extends JDialog {
         lblFootnote.setAlignmentX(Component.LEFT_ALIGNMENT);
         pnlBody.add(lblFootnote);
 
-        root.add(pnlBody, BorderLayout.CENTER);
+        // BỌC BODY VÀO JSCROLLPANE ĐẢM BẢO KHÔNG BAO GIỜ BỊ ĐÈ GIAO DIỆN
+        JScrollPane scroll = new JScrollPane(pnlBody);
+        scroll.setBorder(null);
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(false);
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        root.add(scroll, BorderLayout.CENTER);
 
         // --- 3. BOTTOM ACTIONS BAR ---
         JPanel pnlBottom = new JPanel(new FlowLayout(FlowLayout.RIGHT, 14, 12));
@@ -259,7 +271,7 @@ public class DangKyTaiKhoanDialog extends JDialog {
         btnSubmit.setForeground(Color.WHITE);
         btnSubmit.setFocusPainted(false);
         btnSubmit.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnSubmit.setPreferredSize(new Dimension(280, 38));
+        btnSubmit.setPreferredSize(new Dimension(310, 38));
         btnSubmit.addActionListener(e -> xuLyDangKy());
 
         pnlBottom.add(btnCancel);
@@ -291,13 +303,30 @@ public class DangKyTaiKhoanDialog extends JDialog {
             card.repaint();
         }
 
-        // Cập nhật banner & nút bấm
-        lblSelectedRoleBanner.setBackground(new Color(selectedRole.color.getRed(), selectedRole.color.getGreen(), selectedRole.color.getBlue(), 28));
+        // Cập nhật banner với màu nền solid opaque (100% không xuyên thấu) để xóa triệt để chữ cũ
+        Color bgSolid;
+        if ("Lễ tân".equalsIgnoreCase(selectedRole.roleKey)) {
+            bgSolid = new Color(236, 253, 245); // Emerald-50
+        } else if ("HLV".equalsIgnoreCase(selectedRole.roleKey)) {
+            bgSolid = new Color(254, 243, 199); // Amber-100
+        } else if ("Quản lý".equalsIgnoreCase(selectedRole.roleKey)) {
+            bgSolid = new Color(240, 249, 255); // Sky-50
+        } else {
+            bgSolid = new Color(238, 242, 255); // Indigo-50
+        }
+
+        pnlSelectedRoleBanner.setBackground(bgSolid);
+        pnlSelectedRoleBanner.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(selectedRole.color, 1),
+                new EmptyBorder(2, 6, 2, 6)
+        ));
         lblSelectedRoleBanner.setForeground(selectedRole.color.darker());
         lblSelectedRoleBanner.setText("● ĐANG CHỌN: " + selectedRole.title + " (" + selectedRole.badge + ") • Khởi chạy: " + selectedRole.appName);
+        pnlSelectedRoleBanner.revalidate();
+        pnlSelectedRoleBanner.repaint();
 
         btnSubmit.setBackground(selectedRole.color);
-        btnSubmit.setText("ĐĂNG KÝ VÀ KHỞI CHẠY " + selectedRole.title);
+        btnSubmit.setText("Đăng Ký & Khởi Chạy " + selectedRole.title);
 
         // Gợi ý chi nhánh phù hợp
         if ("Chủ".equalsIgnoreCase(selectedRole.roleKey)) {

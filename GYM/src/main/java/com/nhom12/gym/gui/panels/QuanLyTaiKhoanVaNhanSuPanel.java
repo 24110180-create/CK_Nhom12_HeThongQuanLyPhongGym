@@ -94,14 +94,14 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
         btnAddNew.setPreferredSize(new Dimension(185, 36));
         btnAddNew.addActionListener(e -> moDialogThemTaiKhoan());
 
-        JButton btnResetPass = new JButton("Đặt Lại MK (123456)");
+        JButton btnResetPass = new JButton("Đổi Mật Khẩu");
         btnResetPass.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnResetPass.setBackground(new Color(245, 158, 11)); // Amber
         btnResetPass.setForeground(Color.WHITE);
         btnResetPass.setFocusPainted(false);
         btnResetPass.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnResetPass.setPreferredSize(new Dimension(155, 36));
-        btnResetPass.addActionListener(e -> xuLyResetMatKhau());
+        btnResetPass.setPreferredSize(new Dimension(135, 36));
+        btnResetPass.addActionListener(e -> xuLyDoiMatKhau());
 
         JButton btnDelete = new JButton("Xóa Tài Khoản");
         btnDelete.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -247,28 +247,120 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
         dlg.setVisible(true);
     }
 
-    private void xuLyResetMatKhau() {
+    private void xuLyDoiMatKhau() {
         JTable currentTable = getActiveTable();
         int row = currentTable.getSelectedRow();
         if (row < 0) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 tài khoản trong bảng để đặt lại mật khẩu!", "Chưa chọn tài khoản", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 tài khoản trong bảng để đổi mật khẩu!", "Chưa chọn tài khoản", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         String username = (String) currentTable.getValueAt(row, 0);
-        int opt = JOptionPane.showConfirmDialog(this,
-                "Bạn có chắc chắn muốn đặt lại mật khẩu cho tài khoản '" + username + "' về mặc định '123456'?",
-                "Xác Nhận Đặt Lại Mật Khẩu", JOptionPane.YES_NO_OPTION);
+        String hoTen = (String) currentTable.getValueAt(row, 1);
+        String vaiTro = (String) currentTable.getValueAt(row, 2);
 
-        if (opt == JOptionPane.YES_OPTION) {
+        JDialog dlg = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Đổi Mật Khẩu - " + username, true);
+        dlg.setSize(450, 320);
+        dlg.setLocationRelativeTo(this);
+        dlg.setResizable(false);
+
+        JPanel pnl = new JPanel(new BorderLayout(0, 16));
+        pnl.setBackground(Color.WHITE);
+        pnl.setBorder(new EmptyBorder(20, 24, 20, 24));
+
+        JPanel pnlHeader = new JPanel(new GridLayout(2, 1, 0, 3));
+        pnlHeader.setOpaque(false);
+        JLabel lblTitle = new JLabel("ĐỔI MẬT KHẨU TÀI KHOẢN");
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        lblTitle.setForeground(new Color(15, 23, 42));
+
+        JLabel lblSub = new JLabel("<html>Tài khoản: <b style='color:#2563eb;'>" + username + "</b> - " + hoTen + " (" + vaiTro + ")</html>");
+        lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblSub.setForeground(new Color(100, 116, 139));
+        pnlHeader.add(lblTitle);
+        pnlHeader.add(lblSub);
+
+        JPanel form = new JPanel(new GridLayout(4, 1, 0, 8));
+        form.setOpaque(false);
+
+        JLabel l1 = new JLabel("Mật khẩu mới (*):");
+        l1.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        JPasswordField txtNewPass = new JPasswordField();
+        txtNewPass.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+
+        JLabel l2 = new JLabel("Xác nhận mật khẩu mới (*):");
+        l2.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        JPasswordField txtConfirmPass = new JPasswordField();
+        txtConfirmPass.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+
+        form.add(l1);
+        form.add(txtNewPass);
+        form.add(l2);
+        form.add(txtConfirmPass);
+
+        JPanel pnlBtns = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        pnlBtns.setOpaque(false);
+
+        JButton btnDefault = new JButton("Đặt Mặc Định (123456)");
+        btnDefault.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        btnDefault.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnDefault.addActionListener(ev -> {
+            txtNewPass.setText("123456");
+            txtConfirmPass.setText("123456");
+        });
+
+        JButton btnCancel = new JButton("Hủy");
+        btnCancel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        btnCancel.addActionListener(ev -> dlg.dispose());
+
+        JButton btnSave = new JButton("Lưu Mật Khẩu");
+        btnSave.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnSave.setBackground(new Color(37, 99, 235));
+        btnSave.setForeground(Color.WHITE);
+        btnSave.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnSave.addActionListener(ev -> {
+            String pass1 = new String(txtNewPass.getPassword()).trim();
+            String pass2 = new String(txtConfirmPass.getPassword()).trim();
+            if (pass1.isEmpty() || pass2.isEmpty()) {
+                JOptionPane.showMessageDialog(dlg, "Vui lòng nhập đầy đủ mật khẩu mới!", "Thiếu thông tin", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            if (pass1.length() < 4) {
+                JOptionPane.showMessageDialog(dlg, "Mật khẩu phải có độ dài tối thiểu 4 ký tự!", "Mật khẩu quá ngắn", JOptionPane.WARNING_MESSAGE);
+                txtNewPass.requestFocus();
+                return;
+            }
+            if (!pass1.equals(pass2)) {
+                JOptionPane.showMessageDialog(dlg, "Mật khẩu xác nhận không khớp!", "Lỗi xác nhận", JOptionPane.WARNING_MESSAGE);
+                txtConfirmPass.requestFocus();
+                return;
+            }
+
             TaiKhoan tk = taiKhoanDAO.timTheoTenDangNhap(username);
             if (tk != null) {
-                tk.setMatKhau("123456");
+                tk.setMatKhau(pass1);
                 taiKhoanDAO.capNhat(tk);
-                JOptionPane.showMessageDialog(this, "Đã đặt lại mật khẩu thành công về '123456' cho tài khoản: " + username, "Thành Công", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(dlg, "Đã cập nhật mật khẩu mới thành công cho tài khoản: " + username, "Thành Công", JOptionPane.INFORMATION_MESSAGE);
+                dlg.dispose();
                 loadAllData();
+            } else {
+                JOptionPane.showMessageDialog(dlg, "Không tìm thấy tài khoản để cập nhật!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
-        }
+        });
+
+        JPanel bottomRow = new JPanel(new BorderLayout());
+        bottomRow.setOpaque(false);
+        bottomRow.add(btnDefault, BorderLayout.WEST);
+        pnlBtns.add(btnCancel);
+        pnlBtns.add(btnSave);
+        bottomRow.add(pnlBtns, BorderLayout.EAST);
+
+        pnl.add(pnlHeader, BorderLayout.NORTH);
+        pnl.add(form, BorderLayout.CENTER);
+        pnl.add(bottomRow, BorderLayout.SOUTH);
+
+        dlg.setContentPane(pnl);
+        dlg.setVisible(true);
     }
 
     private void xuLyXoaTaiKhoan() {

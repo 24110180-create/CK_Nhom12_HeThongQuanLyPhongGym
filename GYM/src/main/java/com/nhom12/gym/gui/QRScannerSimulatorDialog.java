@@ -45,6 +45,10 @@ public class QRScannerSimulatorDialog extends JDialog {
     private JTable tblMembers;
     private DefaultTableModel modelMembers;
 
+    public QRScannerSimulatorDialog(Window parent) {
+        this(parent, null);
+    }
+
     public QRScannerSimulatorDialog(Window parent, Consumer<String> onScanCallback) {
         super(parent, "BỘ QUÉT MÃ QR & MÔ PHỎNG MÁY QUÉT HONEYWELL VOYAGER 1450G", ModalityType.APPLICATION_MODAL);
         this.onScanCallback = onScanCallback;

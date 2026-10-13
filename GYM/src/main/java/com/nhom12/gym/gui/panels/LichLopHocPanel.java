@@ -112,23 +112,23 @@ public class LichLopHocPanel extends JPanel {
         pTop.add(pCards, BorderLayout.SOUTH);
         this.add(pTop, BorderLayout.NORTH);
 
-        // 2. Thân chính: JSplitPane Dọc (Tầng 1: Lớp học, Tầng 2: Học viên điểm danh)
-        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        splitPane.setResizeWeight(0.45);
-        splitPane.setDividerSize(8);
-        splitPane.setOpaque(false);
-        splitPane.setBorder(null);
+        // 2. Thân chính: Chuyển sang JTabbedPane 2 Tab thoáng đãng, khoa học (không bị rối chồng chéo 2 bảng)
+        mainTabs = new JTabbedPane();
+        mainTabs.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        mainTabs.setBackground(Color.WHITE);
 
-        // Tầng Trên: Bảng Lớp Học
+        // Tab 1: Danh Sách & Lịch Các Lớp Học
         JPanel pMaster = taoPanelMasterLop();
-        splitPane.setTopComponent(pMaster);
+        mainTabs.addTab("  1. Thời Khóa Biểu & Danh Sách Lớp Học Nhóm  ", pMaster);
 
-        // Tầng Dưới: Bảng Học Viên & Điểm Danh
+        // Tab 2: Danh Sách Học Viên & Điểm Danh Trực Tiếp
         JPanel pDetail = taoPanelDetailHocVien();
-        splitPane.setBottomComponent(pDetail);
+        mainTabs.addTab("  2. Điểm Danh Học Viên Theo Lớp  ", pDetail);
 
-        this.add(splitPane, BorderLayout.CENTER);
+        this.add(mainTabs, BorderLayout.CENTER);
     }
+
+    private JTabbedPane mainTabs;
 
     private JLabel taoKpiCard(JPanel parent, String title, String value, Color accentColor, Color bgCard) {
         JPanel card = new JPanel(new BorderLayout(5, 4));
@@ -222,9 +222,19 @@ public class LichLopHocPanel extends JPanel {
         JButton btnXuatExcelLop = taoButtonFlat("Xuất Excel Lịch Lớp", new Color(15, 118, 110), Color.WHITE);
         btnXuatExcelLop.addActionListener(e -> ExcelExportHelper.exportTableToExcel(this, tableLop, "LichLopHoc_FitLife"));
 
+        JButton btnDiemDanh = taoButtonFlat("Điểm Danh Lớp Này ->", new Color(147, 51, 234), Color.WHITE);
+        btnDiemDanh.addActionListener(e -> {
+            if (lopDangChon == null) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn một lớp học trong bảng để điểm danh!", "Chưa chọn lớp", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            if (mainTabs != null) mainTabs.setSelectedIndex(1);
+        });
+
         pBtns.add(btnThemLop);
         pBtns.add(btnSuaLop);
         pBtns.add(btnXoaLop);
+        pBtns.add(btnDiemDanh);
         pBtns.add(btnRefresh);
         pBtns.add(btnXuatExcelLop);
         pTool.add(pBtns, BorderLayout.EAST);
@@ -293,6 +303,15 @@ public class LichLopHocPanel extends JPanel {
                 } else {
                     lopDangChon = null;
                     xoaTrangBangHocVien();
+                }
+            }
+        });
+
+        tableLop.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (e.getClickCount() == 2 && tableLop.getSelectedRow() != -1 && mainTabs != null) {
+                    mainTabs.setSelectedIndex(1);
                 }
             }
         });
@@ -374,6 +393,12 @@ public class LichLopHocPanel extends JPanel {
             ExcelExportHelper.exportTableToExcel(this, tableHocVien, "DiemDanh_" + lopDangChon.getMaLop());
         });
 
+        JButton btnBackMaster = taoButtonFlat("<- Xem Lịch Các Lớp", new Color(100, 116, 139), Color.WHITE);
+        btnBackMaster.addActionListener(e -> {
+            if (mainTabs != null) mainTabs.setSelectedIndex(0);
+        });
+
+        pBtns.add(btnBackMaster);
         pBtns.add(btnThemHocVien);
         pBtns.add(btnHuyDangKy);
         pBtns.add(btnDiemDanhCoMat);

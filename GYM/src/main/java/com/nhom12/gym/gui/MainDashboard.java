@@ -17,6 +17,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.Window;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,7 +49,6 @@ public class MainDashboard extends JFrame {
     private JPanel workspaceContainer;
     private JLabel lblWorkspaceTitle;
     private JLabel lblWorkspaceBreadcrumb;
-    private final List<SidebarMenuItem> sidebarMenuItems = new ArrayList<>();
 
     // =========================================================================
     // DỮ LIỆU ĐIỀU HÀNH 5 TRỤ CỘT CHO GÓC NHÌN CHỦ PHÒNG (EXECUTIVE NAVIGATION)
@@ -112,52 +112,33 @@ public class MainDashboard extends JFrame {
     private void initOwnerPillars() {
         if (!ownerPillars.isEmpty()) return;
 
-        // Trụ cột 0: Báo Cáo & Thống Kê
-        OwnerPillar p0 = new OwnerPillar("Báo Cáo & Thống Kê", new Color(99, 102, 241));
-        p0.items.add(new OwnerModuleItem("Báo Cáo Doanh Thu", "Doanh thu đa chi nhánh (2 cơ sở) & hội viên hết hạn", () -> new BaoCaoThongKePanel()));
-        p0.items.add(new OwnerModuleItem("Phân Tích Giờ Cao Điểm", "Phân tích mật độ tập luyện 6h-22h", () -> new HeatmapGioCaoDiemPanel()));
-        p0.items.add(new OwnerModuleItem("Tổng Quan Sức Chứa", "KPIs tổng hợp & tỷ lệ lấp đầy", () -> new TrangChuPanel()));
-        p0.items.add(new OwnerModuleItem("Lịch Sử Giao Dịch", "Nhật ký hóa đơn & dòng tiền", () -> new LichSuGiaoDichPanel()));
+        // Nhóm 0: Tổng Quan (Nhìn nhanh tình hình toàn hệ thống)
+        OwnerPillar p0 = new OwnerPillar("Tổng Quan", new Color(99, 102, 241));
+        p0.items.add(new OwnerModuleItem("Trang Chủ (KPI Tổng Hợp)", "Cửa sổ điều hành chiến lược & KPIs tổng thể của Anh Đức", () -> new CuaSoChuHeThongPanel()));
         ownerPillars.add(p0);
 
-        // Trụ cột 1: Vận Hành Phòng Tập
-        OwnerPillar p1 = new OwnerPillar("Vận Hành Phòng Tập", new Color(16, 185, 129));
-        p1.items.add(new OwnerModuleItem("Trạm Quét Check-in", "Honeywell Scanner & Cửa Flap Barrier", () -> new CheckInForm()));
-        p1.items.add(new OwnerModuleItem("Danh Sách Hội Viên", "Hồ sơ cá nhân & thẻ tập", () -> new QuanLyHoiVienPanel()));
-        p1.items.add(new OwnerModuleItem("Đăng Ký Hội Viên Mới", "Tạo hợp đồng & cấp mã QR", () -> new DangKyHoiVienPanel()));
-        p1.items.add(new OwnerModuleItem("Gia Hạn Gói Tập", "Nâng cấp gói & gia hạn thẻ", () -> new GiaHanGoiTapPanel()));
-        p1.items.add(new OwnerModuleItem("Quản Lý Gói Tập", "Cấu hình bảng giá dịch vụ", () -> new QuanLyGoiTapPanel()));
+        // Nhóm 1: Báo Cáo (Kiểm toán & ra quyết định tài chính)
+        OwnerPillar p1 = new OwnerPillar("Báo Cáo", new Color(14, 165, 233));
+        p1.items.add(new OwnerModuleItem("Báo Cáo Doanh Thu", "Ra quyết định tài chính & doanh thu đa chi nhánh (2 cơ sở)", () -> new BaoCaoThongKePanel()));
+        p1.items.add(new OwnerModuleItem("Phân Tích Giờ Cao Điểm", "Quyết định xếp ca & mở rộng cơ sở 6h-22h", () -> new HeatmapGioCaoDiemPanel()));
+        p1.items.add(new OwnerModuleItem("Lịch Sử Giao Dịch", "Kiểm toán, đối soát dòng tiền & hóa đơn", () -> new LichSuGiaoDichPanel()));
         ownerPillars.add(p1);
 
-        // Trụ cột 2: Kinh Doanh & Dịch Vụ
-        OwnerPillar p2 = new OwnerPillar("Kinh Doanh & Dịch Vụ", new Color(14, 165, 233));
-        p2.items.add(new OwnerModuleItem("Quầy Bán Hàng POS", "Bán nước giải khát, whey, đồ tập", () -> new BanHangPOSPanel()));
-        p2.items.add(new OwnerModuleItem("Quản Lý Kho Hàng", "Kiểm kê xuất nhập tồn kho", () -> new QuanLyKhoHangPanel()));
-        p2.items.add(new OwnerModuleItem("Quản Lý Tủ Locker", "Tủ đồ cá nhân thông minh", () -> new QuanLyLockerPanel()));
-        p2.items.add(new OwnerModuleItem("Kiểm Soát & Yêu Cầu Ẩn", "Bảo mật VIP 50% • Offline CN02 • Chống bán chui", () -> new QuanLyKhuyenMaiPanel()));
-        p2.items.add(new OwnerModuleItem("Chăm Sóc Khách Hàng", "Nhắc hạn tự động Zalo/SMS", () -> new ChamSocKhachHangPanel()));
-        p2.items.add(new OwnerModuleItem("Khảo Sát & Phản Hồi", "Khảo sát ý kiến hội viên", () -> new QuanLyPhanHoiPanel()));
+        // Nhóm 2: Chiến Lược Kinh Doanh (Chiến lược giá & marketing)
+        OwnerPillar p2 = new OwnerPillar("Chiến Lược Kinh Doanh", new Color(245, 158, 11));
+        p2.items.add(new OwnerModuleItem("Quản Lý Gói Tập & Giá Tiền", "Quyết định chính sách giá & cấu hình bảng giá dịch vụ", () -> new QuanLyGoiTapPanel()));
+        p2.items.add(new OwnerModuleItem("Quản Lý Khuyến Mãi", "Quyết định marketing, gói VIP ẩn 50% & chống bán chui", () -> new QuanLyKhuyenMaiPanel()));
         ownerPillars.add(p2);
 
-        // Trụ cột 3: Huấn Luyện Viên
-        OwnerPillar p3 = new OwnerPillar("Huấn Luyện Viên", new Color(245, 158, 11));
-        p3.items.add(new OwnerModuleItem("Lịch Lớp Học & Điểm Danh", "Quản lý lớp nhóm, sĩ số & điểm danh học viên", () -> new LichLopHocPanel()));
-        p3.items.add(new OwnerModuleItem("Theo Dõi InBody", "Mỡ cơ, trọng lượng, BMR", () -> new TheoDoiChiSoPanel()));
-        p3.items.add(new OwnerModuleItem("Lịch Dạy Huấn Luyện Viên", "Lịch phân ca huấn luyện viên", () -> new LichDayHLVPanel()));
-        p3.items.add(new OwnerModuleItem("Sổ Tay Tiến Độ PT", "Giáo án tập luyện cá nhân 1:1", () -> new GhiChuTienDoPTPanel()));
-        p3.items.add(new OwnerModuleItem("Hồ Sơ Hội Viên", "Lịch sử tập luyện cá nhân", () -> new ChiTietHoiVienPanel()));
+        // Nhóm 3: Con Người & Hệ Thống (Lương, tài khoản 4 vai trò, bảo mật & hạ tầng)
+        OwnerPillar p3 = new OwnerPillar("Con Người & Hệ Thống", new Color(236, 72, 153));
+        p3.items.add(new OwnerModuleItem("Quản Lý Nhân Sự & Bảng Lương", "Danh sách HLV, nhân viên & bảng lương hệ thống", () -> new QuanLyNhanSuPanel()));
+        p3.items.add(new OwnerModuleItem("Tài Khoản App Hội Viên", "Duyệt hồ sơ mới & quản trị tài khoản 4 vai trò", () -> new QuanLyTaiKhoanVaNhanSuPanel()));
+        p3.items.add(new OwnerModuleItem("Phân Quyền Người Dùng", "Quản trị an ninh & phân quyền vai trò", () -> new PhanQuyenPanel()));
+        p3.items.add(new OwnerModuleItem("Cài Đặt Chung", "Cấu hình chuỗi phòng tập & hệ thống", () -> new CaiDatHeThongPanel()));
         ownerPillars.add(p3);
 
-        // Trụ cột 4: Quản Trị Hệ Thống
-        OwnerPillar p4 = new OwnerPillar("Quản Trị Hệ Thống", new Color(236, 72, 153));
-        p4.items.add(new OwnerModuleItem("Quản Lý Nhân Sự", "Danh sách HLV & nhân viên", () -> new QuanLyNhanSuPanel()));
-        p4.items.add(new OwnerModuleItem("Tài Khoản App Hội Viên", "Cấp & quản lý tài khoản app", () -> new QuanLyTaiKhoanAppPanel()));
-        p4.items.add(new OwnerModuleItem("Phân Ca Làm Việc", "Xếp lịch làm việc theo tuần", () -> new PhanCaLamViecPanel()));
-        p4.items.add(new OwnerModuleItem("Phân Quyền Người Dùng", "Quản trị quyền 5 vai trò", () -> new PhanQuyenPanel()));
-        p4.items.add(new OwnerModuleItem("Cài Đặt Chung", "Thông tin phòng & đa cơ sở", () -> new CaiDatHeThongPanel()));
-        ownerPillars.add(p4);
-
-        // Mặc định nạp Báo Cáo Doanh Thu
+        // Mặc định nạp Cửa Sổ Chủ Hệ Thống
         activeOwnerModule = p0.items.get(0);
     }
 
@@ -576,506 +557,299 @@ public class MainDashboard extends JFrame {
     // 2. GIAO DIỆN 3 ROLE: TRẠM LÀM VIỆC CHUYÊN BIỆT (SIDEBAR + EMBEDDED WORKSPACE)
     // (Không dàn ngang quá đà, sắp xếp hợp lý, thao tác trực tiếp trên màn hình)
     // =========================================================================
+    // =========================================================================
+    // 2. GIAO DIỆN 4 VAI TRÒ: DUAL-TIER HORIZONTAL RIBBON (CHUẨN 100% NHƯ ẢNH 2)
+    // =========================================================================
     private void buildStaffWorkstationLayout(String role) {
         rootPanel.removeAll();
-        sidebarMenuItems.clear();
+        this.currentRole = role;
 
         Color roleColor;
         String roleBadgeText;
-        String avatarInitials;
         String staffName = (Auth.hoTen != null && !Auth.hoTen.isEmpty()) ? Auth.hoTen : "Người Dùng";
-        String statusText = "Đang trực ca • Sẵn sàng";
 
         if ("Lễ tân".equalsIgnoreCase(role)) {
-            roleColor = new Color(16, 185, 129);
-            roleBadgeText = "TRẠM LỄ TÂN & BÁN HÀNG";
-            avatarInitials = "LT";
+            roleColor = new Color(16, 185, 129); // Emerald
+            roleBadgeText = "Trạm Lễ Tân";
         } else if ("HLV".equalsIgnoreCase(role)) {
-            roleColor = new Color(245, 158, 11);
-            roleBadgeText = "KHÔNG GIAN HUẤN LUYỆN VIÊN";
-            avatarInitials = "PT";
+            roleColor = new Color(245, 158, 11); // Amber
+            roleBadgeText = "Trạm HLV";
         } else if ("Hội viên".equalsIgnoreCase(role)) {
-            roleColor = new Color(14, 165, 233);
-            roleBadgeText = "CỔNG DỊCH VỤ HỘI VIÊN VIP";
-            avatarInitials = "HV";
-            statusText = "Thành viên VIP • Đang kích hoạt";
+            roleColor = new Color(14, 165, 233); // Sky Blue
+            roleBadgeText = "Hội Viên VIP";
             if (Auth.hoTen == null || Auth.hoTen.isEmpty()) {
                 staffName = "Nguyễn Văn An";
             }
         } else { // Quản lý
-            roleColor = new Color(99, 102, 241);
-            roleBadgeText = "ĐIỀU HÀNH QUẢN LÝ CHI NHÁNH";
-            avatarInitials = "QL";
+            roleColor = new Color(99, 102, 241); // Indigo
+            roleBadgeText = "Trạm Quản Lý";
         }
 
-        // --- A. SIDEBAR BÊN TRÁI (270px) ---
-        JPanel sidebar = new JPanel(new BorderLayout());
-        sidebar.setBackground(new Color(15, 23, 42));
-        sidebar.setPreferredSize(new Dimension(275, 0));
-        sidebar.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(30, 41, 59)));
-
-        // Sidebar Top: Brand & Staff Card
-        JPanel sidebarTop = new JPanel();
-        sidebarTop.setLayout(new BoxLayout(sidebarTop, BoxLayout.Y_AXIS));
-        sidebarTop.setOpaque(false);
-        sidebarTop.setBorder(new EmptyBorder(20, 20, 15, 20));
-
-        JLabel lblBrand = new JLabel("FITLIFE GYM");
-        lblBrand.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        lblBrand.setForeground(Color.WHITE);
-        lblBrand.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JLabel lblBadge = new JLabel("  " + roleBadgeText + "  ");
-        lblBadge.setFont(new Font("Segoe UI", Font.BOLD, 10));
-        lblBadge.setForeground(Color.WHITE);
-        lblBadge.setBackground(roleColor);
-        lblBadge.setOpaque(true);
-        lblBadge.setBorder(BorderFactory.createEmptyBorder(3, 4, 3, 4));
-        lblBadge.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        // Staff profile box
-        JPanel profileBox = new JPanel(new BorderLayout(12, 0));
-        profileBox.setBackground(new Color(30, 41, 59));
-        profileBox.setBorder(new EmptyBorder(10, 12, 10, 12));
-        profileBox.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JLabel lblAvatar = new JLabel(avatarInitials, SwingConstants.CENTER);
-        lblAvatar.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        lblAvatar.setForeground(Color.WHITE);
-        lblAvatar.setBackground(roleColor);
-        lblAvatar.setOpaque(true);
-        lblAvatar.setPreferredSize(new Dimension(38, 38));
-
-        JPanel profileText = new JPanel(new GridLayout(3, 1, 0, 2));
-        profileText.setOpaque(false);
-        JLabel lblStaff = new JLabel(staffName);
-        lblStaff.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        lblStaff.setForeground(new Color(241, 245, 249));
-
-        JLabel lblShift = new JLabel(statusText);
-        lblShift.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        lblShift.setForeground(new Color(52, 211, 153));
-
-        String staffBranch = (Auth.chiNhanh != null && !Auth.chiNhanh.isEmpty()) ? Auth.chiNhanh : "CN01 - Quận 1";
-        JLabel lblBranch = new JLabel("📍 " + staffBranch);
-        lblBranch.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        lblBranch.setForeground(new Color(148, 163, 184));
-
-        profileText.add(lblStaff);
-        profileText.add(lblShift);
-        profileText.add(lblBranch);
-        profileBox.add(lblAvatar, BorderLayout.WEST);
-        profileBox.add(profileText, BorderLayout.CENTER);
-
-        sidebarTop.add(lblBrand);
-        sidebarTop.add(Box.createRigidArea(new Dimension(0, 6)));
-        sidebarTop.add(lblBadge);
-        sidebarTop.add(Box.createRigidArea(new Dimension(0, 15)));
-        sidebarTop.add(profileBox);
-        sidebar.add(sidebarTop, BorderLayout.NORTH);
-
-        // Sidebar Center: Navigation Menu Items
-        JPanel menuContainer = new JPanel();
-        menuContainer.setLayout(new BoxLayout(menuContainer, BoxLayout.Y_AXIS));
-        menuContainer.setOpaque(false);
-        menuContainer.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-        JScrollPane scrollMenu = new JScrollPane(menuContainer);
-        scrollMenu.setBorder(null);
-        scrollMenu.setOpaque(false);
-        scrollMenu.getViewport().setOpaque(false);
-        scrollMenu.getVerticalScrollBar().setUnitIncrement(14);
-        sidebar.add(scrollMenu, BorderLayout.CENTER);
-
-        // Sidebar Bottom: Logout & Switch back for Owner
-        JPanel sidebarBottom = new JPanel(new GridLayout(0, 1, 0, 8));
-        sidebarBottom.setOpaque(false);
-        sidebarBottom.setBorder(new EmptyBorder(15, 15, 18, 15));
-
-        if ("Chủ".equalsIgnoreCase(Auth.vaiTro)) {
-            JButton btnBackHub = new JButton("<< Về Tổng Quan Của Chủ");
-            btnBackHub.setFont(new Font("Segoe UI", Font.BOLD, 12));
-            btnBackHub.setBackground(new Color(30, 41, 59));
-            btnBackHub.setForeground(new Color(56, 189, 248));
-            btnBackHub.setFocusPainted(false);
-            btnBackHub.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            btnBackHub.addActionListener(e -> {
-                buildOwnerMasterHubLayout();
-                revalidate();
-                repaint();
-            });
-            sidebarBottom.add(btnBackHub);
-        }
-
-        JButton btnLogout = createLogoutButton();
-        btnLogout.setPreferredSize(new Dimension(0, 38));
-        sidebarBottom.add(btnLogout);
-        sidebar.add(sidebarBottom, BorderLayout.SOUTH);
-
-        rootPanel.add(sidebar, BorderLayout.WEST);
-
-        // --- B. WORKSPACE BÊN PHẢI (MAIN EMBEDDED VIEWPORT) ---
-        JPanel mainArea = new JPanel(new BorderLayout());
-        mainArea.setBackground(new Color(248, 250, 252));
-
-        // Workspace Top Header
-        JPanel workspaceHeader = new JPanel(new BorderLayout());
-        workspaceHeader.setBackground(Color.WHITE);
-        workspaceHeader.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(226, 232, 240)),
-                new EmptyBorder(14, 25, 14, 25)
-        ));
-
-        JPanel headerLeft = new JPanel(new GridLayout(2, 1, 0, 2));
-        headerLeft.setOpaque(false);
-        lblWorkspaceTitle = new JLabel("TIÊU ĐỀ MÔ-ĐUN");
-        lblWorkspaceTitle.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        lblWorkspaceTitle.setForeground(new Color(15, 23, 42));
-
-        lblWorkspaceBreadcrumb = new JLabel("Trang nghiệp vụ");
-        lblWorkspaceBreadcrumb.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        lblWorkspaceBreadcrumb.setForeground(new Color(100, 116, 139));
-
-        headerLeft.add(lblWorkspaceTitle);
-        headerLeft.add(lblWorkspaceBreadcrumb);
-        workspaceHeader.add(headerLeft, BorderLayout.WEST);
-
-        JPanel headerRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
-        headerRight.setOpaque(false);
-
-        // Nút chuyển về bàn điều hành chủ (nếu người dùng là Chủ hoặc Admin đang thử các góc nhìn)
-        if ("Chủ".equalsIgnoreCase(Auth.vaiTro) || "Quản trị viên (Chủ phòng tập)".equalsIgnoreCase(Auth.vaiTro) || Auth.vaiTro == null) {
-            JButton btnBackMaster = new JButton("👑 Về Bàn Điều Hành Chủ");
-            btnBackMaster.setFont(new Font("Segoe UI", Font.BOLD, 12));
-            btnBackMaster.setBackground(new Color(241, 245, 249));
-            btnBackMaster.setForeground(new Color(37, 99, 235));
-            btnBackMaster.setFocusPainted(false);
-            btnBackMaster.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            btnBackMaster.addActionListener(e -> {
-                currentRole = "Chủ";
-                setTitle("FitLife Gym Management - " + getRoleDisplayName(currentRole));
-                buildOwnerMasterHubLayout();
-                revalidate();
-                repaint();
-            });
-            headerRight.add(btnBackMaster);
-
-            JLabel lblGoc = new JLabel("Góc nhìn:");
-            lblGoc.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-            lblGoc.setForeground(new Color(100, 116, 139));
-            headerRight.add(lblGoc);
-
-            JComboBox<String> cbStaffView = new JComboBox<>(new String[]{
-                    "Chủ Phòng",
-                    "Trạm Lễ Tân",
-                    "Trạm HLV",
-                    "Trạm Quản Lý",
-                    "Hội Viên VIP"
-            });
-            cbStaffView.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-            cbStaffView.setPreferredSize(new Dimension(115, 28));
-            if ("Lễ tân".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(1);
-            else if ("HLV".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(2);
-            else if ("Quản lý".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(3);
-            else if ("Hội viên".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(4);
-            else cbStaffView.setSelectedIndex(0);
-
-            cbStaffView.addActionListener(e -> {
-                int s = cbStaffView.getSelectedIndex();
-                if (s == 1) buildStaffWorkstationLayout("Lễ tân");
-                else if (s == 2) buildStaffWorkstationLayout("HLV");
-                else if (s == 3) buildStaffWorkstationLayout("Quản lý");
-                else if (s == 4) buildStaffWorkstationLayout("Hội viên");
-                else {
-                    currentRole = "Chủ";
-                    setTitle("FitLife Gym Management - " + getRoleDisplayName(currentRole));
-                    buildOwnerMasterHubLayout();
-                }
-                revalidate();
-                repaint();
-            });
-            headerRight.add(cbStaffView);
-        }
-
-        String today = new SimpleDateFormat("EEEE, dd/MM/yyyy").format(new Date());
-        JLabel lblDate = new JLabel("  " + today);
-        lblDate.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        lblDate.setForeground(new Color(71, 85, 105));
-        headerRight.add(lblDate);
-        workspaceHeader.add(headerRight, BorderLayout.EAST);
-
-        mainArea.add(workspaceHeader, BorderLayout.NORTH);
-
-        // Workspace Dynamic Center Container
-        workspaceContainer = new JPanel(new BorderLayout());
-        workspaceContainer.setOpaque(false);
-        mainArea.add(workspaceContainer, BorderLayout.CENTER);
-
-        rootPanel.add(mainArea, BorderLayout.CENTER);
+        // TẦNG 1: TOP NAVBAR ĐEN HIỆN ĐẠI (SLATE 900 #0F172A)
+        JPanel topContainer = new JPanel();
+        topContainer.setLayout(new BoxLayout(topContainer, BoxLayout.Y_AXIS));
+        topContainer.setOpaque(false);
 
         JPanel offlineBanner = taoBannerCanhBaoOffline();
         if (offlineBanner != null) {
-            rootPanel.add(offlineBanner, BorderLayout.NORTH);
+            topContainer.add(offlineBanner);
         }
 
-        // --- C. THIẾT LẬP MENU ĐẶC THÙ CHO TỪNG ROLE ---
-        if ("Lễ tân".equalsIgnoreCase(role)) {
-            setupReceptionistMenu(menuContainer, roleColor);
-        } else if ("HLV".equalsIgnoreCase(role)) {
-            setupTrainerMenu(menuContainer, roleColor);
-        } else if ("Hội viên".equalsIgnoreCase(role)) {
-            setupMemberMenu(menuContainer, roleColor);
-        } else {
-            setupManagerMenu(menuContainer, roleColor);
-        }
-    }
+        JPanel navBar = new JPanel(new BorderLayout(15, 0));
+        navBar.setBackground(new Color(15, 23, 42));
+        navBar.setPreferredSize(new Dimension(0, 52));
+        navBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 52));
+        navBar.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(30, 41, 59)),
+                new EmptyBorder(0, 20, 0, 20)
+        ));
 
-    // Menu Lễ Tân
-    private void setupReceptionistMenu(JPanel menuContainer, Color accent) {
-        PermissionService ps = PermissionService.getInstance();
-        boolean hasAny = false;
+        // Trái: Tên thương hiệu & Vai trò
+        JPanel brandGroup = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        brandGroup.setOpaque(false);
 
-        if (ps.hasPermission("Lễ tân", PermissionService.PERM_CHECKIN)) {
-            addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên ra vào", () -> new CheckInForm(), accent, !hasAny);
-            hasAny = true;
-        }
-        if (ps.hasPermission("Lễ tân", PermissionService.PERM_POS)) {
-            addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Bán nước, whey & phụ kiện", () -> new BanHangPOSPanel(), accent, !hasAny);
-            hasAny = true;
-        }
-        if (ps.hasPermission("Lễ tân", PermissionService.PERM_HOIVIEN)) {
-            addSidebarItem(menuContainer, "Đăng Ký Hội Viên Mới", "Tạo thẻ và hợp đồng mới", () -> new DangKyHoiVienPanel(), accent, !hasAny);
-            hasAny = true;
-        }
-        if (ps.hasPermission("Lễ tân", PermissionService.PERM_GOITAP)) {
-            addSidebarItem(menuContainer, "Gia Hạn Gói Tập", "Nâng cấp và gia hạn thẻ", () -> new GiaHanGoiTapPanel(), accent, !hasAny);
-            hasAny = true;
-            addSidebarItem(menuContainer, "Quản Lý Gói Tập", "Bảng giá & cấu hình gói tập", () -> new QuanLyGoiTapPanel(), accent, false);
-        }
-        if (ps.hasPermission("Lễ tân", PermissionService.PERM_HOIVIEN)) {
-            addSidebarItem(menuContainer, "Tài Khoản App Hội Viên", "Cấp & mở khóa tài khoản app", () -> new QuanLyTaiKhoanAppPanel(), accent, !hasAny);
-            hasAny = true;
-        }
-        if (ps.hasPermission("Lễ tân", PermissionService.PERM_CHECKIN)) {
-            addSidebarItem(menuContainer, "Quản Lý Tủ Đồ Locker", "Sơ đồ 20 tủ đồ thông minh", () -> new QuanLyLockerPanel(), accent, !hasAny);
-            hasAny = true;
-        }
-        if (ps.hasPermission("Lễ tân", PermissionService.PERM_HOIVIEN)) {
-            addSidebarItem(menuContainer, "Chăm Sóc Khách Hàng", "Gửi SMS & Zalo nhắc hạn", () -> new ChamSocKhachHangPanel(), accent, !hasAny);
-            addSidebarItem(menuContainer, "Hồ Sơ & Lịch Sử HV", "Hồ sơ chi tiết & lượt quét", () -> new ChiTietHoiVienPanel(), accent, false);
-            addSidebarItem(menuContainer, "Danh Sách Hội Viên", "Quản lý danh bạ hội viên", () -> new QuanLyHoiVienPanel(), accent, false);
-            hasAny = true;
-        }
+        JLabel lblLogo = new JLabel("FITLIFE GYM");
+        lblLogo.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        lblLogo.setForeground(Color.WHITE);
 
-        if (!hasAny) {
-            JLabel lblEmpty = new JLabel("<html><center><br><br><i>Vai trò Lễ tân hiện chưa được cấp quyền nào.<br>Vui lòng vào [Phân Quyền] để bật quyền.</i></center></html>");
-            lblEmpty.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-            lblEmpty.setForeground(new Color(148, 163, 184));
-            lblEmpty.setAlignmentX(Component.CENTER_ALIGNMENT);
-            menuContainer.add(lblEmpty);
-        }
-    }
+        JLabel lblDivider = new JLabel("|");
+        lblDivider.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        lblDivider.setForeground(new Color(71, 85, 105));
 
-    // Menu Huấn Luyện Viên (HLV)
-    private void setupTrainerMenu(JPanel menuContainer, Color accent) {
-        PermissionService ps = PermissionService.getInstance();
-        boolean hasAny = false;
+        JLabel lblSubBrand = new JLabel(roleBadgeText);
+        lblSubBrand.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblSubBrand.setForeground(roleColor);
 
-        if (ps.hasPermission("HLV", PermissionService.PERM_LOPHOC)) {
-            addSidebarItem(menuContainer, "Lịch Lớp Học & Điểm Danh", "Quản lý lớp, ghi danh & điểm danh học viên", () -> new LichLopHocPanel(), accent, !hasAny);
-            hasAny = true;
-            addSidebarItem(menuContainer, "Lịch Dạy Huấn Luyện Viên", "Ca dạy hôm nay & sĩ số phòng", () -> new LichDayHLVPanel(), accent, false);
-            addSidebarItem(menuContainer, "Sổ Tay Tiến Độ PT", "Nhật ký mức tạ & số buổi", () -> new GhiChuTienDoPTPanel(), accent, false);
-            addSidebarItem(menuContainer, "Đo Đạc Chỉ Số InBody", "Phân tích cơ, mỡ & BMI", () -> new TheoDoiChiSoPanel(), accent, false);
-        }
-        if (ps.hasPermission("HLV", PermissionService.PERM_HOIVIEN) || ps.hasPermission("HLV", PermissionService.PERM_CHECKIN)) {
-            addSidebarItem(menuContainer, "Hồ Sơ Học Viên Kèm", "Hồ sơ học viên cá nhân", () -> new ChiTietHoiVienPanel(), accent, !hasAny);
-            hasAny = true;
-        }
+        brandGroup.add(lblLogo);
+        brandGroup.add(lblDivider);
+        brandGroup.add(lblSubBrand);
+        navBar.add(brandGroup, BorderLayout.WEST);
 
-        if (!hasAny) {
-            JLabel lblEmpty = new JLabel("<html><center><br><br><i>Vai trò HLV hiện chưa được cấp quyền nào.<br>Vui lòng vào [Phân Quyền] để bật quyền.</i></center></html>");
-            lblEmpty.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-            lblEmpty.setForeground(new Color(148, 163, 184));
-            lblEmpty.setAlignmentX(Component.CENTER_ALIGNMENT);
-            menuContainer.add(lblEmpty);
-        }
-    }
+        // Phải: Nút Quét Check-in, Góc nhìn Dropdown, Tên người dùng, Nút Đăng xuất
+        JPanel userGroup = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        userGroup.setOpaque(false);
 
-    // Menu Hội Viên VIP
-    private void setupMemberMenu(JPanel menuContainer, Color accent) {
-        PermissionService ps = PermissionService.getInstance();
-        boolean hasAny = false;
+        JButton btnQuickCheckIn = new JButton("Quét Mã Check-in");
+        btnQuickCheckIn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnQuickCheckIn.setBackground(new Color(16, 185, 129));
+        btnQuickCheckIn.setForeground(Color.WHITE);
+        btnQuickCheckIn.setFocusPainted(false);
+        btnQuickCheckIn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnQuickCheckIn.setPreferredSize(new Dimension(140, 30));
+        btnQuickCheckIn.addActionListener(e -> {
+            Window top = SwingUtilities.getWindowAncestor(this);
+            new QRScannerSimulatorDialog(top).setVisible(true);
+        });
 
-        if (ps.hasPermission("Hội viên", PermissionService.PERM_CHECKIN)) {
-            addSidebarItem(menuContainer, "Thẻ VIP & Check-in QR", "Mã thẻ cá nhân & cửa tự động", () -> new HoiVienTheDienTuPanel(), accent, !hasAny);
-            hasAny = true;
-        }
-        if (ps.hasPermission("Hội viên", PermissionService.PERM_LOPHOC)) {
-            addSidebarItem(menuContainer, "Đặt Chỗ Lớp Học", "Lớp Yoga, Zumba, Boxing", () -> new HoiVienDatLopPanel(), accent, !hasAny);
-            hasAny = true;
-            addSidebarItem(menuContainer, "Lịch Tập Với HLV (PT)", "Số buổi kèm & kỷ lục tạ PR", () -> new HoiVienLichPTPanel(), accent, false);
-        }
-        addSidebarItem(menuContainer, "Chỉ Số Cơ Thể InBody", "Theo dõi cơ, mỡ, BMI cá nhân", () -> new HoiVienInBodyPanel(), accent, !hasAny);
-        hasAny = true;
+        JLabel lblSwitch = new JLabel("Góc nhìn:");
+        lblSwitch.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        lblSwitch.setForeground(new Color(148, 163, 184));
 
-        if (ps.hasPermission("Hội viên", PermissionService.PERM_GOITAP)) {
-            addSidebarItem(menuContainer, "Gói Tập & Gia Hạn", "Hợp đồng & thanh toán VietQR", () -> new HoiVienGoiTapPanel(), accent, false);
-        }
-        addSidebarItem(menuContainer, "Đánh Giá & Góp Ý", "Chấm điểm dịch vụ & gửi ý kiến", () -> new HoiVienGopYPanel(), accent, false);
-    }
+        JComboBox<String> cbViewMode = new JComboBox<>(new String[]{
+                "Chủ Phòng",
+                "Trạm Lễ Tân",
+                "Trạm HLV",
+                "Trạm Quản Lý",
+                "Hội Viên VIP"
+        });
+        cbViewMode.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        cbViewMode.setBackground(new Color(30, 41, 59));
+        cbViewMode.setForeground(Color.WHITE);
+        cbViewMode.setPreferredSize(new Dimension(120, 30));
 
-    // Menu Quản Lý Chi Nhánh
-    private void setupManagerMenu(JPanel menuContainer, Color accent) {
-        PermissionService ps = PermissionService.getInstance();
-        boolean hasAny = false;
+        if ("Lễ tân".equalsIgnoreCase(role)) cbViewMode.setSelectedIndex(1);
+        else if ("HLV".equalsIgnoreCase(role)) cbViewMode.setSelectedIndex(2);
+        else if ("Quản lý".equalsIgnoreCase(role)) cbViewMode.setSelectedIndex(3);
+        else if ("Hội viên".equalsIgnoreCase(role)) cbViewMode.setSelectedIndex(4);
+        else cbViewMode.setSelectedIndex(0);
 
-        if (ps.hasPermission("Quản lý", PermissionService.PERM_BAOCAO)) {
-            addSidebarItem(menuContainer, "Tổng Quan Vận Hành", "Sức chứa & doanh số ngày", () -> new TrangChuPanel(), accent, !hasAny);
-            hasAny = true;
-            addSidebarItem(menuContainer, "Báo Cáo Doanh Thu", "Doanh thu tuần, tháng, quý", () -> new BaoCaoThongKePanel(), accent, false);
-        }
-        if (ps.hasPermission("Quản lý", PermissionService.PERM_GOITAP)) {
-            addSidebarItem(menuContainer, "Quản Lý Gói Tập", "Bảng giá & cấu hình gói tập", () -> new QuanLyGoiTapPanel(), accent, !hasAny);
-            hasAny = true;
-        }
-        if (ps.hasPermission("Quản lý", PermissionService.PERM_BAOCAO)) {
-            addSidebarItem(menuContainer, "Mật Độ Giờ Cao Điểm", "Heatmap lưu lượng phòng gym", () -> new HeatmapGioCaoDiemPanel(), accent, !hasAny);
-            hasAny = true;
-        }
-        if (ps.hasPermission("Quản lý", PermissionService.PERM_HOIVIEN)) {
-            addSidebarItem(menuContainer, "Tài Khoản App Hội Viên", "Quản lý truy cập app hội viên", () -> new QuanLyTaiKhoanAppPanel(), accent, !hasAny);
-            hasAny = true;
-        }
-        if (ps.hasPermission("Quản lý", PermissionService.PERM_NHANSU)) {
-            addSidebarItem(menuContainer, "Lịch Trực & Phân Ca", "Xếp ca làm việc nhân viên", () -> new PhanCaLamViecPanel(), accent, !hasAny);
-            addSidebarItem(menuContainer, "Quản Lý Nhân Sự", "Danh sách HLV & Lễ tân", () -> new QuanLyNhanSuPanel(), accent, false);
-            hasAny = true;
-        }
-        if (ps.hasPermission("Quản lý", PermissionService.PERM_POS)) {
-            addSidebarItem(menuContainer, "Quản Lý Kho Hàng", "Tồn kho thực phẩm & đồ uống", () -> new QuanLyKhoHangPanel(), accent, !hasAny);
-            hasAny = true;
-        }
-        if (ps.hasPermission("Quản lý", PermissionService.PERM_BAOCAO)) {
-            addSidebarItem(menuContainer, "Lịch Sử Giao Dịch", "Nhật ký hóa đơn toàn viện", () -> new LichSuGiaoDichPanel(), accent, !hasAny);
-            hasAny = true;
-        }
-        if (ps.hasPermission("Quản lý", PermissionService.PERM_HOIVIEN)) {
-            addSidebarItem(menuContainer, "Đánh Giá & Phản Hồi", "Góp ý từ hội viên", () -> new QuanLyPhanHoiPanel(), accent, !hasAny);
-            hasAny = true;
-        }
+        cbViewMode.addActionListener(e -> {
+            int sel = cbViewMode.getSelectedIndex();
+            if (sel == 1) buildStaffWorkstationLayout("Lễ tân");
+            else if (sel == 2) buildStaffWorkstationLayout("HLV");
+            else if (sel == 3) buildStaffWorkstationLayout("Quản lý");
+            else if (sel == 4) buildStaffWorkstationLayout("Hội viên");
+            else {
+                currentRole = "Chủ";
+                setTitle("FitLife Gym Management - " + getRoleDisplayName(currentRole));
+                buildOwnerMasterHubLayout();
+            }
+            revalidate();
+            repaint();
+        });
 
-        if (!hasAny) {
-            JLabel lblEmpty = new JLabel("<html><center><br><br><i>Vai trò Quản lý hiện chưa được cấp quyền nào.<br>Vui lòng vào [Phân Quyền] để bật quyền.</i></center></html>");
-            lblEmpty.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-            lblEmpty.setForeground(new Color(148, 163, 184));
-            lblEmpty.setAlignmentX(Component.CENTER_ALIGNMENT);
-            menuContainer.add(lblEmpty);
-        }
-    }
+        JLabel lblUser = new JLabel(staffName);
+        lblUser.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblUser.setForeground(new Color(241, 245, 249));
 
-    private static class SidebarMenuItem {
-        JButton button;
-        String title;
-        String subtitle;
-        Supplier<JPanel> supplier;
-        Color accent;
-    }
+        JButton btnLogout = createLogoutButton();
 
-    private void addSidebarItem(JPanel container, String title, String subtitle, Supplier<JPanel> supplier, Color accent, boolean isDefault) {
-        SidebarMenuItem item = new SidebarMenuItem();
-        item.title = title;
-        item.subtitle = subtitle;
-        item.supplier = supplier;
-        item.accent = accent;
+        userGroup.add(btnQuickCheckIn);
+        userGroup.add(lblSwitch);
+        userGroup.add(cbViewMode);
+        userGroup.add(lblUser);
+        userGroup.add(btnLogout);
+        navBar.add(userGroup, BorderLayout.EAST);
+        topContainer.add(navBar);
 
-        JButton btn = new JButton() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                if (Boolean.TRUE.equals(getClientProperty("active"))) {
-                    g.setColor(accent);
-                    g.fillRect(0, 0, 4, getHeight());
+        // TẦNG 2: SUB-NAVBAR NẰM NGANG (WHITE #FFFFFF, BORDER #E2E8F0)
+        JPanel subRibbon = new JPanel(new BorderLayout(10, 0));
+        subRibbon.setBackground(Color.WHITE);
+        subRibbon.setPreferredSize(new Dimension(0, 44));
+        subRibbon.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
+        subRibbon.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(226, 232, 240)),
+                new EmptyBorder(0, 16, 0, 16)
+        ));
+
+        JPanel pnlTabs = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+        pnlTabs.setOpaque(false);
+
+        // Danh sách các mô-đun của role
+        List<OwnerModuleItem> roleItems = getModulesForRole(role);
+
+        // Workspace Container
+        workspaceContainer = new JPanel(new BorderLayout());
+        workspaceContainer.setOpaque(false);
+
+        // Nạp các tab button
+        List<JButton> tabButtons = new ArrayList<>();
+        for (int i = 0; i < roleItems.size(); i++) {
+            final OwnerModuleItem mod = roleItems.get(i);
+            JButton btnTab = new JButton(mod.title);
+            btnTab.setFont(new Font("Segoe UI", i == 0 ? Font.BOLD : Font.PLAIN, 12));
+            btnTab.setForeground(i == 0 ? roleColor : new Color(100, 116, 139));
+            btnTab.setBackground(i == 0 ? new Color(241, 245, 249) : Color.WHITE);
+            btnTab.setFocusPainted(false);
+            btnTab.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            btnTab.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createMatteBorder(0, 0, i == 0 ? 3 : 0, 0, i == 0 ? roleColor : new Color(0, 0, 0, 0)),
+                    new EmptyBorder(10, 14, 10, 14)
+            ));
+
+            final int tabIdx = i;
+            btnTab.addActionListener(e -> {
+                for (int j = 0; j < tabButtons.size(); j++) {
+                    JButton b = tabButtons.get(j);
+                    boolean isCur = (j == tabIdx);
+                    b.setFont(new Font("Segoe UI", isCur ? Font.BOLD : Font.PLAIN, 12));
+                    b.setForeground(isCur ? roleColor : new Color(100, 116, 139));
+                    b.setBackground(isCur ? new Color(241, 245, 249) : Color.WHITE);
+                    b.setBorder(BorderFactory.createCompoundBorder(
+                            BorderFactory.createMatteBorder(0, 0, isCur ? 3 : 0, 0, isCur ? roleColor : new Color(0, 0, 0, 0)),
+                            new EmptyBorder(10, 14, 10, 14)
+                    ));
                 }
-            }
-        };
-        btn.setLayout(new BorderLayout(10, 0));
-        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 46));
-        btn.setPreferredSize(new Dimension(255, 46));
-        btn.setFocusPainted(false);
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setBorder(new EmptyBorder(8, 14, 8, 14));
 
-        JPanel textPanel = new JPanel(new GridLayout(2, 1, 0, 1));
-        textPanel.setOpaque(false);
-        JLabel lblMain = new JLabel(title);
-        lblMain.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        lblMain.setForeground(new Color(226, 232, 240));
+                // Load panel
+                try {
+                    JPanel p = mod.supplier.get();
+                    workspaceContainer.removeAll();
+                    workspaceContainer.add(p, BorderLayout.CENTER);
+                    workspaceContainer.revalidate();
+                    workspaceContainer.repaint();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
 
-        JLabel lblSub = new JLabel(subtitle);
-        lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-        lblSub.setForeground(new Color(148, 163, 184));
+            tabButtons.add(btnTab);
+            pnlTabs.add(btnTab);
+        }
+        subRibbon.add(pnlTabs, BorderLayout.CENTER);
 
-        textPanel.add(lblMain);
-        textPanel.add(lblSub);
-        btn.add(textPanel, BorderLayout.CENTER);
+        // Phải: Chi nhánh & Làm mới
+        JPanel pnlRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 7));
+        pnlRight.setOpaque(false);
 
-        item.button = btn;
-        sidebarMenuItems.add(item);
+        JLabel lblBranch = new JLabel("Chi nhánh:");
+        lblBranch.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        lblBranch.setForeground(new Color(71, 85, 105));
 
-        btn.addActionListener(e -> selectSidebarItem(item));
-
-        // Click on children also triggers
-        java.awt.event.MouseAdapter ma = new java.awt.event.MouseAdapter() {
-            @Override
-            public void mousePressed(java.awt.event.MouseEvent e) {
-                selectSidebarItem(item);
-            }
-        };
-        textPanel.addMouseListener(ma);
-        lblMain.addMouseListener(ma);
-        lblSub.addMouseListener(ma);
-
-        container.add(btn);
-        container.add(Box.createRigidArea(new Dimension(0, 3)));
-
-        if (isDefault) {
-            selectSidebarItem(item);
+        JComboBox<String> cbBranchScope;
+        if ("Quản lý".equalsIgnoreCase(role)) {
+            // Quản lý chi nhánh phụ trách: Khóa theo chi nhánh cơ sở, không cho chọn Toàn hệ thống
+            String myBranch = (Auth.chiNhanh != null && Auth.chiNhanh.contains("02"))
+                    ? "CN02 - Tân Bình (Premium)" : "CN01 - Quận 1 (Flagship)";
+            cbBranchScope = new JComboBox<>(new String[]{ myBranch });
+            cbBranchScope.setEnabled(false);
+            cbBranchScope.setToolTipText("Quản lý chỉ xem dữ liệu trong phạm vi chi nhánh phụ trách");
         } else {
-            setButtonState(btn, false, accent);
+            cbBranchScope = new JComboBox<>(new String[]{
+                    "Toàn hệ thống (2 cơ sở)",
+                    "CN01 - Quận 1 (Flagship)",
+                    "CN02 - Tân Bình (Premium)"
+            });
+        }
+        cbBranchScope.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        cbBranchScope.setPreferredSize(new Dimension(175, 28));
+
+        JButton btnRefresh = new JButton("Làm Mới");
+        btnRefresh.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        btnRefresh.setPreferredSize(new Dimension(80, 28));
+        btnRefresh.addActionListener(e -> {
+            if (!roleItems.isEmpty()) {
+                tabButtons.get(0).doClick();
+            }
+        });
+
+        pnlRight.add(lblBranch);
+        pnlRight.add(cbBranchScope);
+        pnlRight.add(btnRefresh);
+        subRibbon.add(pnlRight, BorderLayout.EAST);
+
+        topContainer.add(subRibbon);
+        rootPanel.add(topContainer, BorderLayout.NORTH);
+        rootPanel.add(workspaceContainer, BorderLayout.CENTER);
+
+        // Mặc định nạp tab đầu tiên
+        if (!tabButtons.isEmpty()) {
+            tabButtons.get(0).doClick();
         }
     }
 
-    private void selectSidebarItem(SidebarMenuItem selectedItem) {
-        for (SidebarMenuItem item : sidebarMenuItems) {
-            boolean isSel = (item == selectedItem);
-            setButtonState(item.button, isSel, selectedItem.accent);
+    private List<OwnerModuleItem> getModulesForRole(String role) {
+        List<OwnerModuleItem> list = new ArrayList<>();
+        if ("Lễ tân".equalsIgnoreCase(role)) {
+            // 8 màn hình vận hành trực tiếp tại quầy của Lễ tân
+            list.add(new OwnerModuleItem("Quét Thẻ & Check-in", "Check-in hội viên & cửa flap barrier", () -> new CheckInForm()));
+            list.add(new OwnerModuleItem("Danh Sách Hội Viên", "Quản lý danh bạ & hồ sơ hội viên", () -> new QuanLyHoiVienPanel()));
+            list.add(new OwnerModuleItem("Đăng Ký Hội Viên Mới", "Tạo hợp đồng & cấp mã thẻ QR", () -> new DangKyHoiVienPanel()));
+            list.add(new OwnerModuleItem("Gia Hạn Gói Tập", "Nâng cấp gói tập & gia hạn thẻ", () -> new GiaHanGoiTapPanel()));
+            list.add(new OwnerModuleItem("Lịch Lớp Học & Điểm Danh", "Thời khóa biểu lớp nhóm & điểm danh", () -> new LichLopHocPanel()));
+            list.add(new OwnerModuleItem("Quầy Bán Hàng POS", "Bán nước giải khát, whey & đồ tập", () -> new BanHangPOSPanel()));
+            list.add(new OwnerModuleItem("Quản Lý Tủ Đồ Locker", "20 tủ đồ cá nhân thông minh", () -> new QuanLyLockerPanel()));
+            list.add(new OwnerModuleItem("Chăm Sóc Khách Hàng", "Nhắc hạn tự động Zalo/SMS & tư vấn", () -> new ChamSocKhachHangPanel()));
+        } else if ("HLV".equalsIgnoreCase(role)) {
+            // 4 màn hình chuyên môn của Huấn Luyện Viên
+            list.add(new OwnerModuleItem("Theo Dõi InBody & Thể Lực", "Phân tích cơ, mỡ, BMI & thể trạng", () -> new TheoDoiChiSoPanel()));
+            list.add(new OwnerModuleItem("Lịch Dạy Huấn Luyện Viên", "Lịch trực, ca dạy PT hôm nay & sĩ số", () -> new LichDayHLVPanel()));
+            list.add(new OwnerModuleItem("Sổ Tay Tiến Độ PT", "Giáo án tập luyện 1:1 & kỷ lục tạ cá nhân", () -> new GhiChuTienDoPTPanel()));
+            list.add(new OwnerModuleItem("Hồ Sơ Học Viên Phụ Trách", "Chi tiết lịch sử tập & mục tiêu học viên", () -> new ChiTietHoiVienPanel()));
+        } else if ("Quản lý".equalsIgnoreCase(role)) {
+            // 13 màn hình: 8 của Lễ tân + 3 điều hành chi nhánh + 2 xem số liệu chi nhánh
+            list.add(new OwnerModuleItem("Quét Thẻ & Check-in", "Check-in hội viên tại quầy", () -> new CheckInForm()));
+            list.add(new OwnerModuleItem("Danh Sách Hội Viên", "Hồ sơ hội viên chi nhánh", () -> new QuanLyHoiVienPanel()));
+            list.add(new OwnerModuleItem("Đăng Ký Hội Viên Mới", "Tạo hợp đồng & cấp mã thẻ QR", () -> new DangKyHoiVienPanel()));
+            list.add(new OwnerModuleItem("Gia Hạn Gói Tập", "Nâng cấp gói & gia hạn thẻ", () -> new GiaHanGoiTapPanel()));
+            list.add(new OwnerModuleItem("Lịch Lớp Học & Điểm Danh", "Điều phối lớp nhóm & điểm danh", () -> new LichLopHocPanel()));
+            list.add(new OwnerModuleItem("Quầy Bán Hàng POS", "Thu ngân quầy bar & sản phẩm", () -> new BanHangPOSPanel()));
+            list.add(new OwnerModuleItem("Quản Lý Tủ Đồ Locker", "Tủ đồ cá nhân chi nhánh", () -> new QuanLyLockerPanel()));
+            list.add(new OwnerModuleItem("Chăm Sóc Khách Hàng", "CRM nhắc hạn & chăm sóc khách hàng", () -> new ChamSocKhachHangPanel()));
+            list.add(new OwnerModuleItem("Quản Lý Kho Hàng", "Kiểm kê xuất nhập tồn kho cơ sở", () -> new QuanLyKhoHangPanel()));
+            list.add(new OwnerModuleItem("Khảo Sát & Phản Hồi", "Khảo sát ý kiến hội viên cơ sở", () -> new QuanLyPhanHoiPanel()));
+            list.add(new OwnerModuleItem("Phân Ca Làm Việc", "Xếp lịch làm việc nhân viên theo tuần", () -> new PhanCaLamViecPanel()));
+            list.add(new OwnerModuleItem("Phân Tích Giờ Cao Điểm", "Mật độ khách 6h-22h (Chi nhánh)", () -> new HeatmapGioCaoDiemPanel()));
+            list.add(new OwnerModuleItem("Báo Cáo Doanh Thu Chi Nhánh", "Doanh thu & tài chính chi nhánh", () -> new BaoCaoThongKePanel()));
+        } else { // Hội viên
+            list.add(new OwnerModuleItem("Thẻ VIP & Check-in QR", "Mã thẻ cá nhân & cửa tự động", () -> new HoiVienTheDienTuPanel()));
+            list.add(new OwnerModuleItem("Đặt Chỗ Lớp Học", "Lớp Yoga, Zumba, Boxing", () -> new HoiVienDatLopPanel()));
+            list.add(new OwnerModuleItem("Lịch Tập Với HLV (PT)", "Số buổi kèm & kỷ lục tạ PR", () -> new HoiVienLichPTPanel()));
+            list.add(new OwnerModuleItem("Chỉ Số Cơ Thể InBody", "Theo dõi cơ, mỡ, BMI", () -> new HoiVienInBodyPanel()));
+            list.add(new OwnerModuleItem("Gói Tập & Gia Hạn", "Hợp đồng & thanh toán VietQR", () -> new HoiVienGoiTapPanel()));
+            list.add(new OwnerModuleItem("Đánh Giá & Góp Ý", "Chấm điểm dịch vụ", () -> new HoiVienGopYPanel()));
         }
-
-        lblWorkspaceTitle.setText(selectedItem.title.toUpperCase());
-        lblWorkspaceBreadcrumb.setText("Nghiệp vụ " + currentRole + " > " + selectedItem.title + " (" + selectedItem.subtitle + ")");
-
-        // Load panel into workspace directly
-        try {
-            JPanel panel = selectedItem.supplier.get();
-            workspaceContainer.removeAll();
-            workspaceContainer.add(panel, BorderLayout.CENTER);
-            workspaceContainer.revalidate();
-            workspaceContainer.repaint();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Không thể tải mô-đun: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-        }
-    }
-
-    private void setButtonState(JButton btn, boolean active, Color accent) {
-        btn.putClientProperty("active", active);
-        if (active) {
-            btn.setBackground(new Color(30, 41, 59));
-        } else {
-            btn.setBackground(new Color(15, 23, 42));
-        }
-        btn.repaint();
+        return list;
     }
 
 

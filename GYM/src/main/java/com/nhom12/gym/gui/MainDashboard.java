@@ -310,7 +310,9 @@ public class MainDashboard extends JFrame {
             new QRScannerSimulatorDialog(top).setVisible(true);
         });
 
-        headerRight.add(btnQuickRegister);
+        if (!"HLV".equalsIgnoreCase(role)) {
+            headerRight.add(btnQuickRegister);
+        }
 
         // Dropdown chuyển góc nhìn (CHỈ DÀNH RIÊNG CHO CHỦ PHÒNG TẬP)
         boolean isRealOwner = "Chủ".equalsIgnoreCase(Auth.vaiTro);
@@ -420,8 +422,6 @@ public class MainDashboard extends JFrame {
             setupReceptionistMenu(menuContainer, roleColor);
         } else if ("HLV".equalsIgnoreCase(role)) {
             setupTrainerMenu(menuContainer, roleColor);
-        } else if ("Hội viên".equalsIgnoreCase(role)) {
-            setupMemberMenu(menuContainer, roleColor);
         } else {
             setupManagerMenu(menuContainer, roleColor);
         }
@@ -503,16 +503,7 @@ public class MainDashboard extends JFrame {
         addSidebarItem(menuContainer, "Báo Cáo Doanh Thu Chi Nhánh", "Doanh thu & tài chính chi nhánh", () -> new BaoCaoThongKePanel(), accent, false);
     }
 
-    // =========================================================================
-    // 5. MENU HỘI VIÊN (5 MÔ-ĐUN CỔNG THÀNH VIÊN VIP)
-    // =========================================================================
-    private void setupMemberMenu(JPanel menuContainer, Color accent) {
-        addSidebarItem(menuContainer, "Thẻ VIP & Check-in QR", "Mã thẻ cá nhân & cửa tự động", () -> new HoiVienTheDienTuPanel(), accent, true);
-        addSidebarItem(menuContainer, "Đặt Chỗ Lớp Học", "Lớp Yoga, Zumba, Boxing", () -> new HoiVienDatLopPanel(), accent, false);
-        addSidebarItem(menuContainer, "Lịch Tập Với HLV (PT)", "Số buổi kèm & kỷ lục tạ PR", () -> new HoiVienLichPTPanel(), accent, false);
-        addSidebarItem(menuContainer, "Chỉ Số Cơ Thể InBody", "Theo dõi cơ, mỡ, BMI", () -> new HoiVienInBodyPanel(), accent, false);
-        addSidebarItem(menuContainer, "Gói Tập & Gia Hạn", "Hợp đồng & thanh toán VietQR", () -> new HoiVienGoiTapPanel(), accent, false);
-    }
+
 
     private void addSidebarCategoryHeader(JPanel container, String categoryTitle) {
         JLabel lblCat = new JLabel(categoryTitle.toUpperCase());

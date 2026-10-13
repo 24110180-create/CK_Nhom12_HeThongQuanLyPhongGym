@@ -597,7 +597,9 @@ public class DangKyHoiVienPanel extends JPanel {
                                     "Đăng ký thẻ mới thành công"
                             );
                             com.nhom12.gym.dao.HoaDonDAO.getInstance().them(hd);
-                        } catch (Exception ignored) {
+                        } catch (Exception ex) {
+                            System.err.println("[DangKyHoiVienPanel] Lỗi lưu hội viên hoặc hóa đơn: " + ex.getMessage());
+                            ex.printStackTrace();
                         }
 
                         Frame f = (Frame) SwingUtilities.getWindowAncestor(this);

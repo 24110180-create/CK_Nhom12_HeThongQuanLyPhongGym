@@ -98,13 +98,16 @@ public class ChiTietHoiVienPanel extends JPanel {
         btnRenew.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnRenew.setBackground(new Color(16, 185, 129));
         btnRenew.setForeground(Color.WHITE);
-        searchBar.add(btnRenew);
 
         btnLock = new JButton("Khóa Thẻ Tạm Thời");
         btnLock.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnLock.setBackground(new Color(239, 68, 68));
         btnLock.setForeground(Color.WHITE);
-        searchBar.add(btnLock);
+
+        if (!"HLV".equalsIgnoreCase(Auth.vaiTro)) {
+            searchBar.add(btnRenew);
+            searchBar.add(btnLock);
+        }
 
         btnPrintProfile = new JButton("In Hồ Sơ Hội Viên");
         btnPrintProfile.setFont(new Font("Segoe UI", Font.BOLD, 13));
@@ -320,6 +323,11 @@ public class ChiTietHoiVienPanel extends JPanel {
     }
 
     private void xuLyKhoaMoThe() {
+        if ("HLV".equalsIgnoreCase(Auth.vaiTro)) {
+            JOptionPane.showMessageDialog(this, "Huấn luyện viên không có thẩm quyền khóa hoặc mở thẻ hội viên.\nVui lòng chuyển yêu cầu tới quầy Lễ tân hoặc Quản lý!", "Giới hạn quyền hạn", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         if (currentMember == null) {
             JOptionPane.showMessageDialog(this, "Vui lòng tra cứu hội viên trước!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
@@ -345,6 +353,11 @@ public class ChiTietHoiVienPanel extends JPanel {
     }
 
     private void xuLyGiaHan() {
+        if ("HLV".equalsIgnoreCase(Auth.vaiTro)) {
+            JOptionPane.showMessageDialog(this, "Huấn luyện viên không phụ trách nghiệp vụ thu ngân hoặc gia hạn thẻ tập.\nVui lòng hướng dẫn hội viên tới quầy Lễ tân để thực hiện gia hạn và thanh toán!", "Giới hạn quyền hạn", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         if (currentMember == null) {
             JOptionPane.showMessageDialog(this, "Vui lòng tra cứu hội viên trước khi gia hạn!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;

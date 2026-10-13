@@ -252,7 +252,8 @@ public class BanHangPOSPanel extends JPanel implements KhoHangService.KhoHangLis
                     success -> {
                         if (success) {
                             // THỰC HIỆN LOGIC GIẢM KHO TỰ ĐỘNG & GHI NHẬN SẢN PHẨM ĐÃ BÁN:
-                            String loi = khoService.xuatKhoBanHang(itemsXuatKho, "Chuyển khoản VietQR", "Lê Anh Duy (Admin)");
+                            String staffName = (Auth.hoTen != null && !Auth.hoTen.isEmpty()) ? Auth.hoTen : ((Auth.tenDangNhap != null) ? Auth.tenDangNhap : "Nhân viên");
+                            String loi = khoService.xuatKhoBanHang(itemsXuatKho, "VietQR / Tiền mặt", staffName);
                             if (loi != null) {
                                 JOptionPane.showMessageDialog(this, "Lỗi trừ tồn kho: " + loi, "Lỗi tồn kho", JOptionPane.ERROR_MESSAGE);
                             } else {

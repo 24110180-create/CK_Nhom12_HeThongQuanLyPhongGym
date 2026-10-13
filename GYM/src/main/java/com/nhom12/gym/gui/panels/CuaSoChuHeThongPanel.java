@@ -257,10 +257,18 @@ public class CuaSoChuHeThongPanel extends JPanel {
         JPanel stats = new JPanel(new GridLayout(4, 1, 0, 8));
         stats.setOpaque(false);
 
-        stats.add(createStaffRow("Lễ tân Front Desk:", "4 Nhân viên đang trực ca (CN01: 2, CN02: 2)", new Color(16, 185, 129)));
-        stats.add(createStaffRow("Huấn Luyện Viên (HLV/PT):", "6 HLV đang có lớp (3 lớp Yoga/Zumba, 4 ca PT 1-1)", new Color(245, 158, 11)));
-        stats.add(createStaffRow("Quản Lý Chi Nhánh:", "2 Quản lý đang phụ trách (Lê Thanh Sơn, Nguyễn Linh)", new Color(37, 99, 235)));
-        stats.add(createStaffRow("Tài Khoản Hội Viên App:", "1,280 Hội viên sở hữu tài khoản và thẻ số", new Color(147, 51, 234)));
+        List<com.nhom12.gym.entity.TaiKhoan> allAccounts = taiKhoanDAO.layTatCa();
+        long countLT = allAccounts.stream().filter(t -> "Lễ tân".equalsIgnoreCase(t.getVaiTro())).count();
+        long countHLV = allAccounts.stream().filter(t -> "HLV".equalsIgnoreCase(t.getVaiTro())).count();
+        long countQL = allAccounts.stream().filter(t -> "Quản lý".equalsIgnoreCase(t.getVaiTro())).count();
+
+        List<HoiVien> allMembers = hoiVienDAO.layTatCa();
+        long activeCount = allMembers.stream().filter(m -> "Active".equalsIgnoreCase(m.getTrangThai()) || "Hoạt động".equalsIgnoreCase(m.getTrangThai())).count();
+
+        stats.add(createStaffRow("Lễ tân Quầy:", countLT + " Nhân sự phụ trách trực quầy & check-in 2 chi nhánh", new Color(16, 185, 129)));
+        stats.add(createStaffRow("Huấn Luyện Viên (HLV/PT):", countHLV + " HLV chuyên môn phụ trách lớp nhóm & kèm PT 1-1", new Color(245, 158, 11)));
+        stats.add(createStaffRow("Quản Lý Chi Nhánh:", countQL + " Quản lý điều hành cơ sở", new Color(37, 99, 235)));
+        stats.add(createStaffRow("Thẻ Hội Viên Hoạt Động:", activeCount + " Hội viên sở hữu thẻ QR có hiệu lực trên toàn chuỗi", new Color(147, 51, 234)));
 
         card.add(stats, BorderLayout.CENTER);
         return card;
@@ -309,12 +317,43 @@ public class CuaSoChuHeThongPanel extends JPanel {
         card.add(top, BorderLayout.NORTH);
 
         String[] cols = {"Mã Thẻ", "Họ Tên Hội Viên", "Số Điện Thoại", "Gói Tập Sở Hữu", "Hạn Sử Dụng", "Giá Niêm Yết", "Giá Thực Thu (Anh Đức)", "Hành Động"};
-        Object[][] data = {
-                {"VIP007", "Đỗ Minh Trí", "0909998877", "VIP Diamond Toàn Hệ Thống 2 Năm", "31/12/2027", "15,000,000 đ", "7,500,000 đ (-50%)", "Gọi Chăm Sóc"},
-                {"QR001", "Lê Anh Duy", "0974482749", "Gói Kim Cương 12 Tháng", "31/12/2026", "8,500,000 đ", "8,500,000 đ", "Gửi Zalo Tri Ân"},
-                {"QR002", "Võ Lê Ngọc Hưng", "0912345678", "Gói Standard 3 Tháng", "15/10/2026", "2,400,000 đ", "2,400,000 đ", "Nhắc Hạn Tái Ký"},
-                {"QR004", "Trần Minh Quân", "0933221100", "Gói Premium 6 Tháng", "20/11/2026", "4,800,000 đ", "4,800,000 đ", "Mời Nâng Cấp VIP"}
-        };
+        
+        List<HoiVien> allMembers = hoiVienDAO.layTatCa();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        java.util.List<Object[]> rowList = new java.util.ArrayList<>();
+
+        if (allMembers != null && !allMembers.isEmpty()) {
+            for (HoiVien hv : allMembers) {
+                String pkg = hv.getGoiTapDangKy() != null ? hv.getGoiTapDangKy() : "Gói Tiêu Chuẩn";
+                double paid = hv.getSoTienDaThanhToan() != null ? hv.getSoTienDaThanhToan() : 500000.0;
+                boolean isVip = com.nhom12.gym.service.VipPolicyService.getInstance().laHoiVienVipDacQuyen(hv.getSoDienThoai(), hv.getHoTen(), hv.getMaTheQR())
+                        || pkg.toLowerCase().contains("vip") || pkg.toLowerCase().contains("kim cương");
+                
+                String giaNiemYet = df.format(isVip ? paid * 2 : paid);
+                String giaThucThu = df.format(paid) + (isVip ? " (-50%)" : "");
+                String action = isVip ? "Gọi Chăm Sóc VIP" : "Nhắc Hạn Tái Ký";
+                String expStr = hv.getNgayHetHan() != null ? sdf.format(hv.getNgayHetHan()) : "31/12/2026";
+                String code = hv.getMaTheQR() != null ? hv.getMaTheQR() : "HV" + hv.getMaHoiVien();
+
+                rowList.add(new Object[]{
+                        code,
+                        hv.getHoTen(),
+                        hv.getSoDienThoai(),
+                        pkg,
+                        expStr,
+                        giaNiemYet,
+                        giaThucThu,
+                        action
+                });
+            }
+        }
+
+        if (rowList.isEmpty()) {
+            rowList.add(new Object[]{"VIP007", "Đỗ Minh Trí", "0909998877", "VIP Diamond Toàn Hệ Thống 2 Năm", "31/12/2027", "15,000,000 đ", "7,500,000 đ (-50%)", "Gọi Chăm Sóc"});
+            rowList.add(new Object[]{"QR001", "Lê Anh Duy", "0974482749", "Gói Kim Cương 12 Tháng", "31/12/2026", "8,500,000 đ", "8,500,000 đ", "Gửi Zalo Tri Ân"});
+        }
+
+        Object[][] data = rowList.toArray(new Object[0][]);
 
         JTable table = new JTable(data, cols);
         table.setRowHeight(32);
@@ -323,7 +362,7 @@ public class CuaSoChuHeThongPanel extends JPanel {
         table.getTableHeader().setBackground(new Color(241, 245, 249));
 
         JScrollPane sp = new JScrollPane(table);
-        sp.setPreferredSize(new Dimension(0, 160));
+        sp.setPreferredSize(new Dimension(0, 170));
         sp.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240)));
         card.add(sp, BorderLayout.CENTER);
 

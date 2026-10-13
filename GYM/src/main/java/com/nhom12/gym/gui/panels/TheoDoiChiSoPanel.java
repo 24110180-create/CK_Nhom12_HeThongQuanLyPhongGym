@@ -488,7 +488,7 @@ public class TheoDoiChiSoPanel extends JPanel {
                 + lblDanhGia.getText() + "\n"
                 + "Lời Khuyên HLV: " + txtGhiChu.getText() + "\n"
                 + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-                + "Đã gửi phiếu phân tích InBody tới máy in và đồng bộ lên App Hội Viên!";
+                + "Đã xuất phiếu phân tích InBody và cập nhật vào hồ sơ theo dõi hội viên thành công!";
         JOptionPane.showMessageDialog(this, report, "Xuất Phiếu InBody", JOptionPane.INFORMATION_MESSAGE);
     }
 }

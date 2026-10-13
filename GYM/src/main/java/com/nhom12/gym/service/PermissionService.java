@@ -69,11 +69,6 @@ public class PermissionService {
         ));
         rolePermissions.put("Huấn Luyện Viên (HLV)", hlvPerms);
 
-        // 6. Hội viên (Hội viên VIP)
-        Set<String> memberPerms = new HashSet<>(Arrays.asList(
-                PERM_CHECKIN, PERM_LOPHOC, PERM_GOITAP
-        ));
-        rolePermissions.put("Hội viên (Hội viên VIP)", memberPerms);
     }
 
     private String normalizeRole(String role) {
@@ -93,9 +88,6 @@ public class PermissionService {
         }
         if (r.equalsIgnoreCase("HLV") || r.toLowerCase().contains("huấn luyện")) {
             return "Huấn Luyện Viên (HLV)";
-        }
-        if (r.equalsIgnoreCase("Hội viên") || r.toLowerCase().contains("hội viên")) {
-            return "Hội viên (Hội viên VIP)";
         }
         return r;
     }

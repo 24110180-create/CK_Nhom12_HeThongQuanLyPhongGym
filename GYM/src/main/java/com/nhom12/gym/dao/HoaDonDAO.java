@@ -123,4 +123,17 @@ public class HoaDonDAO {
         }
         return total;
     }
+
+    /**
+     * Tìm hóa đơn theo mã
+     */
+    public HoaDon timTheoMa(String maHoaDon) {
+        if (maHoaDon == null || maHoaDon.trim().isEmpty()) return null;
+        for (HoaDon hd : layTatCa()) {
+            if (maHoaDon.equalsIgnoreCase(hd.getMaHoaDon())) {
+                return hd;
+            }
+        }
+        return null;
+    }
 }

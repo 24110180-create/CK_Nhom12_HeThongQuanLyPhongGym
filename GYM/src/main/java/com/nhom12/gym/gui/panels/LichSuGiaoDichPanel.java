@@ -75,12 +75,12 @@ public class LichSuGiaoDichPanel extends JPanel {
 
         JLabel l3 = new JLabel("Từ Ngày:"); l3.setFont(fontLabel);
         filterPanel.add(l3);
-        txtTuNgay = new JTextField("01/09/2026", 8); txtTuNgay.setFont(fontInput);
+        txtTuNgay = new JTextField("01/10/2026", 8); txtTuNgay.setFont(fontInput);
         filterPanel.add(txtTuNgay);
 
         JLabel l4 = new JLabel("Đến Ngày:"); l4.setFont(fontLabel);
         filterPanel.add(l4);
-        txtDenNgay = new JTextField("30/09/2026", 8); txtDenNgay.setFont(fontInput);
+        txtDenNgay = new JTextField(new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date()), 8); txtDenNgay.setFont(fontInput);
         filterPanel.add(txtDenNgay);
 
         btnTraCuu = new JButton("Tra Cứu Hóa Đơn");
@@ -109,16 +109,8 @@ public class LichSuGiaoDichPanel extends JPanel {
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
 
-        String[] cols = new String[]{"Mã HĐ", "Thời Gian", "Khách Hàng", "Loại Giao Dịch", "Nhân Viên Lập", "Tổng Tiền (VNĐ)", "Hình Thức"};
-        Object[][] data = new Object[][]{
-                {"HD00101", "30/09/2026 08:15", "Khách vãng lai", "Bán hàng POS", "letan1", "55,000", "Tiền mặt"},
-                {"HD00102", "30/09/2026 09:30", "Trần Thu Hà", "Gia hạn Gói tập", "letan1", "2,500,000", "VietQR"},
-                {"HD00103", "30/09/2026 14:20", "Nguyễn Văn Tuấn", "Đăng ký mới", "admin", "4,500,000", "POS Thẻ"},
-                {"HD00104", "29/09/2026 18:45", "Khách vãng lai", "Bán hàng POS", "letan2", "120,000", "Tiền mặt"},
-                {"HD00105", "29/09/2026 20:10", "Lê Hoàng Phúc", "Gia hạn Gói tập", "letan2", "1,100,000", "VietQR"},
-                {"HD00106", "28/09/2026 10:05", "Phạm Trọng Thủy", "Đăng ký mới", "letan1", "3,600,000", "VietQR"}
-        };
-        model = new DefaultTableModel(data, cols) {
+        String[] cols = new String[]{"Mã HĐ", "Thời Gian", "Khách Hàng", "Nội Dung Giao Dịch", "Nhân Viên Lập", "Tổng Tiền (VNĐ)", "Hình Thức"};
+        model = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
                 return false;
@@ -142,6 +134,17 @@ public class LichSuGiaoDichPanel extends JPanel {
         centerContainer.add(tablePanel, BorderLayout.CENTER);
         this.add(centerContainer, BorderLayout.CENTER);
 
+        // Nạp dữ liệu hóa đơn thực tế từ HoaDonDAO
+        loadDataFromDAO();
+
+        // Lắng nghe sự kiện đồng bộ toàn hệ thống
+        com.nhom12.gym.service.DataSyncManager.addListener(type -> {
+            if (type == com.nhom12.gym.service.DataSyncManager.DataType.HOA_DON ||
+                type == com.nhom12.gym.service.DataSyncManager.DataType.ALL) {
+                loadDataFromDAO();
+            }
+        });
+
         // Action Listeners
         btnTraCuu.addActionListener(e -> applyFilter());
         txtSearch.addActionListener(e -> applyFilter());
@@ -163,19 +166,29 @@ public class LichSuGiaoDichPanel extends JPanel {
             String payType = model.getValueAt(mr, 6).toString();
 
             double num = 0;
-            try {
-                num = Double.parseDouble(total.replaceAll("[^0-9]", ""));
-            } catch (Exception ignored) {}
+            double originalPrice = 0;
+            double discount = 0;
+            com.nhom12.gym.entity.HoaDon hd = com.nhom12.gym.dao.HoaDonDAO.getInstance().timTheoMa(code);
+            if (hd != null) {
+                num = hd.getThanhTien();
+                originalPrice = hd.getTongTien() > 0 ? hd.getTongTien() : num;
+                discount = hd.getGiamGia();
+            } else {
+                try {
+                    num = Double.parseDouble(total.replaceAll("[^0-9]", ""));
+                } catch (Exception ignored) {}
+                originalPrice = num;
+            }
             java.util.List<com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang> items = new java.util.ArrayList<>();
-            items.add(new com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang(type, 1, num));
+            items.add(new com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang(type, 1, originalPrice, num));
             Window parent = SwingUtilities.getWindowAncestor(this);
             com.nhom12.gym.gui.ThanhToanHoaDonDialog dialog = new com.nhom12.gym.gui.ThanhToanHoaDonDialog(
                     parent,
                     code,
                     customer,
                     type,
-                    num,
-                    0,
+                    originalPrice,
+                    discount,
                     num,
                     items,
                     null
@@ -186,6 +199,32 @@ public class LichSuGiaoDichPanel extends JPanel {
         btnExportExcel.addActionListener(e -> {
             com.nhom12.gym.util.ExcelExportHelper.exportTableToExcel(this, table, "LichSu_GiaoDich_FitLife");
         });
+    }
+
+    private void loadDataFromDAO() {
+        model.setRowCount(0);
+        java.util.List<com.nhom12.gym.entity.HoaDon> list = com.nhom12.gym.dao.HoaDonDAO.getInstance().layTatCa();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
+        java.text.DecimalFormat df = new java.text.DecimalFormat("#,###");
+        if (list != null && !list.isEmpty()) {
+            for (com.nhom12.gym.entity.HoaDon hd : list) {
+                String time = hd.getNgayLap() != null ? sdf.format(hd.getNgayLap()) : sdf.format(new java.util.Date());
+                String cus = (hd.getTenHoiVien() != null && !hd.getTenHoiVien().isEmpty()) ? hd.getTenHoiVien() : "Khách vãng lai";
+                String type = (hd.getLoaiGiaoDich() != null && !hd.getLoaiGiaoDich().isEmpty()) ? hd.getLoaiGiaoDich() : "Giao dịch FitLife";
+                String staff = (hd.getNguoiLap() != null && !hd.getNguoiLap().isEmpty()) ? hd.getNguoiLap() : "letan1";
+                String total = df.format(hd.getThanhTien());
+                String payMethod = (hd.getHinhThucThanhToan() != null && !hd.getHinhThucThanhToan().isEmpty()) ? hd.getHinhThucThanhToan() : "Tiền mặt";
+                model.addRow(new Object[]{
+                        hd.getMaHoaDon(),
+                        time,
+                        cus,
+                        type,
+                        staff,
+                        total,
+                        payMethod
+                });
+            }
+        }
     }
 
     private void applyFilter() {

@@ -216,7 +216,8 @@ public class GhiChuTienDoPTPanel extends JPanel {
             }
 
             String dateStr = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
-            modelLog.insertRow(0, new Object[]{dateStr, muscle, pr, note, "HLV Phụ Trách"});
+            String trainerName = (com.nhom12.gym.util.Auth.hoTen != null && !com.nhom12.gym.util.Auth.hoTen.isEmpty()) ? com.nhom12.gym.util.Auth.hoTen : "HLV Phụ Trách";
+            modelLog.insertRow(0, new Object[]{dateStr, muscle, pr, note, trainerName});
 
             // Deduct session if possible
             int sel = tableHV.getSelectedRow();

@@ -94,21 +94,34 @@ public class AppHoiVien extends JFrame {
         btnLogin.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnLogin.addActionListener(e -> xuLyDangNhapHoiVien());
 
-        // Dòng liên kết Đăng ký tài khoản
-        JButton btnRegister = new JButton("Bạn chưa có tài khoản?Đăng kí ngay tại đây!");
-        btnRegister.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnRegister.setForeground(new Color(56, 189, 248)); // Sky Blue sáng
-        btnRegister.setBorderPainted(false);
-        btnRegister.setContentAreaFilled(false);
-        btnRegister.setFocusPainted(false);
-        btnRegister.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnRegister.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnRegister.addActionListener(e -> {
-            new com.nhom12.gym.gui.DangKyTaiKhoanDialog(this, (u, p) -> {
-                txtPhone.setText(u);
-                txtPass.setText(p);
-            }).setVisible(true);
+        // Nút Đăng nhập nhanh 1-Click để test chấm thi
+        JButton btnQuickLogin = new JButton("Đăng Nhập Nhanh (Hội Viên Test)");
+        btnQuickLogin.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnQuickLogin.setBackground(new Color(16, 185, 129)); // Xanh lá
+        btnQuickLogin.setForeground(Color.WHITE);
+        btnQuickLogin.setFocusPainted(false);
+        btnQuickLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnQuickLogin.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        btnQuickLogin.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnQuickLogin.addActionListener(e -> {
+            txtPhone.setText("hoivien1");
+            txtPass.setText("123456");
+            xuLyDangNhapHoiVien();
         });
+
+        // Nút Đăng ký tài khoản Hội viên mới
+        JButton btnRegisterNew = new JButton("Đăng Ký Thành Viên Mới (Kích Hoạt Ngay)");
+        btnRegisterNew.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnRegisterNew.setBackground(new Color(30, 41, 59));
+        btnRegisterNew.setForeground(new Color(241, 245, 249));
+        btnRegisterNew.setFocusPainted(false);
+        btnRegisterNew.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnRegisterNew.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        btnRegisterNew.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnRegisterNew.addActionListener(e -> moDialogDangKyApp());
+
+        JLabel lblNote = new JLabel("<html><center style='color:#94a3b8; font-size:11px;'>Tài khoản mặc định: <b>hoivien1</b> • Mật khẩu: <b>123456</b><br>Hội viên mới có thể tự đăng ký hoặc dùng SĐT được cấp</center></html>");
+        lblNote.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         pnlBody.add(lblPhoneTitle);
         pnlBody.add(Box.createRigidArea(new Dimension(0, 6)));
@@ -119,8 +132,12 @@ public class AppHoiVien extends JFrame {
         pnlBody.add(txtPass);
         pnlBody.add(Box.createRigidArea(new Dimension(0, 20)));
         pnlBody.add(btnLogin);
-        pnlBody.add(Box.createRigidArea(new Dimension(0, 14)));
-        pnlBody.add(btnRegister);
+        pnlBody.add(Box.createRigidArea(new Dimension(0, 10)));
+        pnlBody.add(btnQuickLogin);
+        pnlBody.add(Box.createRigidArea(new Dimension(0, 10)));
+        pnlBody.add(btnRegisterNew);
+        pnlBody.add(Box.createRigidArea(new Dimension(0, 18)));
+        pnlBody.add(lblNote);
 
         root.add(pnlBody, BorderLayout.CENTER);
 

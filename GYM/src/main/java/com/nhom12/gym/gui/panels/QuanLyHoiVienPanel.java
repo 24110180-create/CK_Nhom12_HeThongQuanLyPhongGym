@@ -35,7 +35,7 @@ public class QuanLyHoiVienPanel extends JPanel {
     private JTextField txtNgayDangKy;
     private JTextField txtSoTien;
     private JComboBox<String> cbHinhThucTT;
-    private JComboBox<String> cbChiNhanh;
+    private JTextField txtChiNhanh;
     private JTextField txtNgayHetHan;
     private JComboBox<String> cbTrangThai;
 
@@ -218,11 +218,11 @@ public class QuanLyHoiVienPanel extends JPanel {
 
         // Chi Nhánh & Ngày Hết Hạn
         gbc.gridy = r++;
-        formGrid.add(createLabel("Chi Nhánh Đăng Ký (*):", fontLabel), gbc);
-        cbChiNhanh = new JComboBox<>(new String[]{"CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)", "Toàn hệ thống (VIP)"});
-        cbChiNhanh.setFont(fontInput);
+        formGrid.add(createLabel("Chi Nhánh Đăng Ký:", fontLabel), gbc);
+        txtChiNhanh = new JTextField("CN01 - Quận 1");
+        txtChiNhanh.setFont(fontInput);
         gbc.gridy = r++;
-        formGrid.add(cbChiNhanh, gbc);
+        formGrid.add(txtChiNhanh, gbc);
 
         gbc.gridy = r++;
         formGrid.add(createLabel("Ngày Hết Hạn Gói (dd/MM/yyyy):", fontLabel), gbc);
@@ -300,16 +300,11 @@ public class QuanLyHoiVienPanel extends JPanel {
                 0, 0, new Font("Segoe UI", Font.BOLD, 14), new Color(30, 41, 59)
         ));
 
-        // Thanh tìm kiếm và xuất file có bộ lọc cơ sở
+        // Thanh tìm kiếm và xuất file
         JPanel toolBar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
         toolBar.setOpaque(false);
 
-        JComboBox<String> cbFilterBranch = new JComboBox<>(new String[]{
-                "Tất Cả Cơ Sở", "CN01", "CN02", "Toàn hệ thống"
-        });
-        cbFilterBranch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-
-        JTextField txtSearchTable = new JTextField(15);
+        JTextField txtSearchTable = new JTextField(18);
         txtSearchTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         txtSearchTable.putClientProperty("JTextField.placeholderText", "Tìm tên, SĐT, mã QR, gói...");
 
@@ -319,9 +314,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnExport.setForeground(new Color(15, 118, 110));
         btnExport.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        toolBar.add(new JLabel("Lọc cơ sở:"));
-        toolBar.add(cbFilterBranch);
-        toolBar.add(new JLabel("Tìm kiếm:"));
+        toolBar.add(new JLabel("Tìm kiếm nhanh:"));
         toolBar.add(txtSearchTable);
         toolBar.add(btnExport);
         panel.add(toolBar, BorderLayout.NORTH);
@@ -349,33 +342,19 @@ public class QuanLyHoiVienPanel extends JPanel {
         javax.swing.table.TableRowSorter<DefaultTableModel> sorter = new javax.swing.table.TableRowSorter<>(tableModel);
         table.setRowSorter(sorter);
 
-        Runnable doFilter = () -> {
-            String text = txtSearchTable.getText().trim();
-            int brIdx = cbFilterBranch.getSelectedIndex();
-            java.util.List<RowFilter<Object, Object>> filters = new java.util.ArrayList<>();
-            if (!text.isEmpty()) {
-                filters.add(RowFilter.regexFilter("(?i)" + text));
-            }
-            if (brIdx == 1) {
-                filters.add(RowFilter.regexFilter("(?i)CN01|Quận 1", 8));
-            } else if (brIdx == 2) {
-                filters.add(RowFilter.regexFilter("(?i)CN02|Tân Bình", 8));
-            } else if (brIdx == 3) {
-                filters.add(RowFilter.regexFilter("(?i)Toàn|VIP", 8));
-            }
-            if (filters.isEmpty()) {
-                sorter.setRowFilter(null);
-            } else {
-                sorter.setRowFilter(RowFilter.andFilter(filters));
-            }
-        };
-
         txtSearchTable.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-            public void insertUpdate(javax.swing.event.DocumentEvent e) { doFilter.run(); }
-            public void removeUpdate(javax.swing.event.DocumentEvent e) { doFilter.run(); }
-            public void changedUpdate(javax.swing.event.DocumentEvent e) { doFilter.run(); }
+            private void filter() {
+                String text = txtSearchTable.getText().trim();
+                if (text.isEmpty()) {
+                    sorter.setRowFilter(null);
+                } else {
+                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+                }
+            }
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { filter(); }
+            public void removeUpdate(javax.swing.event.DocumentEvent e) { filter(); }
+            public void changedUpdate(javax.swing.event.DocumentEvent e) { filter(); }
         });
-        cbFilterBranch.addActionListener(e -> doFilter.run());
 
         btnExport.addActionListener(e -> com.nhom12.gym.util.ExcelExportHelper.exportTableToExcel(this, table, "DanhSach_HoiVien_DaDangKy"));
 
@@ -605,14 +584,7 @@ public class QuanLyHoiVienPanel extends JPanel {
                 String ht = table.getValueAt(row, 7) != null ? table.getValueAt(row, 7).toString() : "Chuyển khoản VietQR";
                 cbHinhThucTT.setSelectedItem(ht);
 
-                String br = table.getValueAt(row, 8) != null ? table.getValueAt(row, 8).toString() : "";
-                if (br.contains("02") || br.contains("Tân Bình")) {
-                    cbChiNhanh.setSelectedIndex(1);
-                } else if (br.contains("Toàn") || br.contains("VIP")) {
-                    cbChiNhanh.setSelectedIndex(2);
-                } else {
-                    cbChiNhanh.setSelectedIndex(0);
-                }
+                txtChiNhanh.setText(table.getValueAt(row, 8) != null ? table.getValueAt(row, 8).toString() : "CN01");
                 txtNgayHetHan.setText(table.getValueAt(row, 9) != null ? table.getValueAt(row, 9).toString() : "31/12/2026");
                 cbTrangThai.setSelectedItem(table.getValueAt(row, 10).toString());
             }
@@ -624,7 +596,7 @@ public class QuanLyHoiVienPanel extends JPanel {
             String name = txtHoTen.getText().trim();
             String sdt = txtSDT.getText().trim();
             String goiTap = txtGoiTap.getText().trim();
-            String branch = cbChiNhanh.getSelectedItem().toString();
+            String branch = txtChiNhanh.getText().trim();
             String status = cbTrangThai.getSelectedItem().toString();
             String htTT = cbHinhThucTT.getSelectedItem().toString();
             double tien = 0;
@@ -695,7 +667,7 @@ public class QuanLyHoiVienPanel extends JPanel {
             String name = txtHoTen.getText().trim();
             String sdt = txtSDT.getText().trim();
             String goiTap = txtGoiTap.getText().trim();
-            String branch = cbChiNhanh.getSelectedItem().toString();
+            String branch = txtChiNhanh.getText().trim();
             String status = cbTrangThai.getSelectedItem().toString();
             String htTT = cbHinhThucTT.getSelectedItem().toString();
             double tien = 0;
@@ -778,7 +750,7 @@ public class QuanLyHoiVienPanel extends JPanel {
             txtNgayDangKy.setText(sdfDateTime.format(new Date()));
             txtSoTien.setText("2400000");
             cbHinhThucTT.setSelectedIndex(0);
-            cbChiNhanh.setSelectedIndex(0);
+            txtChiNhanh.setText("CN01 - Quận 1");
             txtNgayHetHan.setText("31/12/2026");
             cbTrangThai.setSelectedIndex(0);
             table.clearSelection();

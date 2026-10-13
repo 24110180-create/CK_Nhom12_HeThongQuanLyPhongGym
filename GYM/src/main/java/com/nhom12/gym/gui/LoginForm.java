@@ -156,17 +156,32 @@ public class LoginForm extends JFrame {
         rightPanel.add(btnLogin);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 12)));
 
-        // Dòng liên kết Đăng ký tài khoản (hỗ trợ chọn vai trò: Hội viên, Lễ tân, HLV, Quản lý, Chủ phòng)
-        JButton btnRegisterMultiRole = new JButton("Bạn chưa có tài khoản?Đăng kí ngay tại đây!");
-        btnRegisterMultiRole.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnRegisterMultiRole.setForeground(new Color(2, 132, 199));
-        btnRegisterMultiRole.setBorderPainted(false);
-        btnRegisterMultiRole.setContentAreaFilled(false);
-        btnRegisterMultiRole.setFocusPainted(false);
-        btnRegisterMultiRole.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnRegisterMultiRole.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnRegisterMultiRole.addActionListener(e -> moDialogDangKyChonRole());
-        rightPanel.add(btnRegisterMultiRole);
+        // Nút liên kết Đăng ký App dành riêng cho Hội Viên
+        JButton btnRegisterApp = new JButton("Bạn là Hội viên mới? Đăng ký tài khoản App tại đây");
+        btnRegisterApp.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnRegisterApp.setForeground(new Color(2, 132, 199));
+        btnRegisterApp.setBorderPainted(false);
+        btnRegisterApp.setContentAreaFilled(false);
+        btnRegisterApp.setFocusPainted(false);
+        btnRegisterApp.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnRegisterApp.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnRegisterApp.addActionListener(e -> moDialogDangKyAppHoiVien());
+        rightPanel.add(btnRegisterApp);
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        JButton btnOpenMemberApp = new JButton("Khởi Chạy Ứng Dụng Riêng Cho Hội Viên");
+        btnOpenMemberApp.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnOpenMemberApp.setBackground(new Color(241, 245, 249));
+        btnOpenMemberApp.setForeground(new Color(30, 41, 59));
+        btnOpenMemberApp.setFocusPainted(false);
+        btnOpenMemberApp.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnOpenMemberApp.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
+        btnOpenMemberApp.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnOpenMemberApp.addActionListener(e -> {
+            this.dispose();
+            new com.nhom12.gym.AppHoiVien().setVisible(true);
+        });
+        rightPanel.add(btnOpenMemberApp);
 
         mainContainer.add(leftPanel);
         mainContainer.add(rightPanel);
@@ -175,13 +190,6 @@ public class LoginForm extends JFrame {
         btnLogin.addActionListener(e -> xuLyDangNhap());
         txtPass.addActionListener(e -> xuLyDangNhap());
         txtUser.addActionListener(e -> xuLyDangNhap());
-    }
-
-    private void moDialogDangKyChonRole() {
-        new DangKyTaiKhoanDialog(this, (u, p) -> {
-            txtUser.setText(u);
-            txtPass.setText(p);
-        }).setVisible(true);
     }
 
     private void moDialogDangKyAppHoiVien() {
@@ -300,7 +308,11 @@ public class LoginForm extends JFrame {
                 JOptionPane.showMessageDialog(this, msg, "Đăng Nhập Thành Công", JOptionPane.INFORMATION_MESSAGE);
             }
             this.dispose();
-            new MainDashboard().setVisible(true);
+            if ("Hội viên".equalsIgnoreCase(Auth.vaiTro)) {
+                new HoiVienAppFrame().setVisible(true);
+            } else {
+                new MainDashboard().setVisible(true);
+            }
         } else {
             JOptionPane.showMessageDialog(this, res.message, "Lỗi đăng nhập", JOptionPane.ERROR_MESSAGE);
         }

@@ -112,23 +112,23 @@ public class LichLopHocPanel extends JPanel {
         pTop.add(pCards, BorderLayout.SOUTH);
         this.add(pTop, BorderLayout.NORTH);
 
-        // 2. Thân chính: Chuyển sang JTabbedPane 2 Tab thoáng đãng, khoa học (không bị rối chồng chéo 2 bảng)
-        mainTabs = new JTabbedPane();
-        mainTabs.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        mainTabs.setBackground(Color.WHITE);
+        // 2. Thân chính: JSplitPane Dọc (Tầng 1: Lớp học, Tầng 2: Học viên điểm danh)
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        splitPane.setResizeWeight(0.45);
+        splitPane.setDividerSize(8);
+        splitPane.setOpaque(false);
+        splitPane.setBorder(null);
 
-        // Tab 1: Danh Sách & Lịch Các Lớp Học
+        // Tầng Trên: Bảng Lớp Học
         JPanel pMaster = taoPanelMasterLop();
-        mainTabs.addTab("  1. Thời Khóa Biểu & Danh Sách Lớp Học Nhóm  ", pMaster);
+        splitPane.setTopComponent(pMaster);
 
-        // Tab 2: Danh Sách Học Viên & Điểm Danh Trực Tiếp
+        // Tầng Dưới: Bảng Học Viên & Điểm Danh
         JPanel pDetail = taoPanelDetailHocVien();
-        mainTabs.addTab("  2. Điểm Danh Học Viên Theo Lớp  ", pDetail);
+        splitPane.setBottomComponent(pDetail);
 
-        this.add(mainTabs, BorderLayout.CENTER);
+        this.add(splitPane, BorderLayout.CENTER);
     }
-
-    private JTabbedPane mainTabs;
 
     private JLabel taoKpiCard(JPanel parent, String title, String value, Color accentColor, Color bgCard) {
         JPanel card = new JPanel(new BorderLayout(5, 4));
@@ -163,15 +163,13 @@ public class LichLopHocPanel extends JPanel {
                 new EmptyBorder(12, 14, 12, 14)
         ));
 
-        // Toolbar 2 tầng (chống tràn và đè các nút trên màn hình nhỏ)
-        JPanel pTool = new JPanel();
-        pTool.setLayout(new BoxLayout(pTool, BoxLayout.Y_AXIS));
+        // Toolbar
+        JPanel pTool = new JPanel(new BorderLayout(10, 0));
         pTool.setOpaque(false);
 
         // Trái: Tìm kiếm & Lọc
-        JPanel pFilter = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
+        JPanel pFilter = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         pFilter.setOpaque(false);
-        pFilter.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel lSearch = new JLabel("Tìm kiếm lớp:");
         lSearch.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -197,13 +195,11 @@ public class LichLopHocPanel extends JPanel {
         pFilter.add(txtSearchLop);
         pFilter.add(lBoMon);
         pFilter.add(cbFilterBoMon);
-        pTool.add(pFilter);
-        pTool.add(Box.createRigidArea(new Dimension(0, 6)));
+        pTool.add(pFilter, BorderLayout.WEST);
 
-        // Hàng nút Thêm, Sửa, Xóa, Làm mới, Xuất Excel (căn trái thoáng đãng)
-        JPanel pBtns = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 4));
+        // Phải: Nút Thêm, Sửa, Xóa, Làm mới, Xuất Excel
+        JPanel pBtns = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
         pBtns.setOpaque(false);
-        pBtns.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JButton btnThemLop = taoButtonFlat("+ Thêm Lớp Mới", new Color(16, 185, 129), Color.WHITE);
         btnThemLop.addActionListener(e -> moDialogThemSuaLop(null));
@@ -226,22 +222,12 @@ public class LichLopHocPanel extends JPanel {
         JButton btnXuatExcelLop = taoButtonFlat("Xuất Excel Lịch Lớp", new Color(15, 118, 110), Color.WHITE);
         btnXuatExcelLop.addActionListener(e -> ExcelExportHelper.exportTableToExcel(this, tableLop, "LichLopHoc_FitLife"));
 
-        JButton btnDiemDanh = taoButtonFlat("Điểm Danh Lớp Này ->", new Color(147, 51, 234), Color.WHITE);
-        btnDiemDanh.addActionListener(e -> {
-            if (lopDangChon == null) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn một lớp học trong bảng để điểm danh!", "Chưa chọn lớp", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            if (mainTabs != null) mainTabs.setSelectedIndex(1);
-        });
-
         pBtns.add(btnThemLop);
         pBtns.add(btnSuaLop);
         pBtns.add(btnXoaLop);
-        pBtns.add(btnDiemDanh);
         pBtns.add(btnRefresh);
         pBtns.add(btnXuatExcelLop);
-        pTool.add(pBtns);
+        pTool.add(pBtns, BorderLayout.EAST);
 
         panel.add(pTool, BorderLayout.NORTH);
 
@@ -311,15 +297,6 @@ public class LichLopHocPanel extends JPanel {
             }
         });
 
-        tableLop.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-                if (e.getClickCount() == 2 && tableLop.getSelectedRow() != -1 && mainTabs != null) {
-                    mainTabs.setSelectedIndex(1);
-                }
-            }
-        });
-
         JScrollPane scroll = new JScrollPane(tableLop);
         scroll.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240)));
         panel.add(scroll, BorderLayout.CENTER);
@@ -348,16 +325,13 @@ public class LichLopHocPanel extends JPanel {
         lblDetailTitle.setForeground(new Color(30, 41, 59));
         pTop.add(lblDetailTitle, BorderLayout.NORTH);
 
-        // Hàng điều khiển 2 tầng chống đè
-        JPanel pActions = new JPanel();
-        pActions.setLayout(new BoxLayout(pActions, BoxLayout.Y_AXIS));
+        // Hàng điều khiển
+        JPanel pActions = new JPanel(new BorderLayout(10, 0));
         pActions.setOpaque(false);
-        pActions.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Tìm kiếm học viên trong lớp
-        JPanel pSearchHV = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
+        JPanel pSearchHV = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         pSearchHV.setOpaque(false);
-        pSearchHV.setAlignmentX(Component.LEFT_ALIGNMENT);
         JLabel lSearch = new JLabel("Lọc học viên:");
         lSearch.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lSearch.setForeground(new Color(51, 65, 85));
@@ -370,13 +344,11 @@ public class LichLopHocPanel extends JPanel {
         });
         pSearchHV.add(lSearch);
         pSearchHV.add(txtSearchHocVien);
-        pActions.add(pSearchHV);
-        pActions.add(Box.createRigidArea(new Dimension(0, 6)));
+        pActions.add(pSearchHV, BorderLayout.WEST);
 
-        // Bộ nút hành động học viên: Thêm, Hủy, Điểm danh, Báo vắng, Điểm danh tất cả, Xuất Excel (căn trái thoáng đãng)
-        JPanel pBtns = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 4));
+        // Bộ nút hành động học viên: Thêm, Hủy, Điểm danh, Báo vắng, Điểm danh tất cả, Xuất Excel
+        JPanel pBtns = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
         pBtns.setOpaque(false);
-        pBtns.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         btnThemHocVien = taoButtonFlat("+ Ghi Danh Học Viên", new Color(16, 185, 129), Color.WHITE);
         btnThemHocVien.addActionListener(e -> moDialogGhiDanhHocVien());
@@ -402,19 +374,13 @@ public class LichLopHocPanel extends JPanel {
             ExcelExportHelper.exportTableToExcel(this, tableHocVien, "DiemDanh_" + lopDangChon.getMaLop());
         });
 
-        JButton btnBackMaster = taoButtonFlat("<- Xem Lịch Các Lớp", new Color(100, 116, 139), Color.WHITE);
-        btnBackMaster.addActionListener(e -> {
-            if (mainTabs != null) mainTabs.setSelectedIndex(0);
-        });
-
-        pBtns.add(btnBackMaster);
         pBtns.add(btnThemHocVien);
         pBtns.add(btnHuyDangKy);
         pBtns.add(btnDiemDanhCoMat);
         pBtns.add(btnBaoVang);
         pBtns.add(btnDiemDanhTatCa);
         pBtns.add(btnXuatExcelHocVien);
-        pActions.add(pBtns);
+        pActions.add(pBtns, BorderLayout.EAST);
 
         pTop.add(pActions, BorderLayout.SOUTH);
         panel.add(pTop, BorderLayout.NORTH);

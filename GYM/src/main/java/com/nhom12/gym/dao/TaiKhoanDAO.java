@@ -31,12 +31,9 @@ public class TaiKhoanDAO {
         String hashed123456 = PasswordUtil.hashPassword("123456");
         memoryCache.add(new TaiKhoan("admin", hashed123456, "Chủ", "Võ Anh Đức (Chủ Hệ Thống)", "Toàn hệ thống"));
         memoryCache.add(new TaiKhoan("letan1", hashed123456, "Lễ tân", "Nguyễn Thị Linh (Lễ Tân CN01)", "CN01 - Quận 1"));
-        memoryCache.add(new TaiKhoan("letan2", hashed123456, "Lễ tân", "Trần Thị Mai (Lễ Tân CN02)", "CN02 - Tân Bình"));
-        memoryCache.add(new TaiKhoan("hlv1", hashed123456, "HLV", "Trần Tuấn Kiệt (HLV Trưởng CN01)", "CN01 - Quận 1"));
-        memoryCache.add(new TaiKhoan("hlv2", hashed123456, "HLV", "Phạm Quốc Bảo (HLV CN02)", "CN02 - Tân Bình"));
-        memoryCache.add(new TaiKhoan("quanly1", hashed123456, "Quản lý", "Lê Thanh Sơn (Quản Lý CN02)", "CN02 - Tân Bình"));
-        memoryCache.add(new TaiKhoan("hoivien1", hashed123456, "Hội viên", "Lê Anh Duy (Hội Viên VIP)", "Toàn hệ thống"));
-        memoryCache.add(new TaiKhoan("hoivien2", hashed123456, "Hội viên", "Đặng Thu Thảo (Hội Viên CN02)", "CN02 - Tân Bình"));
+        memoryCache.add(new TaiKhoan("hlv1", hashed123456, "HLV", "Trần Tuấn Kiệt (HLV Trưởng)", "CN01 - Quận 1"));
+        memoryCache.add(new TaiKhoan("quanly1", hashed123456, "Quản lý", "Lê Thanh Sơn (Quản Lý Chi Nhánh)", "CN02 - Tân Bình"));
+        memoryCache.add(new TaiKhoan("hoivien1", hashed123456, "Hội viên", "Lê Anh Duy (Hội Viên VIP)", "CN01 - Quận 1"));
     }
 
     public List<TaiKhoan> layTatCa() {

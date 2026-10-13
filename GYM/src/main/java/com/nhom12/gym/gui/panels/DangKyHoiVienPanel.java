@@ -53,8 +53,8 @@ public class DangKyHoiVienPanel extends JPanel {
     private JLabel lblCardBranch;
 
     public DangKyHoiVienPanel() {
-        this.setLayout(new BorderLayout(15, 15));
-        this.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        this.setLayout(new BorderLayout(15, 10));
+        this.setBorder(BorderFactory.createEmptyBorder(12, 16, 12, 16));
         this.setBackground(new Color(245, 247, 250));
 
         // Header
@@ -245,15 +245,15 @@ public class DangKyHoiVienPanel extends JPanel {
         splitPane.setLeftComponent(formContainer);
 
         // Right Preview: Member Card Simulation
-        JPanel rightContainer = new JPanel(new BorderLayout(15, 15));
+        JPanel rightContainer = new JPanel(new BorderLayout(10, 10));
         rightContainer.setBackground(Color.WHITE);
         rightContainer.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(226, 232, 240)),
-                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+                BorderFactory.createEmptyBorder(12, 14, 12, 14)
         ));
 
         JLabel lblPreviewTitle = new JLabel("Xem Trước Thẻ Hội Viên");
-        lblPreviewTitle.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        lblPreviewTitle.setFont(new Font("Segoe UI", Font.BOLD, 15));
         lblPreviewTitle.setForeground(new Color(30, 41, 59));
         rightContainer.add(lblPreviewTitle, BorderLayout.NORTH);
 
@@ -262,19 +262,19 @@ public class DangKyHoiVienPanel extends JPanel {
         cardPreview.setBackground(new Color(30, 41, 59));
         cardPreview.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(15, 23, 42), 2),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20)
+                BorderFactory.createEmptyBorder(12, 16, 12, 16)
         ));
-        cardPreview.setPreferredSize(new Dimension(380, 230));
+        cardPreview.setPreferredSize(new Dimension(360, 195));
 
         // Card Top: Brand & Code
         JPanel cardTop = new JPanel(new BorderLayout());
         cardTop.setOpaque(false);
         JLabel lblBrand = new JLabel("FITLIFE GYM & FITNESS");
-        lblBrand.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        lblBrand.setFont(new Font("Segoe UI", Font.BOLD, 15));
         lblBrand.setForeground(new Color(248, 250, 252));
 
         lblCardCode = new JLabel("HV046");
-        lblCardCode.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        lblCardCode.setFont(new Font("Segoe UI", Font.BOLD, 15));
         lblCardCode.setForeground(new Color(16, 185, 129));
         cardTop.add(lblBrand, BorderLayout.WEST);
         cardTop.add(lblCardCode, BorderLayout.EAST);
@@ -283,20 +283,20 @@ public class DangKyHoiVienPanel extends JPanel {
         // Card Center: Member Info & Mini QR Code badge
         JPanel cardCenter = new JPanel(new BorderLayout(10, 0));
         cardCenter.setOpaque(false);
-        cardCenter.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        cardCenter.setBorder(BorderFactory.createEmptyBorder(6, 0, 6, 0));
 
-        JPanel cardInfoText = new JPanel(new GridLayout(4, 1, 0, 4));
+        JPanel cardInfoText = new JPanel(new GridLayout(4, 1, 0, 3));
         cardInfoText.setOpaque(false);
         lblCardName = new JLabel("NGUYỄN VĂN A");
-        lblCardName.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblCardName.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblCardName.setForeground(Color.WHITE);
 
         lblCardPhone = new JLabel("SĐT: 0901 234 567");
-        lblCardPhone.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        lblCardPhone.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblCardPhone.setForeground(new Color(203, 213, 225));
 
         lblCardPackage = new JLabel("Gói: Sinh Viên 3 Tháng");
-        lblCardPackage.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        lblCardPackage.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblCardPackage.setForeground(new Color(251, 191, 36));
 
         lblCardExpire = new JLabel("Hạn sử dụng: 30/12/2026");
@@ -316,7 +316,7 @@ public class DangKyHoiVienPanel extends JPanel {
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                int sz = 74;
+                int sz = 64;
                 g2.setColor(Color.WHITE);
                 g2.fillRoundRect(0, 0, sz, sz, 8, 8);
                 g2.setColor(new Color(15, 23, 42));
@@ -331,7 +331,7 @@ public class DangKyHoiVienPanel extends JPanel {
                 }
             }
         };
-        miniQR.setPreferredSize(new Dimension(75, 75));
+        miniQR.setPreferredSize(new Dimension(66, 66));
         miniQR.setOpaque(false);
         miniQR.setCursor(new Cursor(Cursor.HAND_CURSOR));
         miniQR.setToolTipText("Bấm để phóng to và gửi mã QR qua Zalo / SMS");
@@ -348,11 +348,11 @@ public class DangKyHoiVienPanel extends JPanel {
         JPanel cardBottom = new JPanel(new BorderLayout());
         cardBottom.setOpaque(false);
         lblCardBranch = new JLabel("Cơ sở 1 - Gò Vấp");
-        lblCardBranch.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        lblCardBranch.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         lblCardBranch.setForeground(new Color(148, 163, 184));
 
         JLabel lblBadge = new JLabel(" ● HOẠT ĐỘNG ");
-        lblBadge.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        lblBadge.setFont(new Font("Segoe UI", Font.BOLD, 10));
         lblBadge.setOpaque(true);
         lblBadge.setBackground(new Color(16, 185, 129));
         lblBadge.setForeground(Color.WHITE);
@@ -361,11 +361,11 @@ public class DangKyHoiVienPanel extends JPanel {
         cardPreview.add(cardBottom, BorderLayout.SOUTH);
 
         // Instructions and Print/Send buttons
-        JPanel previewActions = new JPanel(new BorderLayout(0, 15));
+        JPanel previewActions = new JPanel(new BorderLayout(0, 10));
         previewActions.setOpaque(false);
         previewActions.add(cardPreview, BorderLayout.NORTH);
 
-        JLabel lblNote = new JLabel("<html><b>Mã thẻ QR</b> hiển thị trực quan ngay trên thẻ. Bạn có thể bấm gửi nhanh qua Zalo / SMS cho hội viên hoặc in thẻ cứng tại quầy.</html>");
+        JLabel lblNote = new JLabel("<html>Mã thẻ QR hiển thị trực tiếp trên thẻ. Bấm gửi nhanh Zalo / SMS hoặc in thẻ cứng tại quầy.</html>");
         lblNote.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblNote.setForeground(new Color(100, 116, 139));
         previewActions.add(lblNote, BorderLayout.CENTER);
@@ -379,7 +379,7 @@ public class DangKyHoiVienPanel extends JPanel {
         btnSendQR.setForeground(Color.WHITE);
         btnSendQR.setFocusPainted(false);
         btnSendQR.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnSendQR.setPreferredSize(new Dimension(0, 42));
+        btnSendQR.setPreferredSize(new Dimension(0, 38));
         btnSendQR.addActionListener(e -> moDialogGuiQR());
 
         JButton btnPrintCard = new JButton("In Thẻ Cứng");
@@ -388,7 +388,7 @@ public class DangKyHoiVienPanel extends JPanel {
         btnPrintCard.setForeground(Color.WHITE);
         btnPrintCard.setFocusPainted(false);
         btnPrintCard.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnPrintCard.setPreferredSize(new Dimension(0, 42));
+        btnPrintCard.setPreferredSize(new Dimension(0, 38));
         btnPrintCard.addActionListener(e -> printCard());
 
         pnlBtns.add(btnSendQR);

@@ -156,8 +156,8 @@ public class LoginForm extends JFrame {
         rightPanel.add(btnLogin);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 12)));
 
-        // Nút liên kết Đăng ký App dành riêng cho Hội Viên
-        JButton btnRegisterApp = new JButton("Bạn là Hội viên mới? Đăng ký tài khoản App tại đây");
+        // Nút liên kết Đăng ký tài khoản
+        JButton btnRegisterApp = new JButton("Bạn chưa có tài khoản? Đăng kí ngay tại đây!");
         btnRegisterApp.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnRegisterApp.setForeground(new Color(2, 132, 199));
         btnRegisterApp.setBorderPainted(false);
@@ -167,21 +167,6 @@ public class LoginForm extends JFrame {
         btnRegisterApp.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnRegisterApp.addActionListener(e -> moDialogDangKyAppHoiVien());
         rightPanel.add(btnRegisterApp);
-        rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        JButton btnOpenMemberApp = new JButton("Khởi Chạy Ứng Dụng Riêng Cho Hội Viên");
-        btnOpenMemberApp.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnOpenMemberApp.setBackground(new Color(241, 245, 249));
-        btnOpenMemberApp.setForeground(new Color(30, 41, 59));
-        btnOpenMemberApp.setFocusPainted(false);
-        btnOpenMemberApp.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnOpenMemberApp.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
-        btnOpenMemberApp.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnOpenMemberApp.addActionListener(e -> {
-            this.dispose();
-            new com.nhom12.gym.AppHoiVien().setVisible(true);
-        });
-        rightPanel.add(btnOpenMemberApp);
 
         mainContainer.add(leftPanel);
         mainContainer.add(rightPanel);

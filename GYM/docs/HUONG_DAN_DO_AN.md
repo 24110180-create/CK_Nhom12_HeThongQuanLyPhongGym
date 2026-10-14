@@ -1,4 +1,4 @@
-# BÁO CÁO ĐỒ ÁN CUỐI KỲ: HỆ THỐNG QUẢN TRỊ PHÒNG TẬP FITLIFE GYM
+# BÁO CÁO ĐỒ ÁN CUỐI KỲ: HỆ THỐNG QUẢN TRỊ PHÒNG TẬP FITLIFE GYM (ĐÃ HOÀN THÀNH 99%)
 **Đề tài:** Phần Mềm Quản Lý & Vận Hành Phòng Gym FitLife (FitLife Gym Management System)  
 **Nhóm sinh viên thực hiện:** Nhóm 12  
 **Nền tảng công nghệ:** Java 17 LTS, Java Swing GUI, FlatLaf Modern Look & Feel, Hibernate ORM 6.4, MS SQL Server, Audio Tone PCM Synthesis, UTF-8 BOM Excel Engine

@@ -1,3 +1,4 @@
+# FitLife Gym Management System - Đã hoàn thành 99%
 if (!(Test-Path "target\classes")) {
     New-Item -ItemType Directory -Path "target\classes" -Force | Out-Null
 }

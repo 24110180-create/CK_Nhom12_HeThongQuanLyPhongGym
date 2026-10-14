@@ -331,7 +331,7 @@ public class MainDashboard extends JFrame {
         });
 
         // Nút Quét mã check-in
-        JButton btnQuickCheckIn = new JButton("Quét QR Check-in");
+        JButton btnQuickCheckIn = new JButton("Quét thẻ/QR");
         btnQuickCheckIn.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnQuickCheckIn.setBackground(new Color(16, 185, 129));
         btnQuickCheckIn.setForeground(Color.WHITE);

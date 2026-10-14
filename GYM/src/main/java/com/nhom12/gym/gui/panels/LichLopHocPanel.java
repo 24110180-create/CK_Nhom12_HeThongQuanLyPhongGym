@@ -321,7 +321,7 @@ public class LichLopHocPanel extends JPanel {
         pTool.add(pFilter);
         pTool.add(Box.createRigidArea(new Dimension(0, 6)));
 
-        // Hàng nút Thêm, Sửa, Xóa, Làm mới, Xuất Excel (căn trái thoáng đãng)
+        // Hàng nút Thêm, Sửa, Xóa, Làm mới, Xuất CSV (căn trái thoáng đãng)
         JPanel pBtns = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 4));
         pBtns.setOpaque(false);
         pBtns.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -363,7 +363,7 @@ public class LichLopHocPanel extends JPanel {
             }
         });
 
-        JButton btnXuatExcelLop = taoButtonFlat("Xuất Excel Lịch Lớp", new Color(15, 118, 110), Color.WHITE);
+        JButton btnXuatExcelLop = taoButtonFlat("Xuất lịch lớp CSV", new Color(15, 118, 110), Color.WHITE);
         btnXuatExcelLop.addActionListener(e -> ExcelExportHelper.exportTableToExcel(this, tableLop, "LichLopHoc_FitLife"));
 
         JButton btnDiemDanh = taoButtonFlat("Điểm Danh Lớp Này", new Color(147, 51, 234), Color.WHITE);
@@ -588,7 +588,7 @@ public class LichLopHocPanel extends JPanel {
         pActions.add(pSearchHV);
         pActions.add(Box.createRigidArea(new Dimension(0, 6)));
 
-        // Bộ nút hành động học viên: Thêm, Hủy, Điểm danh, Báo vắng, Hủy điểm danh, Điểm danh tất cả, Xuất Excel (căn trái thoáng đãng)
+        // Bộ nút hành động học viên: Thêm, Hủy, Điểm danh, Báo vắng, Hủy điểm danh, Điểm danh tất cả, Xuất CSV (căn trái thoáng đãng)
         JPanel pBtns = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 4));
         pBtns.setOpaque(false);
         pBtns.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -611,7 +611,7 @@ public class LichLopHocPanel extends JPanel {
         btnHuyDangKy = taoButtonFlat("Hủy Đăng Ký Lớp", new Color(239, 68, 68), Color.WHITE);
         btnHuyDangKy.addActionListener(e -> actionHuyDangKyHocVien());
 
-        btnXuatExcelHocVien = taoButtonFlat("Xuất Excel Điểm Danh", new Color(15, 118, 110), Color.WHITE);
+        btnXuatExcelHocVien = taoButtonFlat("Xuất điểm danh CSV", new Color(15, 118, 110), Color.WHITE);
         btnXuatExcelHocVien.addActionListener(e -> {
             if (lopDangChon == null) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn lớp học trước khi xuất file điểm danh!");

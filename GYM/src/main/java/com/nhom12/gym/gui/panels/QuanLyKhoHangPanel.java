@@ -243,7 +243,7 @@ public class QuanLyKhoHangPanel extends JPanel implements KhoHangService.KhoHang
         txtSearchKho.setFont(fontInput);
         txtSearchKho.putClientProperty("JTextField.placeholderText", "Tìm mã hoặc tên sản phẩm...");
 
-        JButton btnExportKho = new JButton("Xuất Danh Mục Kho (.csv)");
+        JButton btnExportKho = new JButton("Xuất danh mục kho CSV");
         btnExportKho.setFont(new Font("Segoe UI", Font.BOLD, 11));
         btnExportKho.setBackground(new Color(241, 245, 249));
         btnExportKho.setForeground(new Color(15, 118, 110));
@@ -498,7 +498,7 @@ public class QuanLyKhoHangPanel extends JPanel implements KhoHangService.KhoHang
         txtSearchDaBan.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         txtSearchDaBan.putClientProperty("JTextField.placeholderText", "Tìm mã GD, tên SP, ngày giờ...");
 
-        JButton btnExportDaBan = new JButton("Xuất Báo Cáo (.csv)");
+        JButton btnExportDaBan = new JButton("Xuất báo cáo đã bán CSV");
         btnExportDaBan.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnExportDaBan.setBackground(new Color(241, 245, 249));
         btnExportDaBan.setForeground(new Color(15, 118, 110));

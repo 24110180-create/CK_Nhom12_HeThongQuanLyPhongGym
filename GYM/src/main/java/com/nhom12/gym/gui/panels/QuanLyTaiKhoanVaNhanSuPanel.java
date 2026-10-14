@@ -386,7 +386,7 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
         btnChangePassCustom.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnChangePassCustom.addActionListener(e -> xuLyDoiMatKhauTuyChinh());
 
-        JButton btnExportExcel = new JButton("Xuất Excel (.csv)");
+        JButton btnExportExcel = new JButton("Xuất danh sách CSV");
         btnExportExcel.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnExportExcel.setBackground(new Color(16, 185, 129));
         btnExportExcel.setForeground(Color.WHITE);

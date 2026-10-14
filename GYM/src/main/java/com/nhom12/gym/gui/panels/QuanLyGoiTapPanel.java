@@ -163,7 +163,7 @@ public class QuanLyGoiTapPanel extends JPanel {
 
         JPanel topBar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
         topBar.setOpaque(false);
-        JButton btnExport = new JButton("📊 Xuất Bảng Giá Excel (.csv)");
+        JButton btnExport = new JButton("📊 Xuất bảng giá CSV");
         btnExport.setFont(new Font("Segoe UI", Font.BOLD, 11));
         btnExport.setBackground(new Color(241, 245, 249));
         btnExport.setForeground(new Color(15, 118, 110));

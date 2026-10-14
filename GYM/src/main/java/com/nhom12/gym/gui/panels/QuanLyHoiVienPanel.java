@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * MÀN HÌNH QUẢN TRỊ DANH SÁCH & HỒ SƠ HỘI VIÊN (MEMBER MASTER DIRECTORY)
@@ -94,7 +95,7 @@ public class QuanLyHoiVienPanel extends JPanel {
 
         kpiPanel.add(createKpiCard("Tổng Hội Viên Đã Đăng Ký", lblKpiTongHoiVien, new Color(37, 99, 235), new Color(239, 246, 255)));
         kpiPanel.add(createKpiCard("Tổng Tiền Đã Thanh Toán", lblKpiTongDoanhThu, new Color(16, 185, 129), new Color(236, 253, 245)));
-        kpiPanel.add(createKpiCard("Hội Viên Đang Hoạt Động (Active)", lblKpiDangHoatDong, new Color(14, 165, 233), new Color(240, 249, 255)));
+        kpiPanel.add(createKpiCard("Hội viên đang hoạt động", lblKpiDangHoatDong, new Color(14, 165, 233), new Color(240, 249, 255)));
         kpiPanel.add(createKpiCard("Thanh Toán VietQR / Chuyển Khoản", lblKpiChuyenKhoan, new Color(139, 92, 246), new Color(245, 243, 255)));
 
         return kpiPanel;
@@ -148,7 +149,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         JLabel lblFStatus = new JLabel("Trạng thái:");
         lblFStatus.setFont(new Font("Segoe UI", Font.BOLD, 12));
         cbFilterStatus = new JComboBox<>(new String[]{
-                "Tất Cả Trạng Thái", "Active (Đang hoạt động)", "Expired (Hết hạn)", "Locked (Tạm khóa)", "⚠️ Sắp Hết Hạn (Trong 7 ngày tới)"
+                "Tất cả trạng thái", "Đang hoạt động", "Đã hết hạn", "Tạm khóa", "Sắp hết hạn (trong 7 ngày tới)"
         });
         cbFilterStatus.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
@@ -157,7 +158,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         filterBox.add(lblFStatus);
         filterBox.add(cbFilterStatus);
 
-        // Bên phải toolbar: Tìm kiếm + Nút Đăng ký mới + Xuất Excel
+        // Bên phải toolbar: Tìm kiếm + Nút Đăng ký mới + Xuất CSV
         JPanel actionBox = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
         actionBox.setOpaque(false);
         actionBox.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -180,7 +181,7 @@ public class QuanLyHoiVienPanel extends JPanel {
             }
         });
 
-        JButton btnExport = new JButton("Xuất Excel (.csv)");
+        JButton btnExport = new JButton("Xuất danh sách CSV");
         btnExport.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnExport.setBackground(new Color(241, 245, 249));
         btnExport.setForeground(new Color(15, 118, 110));
@@ -294,20 +295,22 @@ public class QuanLyHoiVienPanel extends JPanel {
         table.getColumnModel().getColumn(8).setCellRenderer(centerRenderer); // Chi nhánh
         table.getColumnModel().getColumn(9).setCellRenderer(centerRenderer); // Ngày hết hạn
 
-        // Renderer màu cho trạng thái (Active: Xanh, Expired: Đỏ, Locked: Cam)
+        // Hiển thị trạng thái tiếng Việt nhưng giữ nguyên giá trị dữ liệu.
         table.getColumnModel().getColumn(10).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable t, Object val, boolean isSel, boolean hasFocus, int r, int c) {
                 JLabel l = (JLabel) super.getTableCellRendererComponent(t, val, isSel, hasFocus, r, c);
                 l.setHorizontalAlignment(SwingConstants.CENTER);
                 String s = (val != null) ? val.toString() : "";
-                if (s.toLowerCase().contains("active") || s.toLowerCase().contains("hoạt động")) {
+                l.setText(hienThiTrangThaiHoiVien(s));
+                String normalized = s.toLowerCase(Locale.ROOT);
+                if (normalized.contains("active") || normalized.contains("hoạt động")) {
                     l.setForeground(new Color(16, 185, 129));
                     l.setFont(new Font("Segoe UI", Font.BOLD, 11));
-                } else if (s.toLowerCase().contains("expired") || s.toLowerCase().contains("hết hạn")) {
+                } else if (normalized.contains("expired") || normalized.contains("hết hạn")) {
                     l.setForeground(new Color(239, 68, 68));
                     l.setFont(new Font("Segoe UI", Font.BOLD, 11));
-                } else if (s.toLowerCase().contains("locked") || s.toLowerCase().contains("khóa")) {
+                } else if (normalized.contains("locked") || normalized.contains("khóa")) {
                     l.setForeground(new Color(245, 158, 11));
                     l.setFont(new Font("Segoe UI", Font.BOLD, 11));
                 } else {
@@ -524,6 +527,20 @@ public class QuanLyHoiVienPanel extends JPanel {
         dialog.setVisible(true);
     }
 
+    private static String hienThiTrangThaiHoiVien(String status) {
+        String normalized = status.toLowerCase(Locale.ROOT);
+        if (normalized.contains("active") || normalized.contains("hoạt động")) {
+            return "Đang hoạt động";
+        }
+        if (normalized.contains("expired") || normalized.contains("hết hạn")) {
+            return "Đã hết hạn";
+        }
+        if (normalized.contains("locked") || normalized.contains("lock") || normalized.contains("khóa")) {
+            return "Tạm khóa";
+        }
+        return status;
+    }
+
     private void moDialogCapNhatHoiVienDangChon() {
         HoiVien hv = getSelectedHoiVien();
         if (hv == null) {
@@ -552,7 +569,24 @@ public class QuanLyHoiVienPanel extends JPanel {
 
         JTextField txtExpire = new JTextField(hv.getNgayHetHan() != null ? sdfDate.format(hv.getNgayHetHan()) : "31/12/2026");
         JComboBox<String> cbStatus = new JComboBox<>(new String[]{"Active", "Expired", "Locked"});
-        cbStatus.setSelectedItem(hv.getTrangThai() != null && hv.getTrangThai().contains("Lock") ? "Locked" : "Active");
+        cbStatus.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                JLabel label = (JLabel) super.getListCellRendererComponent(
+                        list, value, index, isSelected, cellHasFocus);
+                label.setText(hienThiTrangThaiHoiVien(value == null ? "" : value.toString()));
+                return label;
+            }
+        });
+        String currentStatus = hv.getTrangThai() == null ? "" : hv.getTrangThai().toLowerCase(Locale.ROOT);
+        if (currentStatus.contains("lock") || currentStatus.contains("khóa")) {
+            cbStatus.setSelectedItem("Locked");
+        } else if (currentStatus.contains("expired") || currentStatus.contains("hết hạn")) {
+            cbStatus.setSelectedItem("Expired");
+        } else {
+            cbStatus.setSelectedItem("Active");
+        }
 
         pForm.add(new JLabel("Họ Và Tên:"));
         pForm.add(txtName);

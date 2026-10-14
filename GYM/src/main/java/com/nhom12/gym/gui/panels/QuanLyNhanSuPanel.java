@@ -311,7 +311,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         btnDeleteStaff.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnDeleteStaff.setPreferredSize(new Dimension(130, 32));
 
-        btnExportExcel = new JButton("📊 Xuất Bảng Lương (.csv)");
+        btnExportExcel = new JButton("📊 Xuất bảng lương CSV");
         btnExportExcel.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnExportExcel.setBackground(new Color(16, 185, 129));
         btnExportExcel.setForeground(Color.WHITE);

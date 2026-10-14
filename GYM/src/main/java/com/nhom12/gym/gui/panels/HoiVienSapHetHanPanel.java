@@ -146,7 +146,7 @@ public class HoiVienSapHetHanPanel extends JPanel {
         btnRenew.setFocusPainted(false);
         btnRenew.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        JButton btnExport = new JButton("📥 Xuất Excel");
+        JButton btnExport = new JButton("📥 Xuất CSV");
         btnExport.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnExport.setBackground(new Color(100, 116, 139));
         btnExport.setForeground(Color.WHITE);

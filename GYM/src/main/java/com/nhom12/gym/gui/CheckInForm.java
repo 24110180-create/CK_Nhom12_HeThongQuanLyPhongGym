@@ -452,7 +452,7 @@ public class CheckInForm extends JPanel implements Scrollable {
         lblLogSummary.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblLogSummary.setForeground(new Color(100, 116, 139));
 
-        JButton btnExportExcel = new JButton("Xuất Excel Lịch Sử");
+        JButton btnExportExcel = new JButton("Xuất lịch sử CSV");
         btnExportExcel.setFont(new Font("Segoe UI", Font.BOLD, 11));
         btnExportExcel.setBackground(new Color(241, 245, 249));
         btnExportExcel.setForeground(new Color(15, 118, 110));

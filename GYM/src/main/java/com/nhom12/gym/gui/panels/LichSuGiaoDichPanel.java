@@ -95,7 +95,7 @@ public class LichSuGiaoDichPanel extends JPanel {
         btnPrintBill.setForeground(Color.WHITE);
         filterPanel.add(btnPrintBill);
 
-        btnExportExcel = new JButton("Xuất Excel");
+        btnExportExcel = new JButton("Xuất CSV");
         btnExportExcel.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnExportExcel.setBackground(new Color(100, 116, 139));
         btnExportExcel.setForeground(Color.WHITE);

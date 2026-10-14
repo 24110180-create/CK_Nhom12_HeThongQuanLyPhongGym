@@ -73,12 +73,12 @@ Mật khẩu mặc định cho tất cả tài khoản nhân sự: **123456**
   - Dù mục bảo mật có liệt kê 4 role lý thuyết (trong đó có role "Hội viên nếu có app riêng"), nhưng trong phiên bản triển khai thực tế này, **hội viên không có giao diện đăng nhập**.
   - Hội viên chỉ tương tác **gián tiếp**: xuất trình thẻ vật lý hoặc mã QR để lễ tân quét mã check-in tại quầy, và nhờ lễ tân thao tác đăng ký gói hoặc giữ chỗ lớp học trên hệ thống.
 
-| Tài khoản | Mật khẩu | Vai trò (Role) 
-| :--- | :--- | :--- | :--- |
-| `admin` | 123456 | Chủ phòng (Anh Đức) 
-| `letan1` | 123456 | Lễ tân (Chị Linh) 
-| `hlv1` | 123456 | Huấn luyện viên (Anh Tuấn) 
-| `quanly1` | 123456 | Quản lý chi nhánh 
+| Tài khoản | Mật khẩu | Vai trò (Role) |
+| :--- | :--- | :--- |
+| `admin` | 123456 | Chủ phòng (Anh Đức) |
+| `letan1` | 123456 | Lễ tân (Chị Linh) |
+| `hlv1` | 123456 | Huấn luyện viên (Anh Tuấn) |
+| `quanly1` | 123456 | Quản lý chi nhánh |
 ## 5. HƯỚNG DẪN CÀI ĐẶT VÀ CHẠY ỨNG DỤNG
 
 Yêu cầu trước khi chạy:

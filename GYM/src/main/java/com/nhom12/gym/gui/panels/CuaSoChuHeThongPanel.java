@@ -5,6 +5,7 @@ import com.nhom12.gym.dao.HoiVienDAO;
 import com.nhom12.gym.dao.LichSuCheckInDAO;
 import com.nhom12.gym.dao.TaiKhoanDAO;
 import com.nhom12.gym.entity.HoiVien;
+import com.nhom12.gym.entity.LichSuCheckIn;
 import com.nhom12.gym.gui.MainDashboard;
 import com.nhom12.gym.gui.QRScannerSimulatorDialog;
 import com.nhom12.gym.service.DataSyncManager;
@@ -148,15 +149,13 @@ public class CuaSoChuHeThongPanel extends JPanel {
             activeMembers = 6;
         }
 
-        int todayCheckins = checkInDAO.layLichSuHomNay().size();
-        if (todayCheckins == 0) {
-            todayCheckins = checkInDAO.layTatCaLichSu().size();
-        }
-        if (todayCheckins == 0) todayCheckins = 89;
+        int todayCheckins = (int) checkInDAO.layLichSuHomNay().stream()
+                .filter(log -> "Hợp lệ".equalsIgnoreCase(log.getTrangThai()))
+                .count();
 
         row.add(createKpiCard("DOANH THU THỰC TẾ", df.format(totalRevenue), "Cập nhật thời gian thực từ hóa đơn & gói tập", new Color(37, 99, 235), new Color(239, 246, 255)));
         row.add(createKpiCard("HỘI VIÊN CHUỖI", activeMembers + " / " + totalMembers + " HV", "Tỷ lệ kích hoạt: 100% • 0 Thẻ bị khóa", new Color(16, 185, 129), new Color(236, 253, 245)));
-        row.add(createKpiCard("LƯỢT CHECK-IN HÔM NAY", todayCheckins + " Lượt quét", "Hệ thống trạm quét trơn tru 100%", new Color(245, 158, 11), new Color(254, 243, 199)));
+        row.add(createKpiCard("LƯỢT CHECK-IN HÔM NAY", todayCheckins + " Lượt", "Lượt vào cửa hợp lệ được ghi nhận hôm nay", new Color(245, 158, 11), new Color(254, 243, 199)));
         row.add(createKpiCard("QUÂN SỐ NHÂN SỰ ĐANG TRỰC", "7 Nhân sự chuỗi", "2 Lễ tân • 3 HLV • 1 Quản lý • 1 Chủ", new Color(147, 51, 234), new Color(250, 245, 255)));
 
         return row;
@@ -208,11 +207,22 @@ public class CuaSoChuHeThongPanel extends JPanel {
         double cn01Rev = branchRev.getOrDefault("CN01 - Quận 1", 21500000.0);
         double cn02Rev = branchRev.getOrDefault("CN02 - Tân Bình", 11200000.0);
 
-        list.add(createBranchRow("Cơ sở 1 - CN01 (Flagship Quận 1)", df.format(cn01Rev), "593 lượt check-in ghi nhận • 100% Ổn định", new Color(37, 99, 235), 75));
-        list.add(createBranchRow("Cơ sở 2 - CN02 (Premium Tân Bình)", df.format(cn02Rev), "284 lượt check-in ghi nhận • Đệm Offline Fallback bảo vệ", new Color(16, 185, 129), 58));
+        List<LichSuCheckIn> checkIns = checkInDAO.layTatCaLichSu();
+        long cn01CheckIns = demCheckInHopLeTheoChiNhanh(checkIns, "CN01");
+        long cn02CheckIns = demCheckInHopLeTheoChiNhanh(checkIns, "CN02");
+
+        list.add(createBranchRow("Cơ sở 1 - CN01 (Flagship Quận 1)", df.format(cn01Rev), cn01CheckIns + " lượt check-in hợp lệ", new Color(37, 99, 235), 75));
+        list.add(createBranchRow("Cơ sở 2 - CN02 (Premium Tân Bình)", df.format(cn02Rev), cn02CheckIns + " lượt check-in hợp lệ", new Color(16, 185, 129), 58));
 
         card.add(list, BorderLayout.CENTER);
         return card;
+    }
+
+    private long demCheckInHopLeTheoChiNhanh(List<LichSuCheckIn> checkIns, String maChiNhanh) {
+        return checkIns.stream()
+                .filter(log -> "Hợp lệ".equalsIgnoreCase(log.getTrangThai()))
+                .filter(log -> log.getChiNhanh() != null && log.getChiNhanh().contains(maChiNhanh))
+                .count();
     }
 
     private JPanel createBranchRow(String branchName, String revenue, String detail, Color color, int percentOccupancy) {

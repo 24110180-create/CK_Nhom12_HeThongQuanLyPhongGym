@@ -109,8 +109,11 @@ public class TrangChuPanel extends JPanel {
         java.text.DecimalFormat df = new java.text.DecimalFormat("#,### đ");
         int totalMembers = new com.nhom12.gym.dao.HoiVienDAO().layTatCa().size();
         long activeMembers = new com.nhom12.gym.dao.HoiVienDAO().layTatCa().stream().filter(m -> "Active".equalsIgnoreCase(m.getTrangThai()) || "Hoạt động".equalsIgnoreCase(m.getTrangThai())).count();
-        int todayCheckins = new com.nhom12.gym.dao.LichSuCheckInDAO().layLichSuHomNay().size();
-        if (todayCheckins == 0) todayCheckins = new com.nhom12.gym.dao.LichSuCheckInDAO().layTatCaLichSu().size();
+        int todayCheckins = (int) new com.nhom12.gym.dao.LichSuCheckInDAO()
+                .layLichSuHomNay()
+                .stream()
+                .filter(log -> "Hợp lệ".equalsIgnoreCase(log.getTrangThai()))
+                .count();
         double totalRev = com.nhom12.gym.dao.HoaDonDAO.getInstance().layTongDoanhThu();
 
         widgetPanel.add(createWidgetCard(

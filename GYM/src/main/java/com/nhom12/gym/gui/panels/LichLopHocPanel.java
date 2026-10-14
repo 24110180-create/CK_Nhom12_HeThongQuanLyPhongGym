@@ -46,7 +46,6 @@ public class LichLopHocPanel extends JPanel {
     private JLabel lblCardTongLop;
     private JLabel lblCardTongHocVien;
     private JLabel lblCardDaDiemDanh;
-    private JLabel lblCardLopDangChon;
 
     // Component Bảng Lớp Học (Master)
     private JTable tableLop;
@@ -55,6 +54,8 @@ public class LichLopHocPanel extends JPanel {
     private JTextField txtSearchLop;
     private JComboBox<String> cbFilterBoMon;
     private JComboBox<String> cbFilterChiNhanh;
+    private JButton btnSuaLop;
+    private JButton btnXoaLop;
 
     // Component Bảng Học Viên & Điểm Danh (Detail)
     private JLabel lblDetailTitle;
@@ -63,24 +64,21 @@ public class LichLopHocPanel extends JPanel {
     private TableRowSorter<DefaultTableModel> sorterHocVien;
     private JTextField txtSearchHocVien;
 
-    // Bộ lọc Pills bộ môn
-    private String boMonDangChon = "Tất Cả";
-    private final List<JButton> boMonPillButtons = new ArrayList<>();
-
     // Các nút thao tác Học Viên
     private JButton btnThemHocVien;
-    private JButton btnHuyDangKy;
+    private JButton btnThaoTacKhac;
     private JButton btnDiemDanhCoMat;
     private JButton btnBaoVang;
-    private JButton btnHuyDiemDanh;
-    private JButton btnDiemDanhTatCa;
-    private JButton btnXuatExcelHocVien;
+    private JMenuItem itemHuyDangKy;
+    private JMenuItem itemHuyDiemDanh;
+    private JMenuItem itemDiemDanhTatCa;
+    private JMenuItem itemXuatExcelHocVien;
 
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
     public LichLopHocPanel() {
-        this.setLayout(new BorderLayout(15, 15));
-        this.setBorder(new EmptyBorder(16, 20, 16, 20));
+        this.setLayout(new BorderLayout(12, 12));
+        this.setBorder(new EmptyBorder(12, 14, 12, 14));
         this.setBackground(new Color(248, 250, 252));
 
         khoiTaoGiaoDien();
@@ -118,14 +116,12 @@ public class LichLopHocPanel extends JPanel {
         pTop.add(pTitle, BorderLayout.NORTH);
 
         // KPI Badges Bar
-        JPanel pCards = new JPanel(new GridLayout(1, 4, 12, 0));
+        JPanel pCards = new JPanel(new GridLayout(1, 3, 12, 0));
         pCards.setOpaque(false);
 
         lblCardTongLop = taoKpiCard(pCards, "TỔNG SỐ LỚP HỌC", "0 Lớp", new Color(37, 99, 235), new Color(239, 246, 255));
         lblCardTongHocVien = taoKpiCard(pCards, "TỔNG LƯỢT ĐĂNG KÝ", "0 Học viên", new Color(16, 185, 129), new Color(236, 253, 245));
         lblCardDaDiemDanh = taoKpiCard(pCards, "ĐÃ ĐIỂM DANH HÔM NAY", "0 / 0", new Color(217, 119, 6), new Color(254, 243, 199));
-        lblCardLopDangChon = taoKpiCard(pCards, "LỚP ĐANG CHỌN", "Chưa chọn lớp", new Color(100, 116, 139), new Color(241, 245, 249));
-
         pTop.add(pCards, BorderLayout.SOUTH);
         this.add(pTop, BorderLayout.NORTH);
 
@@ -134,10 +130,10 @@ public class LichLopHocPanel extends JPanel {
         JPanel pDetail = taoPanelDetailHocVien();
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, pMaster, pDetail);
-        splitPane.setDividerLocation(310);
+        splitPane.setDividerLocation(285);
         splitPane.setDividerSize(6);
         splitPane.setContinuousLayout(true);
-        splitPane.setResizeWeight(0.48);
+        splitPane.setResizeWeight(0.44);
         splitPane.setOpaque(false);
         splitPane.setBorder(null);
 
@@ -167,79 +163,6 @@ public class LichLopHocPanel extends JPanel {
     }
 
     // =========================================================================
-    // THANH CHỌN BỘ MÔN NHANH DẠNG PILLS HIỆN ĐẠI (YOGA, ZUMBA, CARDIO, BOXING, PILATES)
-    // =========================================================================
-    private JPanel taoPillsBoMon() {
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
-        p.setOpaque(false);
-        p.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JLabel lblQuick = new JLabel("Lọc nhanh bộ môn:");
-        lblQuick.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        lblQuick.setForeground(new Color(71, 85, 105));
-        p.add(lblQuick);
-
-        String[] categories = {"Tất Cả", "Yoga", "Zumba", "Cardio", "Boxing", "Pilates"};
-
-        boMonPillButtons.clear();
-        for (int i = 0; i < categories.length; i++) {
-            String cat = categories[i];
-            JButton btnPill = new JButton(cat);
-            btnPill.setFont(new Font("Segoe UI", Font.BOLD, 11));
-            btnPill.setFocusPainted(false);
-            btnPill.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            btnPill.putClientProperty("category", cat);
-
-            updatePillStyle(btnPill, cat.equalsIgnoreCase(boMonDangChon));
-
-            btnPill.addActionListener(e -> {
-                boMonDangChon = cat;
-                for (JButton b : boMonPillButtons) {
-                    String c = (String) b.getClientProperty("category");
-                    updatePillStyle(b, c != null && c.equalsIgnoreCase(boMonDangChon));
-                }
-                if ("Tất Cả".equalsIgnoreCase(cat)) {
-                    cbFilterBoMon.setSelectedIndex(0);
-                } else {
-                    cbFilterBoMon.setSelectedItem(cat);
-                }
-                filterMaster();
-            });
-
-            boMonPillButtons.add(btnPill);
-            p.add(btnPill);
-        }
-
-        return p;
-    }
-
-    private void updatePillStyle(JButton btn, boolean active) {
-        String cat = (String) btn.getClientProperty("category");
-        if (active) {
-            Color bg = new Color(37, 99, 235);
-            if ("Yoga".equalsIgnoreCase(cat)) bg = new Color(124, 58, 237);
-            else if ("Zumba".equalsIgnoreCase(cat)) bg = new Color(234, 88, 12);
-            else if ("Cardio".equalsIgnoreCase(cat)) bg = new Color(220, 38, 38);
-            else if ("Boxing".equalsIgnoreCase(cat)) bg = new Color(180, 83, 9);
-            else if ("Pilates".equalsIgnoreCase(cat)) bg = new Color(13, 148, 136);
-
-            btn.setBackground(bg);
-            btn.setForeground(Color.WHITE);
-            btn.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(bg.darker(), 1),
-                    new EmptyBorder(5, 12, 5, 12)
-            ));
-        } else {
-            btn.setBackground(Color.WHITE);
-            btn.setForeground(new Color(71, 85, 105));
-            btn.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(203, 213, 225), 1),
-                    new EmptyBorder(5, 12, 5, 12)
-            ));
-        }
-    }
-
-    // =========================================================================
     // 1. TẦNG TRÊN: MASTER LỚP HỌC
     // =========================================================================
     private JPanel taoPanelMasterLop() {
@@ -250,17 +173,23 @@ public class LichLopHocPanel extends JPanel {
                 new EmptyBorder(12, 14, 12, 14)
         ));
 
-        // Toolbar 2 tầng (chống tràn và đè các nút trên màn hình nhỏ)
+        // Keep the class workflow in one compact toolbar.
         JPanel pTool = new JPanel();
         pTool.setLayout(new BoxLayout(pTool, BoxLayout.Y_AXIS));
         pTool.setOpaque(false);
 
-        // Trái: Tìm kiếm & Lọc
+        JLabel lblSection = new JLabel("1. Chọn lớp học");
+        lblSection.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        lblSection.setForeground(new Color(30, 41, 59));
+        lblSection.setAlignmentX(Component.LEFT_ALIGNMENT);
+        pTool.add(lblSection);
+        pTool.add(Box.createRigidArea(new Dimension(0, 4)));
+
         JPanel pFilter = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
         pFilter.setOpaque(false);
         pFilter.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel lSearch = new JLabel("Tìm kiếm lớp:");
+        JLabel lSearch = new JLabel("Tìm lớp:");
         lSearch.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lSearch.setForeground(new Color(51, 65, 85));
 
@@ -294,17 +223,7 @@ public class LichLopHocPanel extends JPanel {
 
         cbFilterBoMon = new JComboBox<>(new String[]{"Tất Cả Bộ Môn", "Yoga", "Zumba", "Boxing", "Cardio", "Pilates"});
         cbFilterBoMon.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        cbFilterBoMon.addActionListener(e -> {
-            String sel = (String) cbFilterBoMon.getSelectedItem();
-            if (sel != null) {
-                boMonDangChon = sel.startsWith("Tất Cả") ? "Tất Cả" : sel;
-                for (JButton b : boMonPillButtons) {
-                    String c = (String) b.getClientProperty("category");
-                    updatePillStyle(b, c != null && c.equalsIgnoreCase(boMonDangChon));
-                }
-            }
-            filterMaster();
-        });
+        cbFilterBoMon.addActionListener(e -> filterMaster());
 
         pFilter.add(lSearch);
         pFilter.add(txtSearchLop);
@@ -313,23 +232,17 @@ public class LichLopHocPanel extends JPanel {
         pFilter.add(lBoMon);
         pFilter.add(cbFilterBoMon);
 
-        // Hàng 1: Nút Pills danh mục bộ môn (Yoga, Zumba, Cardio, Boxing, Pilates)
-        pTool.add(taoPillsBoMon());
-        pTool.add(Box.createRigidArea(new Dimension(0, 4)));
-
-        // Hàng 2: Thanh tìm kiếm & lọc cơ sở
         pTool.add(pFilter);
         pTool.add(Box.createRigidArea(new Dimension(0, 6)));
 
-        // Hàng nút Thêm, Sửa, Xóa, Làm mới, Xuất CSV (căn trái thoáng đãng)
         JPanel pBtns = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 4));
         pBtns.setOpaque(false);
         pBtns.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JButton btnThemLop = taoButtonFlat("+ Thêm Lớp Mới", new Color(16, 185, 129), Color.WHITE);
+        JButton btnThemLop = taoButtonFlat("+ Thêm lớp", new Color(16, 185, 129), Color.WHITE);
         btnThemLop.addActionListener(e -> moDialogThemSuaLop(null));
 
-        JButton btnSuaLop = taoButtonFlat("Cập Nhật Lớp", new Color(37, 99, 235), Color.WHITE);
+        btnSuaLop = taoButtonFlat("Sửa lớp", new Color(37, 99, 235), Color.WHITE);
         btnSuaLop.addActionListener(e -> {
             if (lopDangChon == null) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn một lớp học trong bảng để chỉnh sửa!", "Chưa chọn lớp", JOptionPane.WARNING_MESSAGE);
@@ -338,15 +251,16 @@ public class LichLopHocPanel extends JPanel {
             moDialogThemSuaLop(lopDangChon);
         });
 
-        JButton btnXoaLop = taoButtonFlat("Xóa Lớp", new Color(239, 68, 68), Color.WHITE);
+        btnXoaLop = taoButtonFlat("Xóa lớp", new Color(239, 68, 68), Color.WHITE);
         btnXoaLop.addActionListener(e -> actionXoaLop());
 
-        JButton btnRefresh = taoButtonFlat("Làm Mới", new Color(100, 116, 139), Color.WHITE);
-        btnRefresh.addActionListener(e -> taiDuLieuLopHoc());
-
-        JButton btnNapDuLieu = taoButtonFlat("Nạp Dữ Liệu Mẫu", new Color(99, 102, 241), Color.WHITE);
-        btnNapDuLieu.setToolTipText("Nạp và đồng bộ lại 5 lớp học và 32 lượt điểm danh học viên chuẩn");
-        btnNapDuLieu.addActionListener(e -> {
+        JButton btnMore = taoButtonFlat("Tiện ích ▾", new Color(100, 116, 139), Color.WHITE);
+        JPopupMenu classUtilities = new JPopupMenu();
+        JMenuItem itemRefresh = new JMenuItem("Làm mới danh sách");
+        itemRefresh.addActionListener(e -> taiDuLieuLopHoc());
+        JMenuItem itemLoadSample = new JMenuItem("Nạp dữ liệu mẫu");
+        itemLoadSample.setToolTipText("Nạp lại dữ liệu mẫu lớp học và điểm danh");
+        itemLoadSample.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(this,
                     "Hệ thống sẽ đồng bộ lại bộ dữ liệu mẫu chuẩn cho 5 lớp học (Yoga, Zumba, Cardio, Boxing, Pilates)\n" +
                     "và khôi phục đầy đủ 32 lượt điểm danh học viên, xóa bỏ các lớp rác không hợp lệ.\n\n" +
@@ -362,37 +276,24 @@ public class LichLopHocPanel extends JPanel {
                 }
             }
         });
-
-        JButton btnXuatExcelLop = taoButtonFlat("Xuất lịch lớp CSV", new Color(15, 118, 110), Color.WHITE);
-        btnXuatExcelLop.addActionListener(e -> ExcelExportHelper.exportTableToExcel(this, tableLop, "LichLopHoc_FitLife"));
-
-        JButton btnDiemDanh = taoButtonFlat("Điểm Danh Lớp Này", new Color(147, 51, 234), Color.WHITE);
-        btnDiemDanh.addActionListener(e -> {
-            if (lopDangChon == null) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn một lớp học trong bảng để điểm danh!", "Chưa chọn lớp", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            if (tableHocVien != null) {
-                tableHocVien.requestFocusInWindow();
-                if (tableHocVien.getRowCount() > 0) {
-                    tableHocVien.setRowSelectionInterval(0, 0);
-                }
-            }
-        });
+        JMenuItem itemExportClasses = new JMenuItem("Xuất danh sách lớp (CSV)");
+        itemExportClasses.addActionListener(e -> ExcelExportHelper.exportTableToExcel(this, tableLop, "LichLopHoc_FitLife"));
+        classUtilities.add(itemRefresh);
+        classUtilities.add(itemLoadSample);
+        classUtilities.addSeparator();
+        classUtilities.add(itemExportClasses);
+        btnMore.addActionListener(e -> classUtilities.show(btnMore, 0, btnMore.getHeight()));
 
         pBtns.add(btnThemLop);
         pBtns.add(btnSuaLop);
         pBtns.add(btnXoaLop);
-        pBtns.add(btnDiemDanh);
-        pBtns.add(btnRefresh);
-        pBtns.add(btnNapDuLieu);
-        pBtns.add(btnXuatExcelLop);
+        pBtns.add(btnMore);
         pTool.add(pBtns);
 
         panel.add(pTool, BorderLayout.NORTH);
 
         // Bảng Lớp Học
-        String[] cols = {"Mã Lớp", "Cơ Sở", "Bộ Môn", "Tên Lớp Học", "Huấn Luyện Viên", "Phòng Tập", "Khung Giờ & Lịch Tập", "Sĩ Số", "Tình Trạng Chỗ"};
+        String[] cols = {"Mã lớp", "Cơ sở", "Bộ môn", "Tên lớp", "Huấn luyện viên", "Phòng", "Lịch tập", "Sĩ số", "Chỗ trống"};
         modelLop = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int r, int c) { return false; }
@@ -518,10 +419,17 @@ public class LichLopHocPanel extends JPanel {
                     }
                 } else if (tableLop.getRowCount() == 0) {
                     lopDangChon = null;
+                    danhSachHocVienLop = new ArrayList<>();
+                    xoaTrangBangHocVien();
+                } else {
+                    lopDangChon = null;
+                    danhSachHocVienLop = new ArrayList<>();
                     xoaTrangBangHocVien();
                 }
+                capNhatTrangThaiNutLop(tableLop.getSelectedRow() >= 0);
             }
         });
+        capNhatTrangThaiNutLop(false);
 
         tableLop.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -558,21 +466,15 @@ public class LichLopHocPanel extends JPanel {
         pTop.setOpaque(false);
 
         // Tiêu đề Detail
-        lblDetailTitle = new JLabel("DANH SÁCH HỌC VIÊN ĐĂNG KÝ (Vui lòng chọn một lớp học ở bảng trên)");
-        lblDetailTitle.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblDetailTitle = new JLabel("2. Danh sách học viên · Chọn lớp ở phía trên");
+        lblDetailTitle.setFont(new Font("Segoe UI", Font.BOLD, 15));
         lblDetailTitle.setForeground(new Color(30, 41, 59));
         pTop.add(lblDetailTitle, BorderLayout.NORTH);
 
-        // Hàng điều khiển 2 tầng chống đè
-        JPanel pActions = new JPanel();
-        pActions.setLayout(new BoxLayout(pActions, BoxLayout.Y_AXIS));
+        JPanel pActions = new JPanel(new BorderLayout(8, 4));
         pActions.setOpaque(false);
-        pActions.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        // Tìm kiếm học viên trong lớp
         JPanel pSearchHV = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
         pSearchHV.setOpaque(false);
-        pSearchHV.setAlignmentX(Component.LEFT_ALIGNMENT);
         JLabel lSearch = new JLabel("Lọc học viên:");
         lSearch.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lSearch.setForeground(new Color(51, 65, 85));
@@ -583,53 +485,54 @@ public class LichLopHocPanel extends JPanel {
             public void removeUpdate(DocumentEvent e) { filterDetail(); }
             public void changedUpdate(DocumentEvent e) { filterDetail(); }
         });
+        txtSearchHocVien.setToolTipText("Tìm theo tên, mã hội viên hoặc số điện thoại");
         pSearchHV.add(lSearch);
         pSearchHV.add(txtSearchHocVien);
-        pActions.add(pSearchHV);
-        pActions.add(Box.createRigidArea(new Dimension(0, 6)));
 
-        // Bộ nút hành động học viên: Thêm, Hủy, Điểm danh, Báo vắng, Hủy điểm danh, Điểm danh tất cả, Xuất CSV (căn trái thoáng đãng)
         JPanel pBtns = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 4));
         pBtns.setOpaque(false);
-        pBtns.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        btnThemHocVien = taoButtonFlat("+ Ghi Danh Học Viên", new Color(16, 185, 129), Color.WHITE);
+        btnThemHocVien = taoButtonFlat("+ Ghi danh", new Color(16, 185, 129), Color.WHITE);
         btnThemHocVien.addActionListener(e -> moDialogGhiDanhHocVien());
 
-        btnDiemDanhCoMat = taoButtonFlat("Điểm Danh (Có Mặt)", new Color(5, 150, 105), Color.WHITE);
+        btnDiemDanhCoMat = taoButtonFlat("Có mặt", new Color(5, 150, 105), Color.WHITE);
         btnDiemDanhCoMat.addActionListener(e -> actionCapNhatDiemDanh("Đã điểm danh"));
 
-        btnBaoVang = taoButtonFlat("Báo Vắng", new Color(220, 38, 38), Color.WHITE);
+        btnBaoVang = taoButtonFlat("Vắng mặt", new Color(220, 38, 38), Color.WHITE);
         btnBaoVang.addActionListener(e -> actionCapNhatDiemDanh("Vắng mặt"));
 
-        btnHuyDiemDanh = taoButtonFlat("Hủy Điểm Danh", new Color(217, 119, 6), Color.WHITE);
-        btnHuyDiemDanh.addActionListener(e -> actionCapNhatDiemDanh("Chưa điểm danh"));
-
-        btnDiemDanhTatCa = taoButtonFlat("Điểm Danh Tất Cả", new Color(37, 99, 235), Color.WHITE);
-        btnDiemDanhTatCa.addActionListener(e -> actionDiemDanhTatCa());
-
-        btnHuyDangKy = taoButtonFlat("Hủy Đăng Ký Lớp", new Color(239, 68, 68), Color.WHITE);
-        btnHuyDangKy.addActionListener(e -> actionHuyDangKyHocVien());
-
-        btnXuatExcelHocVien = taoButtonFlat("Xuất điểm danh CSV", new Color(15, 118, 110), Color.WHITE);
-        btnXuatExcelHocVien.addActionListener(e -> {
+        btnThaoTacKhac = taoButtonFlat("Thao tác khác ▾", new Color(100, 116, 139), Color.WHITE);
+        JPopupMenu attendanceUtilities = new JPopupMenu();
+        itemHuyDiemDanh = new JMenuItem("Đặt lại trạng thái điểm danh");
+        itemHuyDiemDanh.addActionListener(e -> actionCapNhatDiemDanh("Chưa điểm danh"));
+        itemDiemDanhTatCa = new JMenuItem("Điểm danh tất cả có mặt");
+        itemDiemDanhTatCa.addActionListener(e -> actionDiemDanhTatCa());
+        itemHuyDangKy = new JMenuItem("Hủy ghi danh học viên");
+        itemHuyDangKy.addActionListener(e -> actionHuyDangKyHocVien());
+        itemXuatExcelHocVien = new JMenuItem("Xuất danh sách học viên (CSV)");
+        itemXuatExcelHocVien.addActionListener(e -> {
             if (lopDangChon == null) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn lớp học trước khi xuất file điểm danh!");
                 return;
             }
             ExcelExportHelper.exportTableToExcel(this, tableHocVien, "DiemDanh_" + lopDangChon.getMaLop());
         });
+        attendanceUtilities.add(itemHuyDiemDanh);
+        attendanceUtilities.add(itemDiemDanhTatCa);
+        attendanceUtilities.addSeparator();
+        attendanceUtilities.add(itemHuyDangKy);
+        attendanceUtilities.addSeparator();
+        attendanceUtilities.add(itemXuatExcelHocVien);
+        btnThaoTacKhac.addActionListener(e -> attendanceUtilities.show(btnThaoTacKhac, 0, btnThaoTacKhac.getHeight()));
 
         pBtns.add(btnThemHocVien);
         pBtns.add(btnDiemDanhCoMat);
         pBtns.add(btnBaoVang);
-        pBtns.add(btnHuyDiemDanh);
-        pBtns.add(btnDiemDanhTatCa);
-        pBtns.add(btnHuyDangKy);
-        pBtns.add(btnXuatExcelHocVien);
-        pActions.add(pBtns);
+        pBtns.add(btnThaoTacKhac);
+        pActions.add(pSearchHV, BorderLayout.WEST);
+        pActions.add(pBtns, BorderLayout.CENTER);
 
-        pTop.add(pActions, BorderLayout.SOUTH);
+        pTop.add(pActions, BorderLayout.CENTER);
         panel.add(pTop, BorderLayout.NORTH);
 
         // Bảng Học Viên
@@ -648,6 +551,11 @@ public class LichLopHocPanel extends JPanel {
         tableHocVien.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         sorterHocVien = new TableRowSorter<>(modelHocVien);
         tableHocVien.setRowSorter(sorterHocVien);
+        tableHocVien.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                capNhatTrangThaiNutDetail(lopDangChon != null);
+            }
+        });
 
         // Căn lề & Kích thước cột
         DefaultTableCellRenderer centerRender = new DefaultTableCellRenderer();
@@ -717,7 +625,7 @@ public class LichLopHocPanel extends JPanel {
         // Mẹo thao tác nghiệp vụ nhanh ở chân bảng
         JPanel pTip = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
         pTip.setOpaque(false);
-        JLabel lblTip = new JLabel("💡 Mẹo nghiệp vụ: Click đúp vào một lớp học để chọn nhanh • Click đúp trực tiếp vào học viên để đảo trạng thái Điểm Danh.");
+        JLabel lblTip = new JLabel("Chọn một lớp để xem học viên. Chọn học viên rồi dùng Có mặt/Vắng mặt; nhấp đúp để đổi nhanh trạng thái.");
         lblTip.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         lblTip.setForeground(new Color(100, 116, 139));
         pTip.add(lblTip);
@@ -729,12 +637,19 @@ public class LichLopHocPanel extends JPanel {
 
     private void capNhatTrangThaiNutDetail(boolean enabled) {
         btnThemHocVien.setEnabled(enabled);
-        btnHuyDangKy.setEnabled(enabled);
-        btnDiemDanhCoMat.setEnabled(enabled);
-        btnBaoVang.setEnabled(enabled);
-        btnHuyDiemDanh.setEnabled(enabled);
-        btnDiemDanhTatCa.setEnabled(enabled);
-        btnXuatExcelHocVien.setEnabled(enabled);
+        boolean hasStudent = enabled && tableHocVien.getSelectedRow() >= 0;
+        btnDiemDanhCoMat.setEnabled(hasStudent);
+        btnBaoVang.setEnabled(hasStudent);
+        itemHuyDiemDanh.setEnabled(hasStudent);
+        itemHuyDangKy.setEnabled(hasStudent);
+        itemDiemDanhTatCa.setEnabled(enabled && !danhSachHocVienLop.isEmpty());
+        itemXuatExcelHocVien.setEnabled(enabled && !danhSachHocVienLop.isEmpty());
+        btnThaoTacKhac.setEnabled(enabled);
+    }
+
+    private void capNhatTrangThaiNutLop(boolean hasSelection) {
+        btnSuaLop.setEnabled(hasSelection);
+        btnXoaLop.setEnabled(hasSelection);
     }
 
     // =========================================================================
@@ -780,28 +695,6 @@ public class LichLopHocPanel extends JPanel {
             if ("Đã điểm danh".equalsIgnoreCase(dk.getTrangThaiDiemDanh())) {
                 tongDaDiemDanh++;
             }
-        }
-
-        // Đếm số lượng lớp theo từng bộ môn để hiển thị số lượng trên Pills
-        int cntYoga = 0, cntZumba = 0, cntCardio = 0, cntBoxing = 0, cntPilates = 0;
-        for (LopHoc lh : danhSachLop) {
-            String bm = lh.getBoMon();
-            if (bm != null) {
-                if (bm.equalsIgnoreCase("Yoga")) cntYoga++;
-                else if (bm.equalsIgnoreCase("Zumba")) cntZumba++;
-                else if (bm.equalsIgnoreCase("Cardio")) cntCardio++;
-                else if (bm.equalsIgnoreCase("Boxing")) cntBoxing++;
-                else if (bm.equalsIgnoreCase("Pilates")) cntPilates++;
-            }
-        }
-        for (JButton b : boMonPillButtons) {
-            String cat = (String) b.getClientProperty("category");
-            if ("Tất Cả".equalsIgnoreCase(cat)) b.setText("Tất Cả (" + danhSachLop.size() + ")");
-            else if ("Yoga".equalsIgnoreCase(cat)) b.setText("Yoga (" + cntYoga + ")");
-            else if ("Zumba".equalsIgnoreCase(cat)) b.setText("Zumba (" + cntZumba + ")");
-            else if ("Cardio".equalsIgnoreCase(cat)) b.setText("Cardio (" + cntCardio + ")");
-            else if ("Boxing".equalsIgnoreCase(cat)) b.setText("Boxing (" + cntBoxing + ")");
-            else if ("Pilates".equalsIgnoreCase(cat)) b.setText("Pilates (" + cntPilates + ")");
         }
 
         lblCardTongLop.setText(tongLop + " Lớp");
@@ -864,15 +757,14 @@ public class LichLopHocPanel extends JPanel {
 
         int cur = danhSachHocVienLop.size();
         int max = lop.getSiSoToiDa();
-        lblDetailTitle.setText("HỌC VIÊN LỚP: " + lop.getTenLop().toUpperCase() + " (" + lop.getMaLop() + ") • SĨ SỐ: " + cur + "/" + max + " • ĐIỂM DANH: " + daDiemDanhCuaLop + "/" + cur);
-        lblCardLopDangChon.setText(lop.getTenLop() + " (" + cur + "/" + max + ")");
+        lblDetailTitle.setText("2. " + lop.getTenLop() + " · " + lop.getMaLop()
+                + " · Sĩ số " + cur + "/" + max + " · Có mặt " + daDiemDanhCuaLop + "/" + cur);
         capNhatTrangThaiNutDetail(true);
     }
 
     private void xoaTrangBangHocVien() {
         modelHocVien.setRowCount(0);
-        lblDetailTitle.setText("DANH SÁCH HỌC VIÊN ĐĂNG KÝ (Vui lòng chọn một lớp học ở bảng trên)");
-        lblCardLopDangChon.setText("Chưa chọn lớp");
+        lblDetailTitle.setText("2. Danh sách học viên · Chọn lớp ở phía trên");
         capNhatTrangThaiNutDetail(false);
     }
 
@@ -978,7 +870,6 @@ public class LichLopHocPanel extends JPanel {
 
         int mr = tableHocVien.convertRowIndexToModel(row);
         int idDangKy = Integer.parseInt(modelHocVien.getValueAt(mr, 0).toString());
-        String tenHV = modelHocVien.getValueAt(mr, 2).toString();
 
         boolean ok = lopHocDAO.capNhatDiemDanh(idDangKy, trangThai);
         if (ok) {
@@ -1022,8 +913,8 @@ public class LichLopHocPanel extends JPanel {
         }
         int cur = modelHocVien.getRowCount();
         int max = lopDangChon.getSiSoToiDa();
-        lblDetailTitle.setText("HỌC VIÊN LỚP: " + lopDangChon.getTenLop().toUpperCase() + " (" + lopDangChon.getMaLop() + ") • SĨ SỐ: " + cur + "/" + max + " • ĐÃ ĐIỂM DANH: " + daDiemDanhCuaLop + "/" + cur);
-        lblCardLopDangChon.setText(lopDangChon.getTenLop() + " (" + cur + "/" + max + ")");
+        lblDetailTitle.setText("2. " + lopDangChon.getTenLop() + " · " + lopDangChon.getMaLop()
+                + " · Sĩ số " + cur + "/" + max + " · Có mặt " + daDiemDanhCuaLop + "/" + cur);
 
         int tongDaDiemDanh = 0;
         List<DangKyLop> tatCaDK = dangKyLopDAO.layTatCa();

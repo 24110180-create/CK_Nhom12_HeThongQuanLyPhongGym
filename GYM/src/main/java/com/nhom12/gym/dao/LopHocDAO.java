@@ -55,19 +55,9 @@ public class LopHocDAO {
             list = new ArrayList<>(memoryClasses);
         }
 
-        // Kiểm tra và tự động dọn dẹp nếu phát hiện dữ liệu rác 'freee'
-        boolean coDuLieuRac = false;
-        for (LopHoc lh : list) {
-            if (lh.getTenLop() != null && lh.getTenLop().toLowerCase().contains("freee")) {
-                coDuLieuRac = true;
-                break;
-            }
-        }
-        if (coDuLieuRac) {
-            LOGGER.info("Phát hiện dữ liệu lớp rác 'freee', tự động đồng bộ lại dữ liệu mẫu chuẩn...");
-            com.nhom12.gym.service.SampleDataService.napDuLieuMauDongBo(true);
-            return layTatCa();
-        }
+        // Lọc bỏ triệt để các dữ liệu lớp học rác hoặc không hợp lệ (như 'freee') mà không gọi đệ quy
+        list.removeIf(lh -> lh == null || (lh.getTenLop() != null && lh.getTenLop().toLowerCase().contains("freee")));
+        memoryClasses.removeIf(lh -> lh == null || (lh.getTenLop() != null && lh.getTenLop().toLowerCase().contains("freee")));
 
         List<LopHoc> result = new ArrayList<>();
         // Đồng bộ sĩ số thực tế từ danh sách đăng ký

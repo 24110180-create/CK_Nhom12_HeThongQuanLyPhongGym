@@ -183,7 +183,10 @@ public class SampleDataService {
                     }
                 }
 
-                // 2. Đồng bộ 5 Lớp Học chuẩn (ghi đè lớp rác 'freee')
+                // 2. Đồng bộ 5 Lớp Học chuẩn (xóa triệt để lớp rác 'freee' trong CSDL)
+                try {
+                    session.createQuery("DELETE FROM LopHoc WHERE LOWER(tenLop) LIKE '%freee%'").executeUpdate();
+                } catch (Exception ignored) {}
                 for (LopHoc lh : lopHocs) {
                     session.merge(lh);
                 }

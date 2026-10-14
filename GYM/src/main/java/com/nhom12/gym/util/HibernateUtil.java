@@ -61,6 +61,8 @@ public class HibernateUtil {
             cfg.addAnnotatedClass(LopHoc.class);
             cfg.addAnnotatedClass(LichSuCheckIn.class);
             cfg.addAnnotatedClass(HoaDon.class);
+            cfg.addAnnotatedClass(HoiVienVipDacQuyen.class);
+            cfg.addAnnotatedClass(NhatKyHeThong.class);
             cfg.addAnnotatedClass(HuanLuyenVien.class);
             cfg.addAnnotatedClass(DangKyLop.class);
 

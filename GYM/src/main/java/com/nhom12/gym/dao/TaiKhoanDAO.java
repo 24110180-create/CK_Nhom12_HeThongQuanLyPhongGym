@@ -143,6 +143,10 @@ public class TaiKhoanDAO {
         SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf == null) {
             com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
+            new com.nhom12.gym.dao.NhatKyHeThongDAO().ghiLog(
+                    com.nhom12.gym.util.Auth.tenDangNhap, com.nhom12.gym.util.Auth.vaiTro, "Tạo tài khoản",
+                    "Tài khoản: " + tk.getTenDangNhap() + ", Vai trò: " + tk.getVaiTro()
+            );
             return true;
         }
 
@@ -152,6 +156,10 @@ public class TaiKhoanDAO {
             session.persist(tk);
             tx.commit();
             com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
+            new com.nhom12.gym.dao.NhatKyHeThongDAO().ghiLog(
+                    com.nhom12.gym.util.Auth.tenDangNhap, com.nhom12.gym.util.Auth.vaiTro, "Tạo tài khoản",
+                    "Tài khoản: " + tk.getTenDangNhap() + ", Vai trò: " + tk.getVaiTro()
+            );
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();

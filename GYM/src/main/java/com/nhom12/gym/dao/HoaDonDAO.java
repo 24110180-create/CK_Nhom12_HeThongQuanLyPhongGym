@@ -52,8 +52,19 @@ public class HoaDonDAO {
     public boolean them(HoaDon hd) {
         if (hd == null) return false;
 
+        org.hibernate.SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf == null) {
+            memoryCache.add(0, hd);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOA_DON);
+            new com.nhom12.gym.dao.NhatKyHeThongDAO().ghiLog(
+                    com.nhom12.gym.util.Auth.tenDangNhap, com.nhom12.gym.util.Auth.vaiTro, "Tạo hóa đơn",
+                    "Mã: " + hd.getMaHoaDon() + ", Số tiền: " + hd.getThanhTien()
+            );
+            return true;
+        }
+
         Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = sf.openSession()) {
             tx = session.beginTransaction();
             session.persist(hd);
             tx.commit();
@@ -61,6 +72,10 @@ public class HoaDonDAO {
             // Chỉ khi CSDL commit thành công mới lưu vào bộ nhớ cache
             memoryCache.add(0, hd);
             com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOA_DON);
+            new com.nhom12.gym.dao.NhatKyHeThongDAO().ghiLog(
+                    com.nhom12.gym.util.Auth.tenDangNhap, com.nhom12.gym.util.Auth.vaiTro, "Tạo hóa đơn",
+                    "Mã: " + hd.getMaHoaDon() + ", Số tiền: " + hd.getThanhTien()
+            );
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();

@@ -417,6 +417,7 @@ public class MainDashboard extends JFrame {
         addSidebarItem(menuContainer, "Báo Cáo Doanh Thu", "Ra quyết định tài chính & doanh thu chuỗi", () -> new BaoCaoThongKePanel(), accent, false);
         addSidebarItem(menuContainer, "Phân Tích Giờ Cao Điểm", "Quyết định xếp ca & mở rộng phòng 6h-22h", () -> new HeatmapGioCaoDiemPanel(), accent, false);
         addSidebarItem(menuContainer, "Lịch Sử Giao Dịch", "Kiểm toán, đối soát dòng tiền & hóa đơn", () -> new LichSuGiaoDichPanel(), accent, false);
+        addSidebarItem(menuContainer, "Nhật Ký Thao Tác (Audit)", "Kiểm toán nhật ký tạo/sửa/xóa hóa đơn & tài khoản", () -> new NhatKyHeThongPanel(), accent, false);
 
         addSidebarCategoryHeader(menuContainer, "Vận Hành Quầy & Dịch Vụ");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên & flap barrier", () -> new CheckInForm(), accent, false);

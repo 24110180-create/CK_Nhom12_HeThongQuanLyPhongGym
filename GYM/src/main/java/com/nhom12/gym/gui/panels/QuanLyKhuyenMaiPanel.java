@@ -1,5 +1,6 @@
 package com.nhom12.gym.gui.panels;
 
+import com.nhom12.gym.entity.HoiVienVipDacQuyen;
 import com.nhom12.gym.service.CheckInService;
 import com.nhom12.gym.service.VipPolicyService;
 import com.nhom12.gym.util.Auth;
@@ -200,7 +201,7 @@ public class QuanLyKhuyenMaiPanel extends JPanel {
 
         btnTestPrice.addActionListener(e -> {
             String role = cbRoleTest.getSelectedItem().toString().contains("Lễ tân") ? "Lễ tân" : "Chủ";
-            VipPolicyService.ThongTinGiaHienThi info = vipService.tinhGiaTheoPhanQuyen(role, "0909998877", "Đỗ Minh Trí", "VIP007", 6000000);
+            VipPolicyService.ThongTinGiaHienThi info = vipService.tinhGiaTheoPhanQuyen(role, "0901000001", "Nguyễn Văn A", "VIP007", 6000000);
             if ("Lễ tân".equals(role)) {
                 lblVipSecurityDemo.setText("<html>LỄ TÂN THẤY: <b>Giá thu: " + df.format(info.soTienThucThu)
                         + "</b> | Chiết khấu: <b>0 đ</b> | Ghi chú: <i>" + info.moTaGiaHienThi + "</i> (ẨN GIÁ GỐC THÀNH CÔNG!)</html>");
@@ -226,8 +227,8 @@ public class QuanLyKhuyenMaiPanel extends JPanel {
 
     private void loadVipTableData() {
         vipModel.setRowCount(0);
-        List<VipPolicyService.HoiVienVipDacQuyen> list = vipService.layDanhSachVip();
-        for (VipPolicyService.HoiVienVipDacQuyen v : list) {
+        List<HoiVienVipDacQuyen> list = vipService.layDanhSachVip();
+        for (HoiVienVipDacQuyen v : list) {
             vipModel.addRow(new Object[]{
                     v.getMaTheQR(),
                     v.getHoTen(),
@@ -250,10 +251,10 @@ public class QuanLyKhuyenMaiPanel extends JPanel {
             return;
         }
 
-        vipService.themVipDacQuyen(new VipPolicyService.HoiVienVipDacQuyen(code, name, phone, rel.isEmpty() ? "Người quen Anh Đức" : rel, 50.0, "Giảm 50% trọn đời - Bí mật nội bộ Chủ"));
+        vipService.themVipDacQuyen(new HoiVienVipDacQuyen(code, name, phone, rel.isEmpty() ? "Khách VIP nội bộ" : rel, 50.0, "Chính sách ưu đãi nội bộ"));
         loadVipTableData();
         txtVipCode.setText(""); txtVipName.setText(""); txtVipPhone.setText(""); txtVipRelation.setText("");
-        JOptionPane.showMessageDialog(this, "Đã thêm khách VIP '" + name + "' vào chính sách bí mật 50% của Anh Đức!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, "Đã thêm khách VIP '" + name + "' vào chính sách ưu đãi nội bộ!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void actionXoaVip() {

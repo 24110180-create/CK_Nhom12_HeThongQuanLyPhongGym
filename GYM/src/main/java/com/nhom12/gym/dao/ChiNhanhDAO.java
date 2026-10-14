@@ -95,6 +95,7 @@ public class ChiNhanhDAO {
         if (sf == null) {
             memoryCache.removeIf(item -> item.getMaChiNhanh().equalsIgnoreCase(cn.getMaChiNhanh()));
             memoryCache.add(cn);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.ALL);
             return true;
         }
 
@@ -106,6 +107,7 @@ public class ChiNhanhDAO {
 
             memoryCache.removeIf(item -> item.getMaChiNhanh().equalsIgnoreCase(cn.getMaChiNhanh()));
             memoryCache.add(cn);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.ALL);
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();

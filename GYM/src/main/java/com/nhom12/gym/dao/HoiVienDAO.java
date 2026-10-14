@@ -77,6 +77,10 @@ public class HoiVienDAO {
             // Offline mode: lưu vào memory cache
             memoryCache.add(0, hv);
             com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN);
+            new com.nhom12.gym.dao.NhatKyHeThongDAO().ghiLog(
+                    com.nhom12.gym.util.Auth.tenDangNhap, com.nhom12.gym.util.Auth.vaiTro, "Thêm hội viên mới",
+                    "Mã: " + hv.getMaTheQR() + ", Tên: " + hv.getHoTen()
+            );
             return true;
         }
 
@@ -89,6 +93,10 @@ public class HoiVienDAO {
             memoryCache.removeIf(item -> item.getMaHoiVien() == hv.getMaHoiVien() || item.getMaTheQR().equalsIgnoreCase(hv.getMaTheQR()));
             memoryCache.add(0, hv);
             com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN);
+            new com.nhom12.gym.dao.NhatKyHeThongDAO().ghiLog(
+                    com.nhom12.gym.util.Auth.tenDangNhap, com.nhom12.gym.util.Auth.vaiTro, "Thêm hội viên mới",
+                    "Mã: " + hv.getMaTheQR() + ", Tên: " + hv.getHoTen()
+            );
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
@@ -139,6 +147,10 @@ public class HoiVienDAO {
             boolean removed = memoryCache.removeIf(item -> item.getMaHoiVien() == maHoiVien);
             if (removed) {
                 com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN);
+                new com.nhom12.gym.dao.NhatKyHeThongDAO().ghiLog(
+                        com.nhom12.gym.util.Auth.tenDangNhap, com.nhom12.gym.util.Auth.vaiTro, "Xóa hội viên",
+                        "Mã hội viên: " + maHoiVien
+                );
             }
             return removed;
         }
@@ -152,6 +164,10 @@ public class HoiVienDAO {
                 tx.commit();
                 memoryCache.removeIf(item -> item.getMaHoiVien() == maHoiVien);
                 com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN);
+                new com.nhom12.gym.dao.NhatKyHeThongDAO().ghiLog(
+                        com.nhom12.gym.util.Auth.tenDangNhap, com.nhom12.gym.util.Auth.vaiTro, "Xóa hội viên",
+                        "Mã hội viên: " + maHoiVien + " (" + hv.getHoTen() + ")"
+                );
                 return true;
             }
             return false;

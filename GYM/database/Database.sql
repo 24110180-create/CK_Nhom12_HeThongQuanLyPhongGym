@@ -25,6 +25,8 @@ DROP TABLE IF EXISTS GoiTap;
 DROP TABLE IF EXISTS HoiVien;
 DROP TABLE IF EXISTS TaiKhoan;
 DROP TABLE IF EXISTS ChiNhanh;
+DROP TABLE IF EXISTS HoiVienVipDacQuyen;
+DROP TABLE IF EXISTS NhatKyHeThong;
 GO
 
 -- 2. BẢNG CHI NHÁNH CƠ SỞ (CORE DOMAIN - MÔ HÌNH CHUỖI ĐA CHI NHÁNH FITLIFE GYM)
@@ -259,4 +261,38 @@ INSERT INTO HoaDon (MaHoaDon, MaHoiVien, TenHoiVien, LoaiGiaoDich, TongTien, Gia
 ('HD2026-003', 4, N'Trần Minh Quân', N'Đăng ký Gói PT 1:1', 7500000.00, 500000.00, 7000000.00, N'Chuyển khoản VietQR', 'letan1', N'CN01 - Cơ sở 1 (Quận 1)', DATEADD(DAY, -3, GETDATE()), N'Đã thanh toán', N'30 buổi cùng HLV Trần Tuấn Kiệt'),
 ('HD2026-004', 5, N'Hoàng Thùy Linh', N'Thuê tủ Locker 6 tháng', 600000.00, 0.00, 600000.00, N'Tiền mặt', 'letan1', N'CN02 - Cơ sở 2 (Tân Bình)', DATEADD(DAY, -2, GETDATE()), N'Đã thanh toán', N'Locker VIP A12'),
 ('HD2026-005', 6, N'Đỗ Minh Trí', N'Đăng ký gói 6 Tháng', 2500000.00, 200000.00, 2300000.00, N'Chuyển khoản VietQR', 'admin', N'CN02 - Cơ sở 2 (Tân Bình)', DATEADD(DAY, -1, GETDATE()), N'Đã thanh toán', N'Khách VIP hệ thống');
+GO
+
+-- 10. BẢNG HỘI VIÊN VIP ĐẶC QUYỀN (CHÍNH SÁCH ƯU ĐÃI NỘI BỘ BẢO MẬT GIÁ THỰC)
+CREATE TABLE HoiVienVipDacQuyen (
+    MaThe VARCHAR(30) PRIMARY KEY,
+    HoTen NVARCHAR(100) NOT NULL,
+    SoDienThoai VARCHAR(15) NOT NULL,
+    MoTaNoiBo NVARCHAR(200),
+    TiLeGiam DECIMAL(5,2) NOT NULL DEFAULT 50.0,
+    GhiChuBaoMat NVARCHAR(200)
+);
+GO
+
+INSERT INTO HoiVienVipDacQuyen (MaThe, HoTen, SoDienThoai, MoTaNoiBo, TiLeGiam, GhiChuBaoMat) VALUES
+('VIP007', N'Nguyễn Văn A', '0901000001', N'Khách VIP lâu năm', 50.0, N'Chính sách ưu đãi nội bộ'),
+('VIP008', N'Trần Thị B', '0902000002', N'Đối tác chiến lược', 50.0, N'Chính sách ưu đãi nội bộ'),
+('VIP009', N'Lê Văn C', '0903000003', N'Hội viên danh dự', 50.0, N'Chính sách ưu đãi nội bộ');
+GO
+
+-- 11. BẢNG NHẬT KÝ THAO TÁC HỆ THỐNG (AUDIT LOG - CHỐNG THẤT THOÁT DOANH THU)
+CREATE TABLE NhatKyHeThong (
+    MaNhatKy INT PRIMARY KEY IDENTITY,
+    TenDangNhap VARCHAR(50) NOT NULL,
+    VaiTro NVARCHAR(50),
+    HanhDong NVARCHAR(100) NOT NULL,
+    ChiTiet NVARCHAR(500),
+    ThoiGian DATETIME DEFAULT GETDATE()
+);
+GO
+
+INSERT INTO NhatKyHeThong (TenDangNhap, VaiTro, HanhDong, ChiTiet, ThoiGian) VALUES
+('admin', N'Chủ', N'Đăng nhập hệ thống', N'Đăng nhập thành công', DATEADD(MINUTE, -120, GETDATE())),
+('letan1', N'Lễ tân', N'Tạo hóa đơn', N'Mã: HD2026-001, Số tiền: 4500000.0', DATEADD(MINUTE, -90, GETDATE())),
+('letan1', N'Lễ tân', N'Thêm hội viên mới', N'Mã thẻ: QR001, Họ tên: Lê Anh Duy', DATEADD(MINUTE, -85, GETDATE()));
 GO

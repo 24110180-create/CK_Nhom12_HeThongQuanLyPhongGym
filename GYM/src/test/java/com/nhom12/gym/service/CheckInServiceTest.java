@@ -143,21 +143,21 @@ public class CheckInServiceTest {
     }
 
     @Test
-    @DisplayName("Yêu Cầu Ẩn 1: VIP 50% Anh Đức - Lễ tân hoàn toàn không thấy giá gốc & không thấy chiết khấu 50%")
+    @DisplayName("Yêu Cầu Ẩn 1: VIP 50% - Lễ tân hoàn toàn không thấy giá gốc & không thấy chiết khấu 50%")
     void testYeuCauAn1_VipPolicyService_BaoMatGiaThuc() {
         VipPolicyService vipService = VipPolicyService.getInstance();
         double giaGoc = 6000000; // Gói 12 tháng 6.000.000 đ
 
-        // Lễ tân tra cứu khách VIP của Anh Đức (Đỗ Minh Trí - VIP007)
-        VipPolicyService.ThongTinGiaHienThi infoLeTan = vipService.tinhGiaTheoPhanQuyen("Lễ tân", "0909998877", "Đỗ Minh Trí", "VIP007", giaGoc);
+        // Lễ tân tra cứu khách VIP đặc quyền (VIP007)
+        VipPolicyService.ThongTinGiaHienThi infoLeTan = vipService.tinhGiaTheoPhanQuyen("Lễ tân", "0901000001", "Nguyễn Văn A", "VIP007", giaGoc);
         assertTrue(infoLeTan.isVipDacQuyen);
         assertEquals(3000000, infoLeTan.soTienThucThu, "Số tiền thực thu phải là 50% (3 triệu)");
         assertEquals(3000000, infoLeTan.giaGoc, "Giá gốc hiển thị cho Lễ tân phải bị tráo thành giá thực thu để giấu giá thực!");
         assertEquals(0, infoLeTan.soTienGiam, "Số tiền giảm hiển thị cho Lễ tân phải bằng 0 để giấu dòng chiết khấu");
         assertFalse(infoLeTan.choPhepNhanVienThayGiaGoc, "Phải chặn quyền xem giá gốc đối với Lễ tân");
 
-        // Chủ phòng tập (Anh Đức) tra cứu
-        VipPolicyService.ThongTinGiaHienThi infoChu = vipService.tinhGiaTheoPhanQuyen("Chủ", "0909998877", "Đỗ Minh Trí", "VIP007", giaGoc);
+        // Chủ phòng tập tra cứu
+        VipPolicyService.ThongTinGiaHienThi infoChu = vipService.tinhGiaTheoPhanQuyen("Chủ", "0901000001", "Nguyễn Văn A", "VIP007", giaGoc);
         assertTrue(infoChu.isVipDacQuyen);
         assertEquals(6000000, infoChu.giaGoc, "Chủ phải thấy đầy đủ giá niêm yết gốc 6 triệu");
         assertEquals(3000000, infoChu.soTienGiam, "Chủ phải thấy rõ chiết khấu 3 triệu");

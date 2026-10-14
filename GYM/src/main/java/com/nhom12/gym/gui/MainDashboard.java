@@ -45,11 +45,46 @@ public class MainDashboard extends JFrame {
         public Color accent;
     }
 
+    private static MainDashboard instance;
+
+    public static MainDashboard getInstance() {
+        return instance;
+    }
+
+    public void navigateTo(String moduleTitle) {
+        navigateTo(moduleTitle, -1);
+    }
+
+    public void navigateTo(String moduleTitle, int tabIndex) {
+        if (moduleTitle == null) return;
+        for (SidebarMenuItem item : sidebarMenuItems) {
+            if (item.title != null && item.title.toLowerCase().contains(moduleTitle.toLowerCase())) {
+                selectSidebarItem(item);
+                if (tabIndex >= 0) {
+                    SwingUtilities.invokeLater(() -> {
+                        for (Component comp : workspaceContainer.getComponents()) {
+                            if (comp instanceof QuanLyHoiVienHubPanel) {
+                                ((QuanLyHoiVienHubPanel) comp).selectTab(tabIndex);
+                            } else if (comp instanceof JScrollPane) {
+                                Component view = ((JScrollPane) comp).getViewport().getView();
+                                if (view instanceof QuanLyHoiVienHubPanel) {
+                                    ((QuanLyHoiVienHubPanel) view).selectTab(tabIndex);
+                                }
+                            }
+                        }
+                    });
+                }
+                return;
+            }
+        }
+    }
+
     public MainDashboard() {
         this((Auth.vaiTro != null && !Auth.vaiTro.trim().isEmpty()) ? Auth.vaiTro : "Chủ");
     }
 
     public MainDashboard(String initialRole) {
+        instance = this;
         this.currentRole = (initialRole != null && !initialRole.trim().isEmpty()) ? initialRole : "Chủ";
         setTitle("FitLife Gym Management - " + getRoleDisplayName(currentRole));
         setSize(1400, 850);

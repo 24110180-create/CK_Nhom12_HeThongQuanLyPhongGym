@@ -61,7 +61,7 @@ public class HoiVienDAO {
         SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf != null) {
             try (Session session = sf.openSession()) {
-                List<HoiVien> list = session.createQuery("FROM HoiVien ORDER BY maHoiVien DESC", HoiVien.class).list();
+                List<HoiVien> list = session.createQuery("FROM HoiVien WHERE maTheQR NOT LIKE 'QR_TEST_%' ORDER BY maHoiVien DESC", HoiVien.class).list();
                 if (list != null && !list.isEmpty()) {
                     memoryCache.clear();
                     memoryCache.addAll(list);
@@ -75,6 +75,7 @@ public class HoiVienDAO {
             }
         }
         for (HoiVien item : memoryCache) {
+            if (item.getMaTheQR() != null && item.getMaTheQR().startsWith("QR_TEST_")) continue;
             result.add(sanitizeHoiVien(item));
         }
         return result;

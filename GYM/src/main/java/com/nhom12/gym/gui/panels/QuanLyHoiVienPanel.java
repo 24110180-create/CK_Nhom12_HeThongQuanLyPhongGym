@@ -144,7 +144,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         JLabel lblFStatus = new JLabel("Trạng thái:");
         lblFStatus.setFont(new Font("Segoe UI", Font.BOLD, 12));
         JComboBox<String> cbFilterStatus = new JComboBox<>(new String[]{
-                "Tất Cả Trạng Thái", "Active (Đang hoạt động)", "Expired (Hết hạn)", "Locked (Tạm khóa)"
+                "Tất Cả Trạng Thái", "Active (Đang hoạt động)", "Expired (Hết hạn)", "Locked (Tạm khóa)", "⚠️ Sắp Hết Hạn (Trong 7 ngày tới)"
         });
         cbFilterStatus.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
@@ -239,6 +239,22 @@ public class QuanLyHoiVienPanel extends JPanel {
                 filters.add(RowFilter.regexFilter("(?i)Expired|Hết hạn", 10));
             } else if (stIdx == 3) {
                 filters.add(RowFilter.regexFilter("(?i)Locked|Khóa", 10));
+            } else if (stIdx == 4) {
+                filters.add(new RowFilter<Object, Object>() {
+                    @Override
+                    public boolean include(Entry<?, ?> entry) {
+                        Object val = entry.getValue(9);
+                        if (val == null) return false;
+                        try {
+                            Date d = new SimpleDateFormat("dd/MM/yyyy").parse(val.toString().trim());
+                            long diff = d.getTime() - System.currentTimeMillis();
+                            long days = diff / (1000L * 60 * 60 * 24);
+                            return days >= -3 && days <= 7;
+                        } catch (Exception ex) {
+                            return false;
+                        }
+                    }
+                });
             }
 
             if (filters.isEmpty()) {

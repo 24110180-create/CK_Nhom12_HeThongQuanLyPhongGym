@@ -63,6 +63,8 @@ public class HibernateUtil {
             cfg.addAnnotatedClass(HoaDon.class);
             cfg.addAnnotatedClass(HuanLuyenVien.class);
             cfg.addAnnotatedClass(DangKyLop.class);
+            cfg.addAnnotatedClass(PhanCaLamViec.class);
+            cfg.addAnnotatedClass(LichPT.class);
 
             // Nạp cấu hình từ database.properties (hoặc ghi đè từ biến môi trường)
             Properties dbProps = loadDatabaseProperties();

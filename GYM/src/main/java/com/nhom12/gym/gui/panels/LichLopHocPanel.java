@@ -50,6 +50,7 @@ public class LichLopHocPanel extends JPanel {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(380);
         splitPane.setDividerSize(6);
+        splitPane.setResizeWeight(0.36);
         splitPane.setOpaque(false);
         splitPane.setBorder(null);
 
@@ -83,6 +84,7 @@ public class LichLopHocPanel extends JPanel {
         formGrid.add(lCode, gbc);
         gbc.gridy = r++;
         txtMaLop = new JTextField(); txtMaLop.setFont(fontInput);
+        styleInput(txtMaLop);
         formGrid.add(txtMaLop, gbc);
 
         // Class Name
@@ -92,6 +94,7 @@ public class LichLopHocPanel extends JPanel {
         gbc.gridy = r++;
         cbTenLop = new JComboBox<>(new String[]{"Yoga Cổ Điển", "Zumba Dance", "Boxing & Kickfit", "Pilates Giảm Mỡ", "Cardio BodyCombat"});
         cbTenLop.setFont(fontInput);
+        styleInput(cbTenLop);
         formGrid.add(cbTenLop, gbc);
 
         // Coach
@@ -101,6 +104,7 @@ public class LichLopHocPanel extends JPanel {
         gbc.gridy = r++;
         cbHLV = new JComboBox<>(new String[]{"HLV John Smith", "HLV Phạm Quốc Bảo", "HLV Anh Tuấn", "HLV Thu Hà"});
         cbHLV.setFont(fontInput);
+        styleInput(cbHLV);
         formGrid.add(cbHLV, gbc);
 
         // Room
@@ -110,6 +114,7 @@ public class LichLopHocPanel extends JPanel {
         gbc.gridy = r++;
         cbPhong = new JComboBox<>(new String[]{"Phòng 01 (Yoga/Pilates)", "Phòng 02 (Zumba/Aerobic)", "Sàn Đấu Boxing", "Khu Functional"});
         cbPhong.setFont(fontInput);
+        styleInput(cbPhong);
         formGrid.add(cbPhong, gbc);
 
         // Schedule & Days
@@ -119,6 +124,7 @@ public class LichLopHocPanel extends JPanel {
         gbc.gridy = r++;
         cbGio = new JComboBox<>(new String[]{"07:00 - 08:30", "09:00 - 10:30", "15:00 - 16:30", "18:00 - 19:30", "19:45 - 21:00"});
         cbGio.setFont(fontInput);
+        styleInput(cbGio);
         formGrid.add(cbGio, gbc);
 
         gbc.gridy = r++;
@@ -127,6 +133,7 @@ public class LichLopHocPanel extends JPanel {
         gbc.gridy = r++;
         cbThu = new JComboBox<>(new String[]{"Thứ 2 - 4 - 6", "Thứ 3 - 5 - 7", "Thứ 7 & Chủ Nhật", "Cả tuần (T2 - T7)"});
         cbThu.setFont(fontInput);
+        styleInput(cbThu);
         formGrid.add(cbThu, gbc);
 
         // Max Students
@@ -136,6 +143,7 @@ public class LichLopHocPanel extends JPanel {
         gbc.gridy = r++;
         txtMaxStudent = new JTextField("25");
         txtMaxStudent.setFont(fontInput);
+        styleInput(txtMaxStudent);
         formGrid.add(txtMaxStudent, gbc);
 
         gbc.gridy = r++;
@@ -152,21 +160,25 @@ public class LichLopHocPanel extends JPanel {
         btnAdd.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnAdd.setBackground(new Color(16, 185, 129));
         btnAdd.setForeground(Color.WHITE);
+        styleActionButton(btnAdd);
 
         btnUpdate = new JButton("Cập Nhật");
         btnUpdate.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnUpdate.setBackground(new Color(37, 99, 235));
         btnUpdate.setForeground(Color.WHITE);
+        styleActionButton(btnUpdate);
 
         btnDelete = new JButton("Hủy Lớp");
         btnDelete.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnDelete.setBackground(new Color(239, 68, 68));
         btnDelete.setForeground(Color.WHITE);
+        styleActionButton(btnDelete);
 
         btnClear = new JButton("Làm Mới");
         btnClear.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnClear.setBackground(new Color(100, 116, 139));
         btnClear.setForeground(Color.WHITE);
+        styleActionButton(btnClear);
 
         btnPanel.add(btnAdd);
         btnPanel.add(btnUpdate);
@@ -194,6 +206,8 @@ public class LichLopHocPanel extends JPanel {
         lblSearch.setFont(new Font("Segoe UI", Font.BOLD, 13));
         txtSearch = new JTextField(15);
         txtSearch.setFont(fontInput);
+        txtSearch.putClientProperty("JTextField.placeholderText", "Tên lớp, HLV hoặc khung giờ...");
+        styleInput(txtSearch);
         pSearch.add(lblSearch);
         pSearch.add(txtSearch);
         rightTop.add(pSearch, BorderLayout.WEST);
@@ -206,12 +220,14 @@ public class LichLopHocPanel extends JPanel {
         btnBook.setBackground(new Color(16, 185, 129));
         btnBook.setForeground(Color.WHITE);
         btnBook.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        styleActionButton(btnBook);
 
         JButton btnDiemDanh = new JButton("📋 Danh Sách Điểm Danh");
         btnDiemDanh.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnDiemDanh.setBackground(new Color(37, 99, 235));
         btnDiemDanh.setForeground(Color.WHITE);
         btnDiemDanh.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        styleActionButton(btnDiemDanh);
         btnDiemDanh.addActionListener(e -> moDialogDiemDanh());
 
         JButton btnExport = new JButton("📊 Xuất Excel");
@@ -219,6 +235,7 @@ public class LichLopHocPanel extends JPanel {
         btnExport.setBackground(new Color(241, 245, 249));
         btnExport.setForeground(new Color(15, 118, 110));
         btnExport.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        styleActionButton(btnExport);
         btnExport.addActionListener(e -> com.nhom12.gym.util.ExcelExportHelper.exportTableToExcel(this, table, "LichLopHoc_FitLife"));
 
         pButtons.add(btnBook);
@@ -248,6 +265,7 @@ public class LichLopHocPanel extends JPanel {
         table.setFont(fontInput);
         table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         table.getTableHeader().setBackground(new Color(241, 245, 249));
+        styleDataTable(table, 1, 2);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         sorter = new TableRowSorter<>(model);
         table.setRowSorter(sorter);
@@ -260,7 +278,7 @@ public class LichLopHocPanel extends JPanel {
             private void filter() {
                 String text = txtSearch.getText().trim();
                 if (text.isEmpty()) sorter.setRowFilter(null);
-                else sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+                else sorter.setRowFilter(RowFilter.regexFilter("(?i)" + java.util.regex.Pattern.quote(text)));
             }
         });
 
@@ -462,14 +480,20 @@ public class LichLopHocPanel extends JPanel {
         tbl.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         tbl.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
         tbl.getTableHeader().setBackground(new Color(241, 245, 249));
+        styleDataTable(tbl, 1, 4);
 
         tbl.getColumnModel().getColumn(3).setCellRenderer(new javax.swing.table.DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable t, Object val, boolean isSel, boolean hasFocus, int r, int c) {
                 JLabel l = (JLabel) super.getTableCellRendererComponent(t, val, isSel, hasFocus, r, c);
                 l.setHorizontalAlignment(SwingConstants.CENTER);
+                l.setBackground(isSel ? t.getSelectionBackground() : (r % 2 == 0 ? Color.WHITE : new Color(248, 250, 252)));
+                l.setOpaque(true);
                 String s = (val != null) ? val.toString() : "";
-                if ("ĐÃ ĐIỂM DANH".equalsIgnoreCase(s)) {
+                if (isSel) {
+                    l.setForeground(t.getSelectionForeground());
+                    l.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                } else if ("ĐÃ ĐIỂM DANH".equalsIgnoreCase(s)) {
                     l.setForeground(new Color(16, 185, 129));
                     l.setFont(new Font("Segoe UI", Font.BOLD, 11));
                 } else if ("VẮNG MẶT".equalsIgnoreCase(s)) {
@@ -493,6 +517,7 @@ public class LichLopHocPanel extends JPanel {
         btnCoMat.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnCoMat.setBackground(new Color(16, 185, 129));
         btnCoMat.setForeground(Color.WHITE);
+        styleActionButton(btnCoMat);
         btnCoMat.addActionListener(e -> {
             int r = tbl.getSelectedRow();
             if (r >= 0) {
@@ -507,6 +532,7 @@ public class LichLopHocPanel extends JPanel {
         btnVang.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnVang.setBackground(new Color(239, 68, 68));
         btnVang.setForeground(Color.WHITE);
+        styleActionButton(btnVang);
         btnVang.addActionListener(e -> {
             int r = tbl.getSelectedRow();
             if (r >= 0) {
@@ -520,10 +546,12 @@ public class LichLopHocPanel extends JPanel {
         btnXuatEx.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnXuatEx.setBackground(new Color(241, 245, 249));
         btnXuatEx.setForeground(new Color(15, 118, 110));
+        styleActionButton(btnXuatEx);
         btnXuatEx.addActionListener(e -> com.nhom12.gym.util.ExcelExportHelper.exportTableToExcel(dlg, tbl, "DiemDanh_" + maLop));
 
         JButton btnClose = new JButton("Đóng");
         btnClose.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        styleActionButton(btnClose);
         btnClose.addActionListener(e -> dlg.dispose());
 
         pBot.add(btnCoMat);
@@ -533,5 +561,53 @@ public class LichLopHocPanel extends JPanel {
         dlg.add(pBot, BorderLayout.SOUTH);
 
         dlg.setVisible(true);
+    }
+
+    private void styleDataTable(JTable dataTable, int... leftAlignedColumns) {
+        dataTable.getTableHeader().setForeground(new Color(30, 41, 59));
+        dataTable.getTableHeader().setPreferredSize(new Dimension(0, 40));
+        dataTable.setShowVerticalLines(false);
+        dataTable.setGridColor(new Color(226, 232, 240));
+        dataTable.setSelectionBackground(new Color(219, 234, 254));
+        dataTable.setSelectionForeground(new Color(15, 23, 42));
+        dataTable.setFillsViewportHeight(true);
+        dataTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable source, Object value, boolean selected, boolean focus, int row, int column) {
+                Component component = super.getTableCellRendererComponent(source, value, selected, focus, row, column);
+                if (!selected) component.setBackground(row % 2 == 0 ? Color.WHITE : new Color(248, 250, 252));
+                boolean leftAligned = false;
+                for (int leftColumn : leftAlignedColumns) {
+                    if (column == leftColumn) leftAligned = true;
+                }
+                setHorizontalAlignment(leftAligned ? SwingConstants.LEFT : SwingConstants.CENTER);
+                setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+                return component;
+            }
+        });
+    }
+
+    private void styleInput(JComponent component) {
+        component.putClientProperty("JComponent.roundRect", true);
+        component.setPreferredSize(new Dimension(component.getPreferredSize().width, 36));
+    }
+
+    private void styleActionButton(JButton button) {
+        Color normalColor = button.getBackground();
+        button.putClientProperty("JButton.buttonType", "roundRect");
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                if (button.isEnabled()) button.setBackground(normalColor.brighter());
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                button.setBackground(normalColor);
+            }
+        });
     }
 }

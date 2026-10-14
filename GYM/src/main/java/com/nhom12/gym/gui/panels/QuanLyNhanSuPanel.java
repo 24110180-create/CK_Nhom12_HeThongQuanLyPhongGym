@@ -12,6 +12,7 @@ import java.awt.Insets;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -26,6 +27,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class QuanLyNhanSuPanel extends JPanel {
     private JTextField txtUsername;
@@ -68,6 +71,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(380);
         splitPane.setDividerSize(6);
+        splitPane.setResizeWeight(0.34);
         splitPane.setOpaque(false);
         splitPane.setBorder(null);
 
@@ -104,6 +108,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         gbc.gridy = row++;
         txtUsername = new JTextField();
         txtUsername.setFont(fontInput);
+        styleInput(txtUsername);
         formGrid.add(txtUsername, gbc);
 
         // Password
@@ -115,6 +120,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         gbc.gridy = row++;
         txtPassword = new JTextField("123456");
         txtPassword.setFont(fontInput);
+        styleInput(txtPassword);
         formGrid.add(txtPassword, gbc);
 
         // Full Name
@@ -126,6 +132,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         gbc.gridy = row++;
         txtFullName = new JTextField();
         txtFullName.setFont(fontInput);
+        styleInput(txtFullName);
         formGrid.add(txtFullName, gbc);
 
         // Role
@@ -137,6 +144,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         gbc.gridy = row++;
         cbRole = new JComboBox<>(new String[]{"Lễ tân", "HLV", "Quản lý", "Chủ"});
         cbRole.setFont(fontInput);
+        styleInput(cbRole);
         formGrid.add(cbRole, gbc);
 
         // Salary
@@ -148,6 +156,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         gbc.gridy = row++;
         txtSalary = new JTextField("7,500,000");
         txtSalary.setFont(fontInput);
+        styleInput(txtSalary);
         formGrid.add(txtSalary, gbc);
 
         // Status
@@ -159,6 +168,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         gbc.gridy = row++;
         cbStatus = new JComboBox<>(new String[]{"Hoạt động", "Tạm khóa"});
         cbStatus.setFont(fontInput);
+        styleInput(cbStatus);
         formGrid.add(cbStatus, gbc);
 
         gbc.gridy = row++;
@@ -196,6 +206,10 @@ public class QuanLyNhanSuPanel extends JPanel {
         btnClear.setBackground(new Color(100, 116, 139));
         btnClear.setForeground(Color.WHITE);
 
+        for (JButton button : new JButton[]{btnAdd, btnUpdate, btnToggleLock, btnDelete, btnClear}) {
+            styleActionButton(button);
+        }
+
         buttonGrid.add(btnAdd);
         buttonGrid.add(btnUpdate);
         buttonGrid.add(btnToggleLock);
@@ -220,8 +234,14 @@ public class QuanLyNhanSuPanel extends JPanel {
         lblSearch.setFont(new Font("Segoe UI", Font.BOLD, 13));
         txtSearch = new JTextField(20);
         txtSearch.setFont(fontInput);
+        txtSearch.putClientProperty("JTextField.placeholderText", "Tên, tài khoản hoặc vai trò...");
+        styleInput(txtSearch);
+        JComboBox<String> filterStatus = new JComboBox<>(new String[]{"Tất cả trạng thái", "Hoạt động", "Tạm khóa"});
+        filterStatus.setFont(fontInput);
+        styleInput(filterStatus);
         searchBar.add(lblSearch);
         searchBar.add(txtSearch);
+        searchBar.add(filterStatus);
         rightPanel.add(searchBar, BorderLayout.NORTH);
 
         // Table
@@ -246,24 +266,60 @@ public class QuanLyNhanSuPanel extends JPanel {
         table.setFont(fontInput);
         table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
         table.getTableHeader().setBackground(new Color(241, 245, 249));
+        table.getTableHeader().setForeground(new Color(30, 41, 59));
+        table.getTableHeader().setPreferredSize(new Dimension(0, 40));
+        table.setShowVerticalLines(false);
+        table.setGridColor(new Color(226, 232, 240));
+        table.setSelectionBackground(new Color(219, 234, 254));
+        table.setSelectionForeground(new Color(15, 23, 42));
+        table.setFillsViewportHeight(true);
+        table.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
+            @Override
+            public java.awt.Component getTableCellRendererComponent(JTable source, Object value, boolean selected, boolean focus, int row, int column) {
+                java.awt.Component component = super.getTableCellRendererComponent(source, value, selected, focus, row, column);
+                setFont(source.getFont());
+                setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+                if (selected) {
+                    component.setBackground(source.getSelectionBackground());
+                    component.setForeground(source.getSelectionForeground());
+                } else if (column == 4) {
+                    String status = value == null ? "" : value.toString();
+                    boolean locked = "Tạm khóa".equalsIgnoreCase(status);
+                    component.setBackground(locked ? new Color(254, 242, 242) : new Color(240, 253, 244));
+                    component.setForeground(locked ? new Color(185, 28, 28) : new Color(21, 128, 61));
+                } else {
+                    component.setBackground(row % 2 == 0 ? Color.WHITE : new Color(248, 250, 252));
+                    component.setForeground(new Color(51, 65, 85));
+                }
+                setHorizontalAlignment(column == 1 ? JLabel.LEFT : JLabel.CENTER);
+                if (column == 4) setFont(getFont().deriveFont(Font.BOLD));
+                return component;
+            }
+        });
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         sorter = new TableRowSorter<>(model);
         table.setRowSorter(sorter);
 
+        Runnable applyFilters = () -> {
+            List<RowFilter<Object, Object>> filters = new ArrayList<>();
+            String text = txtSearch.getText().trim();
+            if (!text.isEmpty()) {
+                filters.add(RowFilter.regexFilter("(?i)" + java.util.regex.Pattern.quote(text)));
+            }
+            String status = (String) filterStatus.getSelectedItem();
+            if (status != null && !"Tất cả trạng thái".equals(status)) {
+                filters.add(RowFilter.regexFilter("^" + java.util.regex.Pattern.quote(status) + "$", 4));
+            }
+            sorter.setRowFilter(filters.isEmpty() ? null : RowFilter.andFilter(filters));
+        };
+
         // Search filter listener
         txtSearch.getDocument().addDocumentListener(new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) { filter(); }
-            public void removeUpdate(DocumentEvent e) { filter(); }
-            public void changedUpdate(DocumentEvent e) { filter(); }
-            private void filter() {
-                String text = txtSearch.getText().trim();
-                if (text.isEmpty()) {
-                    sorter.setRowFilter(null);
-                } else {
-                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
-                }
-            }
+            public void insertUpdate(DocumentEvent e) { applyFilters.run(); }
+            public void removeUpdate(DocumentEvent e) { applyFilters.run(); }
+            public void changedUpdate(DocumentEvent e) { applyFilters.run(); }
         });
+        filterStatus.addActionListener(e -> applyFilters.run());
 
         // Table Selection -> Form Populate
         table.getSelectionModel().addListSelectionListener(e -> {
@@ -313,6 +369,30 @@ public class QuanLyNhanSuPanel extends JPanel {
         model.addRow(new Object[]{username, fullname, role, salary, status});
         JOptionPane.showMessageDialog(this, "Thêm nhân viên '" + fullname + "' thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
         actionLamMoi();
+    }
+
+    private void styleInput(JComponent component) {
+        component.putClientProperty("JComponent.roundRect", true);
+        component.setPreferredSize(new Dimension(component.getPreferredSize().width, 36));
+    }
+
+    private void styleActionButton(JButton button) {
+        Color normalColor = button.getBackground();
+        button.putClientProperty("JButton.buttonType", "roundRect");
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                if (button.isEnabled()) button.setBackground(normalColor.brighter());
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                button.setBackground(normalColor);
+            }
+        });
     }
 
     private void actionCapNhat() {

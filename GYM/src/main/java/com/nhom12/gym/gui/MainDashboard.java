@@ -351,89 +351,22 @@ public class MainDashboard extends JFrame {
         // Bỏ nút Quét QR Check-in ở header đối với role HLV
         boolean hideQuickCheckIn = "HLV".equalsIgnoreCase(role);
 
-        // Dropdown chuyển góc nhìn (CHỈ DÀNH RIÊNG CHO CHỦ PHÒNG TẬP)
-        boolean isRealOwner = "Chủ".equalsIgnoreCase(Auth.vaiTro);
-        if (isRealOwner) {
-            JLabel lblGoc = new JLabel("Góc nhìn:");
-            lblGoc.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-            lblGoc.setForeground(new Color(100, 116, 139));
-
-            JComboBox<String> cbStaffView = new JComboBox<>(new String[]{
-                    "Chủ Phòng Tập",
-                    "Trạm Lễ Tân",
-                    "Trạm HLV",
-                    "Trạm Quản Lý"
-            });
-            cbStaffView.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-            cbStaffView.setPreferredSize(new Dimension(140, 30));
-
-            if ("Lễ tân".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(1);
-            else if ("HLV".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(2);
-            else if ("Quản lý".equalsIgnoreCase(role)) cbStaffView.setSelectedIndex(3);
-            else cbStaffView.setSelectedIndex(0);
-
-            cbStaffView.addActionListener(e -> {
-                int s = cbStaffView.getSelectedIndex();
-                if (s == 1) buildVerticalWorkstationLayout("Lễ tân");
-                else if (s == 2) buildVerticalWorkstationLayout("HLV");
-                else if (s == 3) buildVerticalWorkstationLayout("Quản lý");
-                else buildVerticalWorkstationLayout("Chủ");
-                revalidate();
-                repaint();
-            });
-
-            // Bộ lọc chi nhánh dành cho Chủ phòng
-            JLabel lblBranchHead = new JLabel("Cơ sở:");
-            lblBranchHead.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-            lblBranchHead.setForeground(new Color(100, 116, 139));
-
-            JComboBox<String> cbBranchSelector = new JComboBox<>(new String[]{
-                    "Toàn hệ thống",
-                    "CN01 - Cơ sở 1 (Quận 1)",
-                    "CN02 - Cơ sở 2 (Tân Bình)"
-            });
-            cbBranchSelector.setFont(new Font("Segoe UI", Font.BOLD, 11));
-            cbBranchSelector.setPreferredSize(new Dimension(175, 30));
-            if (Auth.chiNhanhDangChon != null) {
-                if (Auth.chiNhanhDangChon.contains("CN01")) cbBranchSelector.setSelectedIndex(1);
-                else if (Auth.chiNhanhDangChon.contains("CN02")) cbBranchSelector.setSelectedIndex(2);
-                else cbBranchSelector.setSelectedIndex(0);
-            }
-            cbBranchSelector.addActionListener(e -> {
-                String selected = (String) cbBranchSelector.getSelectedItem();
-                Auth.chiNhanhDangChon = selected;
-                if (lblSidebarBranch != null) {
-                    lblSidebarBranch.setText("Cơ sở: " + Auth.getChiNhanhHienTai());
-                }
-                if (currentSelectedItem != null) {
-                    selectSidebarItem(currentSelectedItem);
-                }
-            });
-
-            if (!hideQuickCheckIn) {
-                headerRight.add(btnQuickCheckIn);
-            }
-            headerRight.add(lblGoc);
-            headerRight.add(cbStaffView);
-            headerRight.add(lblBranchHead);
-            headerRight.add(cbBranchSelector);
-        } else {
-            // Đối với nhân sự (Lễ tân, HLV, Quản lý): Cố định chi nhánh công tác, không có dropdown đổi góc nhìn
-            JLabel lblStaffBranchBadge = new JLabel(" Cơ sở: " + Auth.getChiNhanhHienTai() + " ");
-            lblStaffBranchBadge.setFont(new Font("Segoe UI", Font.BOLD, 11));
-            lblStaffBranchBadge.setForeground(new Color(30, 41, 59));
-            lblStaffBranchBadge.setBackground(new Color(241, 245, 249));
-            lblStaffBranchBadge.setOpaque(true);
-            lblStaffBranchBadge.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(203, 213, 225), 1),
-                    new EmptyBorder(4, 8, 4, 8)
-            ));
-
-            if (!hideQuickCheckIn) {
-                headerRight.add(btnQuickCheckIn);
-            }
-            headerRight.add(lblStaffBranchBadge);
+        if (!hideQuickCheckIn) {
+            headerRight.add(btnQuickCheckIn);
         }
+
+        // Huy hiệu cơ sở hoạt động (Trực quan, trang nhã, đồng bộ theo phiên làm việc)
+        String branchText = Auth.getChiNhanhHienTai();
+        JLabel lblBranchBadge = new JLabel("Cơ sở: " + branchText);
+        lblBranchBadge.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        lblBranchBadge.setForeground(new Color(51, 65, 85));
+        lblBranchBadge.setBackground(new Color(241, 245, 249));
+        lblBranchBadge.setOpaque(true);
+        lblBranchBadge.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(203, 213, 225), 1),
+                new EmptyBorder(5, 10, 5, 10)
+        ));
+        headerRight.add(lblBranchBadge);
 
         String today = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
         JLabel lblDate = new JLabel("Ngày: " + today);

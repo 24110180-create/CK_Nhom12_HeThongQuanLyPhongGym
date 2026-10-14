@@ -58,11 +58,11 @@ public class ChiTietHoiVienPanel extends JPanel {
         centerPanel.setOpaque(false);
 
         // Search Bar Top
-        JPanel searchBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 10));
+        JPanel searchBar = new JPanel(new BorderLayout(0, 8));
         searchBar.setBackground(Color.WHITE);
         searchBar.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(226, 232, 240)),
-                BorderFactory.createEmptyBorder(5, 10, 5, 10)
+            BorderFactory.createEmptyBorder(12, 14, 12, 14)
         ));
 
         JLabel lSearch = new JLabel("Tra Cứu Mã HV / SĐT:");
@@ -70,31 +70,46 @@ public class ChiTietHoiVienPanel extends JPanel {
         searchBar.add(lSearch);
         txtSearch = new JTextField("HV001", 15);
         txtSearch.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        searchBar.add(txtSearch);
+        txtSearch.putClientProperty("JComponent.roundRect", true);
+        txtSearch.setPreferredSize(new Dimension(txtSearch.getPreferredSize().width, 38));
 
         btnSearch = new JButton("Tìm Kiếm Hồ Sơ");
         btnSearch.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnSearch.setBackground(new Color(37, 99, 235));
         btnSearch.setForeground(Color.WHITE);
-        searchBar.add(btnSearch);
+        styleActionButton(btnSearch);
+
+        JPanel searchControls = new JPanel(new BorderLayout(10, 0));
+        searchControls.setOpaque(false);
+        searchControls.add(lSearch, BorderLayout.WEST);
+        searchControls.add(txtSearch, BorderLayout.CENTER);
+        searchControls.add(btnSearch, BorderLayout.EAST);
 
         btnRenew = new JButton("Gia Hạn Gói Này");
         btnRenew.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnRenew.setBackground(new Color(16, 185, 129));
         btnRenew.setForeground(Color.WHITE);
-        searchBar.add(btnRenew);
+        styleActionButton(btnRenew);
 
         btnLock = new JButton("Khóa Thẻ Tạm Thời");
         btnLock.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnLock.setBackground(new Color(245, 158, 11));
         btnLock.setForeground(Color.WHITE);
-        searchBar.add(btnLock);
+        styleActionButton(btnLock);
 
         btnPrintProfile = new JButton("In Hồ Sơ");
         btnPrintProfile.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnPrintProfile.setBackground(new Color(100, 116, 139));
         btnPrintProfile.setForeground(Color.WHITE);
-        searchBar.add(btnPrintProfile);
+        styleActionButton(btnPrintProfile);
+
+        JPanel searchActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        searchActions.setOpaque(false);
+        searchActions.add(btnRenew);
+        searchActions.add(btnLock);
+        searchActions.add(btnPrintProfile);
+        searchBar.add(searchControls, BorderLayout.NORTH);
+        searchBar.add(searchActions, BorderLayout.SOUTH);
 
         centerPanel.add(searchBar, BorderLayout.NORTH);
 
@@ -118,6 +133,7 @@ public class ChiTietHoiVienPanel extends JPanel {
         lblAvatar.setBackground(new Color(238, 242, 255));
         lblAvatar.setOpaque(true);
         lblAvatar.setBorder(BorderFactory.createLineBorder(new Color(199, 210, 254), 2));
+        lblAvatar.putClientProperty("JComponent.roundRect", true);
         gbc.gridheight = 4;
         gbc.gridx = 0; gbc.gridy = 0;
         infoPanel.add(lblAvatar, gbc);
@@ -133,6 +149,8 @@ public class ChiTietHoiVienPanel extends JPanel {
         lblName = new JLabel("Nguyễn Văn Tuấn");
         lblName.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblName.setForeground(new Color(30, 41, 59));
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         infoPanel.add(lblName, gbc);
 
         gbc.gridx = 1; gbc.gridy = 1;
@@ -141,6 +159,7 @@ public class ChiTietHoiVienPanel extends JPanel {
         gbc.gridx = 2;
         lblPhone = new JLabel("HV001 (Toàn hệ thống)");
         lblPhone.setFont(fValue);
+        gbc.weightx = 1.0;
         infoPanel.add(lblPhone, gbc);
 
         gbc.gridx = 1; gbc.gridy = 2;
@@ -149,6 +168,7 @@ public class ChiTietHoiVienPanel extends JPanel {
         gbc.gridx = 2;
         lblGoi = new JLabel("VIP Thể Lực (6 Tháng) - Hạn: 15/11/2026");
         lblGoi.setFont(fValue);
+        gbc.weightx = 1.0;
         infoPanel.add(lblGoi, gbc);
 
         gbc.gridx = 1; gbc.gridy = 3;
@@ -158,6 +178,10 @@ public class ChiTietHoiVienPanel extends JPanel {
         lblStatus = new JLabel("Đang hoạt động (Còn 45 ngày)");
         lblStatus.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblStatus.setForeground(new Color(16, 185, 129));
+        lblStatus.setOpaque(true);
+        lblStatus.setBackground(new Color(240, 253, 244));
+        lblStatus.setBorder(BorderFactory.createEmptyBorder(7, 10, 7, 10));
+        gbc.weightx = 1.0;
         infoPanel.add(lblStatus, gbc);
 
         // History Table
@@ -192,6 +216,22 @@ public class ChiTietHoiVienPanel extends JPanel {
         table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         table.getTableHeader().setBackground(new Color(241, 245, 249));
+        table.getTableHeader().setForeground(new Color(30, 41, 59));
+        table.getTableHeader().setPreferredSize(new Dimension(0, 40));
+        table.setShowVerticalLines(false);
+        table.setGridColor(new Color(226, 232, 240));
+        table.setSelectionBackground(new Color(219, 234, 254));
+        table.setSelectionForeground(new Color(15, 23, 42));
+        table.setFillsViewportHeight(true);
+        table.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
+            @Override
+            public java.awt.Component getTableCellRendererComponent(JTable source, Object value, boolean selected, boolean focus, int row, int column) {
+                java.awt.Component component = super.getTableCellRendererComponent(source, value, selected, focus, row, column);
+                if (!selected) component.setBackground(row % 2 == 0 ? Color.WHITE : new Color(248, 250, 252));
+                setHorizontalAlignment(column < 3 ? JLabel.CENTER : JLabel.LEFT);
+                return component;
+            }
+        });
         historyPanel.add(new JScrollPane(table), BorderLayout.CENTER);
 
         JPanel mainCenter = new JPanel(new BorderLayout(0, 15));
@@ -230,16 +270,20 @@ public class ChiTietHoiVienPanel extends JPanel {
                     if (days < 0) {
                         lblStatus.setText("ĐÃ HẾT HẠN (Quá hạn " + Math.abs(days) + " ngày)");
                         lblStatus.setForeground(new Color(239, 68, 68));
+                        lblStatus.setBackground(new Color(254, 242, 242));
                     } else if (days <= 7) {
                         lblStatus.setText("Sắp hết hạn (Còn " + days + " ngày)");
                         lblStatus.setForeground(new Color(245, 158, 11));
+                        lblStatus.setBackground(new Color(255, 251, 235));
                     } else {
                         lblStatus.setText("Đang hoạt động (Còn " + days + " ngày)");
                         lblStatus.setForeground(new Color(16, 185, 129));
+                        lblStatus.setBackground(new Color(240, 253, 244));
                     }
                 } else {
                     lblStatus.setText(hv.getTrangThai() != null ? hv.getTrangThai() : "Đang hoạt động");
                     lblStatus.setForeground(new Color(16, 185, 129));
+                    lblStatus.setBackground(new Color(240, 253, 244));
                 }
 
                 JOptionPane.showMessageDialog(this, "Đã tìm thấy hồ sơ hội viên: " + hv.getHoTen() + " [Mã: " + hv.getMaHoiVien() + " | Thẻ QR: " + hv.getMaTheQR() + "]", "Tra Cứu", JOptionPane.INFORMATION_MESSAGE);
@@ -260,11 +304,13 @@ public class ChiTietHoiVienPanel extends JPanel {
             if (cur.contains("Tạm khóa")) {
                 lblStatus.setText("Đang hoạt động (Còn 45 ngày)");
                 lblStatus.setForeground(new Color(16, 185, 129));
+                lblStatus.setBackground(new Color(240, 253, 244));
                 btnLock.setText("Khóa Thẻ Tạm Thời");
                 JOptionPane.showMessageDialog(this, "Đã MỞ KHÓA thẻ hội viên thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 lblStatus.setText("Tạm khóa theo yêu cầu của khách");
                 lblStatus.setForeground(new Color(239, 68, 68));
+                lblStatus.setBackground(new Color(254, 242, 242));
                 btnLock.setText("Mở Khóa Thẻ");
                 JOptionPane.showMessageDialog(this, "Đã TẠM KHÓA thẻ hội viên thành công! Khách không thể check-in cho tới khi mở lại.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
             }
@@ -272,6 +318,26 @@ public class ChiTietHoiVienPanel extends JPanel {
 
         btnPrintProfile.addActionListener(e -> {
             JOptionPane.showMessageDialog(this, "Đang kết nối máy in...\nĐã xuất và in hồ sơ chi tiết kèm lịch sử check-in của hội viên: " + lblName.getText(), "In Hồ Sơ", JOptionPane.INFORMATION_MESSAGE);
+        });
+    }
+
+    private void styleActionButton(JButton button) {
+        Color normalColor = button.getBackground();
+        button.putClientProperty("JButton.buttonType", "roundRect");
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        button.setPreferredSize(new Dimension(Math.max(button.getPreferredSize().width, 130), 40));
+        button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                if (button.isEnabled()) button.setBackground(normalColor.brighter());
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                button.setBackground(normalColor);
+            }
         });
     }
 }

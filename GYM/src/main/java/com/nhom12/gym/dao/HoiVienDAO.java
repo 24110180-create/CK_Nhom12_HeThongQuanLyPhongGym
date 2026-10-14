@@ -284,4 +284,55 @@ public class HoiVienDAO {
 
         return null;
     }
+
+    /**
+     * Lấy danh sách hội viên sắp hết hạn trong vòng soNgayToi ngày (tính chuẩn theo mốc 00:00:00 đầu ngày)
+     * @param soNgayToi Số ngày tới (ví dụ: 7, 14, 30 ngày). Nếu soNgayToi < 0 sẽ lấy toàn bộ hội viên đã quá hạn.
+     * @return Danh sách hội viên sắp hết hạn, sắp xếp ưu tiên từ khẩn cấp nhất đến ít khẩn cấp hơn
+     */
+    public List<HoiVien> layDanhSachSapHetHan(int soNgayToi) {
+        List<HoiVien> all = layTatCa();
+        List<HoiVien> res = new ArrayList<>();
+        if (all == null) return res;
+
+        java.util.Calendar todayCal = java.util.Calendar.getInstance();
+        todayCal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        todayCal.set(java.util.Calendar.MINUTE, 0);
+        todayCal.set(java.util.Calendar.SECOND, 0);
+        todayCal.set(java.util.Calendar.MILLISECOND, 0);
+        long todayMs = todayCal.getTimeInMillis();
+
+        for (HoiVien hv : all) {
+            java.util.Date exp = hv.getNgayHetHan();
+            if (exp == null) continue;
+
+            java.util.Calendar expCal = java.util.Calendar.getInstance();
+            expCal.setTime(exp);
+            expCal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+            expCal.set(java.util.Calendar.MINUTE, 0);
+            expCal.set(java.util.Calendar.SECOND, 0);
+            expCal.set(java.util.Calendar.MILLISECOND, 0);
+            long remainDays = (expCal.getTimeInMillis() - todayMs) / (1000L * 60 * 60 * 24);
+
+            if (soNgayToi < 0) {
+                if (remainDays < 0) {
+                    res.add(sanitizeHoiVien(hv));
+                }
+            } else {
+                if (remainDays <= soNgayToi) {
+                    res.add(sanitizeHoiVien(hv));
+                }
+            }
+        }
+
+        // Sắp xếp ngày hết hạn tăng dần (những ai hết hạn trước / quá hạn xếp lên đầu để xử lý trước)
+        res.sort((a, b) -> {
+            if (a.getNgayHetHan() == null && b.getNgayHetHan() == null) return 0;
+            if (a.getNgayHetHan() == null) return 1;
+            if (b.getNgayHetHan() == null) return -1;
+            return a.getNgayHetHan().compareTo(b.getNgayHetHan());
+        });
+
+        return res;
+    }
 }

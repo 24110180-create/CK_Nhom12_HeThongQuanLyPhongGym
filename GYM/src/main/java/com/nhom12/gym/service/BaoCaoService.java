@@ -24,26 +24,7 @@ public class BaoCaoService {
      * Báo cáo 2: Danh sách hội viên sắp hết hạn trong vòng N ngày tới
      */
     public List<HoiVien> getHoiVienSapHetHan(int soNgayToi) {
-        List<HoiVien> all = hoiVienDAO.layTatCa();
-        List<HoiVien> result = new ArrayList<>();
-        if (all == null) return result;
-
-        Date now = new Date();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(now);
-        cal.add(Calendar.DAY_OF_MONTH, soNgayToi);
-        Date futureLimit = cal.getTime();
-
-        for (HoiVien hv : all) {
-            Date expireDate = hv.getNgayHetHan();
-            if (expireDate != null) {
-                // Đã hết hạn hoặc sắp hết hạn trong khoảng soNgayToi
-                if (expireDate.before(futureLimit)) {
-                    result.add(hv);
-                }
-            }
-        }
-        return result;
+        return hoiVienDAO.layDanhSachSapHetHan(soNgayToi);
     }
 
     /**

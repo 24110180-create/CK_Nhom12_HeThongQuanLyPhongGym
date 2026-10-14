@@ -117,7 +117,6 @@ public class MainDashboard extends JFrame {
         if ("Lễ tân".equalsIgnoreCase(role)) return "Trạm Vận Hành Lễ Tân";
         if ("HLV".equalsIgnoreCase(role)) return "Không Gian Huấn Luyện Viên";
         if ("Quản lý".equalsIgnoreCase(role)) return "Quản Lý Vận Hành Chi Nhánh";
-        if ("Hội viên".equalsIgnoreCase(role)) return "Cổng Dịch Vụ Hội Viên VIP";
         return "Quản Trị Hệ Thống";
     }
 
@@ -421,7 +420,8 @@ public class MainDashboard extends JFrame {
 
         addSidebarCategoryHeader(menuContainer, "Vận Hành Quầy & Dịch Vụ");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên & flap barrier", () -> new CheckInForm(), accent, false);
-        addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ hội viên, gói tập & tra cứu toàn diện", () -> new QuanLyHoiVienPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ hội viên, gói tập & tra cứu toàn diện", () -> new QuanLyHoiVienHubPanel(), accent, false);
+        addSidebarItem(menuContainer, "Hội Viên Sắp Hết Hạn", "Cảnh báo hết hạn (3, 7, 30 ngày) & chăm sóc tái ký", () -> new HoiVienSapHetHanPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Lớp Học Theo Lịch", "Thời khóa biểu lớp Yoga, Zumba, Cardio & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Bán nước giải khát, whey & đồ tập", () -> new BanHangPOSPanel(), accent, false);
 
@@ -442,7 +442,8 @@ public class MainDashboard extends JFrame {
     private void setupReceptionistMenu(JPanel menuContainer, Color accent) {
         addSidebarCategoryHeader(menuContainer, "Vận Hành Quầy & Dịch Vụ");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên & cửa flap barrier", () -> new CheckInForm(), accent, true);
-        addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ hội viên, gói tập & tra cứu toàn diện", () -> new QuanLyHoiVienPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ hội viên, gói tập & tra cứu toàn diện", () -> new QuanLyHoiVienHubPanel(), accent, false);
+        addSidebarItem(menuContainer, "Hội Viên Sắp Hết Hạn", "Cảnh báo hết hạn (3, 7, 30 ngày) & chăm sóc tái ký", () -> new HoiVienSapHetHanPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Lớp Học Theo Lịch", "Thời khóa biểu lớp Yoga, Zumba, Cardio & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Bán nước giải khát, whey & đồ tập", () -> new BanHangPOSPanel(), accent, false);
     }
@@ -464,7 +465,8 @@ public class MainDashboard extends JFrame {
     private void setupManagerMenu(JPanel menuContainer, Color accent) {
         addSidebarCategoryHeader(menuContainer, "Vận Hành Quầy & Dịch Vụ");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên tại quầy", () -> new CheckInForm(), accent, true);
-        addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ hội viên, gói tập & tra cứu toàn diện", () -> new QuanLyHoiVienPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ hội viên, gói tập & tra cứu toàn diện", () -> new QuanLyHoiVienHubPanel(), accent, false);
+        addSidebarItem(menuContainer, "Hội Viên Sắp Hết Hạn", "Cảnh báo hết hạn (3, 7, 30 ngày) & chăm sóc tái ký", () -> new HoiVienSapHetHanPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Lớp Học Theo Lịch", "Điều phối lớp nhóm Yoga, Zumba, Cardio & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Thu ngân quầy bar & sản phẩm", () -> new BanHangPOSPanel(), accent, false);
 

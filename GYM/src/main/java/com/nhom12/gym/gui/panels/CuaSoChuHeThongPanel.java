@@ -313,7 +313,7 @@ public class CuaSoChuHeThongPanel extends JPanel {
         return row;
     }
 
-    // --- 3. TIỆN ÍCH THÔNG BÁO TÁI KÝ HỘI VIÊN TINH GỌN (THAY THẾ BẢNG THÔ RƯỜM RÀ) ---
+    // --- 3. TIỆN ÍCH THÔNG BÁO TÁI KÝ HỘI VIÊN ĐỒNG BỘ THỜI GIAN THỰC ---
     private JPanel createExpiringRenewalAlertCard() {
         JPanel card = new JPanel(new BorderLayout(0, 10));
         card.setBackground(Color.WHITE);
@@ -322,13 +322,17 @@ public class CuaSoChuHeThongPanel extends JPanel {
                 new EmptyBorder(14, 16, 14, 16)
         ));
 
-        // Header: Title + Link Navigation sang Quản Lý Hội Viên
+        // Lấy danh sách thực tế từ CSDL / DAO
+        List<HoiVien> expiringList = hoiVienDAO.layDanhSachSapHetHan(7);
+
+        // Header: Title + Link Navigation sang Hội Viên Sắp Hết Hạn
         JPanel top = new JPanel(new BorderLayout());
         top.setOpaque(false);
 
-        JLabel lblHeader = new JLabel("THÔNG BÁO TÁI KÝ HỘI VIÊN (7 NGÀY TỚI)");
+        int count = expiringList != null ? expiringList.size() : 0;
+        JLabel lblHeader = new JLabel("CẢNH BÁO TÁI KÝ THẺ TẬP (" + count + " HỘI VIÊN)");
         lblHeader.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        lblHeader.setForeground(new Color(217, 119, 6)); // Amber
+        lblHeader.setForeground(count > 0 ? new Color(217, 119, 6) : new Color(16, 185, 129));
 
         JButton btnViewAll = new JButton("Xem Toàn Bộ ➔");
         btnViewAll.setFont(new Font("Segoe UI", Font.BOLD, 11));
@@ -339,7 +343,7 @@ public class CuaSoChuHeThongPanel extends JPanel {
         btnViewAll.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnViewAll.addActionListener(e -> {
             if (MainDashboard.getInstance() != null) {
-                MainDashboard.getInstance().navigateTo("Quản Lý Hội Viên", 2);
+                MainDashboard.getInstance().navigateTo("Hội Viên Sắp Hết Hạn");
             }
         });
 
@@ -347,23 +351,72 @@ public class CuaSoChuHeThongPanel extends JPanel {
         top.add(btnViewAll, BorderLayout.EAST);
         card.add(top, BorderLayout.NORTH);
 
-        // Body: 2 mục tóm tắt tinh gọn
         JPanel list = new JPanel(new GridLayout(2, 1, 0, 8));
         list.setOpaque(false);
 
-        list.add(createExpiringItemRow(
-                "Võ Lê Ngọc Hưng", "0912345678", "Gói Standard 3 Tháng", "15/10/2026",
-                "🔴 Hết hạn hôm nay!", new Color(220, 38, 38), new Color(254, 242, 242)
-        ));
+        Calendar todayCal = Calendar.getInstance();
+        todayCal.set(Calendar.HOUR_OF_DAY, 0);
+        todayCal.set(Calendar.MINUTE, 0);
+        todayCal.set(Calendar.SECOND, 0);
+        todayCal.set(Calendar.MILLISECOND, 0);
+        long todayMs = todayCal.getTimeInMillis();
 
-        list.add(createExpiringItemRow(
-                "Võ Tấn Phát", "0988776655", "Gói Cơ Bản 1 Tháng", "01/01/2025",
-                "⚠️ Đã quá hạn (Mời tái ký)", new Color(217, 119, 6), new Color(254, 243, 199)
-        ));
+        if (expiringList != null && !expiringList.isEmpty()) {
+            int displayed = 0;
+            for (HoiVien hv : expiringList) {
+                if (displayed >= 2) break;
+                Date exp = hv.getNgayHetHan();
+                if (exp == null) continue;
+
+                Calendar expCal = Calendar.getInstance();
+                expCal.setTime(exp);
+                expCal.set(Calendar.HOUR_OF_DAY, 0);
+                expCal.set(Calendar.MINUTE, 0);
+                expCal.set(Calendar.SECOND, 0);
+                expCal.set(Calendar.MILLISECOND, 0);
+                long remain = (expCal.getTimeInMillis() - todayMs) / 86400000L;
+
+                String badge;
+                Color bColor;
+                Color bBg;
+                if (remain < 0) {
+                    badge = "⚠️ Quá hạn " + Math.abs(remain) + " ngày";
+                    bColor = new Color(220, 38, 38);
+                    bBg = new Color(254, 242, 242);
+                } else if (remain == 0) {
+                    badge = "🔴 Hết hạn hôm nay!";
+                    bColor = new Color(220, 38, 38);
+                    bBg = new Color(254, 242, 242);
+                } else if (remain <= 3) {
+                    badge = "🔴 Còn " + remain + " ngày";
+                    bColor = new Color(220, 38, 38);
+                    bBg = new Color(254, 242, 242);
+                } else {
+                    badge = "🟡 Còn " + remain + " ngày";
+                    bColor = new Color(217, 119, 6);
+                    bBg = new Color(254, 243, 199);
+                }
+
+                String hoTen = com.nhom12.gym.util.TextSanitizer.sanitize(hv.getHoTen());
+                String sdt = hv.getSoDienThoai() != null ? hv.getSoDienThoai() : "--";
+                String pkg = com.nhom12.gym.util.TextSanitizer.sanitize(hv.getGoiTapDangKy() != null ? hv.getGoiTapDangKy() : "Gói Tiêu Chuẩn");
+
+                list.add(createExpiringItemRow(
+                        hoTen, sdt, pkg, sdfDate.format(exp),
+                        badge, bColor, bBg
+                ));
+                displayed++;
+            }
+        } else {
+            JLabel lblEmpty = new JLabel("🟢 Toàn bộ hội viên đang trong thời hạn thẻ tập hợp lệ • 0 cảnh báo khẩn cấp", SwingConstants.CENTER);
+            lblEmpty.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+            lblEmpty.setForeground(new Color(16, 185, 129));
+            list.add(lblEmpty);
+        }
 
         card.add(list, BorderLayout.CENTER);
 
-        JLabel lblFoot = new JLabel("💡 Bảng dữ liệu chi tiết đã được chuyển tập trung sang 'Quản Lý Hội Viên'.");
+        JLabel lblFoot = new JLabel("💡 Dữ liệu tự động đồng bộ thời gian thực từ CSDL chuỗi FitLife Gym.");
         lblFoot.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         lblFoot.setForeground(new Color(100, 116, 139));
         card.add(lblFoot, BorderLayout.SOUTH);

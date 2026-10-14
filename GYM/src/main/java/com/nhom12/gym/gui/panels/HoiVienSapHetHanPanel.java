@@ -1,8 +1,11 @@
 package com.nhom12.gym.gui.panels;
 
+import com.nhom12.gym.dao.HoaDonDAO;
 import com.nhom12.gym.dao.HoiVienDAO;
+import com.nhom12.gym.entity.HoaDon;
 import com.nhom12.gym.entity.HoiVien;
 import com.nhom12.gym.service.DataSyncManager;
+import com.nhom12.gym.util.Auth;
 import com.nhom12.gym.util.ExcelExportHelper;
 import com.nhom12.gym.util.TextSanitizer;
 
@@ -254,44 +257,59 @@ public class HoiVienSapHetHanPanel extends JPanel {
         if (all == null) return;
 
         int daysFilterIdx = cbDaysFilter.getSelectedIndex();
-        int maxDays = 7;
-        if (daysFilterIdx == 1) maxDays = 14;
-        else if (daysFilterIdx == 2) maxDays = 30;
-        else if (daysFilterIdx == 3) maxDays = 0; // Quá hạn
-        else if (daysFilterIdx == 4) maxDays = 365;
 
         String branchFilter = (String) cbBranchFilter.getSelectedItem();
-        long now = System.currentTimeMillis();
+
+        Calendar todayCal = Calendar.getInstance();
+        todayCal.set(Calendar.HOUR_OF_DAY, 0);
+        todayCal.set(Calendar.MINUTE, 0);
+        todayCal.set(Calendar.SECOND, 0);
+        todayCal.set(Calendar.MILLISECOND, 0);
+        long todayMidnight = todayCal.getTimeInMillis();
 
         int critical = 0;
         int warning = 0;
         int expired = 0;
 
+        List<Object[]> matchedRows = new java.util.ArrayList<>();
+
         for (HoiVien hv : all) {
             Date exp = hv.getNgayHetHan();
             if (exp == null) continue;
 
-            // Lọc cơ sở
+            // Lọc cơ sở thông minh và an toàn thông qua TextSanitizer.isBranchMatching
             if (branchFilter != null && !branchFilter.startsWith("Tất cả")) {
-                if (hv.getChiNhanhDangKy() != null && !hv.getChiNhanhDangKy().contains(branchFilter.substring(0, 4))) {
+                if (!TextSanitizer.isBranchMatching(hv.getChiNhanhDangKy(), branchFilter)) {
                     continue;
                 }
             }
 
-            long diff = exp.getTime() - now;
-            long remainDays = diff / (1000L * 60 * 60 * 24);
+            Calendar expCal = Calendar.getInstance();
+            expCal.setTime(exp);
+            expCal.set(Calendar.HOUR_OF_DAY, 0);
+            expCal.set(Calendar.MINUTE, 0);
+            expCal.set(Calendar.SECOND, 0);
+            expCal.set(Calendar.MILLISECOND, 0);
+            long expMidnight = expCal.getTimeInMillis();
+
+            long remainDays = (expMidnight - todayMidnight) / (1000L * 60 * 60 * 24);
 
             if (remainDays < 0) expired++;
             else if (remainDays <= 3) critical++;
             else if (remainDays <= 7) warning++;
 
             boolean match = false;
-            if (daysFilterIdx == 3) {
+            if (daysFilterIdx == 0) {
+                // Sắp hết hạn trong 7 ngày hoặc đã quá hạn
+                match = (remainDays <= 7);
+            } else if (daysFilterIdx == 1) {
+                match = (remainDays <= 14);
+            } else if (daysFilterIdx == 2) {
+                match = (remainDays <= 30);
+            } else if (daysFilterIdx == 3) {
                 match = (remainDays < 0);
-            } else if (daysFilterIdx == 4) {
-                match = true;
             } else {
-                match = (remainDays <= maxDays);
+                match = true;
             }
 
             if (match) {
@@ -318,7 +336,7 @@ public class HoiVienSapHetHanPanel extends JPanel {
                 String goiTap = TextSanitizer.sanitize(hv.getGoiTapDangKy() != null ? hv.getGoiTapDangKy() : "Gói Tiêu Chuẩn");
                 String chiNhanh = TextSanitizer.normalizeBranch(hv.getChiNhanhDangKy());
 
-                model.addRow(new Object[]{
+                matchedRows.add(new Object[]{
                         hv.getMaHoiVien(),
                         hv.getMaTheQR() != null ? hv.getMaTheQR() : ("HV" + hv.getMaHoiVien()),
                         hoTen,
@@ -327,9 +345,18 @@ public class HoiVienSapHetHanPanel extends JPanel {
                         chiNhanh,
                         sdf.format(exp),
                         remainText,
-                        alertLevel
+                        alertLevel,
+                        remainDays
                 });
             }
+        }
+
+        // Sắp xếp ưu tiên hội viên hết hạn trước / quá hạn lên đầu bảng
+        matchedRows.sort((r1, r2) -> Long.compare((Long) r1[9], (Long) r2[9]));
+        for (Object[] row : matchedRows) {
+            model.addRow(new Object[]{
+                    row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]
+            });
         }
 
         lblCountCritical.setText(critical + " Hội viên");
@@ -414,7 +441,31 @@ public class HoiVienSapHetHanPanel extends JPanel {
         }
 
         hoiVienDAO.capNhat(hv);
-        DataSyncManager.fireDataChanged(DataSyncManager.DataType.HOI_VIEN);
+
+        // Tạo hóa đơn tự động để đồng bộ tức thì với Lịch Sử Giao Dịch và Doanh Thu Chuỗi
+        try {
+            String maHD = "HD-RENEW-" + System.currentTimeMillis();
+            HoaDon hd = new HoaDon(
+                    maHD,
+                    hv.getMaHoiVien(),
+                    hv.getHoTen(),
+                    "Gia hạn thẻ tập: " + pkg,
+                    fee,
+                    0.0,
+                    fee,
+                    "Tiền mặt / VietQR",
+                    (Auth.tenDangNhap != null ? Auth.tenDangNhap : "letan1"),
+                    (hv.getChiNhanhDangKy() != null ? hv.getChiNhanhDangKy() : Auth.getChiNhanhHienTai()),
+                    new Date(),
+                    "Đã thanh toán",
+                    "Gia hạn gói " + pkg + " đến ngày " + sdf.format(newExp)
+            );
+            HoaDonDAO.getInstance().them(hd);
+        } catch (Exception ex) {
+            System.err.println("[HoiVienSapHetHanPanel] Lỗi tạo hóa đơn gia hạn: " + ex.getMessage());
+        }
+
+        DataSyncManager.fireDataChanged(DataSyncManager.DataType.ALL);
         loadData();
 
         JOptionPane.showMessageDialog(this,

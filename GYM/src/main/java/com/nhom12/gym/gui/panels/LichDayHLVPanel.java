@@ -2,6 +2,7 @@ package com.nhom12.gym.gui.panels;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -47,6 +48,7 @@ public class LichDayHLVPanel extends JPanel {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(520);
         splitPane.setDividerSize(6);
+        splitPane.setResizeWeight(0.48);
         splitPane.setOpaque(false);
         splitPane.setBorder(null);
 
@@ -82,6 +84,7 @@ public class LichDayHLVPanel extends JPanel {
         classTable.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         classTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         classTable.getTableHeader().setBackground(new Color(241, 245, 249));
+        styleDataTable(classTable, 1);
         classTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         leftPanel.add(new JScrollPane(classTable), BorderLayout.CENTER);
         splitPane.setLeftComponent(leftPanel);
@@ -119,6 +122,28 @@ public class LichDayHLVPanel extends JPanel {
         studentTable.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         studentTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         studentTable.getTableHeader().setBackground(new Color(241, 245, 249));
+        styleDataTable(studentTable, 1);
+        studentTable.getColumnModel().getColumn(2).setCellRenderer(new javax.swing.table.DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable source, Object value, boolean selected, boolean focus, int row, int column) {
+                Component component = super.getTableCellRendererComponent(source, value, selected, focus, row, column);
+                String status = value == null ? "" : value.toString();
+                if (selected) {
+                    component.setBackground(source.getSelectionBackground());
+                    component.setForeground(source.getSelectionForeground());
+                } else if (status.contains("Đã có mặt")) {
+                    component.setBackground(new Color(240, 253, 244));
+                    component.setForeground(new Color(21, 128, 61));
+                } else {
+                    component.setBackground(new Color(255, 251, 235));
+                    component.setForeground(new Color(161, 98, 7));
+                }
+                setHorizontalAlignment(JLabel.CENTER);
+                setFont(source.getFont().deriveFont(Font.BOLD));
+                setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+                return component;
+            }
+        });
         studentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         rightPanel.add(new JScrollPane(studentTable), BorderLayout.CENTER);
 
@@ -131,11 +156,13 @@ public class LichDayHLVPanel extends JPanel {
         btnDiemDanh.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnDiemDanh.setBackground(new Color(16, 185, 129));
         btnDiemDanh.setForeground(Color.WHITE);
+        styleActionButton(btnDiemDanh);
 
         btnDiemDanhAll = new JButton("Điểm Danh Có Mặt Tất Cả");
         btnDiemDanhAll.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnDiemDanhAll.setBackground(new Color(37, 99, 235));
         btnDiemDanhAll.setForeground(Color.WHITE);
+        styleActionButton(btnDiemDanhAll);
 
         btnPanel.add(btnDiemDanh);
         btnPanel.add(btnDiemDanhAll);
@@ -170,6 +197,50 @@ public class LichDayHLVPanel extends JPanel {
                 studentModel.setValueAt("Đã có mặt ✔", i, 2);
             }
             JOptionPane.showMessageDialog(this, "Đã điểm danh CÓ MẶT cho toàn bộ " + studentModel.getRowCount() + " học viên trong lớp!", "Điểm Danh Toàn Bộ", JOptionPane.INFORMATION_MESSAGE);
+        });
+    }
+
+    private void styleDataTable(JTable dataTable, int... leftAlignedColumns) {
+        dataTable.getTableHeader().setForeground(new Color(30, 41, 59));
+        dataTable.getTableHeader().setPreferredSize(new Dimension(0, 40));
+        dataTable.setShowVerticalLines(false);
+        dataTable.setGridColor(new Color(226, 232, 240));
+        dataTable.setSelectionBackground(new Color(219, 234, 254));
+        dataTable.setSelectionForeground(new Color(15, 23, 42));
+        dataTable.setFillsViewportHeight(true);
+        dataTable.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable source, Object value, boolean selected, boolean focus, int row, int column) {
+                Component component = super.getTableCellRendererComponent(source, value, selected, focus, row, column);
+                setFont(source.getFont());
+                if (!selected) component.setBackground(row % 2 == 0 ? Color.WHITE : new Color(248, 250, 252));
+                boolean leftAligned = false;
+                for (int leftColumn : leftAlignedColumns) {
+                    if (column == leftColumn) leftAligned = true;
+                }
+                setHorizontalAlignment(leftAligned ? JLabel.LEFT : JLabel.CENTER);
+                setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+                return component;
+            }
+        });
+    }
+
+    private void styleActionButton(JButton button) {
+        Color normalColor = button.getBackground();
+        button.putClientProperty("JButton.buttonType", "roundRect");
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                if (button.isEnabled()) button.setBackground(normalColor.brighter());
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                button.setBackground(normalColor);
+            }
         });
     }
 }

@@ -355,19 +355,6 @@ public class MainDashboard extends JFrame {
             headerRight.add(btnQuickCheckIn);
         }
 
-        // Huy hiệu cơ sở hoạt động (Trực quan, trang nhã, đồng bộ theo phiên làm việc)
-        String branchText = Auth.getChiNhanhHienTai();
-        JLabel lblBranchBadge = new JLabel("Cơ sở: " + branchText);
-        lblBranchBadge.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        lblBranchBadge.setForeground(new Color(51, 65, 85));
-        lblBranchBadge.setBackground(new Color(241, 245, 249));
-        lblBranchBadge.setOpaque(true);
-        lblBranchBadge.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(203, 213, 225), 1),
-                new EmptyBorder(5, 10, 5, 10)
-        ));
-        headerRight.add(lblBranchBadge);
-
         String today = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
         JLabel lblDate = new JLabel("Ngày: " + today);
         lblDate.setFont(new Font("Segoe UI", Font.BOLD, 11));

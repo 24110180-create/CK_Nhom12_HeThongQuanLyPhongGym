@@ -23,7 +23,6 @@ public class CheckInForm extends JPanel {
     private final CheckInService checkInService = new CheckInService();
 
     private JTextField txtMaQR;
-    private JComboBox<String> cbStationBranch;
     private JLabel lblNetworkStatus;
     private JLabel lblPerfMs;
     private JButton btnGuestPass;
@@ -113,12 +112,6 @@ public class CheckInForm extends JPanel {
         btnAutoSync.setVisible(false);
         btnAutoSync.addActionListener(e -> dongBoOffline());
 
-        JLabel lblBr = new JLabel("Trạm:");
-        lblBr.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        cbStationBranch = new JComboBox<>(new String[]{"CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)", "Toàn hệ thống (Tất cả trạm)"});
-        cbStationBranch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        cbStationBranch.setPreferredSize(new Dimension(180, 32));
-
         lblNetworkStatus = new JLabel("Online (Đồng bộ)");
         lblNetworkStatus.setFont(new Font("Segoe UI", Font.BOLD, 11));
         lblNetworkStatus.setForeground(new Color(16, 185, 129));
@@ -130,8 +123,6 @@ public class CheckInForm extends JPanel {
         rightControls.add(btnGuestPass);
         rightControls.add(btnToggleOffline);
         rightControls.add(btnAutoSync);
-        rightControls.add(lblBr);
-        rightControls.add(cbStationBranch);
         rightControls.add(lblNetworkStatus);
         rightControls.add(lblPerfMs);
         topToolbar.add(rightControls);
@@ -440,7 +431,7 @@ public class CheckInForm extends JPanel {
     private void moDialogBanVeLe() {
         JTextField txtTenKhach = new JTextField("Nguyễn Văn Lẻ");
         JTextField txtSdt = new JTextField("0988776655");
-        String currentBranch = (String) cbStationBranch.getSelectedItem();
+        String currentBranch = com.nhom12.gym.util.Auth.getChiNhanhHienTai();
 
         JPanel pnlInput = new JPanel(new GridLayout(2, 2, 8, 8));
         pnlInput.add(new JLabel("Họ Tên Khách Vãng Lai:"));
@@ -584,7 +575,7 @@ public class CheckInForm extends JPanel {
 
     private void xuLyCheckIn() {
         String code = txtMaQR.getText().trim();
-        String currentBranch = (String) cbStationBranch.getSelectedItem();
+        String currentBranch = com.nhom12.gym.util.Auth.getChiNhanhHienTai();
 
         CheckInService.CheckInResult res = checkInService.thucHienCheckIn(code, currentBranch);
         lblPerfMs.setText("Phản hồi: " + res.responseTimeMs + "ms (< 2.0s)");

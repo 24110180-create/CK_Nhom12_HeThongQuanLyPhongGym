@@ -1,5 +1,5 @@
 # FITLIFE GYM MANAGEMENT SYSTEM
-Hệ thống Quản lý và Vận hành Phòng Gym - Nhóm 12
+Hệ thống Quản lý và Vận hành Phòng Gym - Nhóm 12 (Trạng thái: Đã hoàn thành 99%)
 
 ---
 

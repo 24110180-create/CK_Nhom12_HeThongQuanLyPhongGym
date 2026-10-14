@@ -143,7 +143,7 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
         lblSummaryStats.setForeground(new Color(71, 85, 105));
         pnlBottom.add(lblSummaryStats, BorderLayout.WEST);
 
-        JLabel lblTips = new JLabel("💡 Mọi tài khoản sau khi cấp mới hoặc đặt lại mật khẩu đều có thể đăng nhập ngay vào hệ thống!");
+        JLabel lblTips = new JLabel("Mẹo: Mọi tài khoản sau khi cấp mới hoặc đặt lại mật khẩu đều có thể đăng nhập ngay vào hệ thống!");
         lblTips.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         lblTips.setForeground(new Color(16, 185, 129));
         pnlBottom.add(lblTips, BorderLayout.EAST);
@@ -290,31 +290,31 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
         btnAddAccount.setForeground(Color.WHITE);
         btnAddAccount.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        btnUpdateAccount = new JButton("✏️ Cập Nhật");
+        btnUpdateAccount = new JButton("Cập Nhật");
         btnUpdateAccount.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnUpdateAccount.setBackground(new Color(37, 99, 235));
         btnUpdateAccount.setForeground(Color.WHITE);
         btnUpdateAccount.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        btnDeleteAccount = new JButton("🗑️ Xóa Tài Khoản");
+        btnDeleteAccount = new JButton("Xóa Tài Khoản");
         btnDeleteAccount.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnDeleteAccount.setBackground(new Color(239, 68, 68));
         btnDeleteAccount.setForeground(Color.WHITE);
         btnDeleteAccount.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        btnToggleLock = new JButton("🔒 Khóa / Mở Khóa");
+        btnToggleLock = new JButton("Khóa / Mở Khóa");
         btnToggleLock.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnToggleLock.setBackground(new Color(245, 158, 11));
         btnToggleLock.setForeground(Color.WHITE);
         btnToggleLock.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        btnResetPassword = new JButton("🔑 Reset MK (123456)");
+        btnResetPassword = new JButton("Reset MK (123456)");
         btnResetPassword.setFont(new Font("Segoe UI", Font.BOLD, 11));
         btnResetPassword.setBackground(new Color(139, 92, 246));
         btnResetPassword.setForeground(Color.WHITE);
         btnResetPassword.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        btnClearForm = new JButton("🔄 Làm Mới Form");
+        btnClearForm = new JButton("Làm Mới Form");
         btnClearForm.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnClearForm.setBackground(new Color(100, 116, 139));
         btnClearForm.setForeground(Color.WHITE);
@@ -572,7 +572,7 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
             }
         }
 
-        lblSummaryStats.setText(String.format("● Tổng quân số nội bộ: %d Lễ tân • %d HLV • %d Quản lý • %d Chủ phòng (Tổng: %d tài khoản)",
+        lblSummaryStats.setText(String.format("Tổng quân số nội bộ: %d Lễ tân • %d HLV • %d Quản lý • %d Chủ phòng (Tổng: %d tài khoản)",
                 countLT, countHLV, countQL, countChu, countLT + countHLV + countQL + countChu));
     }
 
@@ -627,7 +627,7 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
                         "<p>Họ tên: <b>" + fullName + "</b> (" + role + ")</p>" +
                         "<p>Tài khoản: <b>" + username + "</b> | Mật khẩu: <b>" + password + "</b></p>" +
                         "<p>Cơ sở: <b>" + branch + "</b></p>" +
-                        "<p style='color: green;'>✅ Nhân viên có thể dùng tài khoản này để đăng nhập ngay!</p>" +
+                        "<p style='color: green;'>Nhân viên có thể dùng tài khoản này để đăng nhập ngay!</p>" +
                         "</body></html>",
                 "Cấp Tài Khoản Thành Công", JOptionPane.INFORMATION_MESSAGE);
 

@@ -156,7 +156,7 @@ public class LoginForm extends JFrame {
         rightPanel.add(btnLogin);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 14)));
 
-        JLabel lblSecNote = new JLabel("🔒 Đăng nhập dành cho nội bộ");
+        JLabel lblSecNote = new JLabel("Đăng nhập dành cho nội bộ");
         lblSecNote.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblSecNote.setForeground(new Color(100, 116, 139));
         lblSecNote.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -187,7 +187,7 @@ public class LoginForm extends JFrame {
             // Kiểm tra phân quyền: Hội viên KHÔNG ĐƯỢC đăng nhập ứng dụng quản trị nội bộ
             if ("Hội viên".equalsIgnoreCase(Auth.vaiTro)) {
                 JOptionPane.showMessageDialog(this,
-                        "⚠️ HỘI VIÊN (KHÁCH TẬP) KHÔNG ĐƯỢC ĐĂNG NHẬP VÀO ỨNG DỤNG NỘI BỘ NÀY!\n\n" +
+                        "HỘI VIÊN (KHÁCH TẬP) KHÔNG ĐƯỢC ĐĂNG NHẬP VÀO ỨNG DỤNG NỘI BỘ NÀY!\n\n" +
                         "• Theo tài liệu phạm vi dự án FitLife Gym, App riêng cho hội viên nằm ngoài phạm vi triển khai (Out of Scope).\n" +
                         "• Hội viên chỉ tương tác gián tiếp: Vui lòng xuất trình mã QR hoặc thẻ tập tại quầy Lễ tân để check-in và nhờ lễ tân thao tác đăng ký gói / xếp lớp.",
                         "Thông Báo Phạm Vi Ứng Dụng",
@@ -197,7 +197,7 @@ public class LoginForm extends JFrame {
 
             String msg = "Xin chào " + Auth.vaiTro + " - " + Auth.hoTen + "!";
             if (res.isOffline) {
-                msg += "\n\n⚠️ ĐANG CHẠY CHẾ ĐỘ OFFLINE – DỮ LIỆU ĐỆM GIẢ LẬP\n(Không có kết nối máy chủ SQL Server, hệ thống kích hoạt đệm ngoại tuyến).";
+                msg += "\n\nĐANG CHẠY CHẾ ĐỘ OFFLINE – DỮ LIỆU ĐỆM GIẢ LẬP\n(Không có kết nối máy chủ SQL Server, hệ thống kích hoạt đệm ngoại tuyến).";
                 JOptionPane.showMessageDialog(this, msg, "Cảnh Báo Chế Độ Ngoại Tuyến", JOptionPane.WARNING_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, msg, "Đăng Nhập Thành Công", JOptionPane.INFORMATION_MESSAGE);

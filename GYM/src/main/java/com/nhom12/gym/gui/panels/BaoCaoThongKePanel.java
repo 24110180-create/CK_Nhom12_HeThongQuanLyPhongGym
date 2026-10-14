@@ -321,7 +321,7 @@ public class BaoCaoThongKePanel extends JPanel {
 
             JOptionPane.showMessageDialog(this,
                     "<html><body style='width: 320px; font-family: Segoe UI;'>"
-                            + "<b style='color: #2563eb;'>✓ Đã gửi tin nhắn nhắc hạn tự động!</b><br><br>"
+                            + "<b style='color: #2563eb;'>Đã gửi tin nhắn nhắc hạn tự động!</b><br><br>"
                             + "<b>Người nhận:</b> " + name + " (" + phone + ")<br>"
                             + "<b>Thời hạn gói:</b> " + exp + "<br>"
                             + "<b>Kênh gửi:</b> Zalo ZNS Template ID: #FITLIFE_RENEW_PROMO<br>"

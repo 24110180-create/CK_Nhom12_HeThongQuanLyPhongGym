@@ -83,9 +83,9 @@ public class HoiVienSapHetHanPanel extends JPanel {
         lblCountWarning = new JLabel("0 Hội viên", SwingConstants.CENTER);
         lblCountExpired = new JLabel("0 Hội viên", SwingConstants.CENTER);
 
-        pMetrics.add(createMiniCard("🔴 Khẩn cấp (≤ 3 ngày / Hôm nay)", lblCountCritical, new Color(220, 38, 38), new Color(254, 242, 242)));
-        pMetrics.add(createMiniCard("🟡 Cần chăm sóc (≤ 7 ngày tới)", lblCountWarning, new Color(217, 119, 6), new Color(254, 243, 199)));
-        pMetrics.add(createMiniCard("⚠️ Đã quá hạn (Mời gia hạn lại)", lblCountExpired, new Color(100, 116, 139), new Color(241, 245, 249)));
+        pMetrics.add(createMiniCard("Khẩn cấp (<= 3 ngày / Hôm nay)", lblCountCritical, new Color(220, 38, 38), new Color(254, 242, 242)));
+        pMetrics.add(createMiniCard("Cần chăm sóc (<= 7 ngày tới)", lblCountWarning, new Color(217, 119, 6), new Color(254, 243, 199)));
+        pMetrics.add(createMiniCard("Đã quá hạn (Mời gia hạn lại)", lblCountExpired, new Color(100, 116, 139), new Color(241, 245, 249)));
 
         pTop.add(pMetrics, BorderLayout.SOUTH);
         add(pTop, BorderLayout.NORTH);
@@ -135,21 +135,21 @@ public class HoiVienSapHetHanPanel extends JPanel {
         JPanel pActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         pActions.setOpaque(false);
 
-        JButton btnZalo = new JButton("📱 Gửi Nhắc Hạn (Zalo ZNS / SMS)");
+        JButton btnZalo = new JButton("Gửi Nhắc Hạn (Zalo ZNS / SMS)");
         btnZalo.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnZalo.setBackground(new Color(37, 99, 235));
         btnZalo.setForeground(Color.WHITE);
         btnZalo.setFocusPainted(false);
         btnZalo.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        JButton btnRenew = new JButton("💳 Gia Hạn Gói Cho Hội Viên");
+        JButton btnRenew = new JButton("Gia Hạn Gói Cho Hội Viên");
         btnRenew.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnRenew.setBackground(new Color(16, 185, 129));
         btnRenew.setForeground(Color.WHITE);
         btnRenew.setFocusPainted(false);
         btnRenew.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        JButton btnExport = new JButton("📥 Xuất Excel");
+        JButton btnExport = new JButton("Xuất Excel");
         btnExport.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnExport.setBackground(new Color(100, 116, 139));
         btnExport.setForeground(Color.WHITE);
@@ -317,19 +317,19 @@ public class HoiVienSapHetHanPanel extends JPanel {
                 String alertLevel;
                 if (remainDays < 0) {
                     remainText = "Quá hạn " + Math.abs(remainDays) + " ngày";
-                    alertLevel = "🔴 ĐÃ QUÁ HẠN (CẤP 3)";
+                    alertLevel = "ĐÃ QUÁ HẠN (CẤP 3)";
                 } else if (remainDays == 0) {
                     remainText = "Hết hạn hôm nay!";
-                    alertLevel = "🔴 KHẨN CẤP: HÔM NAY";
+                    alertLevel = "KHẨN CẤP: HÔM NAY";
                 } else if (remainDays <= 3) {
                     remainText = "Còn " + remainDays + " ngày";
-                    alertLevel = "🔴 KHẨN CẤP (CẤP 1)";
+                    alertLevel = "KHẨN CẤP (CẤP 1)";
                 } else if (remainDays <= 7) {
                     remainText = "Còn " + remainDays + " ngày";
-                    alertLevel = "🟡 SẮP HẾT HẠN (7 NGÀY)";
+                    alertLevel = "SẮP HẾT HẠN (7 NGÀY)";
                 } else {
                     remainText = "Còn " + remainDays + " ngày";
-                    alertLevel = "🟢 TRONG HẠN ĐỊNH";
+                    alertLevel = "TRONG HẠN ĐỊNH";
                 }
 
                 String hoTen = TextSanitizer.sanitize(hv.getHoTen());

@@ -89,7 +89,7 @@ public class ExcelExportHelper {
             // Hỏi người dùng có muốn mở file ngay không
             int choice = JOptionPane.showConfirmDialog(parentComponent,
                     "<html><body style='width: 320px; font-family: Segoe UI;'>"
-                            + "<b style='color: #16a34a; font-size: 14px;'>✓ Xuất file Excel thành công!</b><br><br>"
+                            + "<b style='color: #16a34a; font-size: 14px;'>Xuất file Excel thành công!</b><br><br>"
                             + "<b>Đường dẫn:</b> " + fileToSave.getAbsolutePath() + "<br>"
                             + "<b>Tổng số bản ghi:</b> " + rowCount + " dòng.<br><br>"
                             + "Bạn có muốn mở file ngay bây giờ không?</body></html>",

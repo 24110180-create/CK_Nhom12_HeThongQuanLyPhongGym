@@ -321,7 +321,7 @@ public class DangKyTaiKhoanDialog extends JDialog {
                 new EmptyBorder(2, 6, 2, 6)
         ));
         lblSelectedRoleBanner.setForeground(selectedRole.color.darker());
-        lblSelectedRoleBanner.setText("● ĐANG CHỌN: " + selectedRole.title + " (" + selectedRole.badge + ") • Khởi chạy: " + selectedRole.appName);
+        lblSelectedRoleBanner.setText("ĐANG CHỌN: " + selectedRole.title + " (" + selectedRole.badge + ") • Khởi chạy: " + selectedRole.appName);
         pnlSelectedRoleBanner.revalidate();
         pnlSelectedRoleBanner.repaint();
 

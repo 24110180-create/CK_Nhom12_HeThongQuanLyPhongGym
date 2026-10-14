@@ -273,7 +273,7 @@ public class LichDayHLVPanel extends JPanel {
         if (id <= 0) return;
 
         String cur = studentModel.getValueAt(sel, 4).toString();
-        String nxt = cur.contains("Đã có mặt") || cur.contains("Đã điểm danh") ? "Chưa điểm danh" : "Đã có mặt ✔";
+        String nxt = cur.contains("Đã có mặt") || cur.contains("Đã điểm danh") ? "Chưa điểm danh" : "Đã có mặt";
 
         dangKyLopDAO.capNhatDiemDanh(id, nxt);
         studentModel.setValueAt(nxt, sel, 4);
@@ -319,8 +319,8 @@ public class LichDayHLVPanel extends JPanel {
             Object idObj = studentModel.getValueAt(i, 0);
             int id = (idObj instanceof Number) ? ((Number) idObj).intValue() : Integer.parseInt(idObj.toString());
             if (id > 0) {
-                dangKyLopDAO.capNhatDiemDanh(id, "Đã có mặt ✔");
-                studentModel.setValueAt("Đã có mặt ✔", i, 4);
+                dangKyLopDAO.capNhatDiemDanh(id, "Đã có mặt");
+                studentModel.setValueAt("Đã có mặt", i, 4);
                 count++;
             }
         }

@@ -153,22 +153,22 @@ public class QuanLyNhanSuPanel extends JPanel {
         // Card 1: Tổng nhân sự
         lblKpiTotalStaff = new JLabel("0 Nhân sự");
         lblKpiTotalStaffSub = new JLabel("CN01: 0 • CN02: 0 • Trụ sở: 0");
-        pnl.add(createSingleKpiCard("👥 TỔNG NHÂN LỰC CHUỖI", lblKpiTotalStaff, lblKpiTotalStaffSub, new Color(99, 102, 241)));
+        pnl.add(createSingleKpiCard("TỔNG NHÂN LỰC CHUỖI", lblKpiTotalStaff, lblKpiTotalStaffSub, new Color(99, 102, 241)));
 
         // Card 2: Lực lượng
         lblKpiRoleComposition = new JLabel("0 LT • 0 HLV");
         lblKpiRoleCompositionSub = new JLabel("0 Quản Lý • 1 Chủ");
-        pnl.add(createSingleKpiCard("🏢 CƠ CẤU VẬN HÀNH", lblKpiRoleComposition, lblKpiRoleCompositionSub, new Color(16, 185, 129)));
+        pnl.add(createSingleKpiCard("CƠ CẤU VẬN HÀNH", lblKpiRoleComposition, lblKpiRoleCompositionSub, new Color(16, 185, 129)));
 
         // Card 3: Quỹ lương
         lblKpiPayroll = new JLabel("0 VNĐ");
         lblKpiPayrollSub = new JLabel("Lương cơ bản + Thưởng KPI");
-        pnl.add(createSingleKpiCard("💰 DỰ TOÁN QUỸ LƯƠNG", lblKpiPayroll, lblKpiPayrollSub, new Color(245, 158, 11)));
+        pnl.add(createSingleKpiCard("DỰ TOÁN QUỸ LƯƠNG", lblKpiPayroll, lblKpiPayrollSub, new Color(245, 158, 11)));
 
         // Card 4: Trạng thái ca trực
         lblKpiStatusRate = new JLabel("100% Hoạt động");
         lblKpiStatusRateSub = new JLabel("Sẵn sàng phục vụ khách");
-        pnl.add(createSingleKpiCard("⚡ TRẠNG THÁI CA TRỰC", lblKpiStatusRate, lblKpiStatusRateSub, new Color(14, 165, 233)));
+        pnl.add(createSingleKpiCard("TRẠNG THÁI CA TRỰC", lblKpiStatusRate, lblKpiStatusRateSub, new Color(14, 165, 233)));
 
         return pnl;
     }
@@ -263,7 +263,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         pRow2.setOpaque(false);
         pRow2.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        btnEditSalary = new JButton("✏️ Điều Chỉnh Lương & Ca Trực");
+        btnEditSalary = new JButton("Điều Chỉnh Lương & Ca Trực");
         btnEditSalary.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnEditSalary.setBackground(new Color(37, 99, 235));
         btnEditSalary.setForeground(Color.WHITE);
@@ -271,7 +271,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         btnEditSalary.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnEditSalary.setPreferredSize(new Dimension(215, 32));
 
-        btnViewProfile = new JButton("📋 Hồ Sơ Chi Tiết");
+        btnViewProfile = new JButton("Hồ Sơ Chi Tiết");
         btnViewProfile.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnViewProfile.setBackground(new Color(79, 70, 229));
         btnViewProfile.setForeground(Color.WHITE);
@@ -279,7 +279,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         btnViewProfile.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnViewProfile.setPreferredSize(new Dimension(135, 32));
 
-        btnTransferBranch = new JButton("🏢 Điều Động Chi Nhánh");
+        btnTransferBranch = new JButton("Điều Động Chi Nhánh");
         btnTransferBranch.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnTransferBranch.setBackground(new Color(99, 102, 241));
         btnTransferBranch.setForeground(Color.WHITE);
@@ -287,7 +287,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         btnTransferBranch.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnTransferBranch.setPreferredSize(new Dimension(175, 32));
 
-        btnShiftBoard = new JButton("📅 Lịch Trực & Ca Làm");
+        btnShiftBoard = new JButton("Lịch Trực & Ca Làm");
         btnShiftBoard.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnShiftBoard.setBackground(new Color(14, 165, 233));
         btnShiftBoard.setForeground(Color.WHITE);
@@ -295,7 +295,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         btnShiftBoard.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnShiftBoard.setPreferredSize(new Dimension(165, 32));
 
-        btnCalculateKPI = new JButton("💵 Tính Thưởng KPI");
+        btnCalculateKPI = new JButton("Tính Thưởng KPI");
         btnCalculateKPI.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnCalculateKPI.setBackground(new Color(245, 158, 11));
         btnCalculateKPI.setForeground(Color.WHITE);
@@ -303,7 +303,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         btnCalculateKPI.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnCalculateKPI.setPreferredSize(new Dimension(145, 32));
 
-        btnDeleteStaff = new JButton("🗑️ Xóa Nhân Sự");
+        btnDeleteStaff = new JButton("Xóa Nhân Sự");
         btnDeleteStaff.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnDeleteStaff.setBackground(new Color(239, 68, 68));
         btnDeleteStaff.setForeground(Color.WHITE);
@@ -311,7 +311,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         btnDeleteStaff.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnDeleteStaff.setPreferredSize(new Dimension(130, 32));
 
-        btnExportExcel = new JButton("📊 Xuất Bảng Lương (.csv)");
+        btnExportExcel = new JButton("Xuất Bảng Lương (.csv)");
         btnExportExcel.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnExportExcel.setBackground(new Color(16, 185, 129));
         btnExportExcel.setForeground(Color.WHITE);
@@ -319,7 +319,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         btnExportExcel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnExportExcel.setPreferredSize(new Dimension(185, 32));
 
-        btnRefresh = new JButton("🔄 Làm Mới");
+        btnRefresh = new JButton("Làm Mới");
         btnRefresh.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         btnRefresh.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnRefresh.setPreferredSize(new Dimension(105, 32));
@@ -472,13 +472,13 @@ public class QuanLyNhanSuPanel extends JPanel {
         staffList.clear();
 
         // Nạp dữ liệu nền tảng chuẩn mực cho chuỗi 2 cơ sở
-        staffList.add(new StaffDetail("admin", "Võ Anh Đức", "Chủ", "Toàn hệ thống", "Ca hành chính (08:00 - 17:00)", "0909000001", 30000000, 10000000, "5.0 ⭐ (Xuất sắc)", "Đang làm việc"));
-        staffList.add(new StaffDetail("letan1", "Nguyễn Thị Linh", "Lễ tân", "CN01 - Cơ sở 1 (Quận 1)", "Ca sáng (06:00 - 14:00)", "0912345601", 7500000, 1500000, "5.0 ⭐ (Xuất sắc)", "Đang làm việc"));
-        staffList.add(new StaffDetail("letan2", "Trần Thị Mai", "Lễ tân", "CN02 - Cơ sở 2 (Tân Bình)", "Ca chiều (14:00 - 22:00)", "0912345602", 7500000, 1200000, "4.8 ⭐ (Tốt)", "Đang làm việc"));
-        staffList.add(new StaffDetail("hlv1", "Trần Tuấn Kiệt", "HLV", "CN01 - Cơ sở 1 (Quận 1)", "Ca chiều (14:00 - 22:00)", "0912345603", 15000000, 4500000, "4.9 ⭐ (Xuất sắc)", "Đang làm việc"));
-        staffList.add(new StaffDetail("hlv2", "Phạm Quốc Bảo", "HLV", "CN02 - Cơ sở 2 (Tân Bình)", "Ca sáng (06:00 - 14:00)", "0912345604", 14000000, 3800000, "4.8 ⭐ (Tốt)", "Đang làm việc"));
-        staffList.add(new StaffDetail("hlv3", "Nguyễn Thu Thảo", "HLV", "CN01 - Cơ sở 1 (Quận 1)", "Ca sáng (06:00 - 14:00)", "0912345605", 13000000, 3200000, "5.0 ⭐ (Xuất sắc)", "Đang làm việc"));
-        staffList.add(new StaffDetail("quanly1", "Lê Thanh Sơn", "Quản lý", "CN02 - Cơ sở 2 (Tân Bình)", "Ca hành chính (08:00 - 17:00)", "0912345606", 18000000, 4000000, "4.9 ⭐ (Xuất sắc)", "Đang làm việc"));
+        staffList.add(new StaffDetail("admin", "Võ Anh Đức", "Chủ", "Toàn hệ thống", "Ca hành chính (08:00 - 17:00)", "0909000001", 30000000, 10000000, "5.0 (Xuất sắc)", "Đang làm việc"));
+        staffList.add(new StaffDetail("letan1", "Nguyễn Thị Linh", "Lễ tân", "CN01 - Cơ sở 1 (Quận 1)", "Ca sáng (06:00 - 14:00)", "0912345601", 7500000, 1500000, "5.0 (Xuất sắc)", "Đang làm việc"));
+        staffList.add(new StaffDetail("letan2", "Trần Thị Mai", "Lễ tân", "CN02 - Cơ sở 2 (Tân Bình)", "Ca chiều (14:00 - 22:00)", "0912345602", 7500000, 1200000, "4.8 (Tốt)", "Đang làm việc"));
+        staffList.add(new StaffDetail("hlv1", "Trần Tuấn Kiệt", "HLV", "CN01 - Cơ sở 1 (Quận 1)", "Ca chiều (14:00 - 22:00)", "0912345603", 15000000, 4500000, "4.9 (Xuất sắc)", "Đang làm việc"));
+        staffList.add(new StaffDetail("hlv2", "Phạm Quốc Bảo", "HLV", "CN02 - Cơ sở 2 (Tân Bình)", "Ca sáng (06:00 - 14:00)", "0912345604", 14000000, 3800000, "4.8 (Tốt)", "Đang làm việc"));
+        staffList.add(new StaffDetail("hlv3", "Nguyễn Thu Thảo", "HLV", "CN01 - Cơ sở 1 (Quận 1)", "Ca sáng (06:00 - 14:00)", "0912345605", 13000000, 3200000, "5.0 (Xuất sắc)", "Đang làm việc"));
+        staffList.add(new StaffDetail("quanly1", "Lê Thanh Sơn", "Quản lý", "CN02 - Cơ sở 2 (Tân Bình)", "Ca hành chính (08:00 - 17:00)", "0912345606", 18000000, 4000000, "4.9 (Xuất sắc)", "Đang làm việc"));
 
         // Đồng bộ dữ liệu thực tế từ TaiKhoanDAO
         try {
@@ -507,7 +507,7 @@ public class QuanLyNhanSuPanel extends JPanel {
                         String phoneVal = tk.getTenDangNhap().matches("^0[35789][0-9]{8}$")
                                 ? tk.getTenDangNhap()
                                 : String.format("09%08d", Math.abs(tk.getTenDangNhap().hashCode()) % 100000000);
-                        staffList.add(new StaffDetail(tk.getTenDangNhap(), fn, r, b, "Ca xoay linh hoạt", phoneVal, base, bonus, "5.0 ⭐ (Xuất sắc)", "Đang làm việc"));
+                        staffList.add(new StaffDetail(tk.getTenDangNhap(), fn, r, b, "Ca xoay linh hoạt", phoneVal, base, bonus, "5.0 (Xuất sắc)", "Đang làm việc"));
                     }
                 }
             }
@@ -673,7 +673,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         cbBranchEdit.setSelectedItem(staff.branch);
 
         JComboBox<String> cbRatingEdit = new JComboBox<>(new String[]{
-                "5.0 ⭐ (Xuất sắc)", "4.8 ⭐ (Tốt)", "4.5 ⭐ (Khá)", "4.0 ⭐ (Đạt)"
+                "5.0 (Xuất sắc)", "4.8 (Tốt)", "4.5 (Khá)", "4.0 (Đạt)"
         });
         cbRatingEdit.setFont(fI);
         cbRatingEdit.setSelectedItem(staff.rating);
@@ -706,7 +706,7 @@ public class QuanLyNhanSuPanel extends JPanel {
         btnCancel.addActionListener(e -> dlg.dispose());
 
         final StaffDetail staffFinal = staff;
-        JButton btnSave = new JButton("💾 Lưu Thay Đổi");
+        JButton btnSave = new JButton("Lưu Thay Đổi");
         btnSave.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnSave.setBackground(new Color(37, 99, 235));
         btnSave.setForeground(Color.WHITE);

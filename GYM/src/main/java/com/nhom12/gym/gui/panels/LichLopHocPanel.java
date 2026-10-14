@@ -484,11 +484,11 @@ public class LichLopHocPanel extends JPanel {
                 if (val.contains("ĐẦY LỚP")) {
                     l.setBackground(new Color(254, 226, 226));
                     l.setForeground(new Color(220, 38, 38));
-                    l.setText("● ĐẦY LỚP (0)");
+                    l.setText("ĐẦY LỚP (0)");
                 } else if (val.contains("CÒN CHỖ")) {
                     l.setBackground(new Color(220, 252, 231));
                     l.setForeground(new Color(22, 163, 74));
-                    l.setText("● " + val);
+                    l.setText(val);
                 } else {
                     l.setBackground(new Color(241, 245, 249));
                     l.setForeground(new Color(71, 85, 105));
@@ -717,7 +717,7 @@ public class LichLopHocPanel extends JPanel {
         // Mẹo thao tác nghiệp vụ nhanh ở chân bảng
         JPanel pTip = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
         pTip.setOpaque(false);
-        JLabel lblTip = new JLabel("💡 Mẹo nghiệp vụ: Click đúp vào một lớp học để chọn nhanh • Click đúp trực tiếp vào học viên để đảo trạng thái Điểm Danh.");
+        JLabel lblTip = new JLabel("Mẹo nghiệp vụ: Click đúp vào một lớp học để chọn nhanh • Click đúp trực tiếp vào học viên để đảo trạng thái Điểm Danh.");
         lblTip.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         lblTip.setForeground(new Color(100, 116, 139));
         pTip.add(lblTip);

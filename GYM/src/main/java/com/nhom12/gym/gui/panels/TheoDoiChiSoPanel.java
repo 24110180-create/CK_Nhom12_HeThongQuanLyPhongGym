@@ -504,9 +504,9 @@ public class TheoDoiChiSoPanel extends JPanel {
         int sel = table.getSelectedRow();
         String member = sel != -1 ? model.getValueAt(table.convertRowIndexToModel(sel), 1).toString() : cbHoiVien.getSelectedItem().toString().split(" \\(")[0];
 
-        String report = "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+        String report = "==========================================\n"
                 + "       PHIẾU KẾT QUẢ PHÂN TÍCH INBODY\n"
-                + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                + "==========================================\n"
                 + "Hội Viên: " + member + "\n"
                 + "Ngày Đo: " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date()) + "\n"
                 + "Chiều Cao: " + txtChieuCao.getText() + " cm | Cân Nặng: " + txtCanNang.getText() + " kg\n"
@@ -515,7 +515,7 @@ public class TheoDoiChiSoPanel extends JPanel {
                 + lblBMI.getText() + "\n"
                 + lblDanhGia.getText() + "\n"
                 + "Lời Khuyên HLV: " + txtGhiChu.getText() + "\n"
-                + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                + "==========================================\n"
                 + "Đã xuất phiếu phân tích InBody và cập nhật vào hồ sơ theo dõi hội viên thành công!";
         JOptionPane.showMessageDialog(this, report, "Xuất Phiếu InBody", JOptionPane.INFORMATION_MESSAGE);
     }

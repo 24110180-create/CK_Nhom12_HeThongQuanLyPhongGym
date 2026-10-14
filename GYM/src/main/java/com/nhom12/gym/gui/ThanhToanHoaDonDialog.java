@@ -142,7 +142,7 @@ public class ThanhToanHoaDonDialog extends JDialog {
         bottomBar.setOpaque(false);
         bottomBar.setBorder(new EmptyBorder(8, 0, 0, 0));
 
-        JLabel lblSecurity = new JLabel("🔒 Giao dịch mã hóa an toàn • Đã đồng bộ với CSDL FitLife Gym");
+        JLabel lblSecurity = new JLabel("Giao dịch mã hóa an toàn • Đã đồng bộ với CSDL FitLife Gym");
         lblSecurity.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         lblSecurity.setForeground(new Color(100, 116, 139));
         bottomBar.add(lblSecurity, BorderLayout.WEST);
@@ -158,7 +158,7 @@ public class ThanhToanHoaDonDialog extends JDialog {
         btnCancel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnCancel.addActionListener(e -> dispose());
 
-        JButton btnPrint = new JButton("🖨️ Xem Phiếu Thu");
+        JButton btnPrint = new JButton("Xem Phiếu Thu");
         btnPrint.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnPrint.setBackground(new Color(241, 245, 249));
         btnPrint.setForeground(new Color(30, 41, 59));
@@ -166,7 +166,7 @@ public class ThanhToanHoaDonDialog extends JDialog {
         btnPrint.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnPrint.addActionListener(e -> hienThiPhieuThuNhiet());
 
-        JButton btnConfirm = new JButton("✓ XÁC NHẬN ĐÃ THANH TOÁN (" + df.format(thanhTien) + ")");
+        JButton btnConfirm = new JButton("XÁC NHẬN ĐÃ THANH TOÁN (" + df.format(thanhTien) + ")");
         btnConfirm.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnConfirm.setBackground(new Color(16, 185, 129)); // Emerald 500
         btnConfirm.setForeground(Color.WHITE);
@@ -387,7 +387,7 @@ public class ThanhToanHoaDonDialog extends JDialog {
         pnlQRBottom.setOpaque(false);
         pnlQRBottom.add(pnlAccInfo, BorderLayout.CENTER);
 
-        JButton btnCopy = new JButton("📋 Sao Chép Số TK & Nội Dung");
+        JButton btnCopy = new JButton("Sao Chép Số TK & Nội Dung");
         btnCopy.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         btnCopy.setBackground(new Color(241, 245, 249));
         btnCopy.setForeground(new Color(30, 41, 59));
@@ -497,7 +497,7 @@ public class ThanhToanHoaDonDialog extends JDialog {
         }
 
         JOptionPane.showMessageDialog(this,
-                "✓ Đã xác nhận thanh toán thành công!\n"
+                "Đã xác nhận thanh toán thành công!\n"
                         + "• Mã Hóa Đơn: " + maHoaDon + "\n"
                         + "• Khách hàng: " + tenKhachHang + "\n"
                         + "• Tổng tiền: " + df.format(thanhTien) + "\n"

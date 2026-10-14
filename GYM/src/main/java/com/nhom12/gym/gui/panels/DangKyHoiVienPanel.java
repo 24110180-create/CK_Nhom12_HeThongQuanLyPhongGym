@@ -77,7 +77,7 @@ public class DangKyHoiVienPanel extends JPanel {
         headerPanel.add(lblSubtitle, BorderLayout.SOUTH);
 
         if (onBackToList != null) {
-            JButton btnBack = new JButton("📋 Xem Danh Sách Hội Viên");
+            JButton btnBack = new JButton("Xem Danh Sách Hội Viên");
             btnBack.setFont(new Font("Segoe UI", Font.BOLD, 12));
             btnBack.setBackground(new Color(241, 245, 249));
             btnBack.setForeground(new Color(37, 99, 235));
@@ -368,7 +368,7 @@ public class DangKyHoiVienPanel extends JPanel {
         lblCardBranch.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         lblCardBranch.setForeground(new Color(148, 163, 184));
 
-        JLabel lblBadge = new JLabel(" ● HOẠT ĐỘNG ");
+        JLabel lblBadge = new JLabel(" HOẠT ĐỘNG ");
         lblBadge.setFont(new Font("Segoe UI", Font.BOLD, 10));
         lblBadge.setOpaque(true);
         lblBadge.setBackground(new Color(16, 185, 129));

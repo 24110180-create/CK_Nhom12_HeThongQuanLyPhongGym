@@ -70,7 +70,7 @@ public class CuaSoChuHeThongPanel extends JPanel {
         JPanel pnlBadge = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 4));
         pnlBadge.setOpaque(false);
 
-        JLabel badgeChain = new JLabel("🟢 Chuỗi 2 Cơ Sở Online • Trực Ca 100%");
+        JLabel badgeChain = new JLabel("Chuỗi 2 Cơ Sở Online • Trực Ca 100%");
         badgeChain.setFont(new Font("Segoe UI", Font.BOLD, 12));
         badgeChain.setOpaque(true);
         badgeChain.setBackground(new Color(236, 253, 245));
@@ -288,7 +288,7 @@ public class CuaSoChuHeThongPanel extends JPanel {
 
         card.add(stats, BorderLayout.CENTER);
 
-        JLabel lblFooter = new JLabel("🟢 Đầy đủ nhân lực trực ca sáng (06:00 - 14:00) & chiều (14:00 - 22:00)");
+        JLabel lblFooter = new JLabel("Đầy đủ nhân lực trực ca sáng (06:00 - 14:00) & chiều (14:00 - 22:00)");
         lblFooter.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         lblFooter.setForeground(new Color(16, 185, 129));
         card.add(lblFooter, BorderLayout.SOUTH);
@@ -300,7 +300,7 @@ public class CuaSoChuHeThongPanel extends JPanel {
         JPanel row = new JPanel(new BorderLayout(8, 0));
         row.setOpaque(false);
 
-        JLabel lblT = new JLabel("● " + roleTitle);
+        JLabel lblT = new JLabel("- " + roleTitle);
         lblT.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblT.setForeground(dotColor);
 
@@ -334,7 +334,7 @@ public class CuaSoChuHeThongPanel extends JPanel {
         lblHeader.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblHeader.setForeground(count > 0 ? new Color(217, 119, 6) : new Color(16, 185, 129));
 
-        JButton btnViewAll = new JButton("Xem Toàn Bộ ➔");
+        JButton btnViewAll = new JButton("Xem Toàn Bộ");
         btnViewAll.setFont(new Font("Segoe UI", Font.BOLD, 11));
         btnViewAll.setForeground(new Color(37, 99, 235));
         btnViewAll.setContentAreaFilled(false);
@@ -343,7 +343,7 @@ public class CuaSoChuHeThongPanel extends JPanel {
         btnViewAll.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnViewAll.addActionListener(e -> {
             if (MainDashboard.getInstance() != null) {
-                MainDashboard.getInstance().navigateTo("Hội Viên Sắp Hết Hạn");
+                MainDashboard.getInstance().navigateTo("Quản Lý Hội Viên", 2);
             }
         });
 
@@ -380,19 +380,19 @@ public class CuaSoChuHeThongPanel extends JPanel {
                 Color bColor;
                 Color bBg;
                 if (remain < 0) {
-                    badge = "⚠️ Quá hạn " + Math.abs(remain) + " ngày";
+                    badge = "Quá hạn " + Math.abs(remain) + " ngày";
                     bColor = new Color(220, 38, 38);
                     bBg = new Color(254, 242, 242);
                 } else if (remain == 0) {
-                    badge = "🔴 Hết hạn hôm nay!";
+                    badge = "Hết hạn hôm nay!";
                     bColor = new Color(220, 38, 38);
                     bBg = new Color(254, 242, 242);
                 } else if (remain <= 3) {
-                    badge = "🔴 Còn " + remain + " ngày";
+                    badge = "Còn " + remain + " ngày (Khẩn cấp)";
                     bColor = new Color(220, 38, 38);
                     bBg = new Color(254, 242, 242);
                 } else {
-                    badge = "🟡 Còn " + remain + " ngày";
+                    badge = "Còn " + remain + " ngày (Cần nhắc)";
                     bColor = new Color(217, 119, 6);
                     bBg = new Color(254, 243, 199);
                 }
@@ -408,7 +408,7 @@ public class CuaSoChuHeThongPanel extends JPanel {
                 displayed++;
             }
         } else {
-            JLabel lblEmpty = new JLabel("🟢 Toàn bộ hội viên đang trong thời hạn thẻ tập hợp lệ • 0 cảnh báo khẩn cấp", SwingConstants.CENTER);
+            JLabel lblEmpty = new JLabel("Toàn bộ hội viên đang trong thời hạn thẻ tập hợp lệ • 0 cảnh báo khẩn cấp", SwingConstants.CENTER);
             lblEmpty.setFont(new Font("Segoe UI", Font.PLAIN, 12));
             lblEmpty.setForeground(new Color(16, 185, 129));
             list.add(lblEmpty);
@@ -416,7 +416,7 @@ public class CuaSoChuHeThongPanel extends JPanel {
 
         card.add(list, BorderLayout.CENTER);
 
-        JLabel lblFoot = new JLabel("💡 Dữ liệu tự động đồng bộ thời gian thực từ CSDL chuỗi FitLife Gym.");
+        JLabel lblFoot = new JLabel("Dữ liệu tự động đồng bộ thời gian thực từ CSDL chuỗi FitLife Gym.");
         lblFoot.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         lblFoot.setForeground(new Color(100, 116, 139));
         card.add(lblFoot, BorderLayout.SOUTH);
@@ -495,19 +495,19 @@ public class CuaSoChuHeThongPanel extends JPanel {
         JPanel grid = new JPanel(new GridLayout(2, 2, 10, 10));
         grid.setOpaque(false);
 
-        grid.add(createActionTile("👥 Quản Lý Hội Viên", "Hồ sơ hội viên, thẻ QR & tái ký", new Color(37, 99, 235), () -> {
+        grid.add(createActionTile("Quản Lý Hội Viên", "Hồ sơ hội viên, thẻ QR & tái ký", new Color(37, 99, 235), () -> {
             if (MainDashboard.getInstance() != null) MainDashboard.getInstance().navigateTo("Quản Lý Hội Viên");
         }));
 
-        grid.add(createActionTile("📊 Báo Cáo Doanh Thu Chuỗi", "Doanh thu cơ sở & danh sách hết hạn", new Color(16, 185, 129), () -> {
+        grid.add(createActionTile("Báo Cáo Doanh Thu Chuỗi", "Doanh thu cơ sở & danh sách hết hạn", new Color(16, 185, 129), () -> {
             if (MainDashboard.getInstance() != null) MainDashboard.getInstance().navigateTo("Báo Cáo Doanh Thu");
         }));
 
-        grid.add(createActionTile("👔 Quản Lý Nhân Sự & Bảng Lương", "Độ phủ ca, KPI & điều động chi nhánh", new Color(245, 158, 11), () -> {
+        grid.add(createActionTile("Quản Lý Nhân Sự & Bảng Lương", "Độ phủ ca, KPI & điều động chi nhánh", new Color(245, 158, 11), () -> {
             if (MainDashboard.getInstance() != null) MainDashboard.getInstance().navigateTo("Quản Lý Nhân Sự & Bảng Lương");
         }));
 
-        grid.add(createActionTile("📱 Trạm Quét QR Check-in", "Mở cửa sổ quét thẻ QR cổng ra vào", new Color(147, 51, 234), () -> {
+        grid.add(createActionTile("Trạm Quét QR Check-in", "Mở cửa sổ quét thẻ QR cổng ra vào", new Color(147, 51, 234), () -> {
             new QRScannerSimulatorDialog((Frame) SwingUtilities.getWindowAncestor(this)).setVisible(true);
         }));
 

@@ -165,7 +165,7 @@ public class CheckInForm extends JPanel implements Scrollable {
         JPanel pStatusLeft = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         pStatusLeft.setOpaque(false);
 
-        lblNetworkStatus = new JLabel("● Online (Đồng bộ)");
+        lblNetworkStatus = new JLabel("Online (Đồng bộ)");
         lblNetworkStatus.setFont(new Font("Segoe UI", Font.BOLD, 11));
         lblNetworkStatus.setForeground(new Color(16, 185, 129));
 
@@ -702,7 +702,7 @@ public class CheckInForm extends JPanel implements Scrollable {
         checkInService.setNetworkOnline(newState);
 
         if (newState) {
-            lblNetworkStatus.setText("● Online (Đồng bộ)");
+            lblNetworkStatus.setText("Online (Đồng bộ)");
             lblNetworkStatus.setForeground(new Color(16, 185, 129));
             btnToggleOffline.setText("Mạng: Online");
             btnToggleOffline.setBackground(new Color(16, 185, 129));
@@ -711,7 +711,7 @@ public class CheckInForm extends JPanel implements Scrollable {
                 dongBoOffline();
             }
         } else {
-            lblNetworkStatus.setText("● Ngoại tuyến (Wifi CN02 yếu)");
+            lblNetworkStatus.setText("Ngoại tuyến (Wifi CN02 yếu)");
             lblNetworkStatus.setForeground(new Color(245, 158, 11));
             btnToggleOffline.setText("Mạng: Ngoại Tuyến (Offline)");
             btnToggleOffline.setBackground(new Color(239, 68, 68));

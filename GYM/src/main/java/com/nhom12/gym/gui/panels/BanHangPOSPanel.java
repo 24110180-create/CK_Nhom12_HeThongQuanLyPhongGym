@@ -56,7 +56,7 @@ public class BanHangPOSPanel extends JPanel implements KhoHangService.KhoHangLis
         lblLeftTitle.setFont(new Font("Segoe UI", Font.BOLD, 15));
         lblLeftTitle.setForeground(new Color(30, 41, 59));
 
-        JLabel lblSyncStatus = new JLabel("● Đồng bộ kho thời gian thực");
+        JLabel lblSyncStatus = new JLabel("Đồng bộ kho thời gian thực");
         lblSyncStatus.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblSyncStatus.setForeground(new Color(16, 185, 129));
 

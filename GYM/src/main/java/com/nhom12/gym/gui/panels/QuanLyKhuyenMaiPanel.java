@@ -294,7 +294,7 @@ public class QuanLyKhuyenMaiPanel extends JPanel {
         lblOfflineQueueCount.setForeground(new Color(37, 99, 235));
         topCards.add(createMiniCard("HÀNG ĐỢI OFFLINE BUFFER", lblOfflineQueueCount, "Tự động đồng bộ khi có Wifi"));
 
-        JLabel lblSpeed = new JLabel("⚡ 18 ms (< 2.0s)");
+        JLabel lblSpeed = new JLabel("18 ms (< 2.0s)");
         lblSpeed.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblSpeed.setForeground(new Color(16, 185, 129));
         topCards.add(createMiniCard("TỐC ĐỘ CHECK-IN CỤC BỘ", lblSpeed, "Đạt chuẩn yêu cầu phi chức năng"));

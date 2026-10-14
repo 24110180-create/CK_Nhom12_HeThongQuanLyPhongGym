@@ -66,7 +66,7 @@ public class QuanLyHoiVienHubPanel extends JPanel {
 
         btnTabList = createTabButton("Danh Sách & Tra Cứu Hội Viên", true);
         btnTabRegister = createTabButton("+ Tiếp Nhận & Đăng Ký Mới", false);
-        btnTabExpiring = createTabButton("⚠️ Hội Viên Sắp Hết Hạn & Tái Ký", false);
+        btnTabExpiring = createTabButton("Hội Viên Sắp Hết Hạn & Tái Ký", false);
 
         btnTabList.addActionListener(e -> selectTab(0));
         btnTabRegister.addActionListener(e -> selectTab(1));

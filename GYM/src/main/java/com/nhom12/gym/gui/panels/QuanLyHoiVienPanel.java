@@ -146,7 +146,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         JLabel lblFStatus = new JLabel("Trạng thái:");
         lblFStatus.setFont(new Font("Segoe UI", Font.BOLD, 12));
         cbFilterStatus = new JComboBox<>(new String[]{
-                "Tất Cả Trạng Thái", "Active (Đang hoạt động)", "Expired (Hết hạn)", "Locked (Tạm khóa)", "⚠️ Sắp Hết Hạn (Trong 7 ngày tới)"
+                "Tất Cả Trạng Thái", "Active (Đang hoạt động)", "Expired (Hết hạn)", "Locked (Tạm khóa)", "Sắp Hết Hạn (Trong 7 ngày tới)"
         });
         cbFilterStatus.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
@@ -347,7 +347,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         bottomActions.setOpaque(false);
         bottomActions.setBorder(new EmptyBorder(6, 0, 0, 0));
 
-        JLabel lblHint = new JLabel("💡 Mẹo: Nhấp đúp chuột vào hàng hoặc chọn nút dưới đây để cập nhật hồ sơ, khóa thẻ hoặc gửi mã QR:");
+        JLabel lblHint = new JLabel("Mẹo: Nhấp đúp chuột vào hàng hoặc chọn nút dưới đây để cập nhật hồ sơ, khóa thẻ hoặc gửi mã QR:");
         lblHint.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         lblHint.setForeground(new Color(100, 116, 139));
         bottomActions.add(lblHint, BorderLayout.WEST);
@@ -355,7 +355,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         JPanel btnActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         btnActions.setOpaque(false);
 
-        JButton btnXemTheQR = new JButton("📱 Xem & Gửi Thẻ QR");
+        JButton btnXemTheQR = new JButton("Xem & Gửi Thẻ QR");
         btnXemTheQR.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnXemTheQR.setBackground(new Color(37, 99, 235));
         btnXemTheQR.setForeground(Color.WHITE);
@@ -363,7 +363,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnXemTheQR.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnXemTheQR.addActionListener(e -> xemTheQRHoiVienDangChon());
 
-        JButton btnCapNhat = new JButton("✏️ Cập Nhật Hồ Sơ");
+        JButton btnCapNhat = new JButton("Cập Nhật Hồ Sơ");
         btnCapNhat.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnCapNhat.setBackground(new Color(14, 165, 233));
         btnCapNhat.setForeground(Color.WHITE);
@@ -371,7 +371,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnCapNhat.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnCapNhat.addActionListener(e -> moDialogCapNhatHoiVienDangChon());
 
-        JButton btnToggleLock = new JButton("🔒 Khóa / Mở Khóa");
+        JButton btnToggleLock = new JButton("Khóa / Mở Khóa");
         btnToggleLock.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnToggleLock.setBackground(new Color(245, 158, 11));
         btnToggleLock.setForeground(Color.WHITE);
@@ -379,7 +379,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnToggleLock.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnToggleLock.addActionListener(e -> xuLyKhoaMoKhoaThe());
 
-        JButton btnQuetCheckIn = new JButton("⏱️ Quét Thử Check-in");
+        JButton btnQuetCheckIn = new JButton("Quét Thử Check-in");
         btnQuetCheckIn.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnQuetCheckIn.setBackground(new Color(16, 185, 129));
         btnQuetCheckIn.setForeground(Color.WHITE);
@@ -387,7 +387,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnQuetCheckIn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnQuetCheckIn.addActionListener(e -> quetCheckInHoiVienDangChon());
 
-        JButton btnXoa = new JButton("🗑️ Xóa");
+        JButton btnXoa = new JButton("Xóa");
         btnXoa.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnXoa.setBackground(new Color(239, 68, 68));
         btnXoa.setForeground(Color.WHITE);
@@ -395,7 +395,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnXoa.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnXoa.addActionListener(e -> xuLyXoaHoiVien());
 
-        JButton btnLamMoi = new JButton("🔄 Tải Lại");
+        JButton btnLamMoi = new JButton("Tải Lại");
         btnLamMoi.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnLamMoi.setBackground(new Color(241, 245, 249));
         btnLamMoi.setForeground(new Color(71, 85, 105));

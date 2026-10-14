@@ -52,12 +52,12 @@ public class MainDashboard extends JFrame {
         return instance;
     }
 
-    public void navigateTo(String moduleTitle) {
-        navigateTo(moduleTitle, -1);
+    public boolean navigateTo(String moduleTitle) {
+        return navigateTo(moduleTitle, -1);
     }
 
-    public void navigateTo(String moduleTitle, int tabIndex) {
-        if (moduleTitle == null) return;
+    public boolean navigateTo(String moduleTitle, int tabIndex) {
+        if (moduleTitle == null) return false;
         for (SidebarMenuItem item : sidebarMenuItems) {
             if (item.title != null && item.title.toLowerCase().contains(moduleTitle.toLowerCase())) {
                 selectSidebarItem(item);
@@ -81,9 +81,10 @@ public class MainDashboard extends JFrame {
                         }
                     });
                 }
-                return;
+                return true;
             }
         }
+        return false;
     }
 
     public MainDashboard() {
@@ -421,6 +422,7 @@ public class MainDashboard extends JFrame {
         addSidebarCategoryHeader(menuContainer, "Vận Hành Quầy & Dịch Vụ");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên & flap barrier", () -> new CheckInForm(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ hội viên, gói tập & tra cứu toàn diện", () -> new QuanLyHoiVienPanel(), accent, false);
+        addSidebarItem(menuContainer, "Gia Hạn Gói Tập", "Tra cứu hội viên và gia hạn thẻ tập", () -> new GiaHanGoiTapPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Lớp Học Theo Lịch", "Thời khóa biểu lớp Yoga, Zumba, Cardio & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Bán nước giải khát, whey & đồ tập", () -> new BanHangPOSPanel(), accent, false);
 
@@ -442,6 +444,7 @@ public class MainDashboard extends JFrame {
         addSidebarCategoryHeader(menuContainer, "Vận Hành Quầy & Dịch Vụ");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên & cửa flap barrier", () -> new CheckInForm(), accent, true);
         addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ hội viên, gói tập & tra cứu toàn diện", () -> new QuanLyHoiVienPanel(), accent, false);
+        addSidebarItem(menuContainer, "Gia Hạn Gói Tập", "Tra cứu hội viên và gia hạn thẻ tập", () -> new GiaHanGoiTapPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Lớp Học Theo Lịch", "Thời khóa biểu lớp Yoga, Zumba, Cardio & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Bán nước giải khát, whey & đồ tập", () -> new BanHangPOSPanel(), accent, false);
     }
@@ -464,6 +467,7 @@ public class MainDashboard extends JFrame {
         addSidebarCategoryHeader(menuContainer, "Vận Hành Quầy & Dịch Vụ");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên tại quầy", () -> new CheckInForm(), accent, true);
         addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ hội viên, gói tập & tra cứu toàn diện", () -> new QuanLyHoiVienPanel(), accent, false);
+        addSidebarItem(menuContainer, "Gia Hạn Gói Tập", "Tra cứu hội viên và gia hạn thẻ tập", () -> new GiaHanGoiTapPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Lớp Học Theo Lịch", "Điều phối lớp nhóm Yoga, Zumba, Cardio & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Thu ngân quầy bar & sản phẩm", () -> new BanHangPOSPanel(), accent, false);
 

@@ -439,8 +439,16 @@ public class CuaSoChuHeThongPanel extends JPanel {
         lblH.setForeground(new Color(15, 23, 42));
         card.add(lblH, BorderLayout.NORTH);
 
-        JPanel grid = new JPanel(new GridLayout(2, 2, 10, 10));
+        JPanel grid = new JPanel(new GridLayout(0, 2, 10, 10));
         grid.setOpaque(false);
+
+        grid.add(createActionTile("➕ Đăng Ký Hội Viên Mới", "Mở form tiếp nhận và đăng ký hội viên", new Color(16, 185, 129), () -> {
+            if (MainDashboard.getInstance() != null) MainDashboard.getInstance().navigateTo("Quản Lý Hội Viên", 1);
+        }));
+
+        grid.add(createActionTile("🔄 Gia Hạn Gói Tập", "Tra cứu hội viên và xử lý gia hạn thẻ", new Color(217, 119, 6), () -> {
+            if (MainDashboard.getInstance() != null) MainDashboard.getInstance().navigateTo("Gia Hạn Gói Tập");
+        }));
 
         grid.add(createActionTile("👥 Quản Lý Hội Viên", "Hồ sơ hội viên, thẻ QR & tái ký", new Color(37, 99, 235), () -> {
             if (MainDashboard.getInstance() != null) MainDashboard.getInstance().navigateTo("Quản Lý Hội Viên");
@@ -508,6 +516,8 @@ public class CuaSoChuHeThongPanel extends JPanel {
         };
 
         tile.addMouseListener(ma);
+        lT.addMouseListener(ma);
+        lD.addMouseListener(ma);
         lT.addMouseListener(ma);
         lD.addMouseListener(ma);
 

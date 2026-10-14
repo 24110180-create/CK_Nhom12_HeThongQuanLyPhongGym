@@ -1,5 +1,6 @@
 package com.nhom12.gym.gui.panels;
 
+import com.nhom12.gym.gui.MainDashboard;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -53,7 +54,7 @@ public class TrangChuPanel extends JPanel {
 
         JButton btnDangKy = createQuickButton("Đăng Ký Hội Viên");
         JButton btnGiaHan = createQuickButton("Gia Hạn Thẻ Tập");
-        JButton btnBaoCao = createQuickButton("Xuất Báo Cáo Nhanh");
+        JButton btnBaoCao = createQuickButton("Mở Báo Cáo Doanh Thu");
 
         quickActionPanel.add(btnDangKy);
         quickActionPanel.add(btnGiaHan);
@@ -76,18 +77,28 @@ public class TrangChuPanel extends JPanel {
 
         add(bottomPanel, BorderLayout.SOUTH);
 
-        // Wire Action Listeners for Quick Action Buttons
-        btnDangKy.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Chuyển hướng đến màn hình: ĐĂNG KÝ HỘI VIÊN MỚI\n(Bạn cũng có thể click vào mục 'Đăng Ký Hội Viên' trên thanh menu bên trái)", "Thao Tác Nhanh", JOptionPane.INFORMATION_MESSAGE);
-        });
+        btnDangKy.addActionListener(e -> navigateToModule("Quản Lý Hội Viên", 1));
+        btnGiaHan.addActionListener(e -> navigateToModule("Gia Hạn Gói Tập", -1));
+        btnBaoCao.addActionListener(e -> navigateToModule("Báo Cáo Doanh Thu", -1));
+    }
 
-        btnGiaHan.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Chuyển hướng đến màn hình: GIA HẠN GÓI TẬP\n(Bạn cũng có thể click vào mục 'Gia Hạn Gói Tập' trên thanh menu bên trái)", "Thao Tác Nhanh", JOptionPane.INFORMATION_MESSAGE);
-        });
+    private void navigateToModule(String moduleTitle, int tabIndex) {
+        MainDashboard dashboard = MainDashboard.getInstance();
+        if (dashboard == null) {
+            JOptionPane.showMessageDialog(this,
+                    "Không thể mở chức năng vì bảng điều khiển chưa sẵn sàng.",
+                    "Không thể điều hướng", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        btnBaoCao.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Đã tổng hợp và xuất Báo Cáo Vận Hành Nhanh hôm nay:\n- Check-in: 142 lượt\n- Sức chứa: 85/100 (Cao điểm)\n- Doanh thu: 12,500,000 đ", "Báo Cáo Nhanh", JOptionPane.INFORMATION_MESSAGE);
-        });
+        boolean opened = tabIndex >= 0
+                ? dashboard.navigateTo(moduleTitle, tabIndex)
+                : dashboard.navigateTo(moduleTitle);
+        if (!opened) {
+            JOptionPane.showMessageDialog(this,
+                    "Vai trò hiện tại không được cấp quyền truy cập chức năng \"" + moduleTitle + "\".",
+                    "Không đủ quyền", JOptionPane.WARNING_MESSAGE);
+        }
     }
 
     private final JPanel widgetPanel = new JPanel();

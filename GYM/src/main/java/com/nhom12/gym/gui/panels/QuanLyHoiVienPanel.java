@@ -43,6 +43,8 @@ public class QuanLyHoiVienPanel extends JPanel {
     private JLabel lblKpiDangHoatDong;
     private JLabel lblKpiChuyenKhoan;
 
+    private JComboBox<String> cbFilterStatus;
+
     public QuanLyHoiVienPanel() {
         this(null);
     }
@@ -143,7 +145,7 @@ public class QuanLyHoiVienPanel extends JPanel {
 
         JLabel lblFStatus = new JLabel("Trạng thái:");
         lblFStatus.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        JComboBox<String> cbFilterStatus = new JComboBox<>(new String[]{
+        cbFilterStatus = new JComboBox<>(new String[]{
                 "Tất Cả Trạng Thái", "Active (Đang hoạt động)", "Expired (Hết hạn)", "Locked (Tạm khóa)", "⚠️ Sắp Hết Hạn (Trong 7 ngày tới)"
         });
         cbFilterStatus.setFont(new Font("Segoe UI", Font.PLAIN, 12));
@@ -682,7 +684,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         }
     }
 
-    private void moDialogDangKyNhanh() {
+    public void moDialogDangKyNhanh() {
         Window parentWindow = SwingUtilities.getWindowAncestor(this);
         JDialog dlg = new JDialog(parentWindow, "TIẾP NHẬN & ĐĂNG KÝ HỘI VIÊN MỚI", Dialog.ModalityType.APPLICATION_MODAL);
         dlg.setSize(1080, 700);
@@ -695,209 +697,10 @@ public class QuanLyHoiVienPanel extends JPanel {
         dlg.setVisible(true);
     }
 
-    private void moDialogGhiDanhLopChoHoiVien() {
-        HoiVien hv = getSelectedHoiVien();
-        if (hv == null) {
-            JOptionPane.showMessageDialog(this,
-                    "Vui lòng chọn một hội viên trong bảng để ghi danh vào lớp học!",
-                    "Chưa Chọn Hội Viên", JOptionPane.WARNING_MESSAGE);
-            return;
+    public void locHoiVienSapHetHan() {
+        if (cbFilterStatus != null && cbFilterStatus.getItemCount() > 4) {
+            cbFilterStatus.setSelectedIndex(4);
         }
-
-        Window parentWindow = SwingUtilities.getWindowAncestor(this);
-        JDialog dlg = new JDialog(parentWindow, "GHI DANH LỚP HỌC CHO HỘI VIÊN: " + hv.getHoTen() + " (" + hv.getMaTheQR() + ")", Dialog.ModalityType.APPLICATION_MODAL);
-        dlg.setSize(860, 580);
-        dlg.setLocationRelativeTo(parentWindow);
-        dlg.setLayout(new BorderLayout(12, 12));
-        ((JPanel) dlg.getContentPane()).setBorder(new EmptyBorder(16, 20, 16, 20));
-        dlg.getContentPane().setBackground(Color.WHITE);
-
-        // Header
-        JPanel pHead = new JPanel(new BorderLayout(0, 4));
-        pHead.setOpaque(false);
-        JLabel lblH = new JLabel("ĐIỀU PHỐI & GHI DANH LỚP HỌC THEO THỜI KHÓA BIỂU");
-        lblH.setFont(new Font("Segoe UI", Font.BOLD, 17));
-        lblH.setForeground(new Color(15, 23, 42));
-
-        JLabel lblSub = new JLabel("Hội viên: " + hv.getHoTen() + " (" + hv.getMaTheQR() + ") • SĐT: " + hv.getSoDienThoai() + " • Gói: " + hv.getGoiTapDangKy() + " • Cơ sở: " + hv.getChiNhanhDangKy());
-        lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        lblSub.setForeground(new Color(100, 116, 139));
-        pHead.add(lblH, BorderLayout.NORTH);
-        pHead.add(lblSub, BorderLayout.SOUTH);
-        dlg.add(pHead, BorderLayout.NORTH);
-
-        // Center: 2 phần: Lớp đã tham gia & Lớp mở
-        JPanel pCenter = new JPanel(new GridLayout(2, 1, 0, 14));
-        pCenter.setOpaque(false);
-
-        // Phần 1: Các lớp học đang tham gia
-        JPanel pCurrentClasses = new JPanel(new BorderLayout(0, 6));
-        pCurrentClasses.setOpaque(false);
-        JLabel lblCurTitle = new JLabel("1. CÁC LỚP HỌC HỘI VIÊN ĐANG THAM GIA:");
-        lblCurTitle.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        lblCurTitle.setForeground(new Color(30, 41, 59));
-        pCurrentClasses.add(lblCurTitle, BorderLayout.NORTH);
-
-        String[] curCols = {"ID ĐK", "Mã Lớp", "Tên Lớp Học", "HLV Phụ Trách", "Lịch Học", "Thời Gian Đăng Ký", "Điểm Danh"};
-        DefaultTableModel curModel = new DefaultTableModel(curCols, 0) {
-            @Override
-            public boolean isCellEditable(int r, int c) { return false; }
-        };
-
-        com.nhom12.gym.dao.DangKyLopDAO dkDAO = new com.nhom12.gym.dao.DangKyLopDAO();
-        com.nhom12.gym.dao.LopHocDAO lhDAO = new com.nhom12.gym.dao.LopHocDAO();
-
-        Runnable reloadCurClasses = () -> {
-            curModel.setRowCount(0);
-            List<com.nhom12.gym.entity.DangKyLop> dks = dkDAO.layDanhSachTheoHoiVien(hv.getMaHoiVien());
-            SimpleDateFormat dFmt = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-            for (com.nhom12.gym.entity.DangKyLop d : dks) {
-                com.nhom12.gym.entity.LopHoc lh = lhDAO.timTheoMa(d.getMaLop());
-                String tLop = (lh != null) ? lh.getTenLop() : d.getMaLop();
-                String hlv = (lh != null) ? lh.getHuanLuyenVien() : "HLV Phụ Trách";
-                String lich = (lh != null) ? lh.getThoiGian() : "Theo lịch lớp";
-                curModel.addRow(new Object[]{
-                        d.getId(),
-                        d.getMaLop(),
-                        tLop,
-                        hlv,
-                        lich,
-                        d.getNgayDangKy() != null ? dFmt.format(d.getNgayDangKy()) : "",
-                        d.getTrangThaiDiemDanh() != null ? d.getTrangThaiDiemDanh() : "Chưa điểm danh"
-                });
-            }
-        };
-        reloadCurClasses.run();
-
-        JTable tableCur = new JTable(curModel);
-        tableCur.setRowHeight(28);
-        tableCur.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 11));
-        tableCur.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        pCurrentClasses.add(new JScrollPane(tableCur), BorderLayout.CENTER);
-
-        // Nút hủy lớp đang tham gia
-        JPanel pCurActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 2));
-        pCurActions.setOpaque(false);
-        JButton btnHuyLop = new JButton("Hủy Tham Gia Lớp Đã Chọn");
-        btnHuyLop.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        btnHuyLop.setForeground(new Color(220, 38, 38));
-        btnHuyLop.addActionListener(e -> {
-            int sel = tableCur.getSelectedRow();
-            if (sel == -1) {
-                JOptionPane.showMessageDialog(dlg, "Vui lòng chọn 1 lớp đang tham gia để hủy đăng ký!", "Thông báo", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            int idDk = (int) curModel.getValueAt(sel, 0);
-            String maLop = curModel.getValueAt(sel, 1).toString();
-            String tenLop = curModel.getValueAt(sel, 2).toString();
-
-            int cf = JOptionPane.showConfirmDialog(dlg, "Xác nhận hủy đăng ký lớp [" + tenLop + "] cho hội viên " + hv.getHoTen() + "?", "Xác Nhận Hủy Lớp", JOptionPane.YES_NO_OPTION);
-            if (cf == JOptionPane.YES_OPTION) {
-                lhDAO.huyDangKy(idDk, maLop);
-                reloadCurClasses.run();
-                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
-                JOptionPane.showMessageDialog(dlg, "Đã hủy đăng ký thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
-        pCurActions.add(btnHuyLop);
-        pCurrentClasses.add(pCurActions, BorderLayout.SOUTH);
-
-        // Phần 2: Danh sách các lớp học mở
-        JPanel pOpenClasses = new JPanel(new BorderLayout(0, 6));
-        pOpenClasses.setOpaque(false);
-        JLabel lblOpenTitle = new JLabel("2. DANH SÁCH CÁC LỚP HỌC MỞ ĐANG TUYỂN HỌC VIÊN:");
-        lblOpenTitle.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        lblOpenTitle.setForeground(new Color(30, 41, 59));
-        pOpenClasses.add(lblOpenTitle, BorderLayout.NORTH);
-
-        String[] openCols = {"Mã Lớp", "Bộ Môn", "Tên Lớp Học", "Huấn Luyện Viên", "Phòng Tập", "Lịch Học", "Cơ Sở", "Sĩ Số", "Tình Trạng"};
-        DefaultTableModel openModel = new DefaultTableModel(openCols, 0) {
-            @Override
-            public boolean isCellEditable(int r, int c) { return false; }
-        };
-
-        Runnable reloadOpenClasses = () -> {
-            openModel.setRowCount(0);
-            List<com.nhom12.gym.entity.LopHoc> allLop = lhDAO.layTatCa();
-            for (com.nhom12.gym.entity.LopHoc l : allLop) {
-                int curC = l.getSiSoHienTai();
-                int maxC = l.getSiSoToiDa();
-                String stt = (curC >= maxC) ? "ĐẦY LỚP" : "CÒN CHỖ (" + (maxC - curC) + ")";
-                openModel.addRow(new Object[]{
-                        l.getMaLop(),
-                        l.getBoMon() != null ? l.getBoMon() : "Gym",
-                        l.getTenLop(),
-                        l.getHuanLuyenVien(),
-                        l.getPhongTap(),
-                        l.getThoiGian(),
-                        l.getChiNhanh() != null ? l.getChiNhanh() : "CN01",
-                        curC + "/" + maxC,
-                        stt
-                });
-            }
-        };
-        reloadOpenClasses.run();
-
-        JTable tableOpen = new JTable(openModel);
-        tableOpen.setRowHeight(28);
-        tableOpen.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 11));
-        tableOpen.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        pOpenClasses.add(new JScrollPane(tableOpen), BorderLayout.CENTER);
-
-        pCenter.add(pCurrentClasses);
-        pCenter.add(pOpenClasses);
-        dlg.add(pCenter, BorderLayout.CENTER);
-
-        // Bottom Bar
-        JPanel pBot = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
-        pBot.setOpaque(false);
-
-        JButton btnRegisterToClass = new JButton("Ghi Danh Vào Lớp Đang Chọn");
-        btnRegisterToClass.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btnRegisterToClass.setBackground(new Color(16, 185, 129));
-        btnRegisterToClass.setForeground(Color.WHITE);
-        btnRegisterToClass.addActionListener(e -> {
-            int sel = tableOpen.getSelectedRow();
-            if (sel == -1) {
-                JOptionPane.showMessageDialog(dlg, "Vui lòng chọn 1 lớp học ở bảng dưới để ghi danh!", "Chưa chọn lớp", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            String maLop = openModel.getValueAt(sel, 0).toString();
-            String tenLop = openModel.getValueAt(sel, 2).toString();
-            String stt = openModel.getValueAt(sel, 8).toString();
-
-            if (stt.contains("ĐẦY LỚP")) {
-                JOptionPane.showMessageDialog(dlg, "Lớp học [" + tenLop + "] đã đủ sĩ số tối đa. Vui lòng chọn lớp khác!", "Lớp Đầy", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            if (dkDAO.daDangKy(maLop, hv.getMaHoiVien())) {
-                JOptionPane.showMessageDialog(dlg, "Hội viên [" + hv.getHoTen() + "] đã đăng ký lớp [" + tenLop + "] rồi!", "Đã Đăng Ký", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            com.nhom12.gym.entity.DangKyLop dk = new com.nhom12.gym.entity.DangKyLop(
-                    0, maLop, hv.getMaHoiVien(), hv.getHoTen(), hv.getSoDienThoai(), new Date(), "Chưa điểm danh", "Đăng ký từ Quản Lý Hội Viên"
-            );
-            boolean ok = lhDAO.dangKyVaoLop(dk);
-            if (ok) {
-                reloadCurClasses.run();
-                reloadOpenClasses.run();
-                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
-                JOptionPane.showMessageDialog(dlg, "Ghi danh hội viên [" + hv.getHoTen() + "] vào lớp [" + tenLop + "] thành công!", "Thành Công", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(dlg, "Không thể ghi danh vào lớp. Vui lòng thử lại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        JButton btnClose = new JButton("Đóng Cửa Sổ");
-        btnClose.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        btnClose.addActionListener(e -> dlg.dispose());
-
-        pBot.add(btnRegisterToClass);
-        pBot.add(btnClose);
-        dlg.add(pBot, BorderLayout.SOUTH);
-
-        dlg.setVisible(true);
     }
+
 }

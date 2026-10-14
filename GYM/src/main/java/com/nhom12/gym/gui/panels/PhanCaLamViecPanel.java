@@ -31,7 +31,7 @@ public class PhanCaLamViecPanel extends JPanel {
         // Header
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false);
-        JLabel lblTitle = new JLabel("LỊCH LÀM VIỆC & PHÂN CA TRỰC (QUẢN LÝ)");
+        JLabel lblTitle = new JLabel("LỊCH LÀM VIỆC VÀ PHÂN CA TRỰC");
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
         lblTitle.setForeground(new Color(30, 41, 59));
         JLabel lblSubtitle = new JLabel("Sắp xếp ca trực lễ tân, huấn luyện viên sàn và xuất bảng phân ca hàng tuần");

@@ -63,11 +63,17 @@ public class MainDashboard extends JFrame {
                 if (tabIndex >= 0) {
                     SwingUtilities.invokeLater(() -> {
                         for (Component comp : workspaceContainer.getComponents()) {
-                            if (comp instanceof QuanLyHoiVienHubPanel) {
+                            if (comp instanceof QuanLyHoiVienPanel) {
+                                if (tabIndex == 1) ((QuanLyHoiVienPanel) comp).moDialogDangKyNhanh();
+                                else if (tabIndex == 2) ((QuanLyHoiVienPanel) comp).locHoiVienSapHetHan();
+                            } else if (comp instanceof QuanLyHoiVienHubPanel) {
                                 ((QuanLyHoiVienHubPanel) comp).selectTab(tabIndex);
                             } else if (comp instanceof JScrollPane) {
                                 Component view = ((JScrollPane) comp).getViewport().getView();
-                                if (view instanceof QuanLyHoiVienHubPanel) {
+                                if (view instanceof QuanLyHoiVienPanel) {
+                                    if (tabIndex == 1) ((QuanLyHoiVienPanel) view).moDialogDangKyNhanh();
+                                    else if (tabIndex == 2) ((QuanLyHoiVienPanel) view).locHoiVienSapHetHan();
+                                } else if (view instanceof QuanLyHoiVienHubPanel) {
                                     ((QuanLyHoiVienHubPanel) view).selectTab(tabIndex);
                                 }
                             }
@@ -469,8 +475,8 @@ public class MainDashboard extends JFrame {
         addSidebarItem(menuContainer, "Lịch Sử Giao Dịch", "Kiểm toán, đối soát dòng tiền & hóa đơn", () -> new LichSuGiaoDichPanel(), accent, false);
 
         addSidebarCategoryHeader(menuContainer, "Khách Hàng & Dịch Vụ");
-        addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ, thẻ QR, tiếp nhận mới & tái ký gói tập", () -> new QuanLyHoiVienHubPanel(), accent, false);
-        addSidebarItem(menuContainer, "Lịch Lớp Học & Điểm Danh", "Thời khóa biểu lớp nhóm & điểm danh học viên", () -> new LichLopHocPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Danh bạ hội viên, tra cứu thẻ QR & doanh thu hội phí", () -> new QuanLyHoiVienPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý Lớp Học Theo Lịch", "Lớp Yoga, Zumba, Cardio • Ghi danh & Điểm danh", () -> new LichLopHocPanel(), accent, false);
 
         addSidebarCategoryHeader(menuContainer, "Chiến Lược Kinh Doanh");
         addSidebarItem(menuContainer, "Quản Lý Gói Tập & Giá Tiền", "Quyết định chính sách giá & bảng giá dịch vụ", () -> new QuanLyGoiTapPanel(), accent, false);
@@ -478,7 +484,7 @@ public class MainDashboard extends JFrame {
 
         addSidebarCategoryHeader(menuContainer, "Con Người & Hệ Thống");
         addSidebarItem(menuContainer, "Quản Lý Nhân Sự & Bảng Lương", "Danh sách HLV, nhân viên & bảng lương hệ thống", () -> new QuanLyNhanSuPanel(), accent, false);
-        addSidebarItem(menuContainer, "Lịch Làm Việc & Phân Ca HLV", "Quản lý ca trực, phân công lớp và lịch làm việc HLV", () -> new PhanCaLamViecPanel(), accent, false);
+        addSidebarItem(menuContainer, "Lịch Làm Việc & Phân Ca Trực", "Sắp xếp ca trực lễ tân, HLV sàn & xuất bảng phân ca", () -> new PhanCaLamViecPanel(), accent, false);
         addSidebarItem(menuContainer, "Tài Khoản Nhân Sự & Phân Quyền", "Quản trị tài khoản 4 vai trò nhân sự nội bộ", () -> new QuanLyTaiKhoanVaNhanSuPanel(), accent, false);
         addSidebarItem(menuContainer, "Cài Đặt Chung", "Cấu hình chuỗi phòng tập & hệ thống", () -> new CaiDatHeThongPanel(), accent, false);
     }
@@ -489,10 +495,10 @@ public class MainDashboard extends JFrame {
     private void setupReceptionistMenu(JPanel menuContainer, Color accent) {
         addSidebarCategoryHeader(menuContainer, "Nghiệp Vụ Hội Viên");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên & cửa flap barrier", () -> new CheckInForm(), accent, true);
-        addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ thẻ QR, tiếp nhận mới & gia hạn gói tập", () -> new QuanLyHoiVienHubPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ thẻ QR, gia hạn & tra cứu hội viên", () -> new QuanLyHoiVienPanel(), accent, false);
 
         addSidebarCategoryHeader(menuContainer, "Dịch Vụ & Lớp Học");
-        addSidebarItem(menuContainer, "Lịch Lớp Học & Điểm Danh", "Thời khóa biểu lớp nhóm & điểm danh học viên", () -> new LichLopHocPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý Lớp Học Theo Lịch", "Thời khóa biểu lớp Yoga, Zumba, Cardio & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Bán nước giải khát, whey & đồ tập", () -> new BanHangPOSPanel(), accent, false);
     }
 
@@ -501,7 +507,7 @@ public class MainDashboard extends JFrame {
     // =========================================================================
     private void setupTrainerMenu(JPanel menuContainer, Color accent) {
         addSidebarItem(menuContainer, "Theo Dõi InBody & Thể Lực", "Phân tích cơ, mỡ, BMI & thể trạng", () -> new TheoDoiChiSoPanel(), accent, true);
-        addSidebarItem(menuContainer, "Lịch Lớp Học & Điểm Danh", "Thời khóa biểu lớp nhóm & điểm danh học viên", () -> new LichLopHocPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý Lớp Học Theo Lịch", "Thời khóa biểu lớp nhóm Yoga, Zumba, Cardio & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Sổ Tay Tiến Độ PT", "Giáo án tập luyện 1:1 & kỷ lục tạ cá nhân", () -> new GhiChuTienDoPTPanel(), accent, false);
         addSidebarItem(menuContainer, "Hồ Sơ Học Viên Phụ Trách", "Chi tiết lịch sử tập & mục tiêu học viên", () -> new ChiTietHoiVienPanel(), accent, false);
     }
@@ -512,13 +518,13 @@ public class MainDashboard extends JFrame {
     private void setupManagerMenu(JPanel menuContainer, Color accent) {
         addSidebarCategoryHeader(menuContainer, "Vận Hành Quầy & Dịch Vụ");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên tại quầy", () -> new CheckInForm(), accent, true);
-        addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ hội viên, tiếp nhận đăng ký & tái ký", () -> new QuanLyHoiVienHubPanel(), accent, false);
-        addSidebarItem(menuContainer, "Lịch Lớp Học & Điểm Danh", "Điều phối lớp nhóm & điểm danh học viên", () -> new LichLopHocPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ hội viên, gói tập & tra cứu toàn diện", () -> new QuanLyHoiVienPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý Lớp Học Theo Lịch", "Điều phối lớp nhóm Yoga, Zumba, Cardio & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Thu ngân quầy bar & sản phẩm", () -> new BanHangPOSPanel(), accent, false);
 
         addSidebarCategoryHeader(menuContainer, "Điều Hành Cơ Sở");
         addSidebarItem(menuContainer, "Quản Lý Kho Hàng", "Kiểm kê xuất nhập tồn kho cơ sở", () -> new QuanLyKhoHangPanel(), accent, false);
-        addSidebarItem(menuContainer, "Phân Ca Làm Việc", "Xếp lịch làm việc nhân viên theo tuần", () -> new PhanCaLamViecPanel(), accent, false);
+        addSidebarItem(menuContainer, "Lịch Làm Việc & Phân Ca Trực", "Sắp xếp ca trực lễ tân, HLV sàn & xuất bảng phân ca", () -> new PhanCaLamViecPanel(), accent, false);
 
         addSidebarCategoryHeader(menuContainer, "Báo Cáo Chi Nhánh");
         addSidebarItem(menuContainer, "Phân Tích Giờ Cao Điểm", "Mật độ khách 6h-22h (Chi nhánh)", () -> new HeatmapGioCaoDiemPanel(), accent, false);

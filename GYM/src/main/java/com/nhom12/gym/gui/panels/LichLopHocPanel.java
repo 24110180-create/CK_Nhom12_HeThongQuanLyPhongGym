@@ -63,11 +63,16 @@ public class LichLopHocPanel extends JPanel {
     private TableRowSorter<DefaultTableModel> sorterHocVien;
     private JTextField txtSearchHocVien;
 
+    // Bộ lọc Pills bộ môn
+    private String boMonDangChon = "Tất Cả";
+    private final List<JButton> boMonPillButtons = new ArrayList<>();
+
     // Các nút thao tác Học Viên
     private JButton btnThemHocVien;
     private JButton btnHuyDangKy;
     private JButton btnDiemDanhCoMat;
     private JButton btnBaoVang;
+    private JButton btnHuyDiemDanh;
     private JButton btnDiemDanhTatCa;
     private JButton btnXuatExcelHocVien;
 
@@ -100,11 +105,11 @@ public class LichLopHocPanel extends JPanel {
         JPanel pTitle = new JPanel(new BorderLayout(5, 5));
         pTitle.setOpaque(false);
 
-        JLabel lblTitle = new JLabel("LỊCH LỚP HỌC & ĐIỂM DANH HỘI VIÊN");
+        JLabel lblTitle = new JLabel("QUẢN LÝ LỚP HỌC THEO LỊCH & ĐIỂM DANH");
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
         lblTitle.setForeground(new Color(15, 23, 42));
 
-        JLabel lblSubtitle = new JLabel("Quản lý thời khóa biểu lớp nhóm Yoga, Zumba, Boxing • Ghi danh & Điểm danh học viên theo thời gian thực");
+        JLabel lblSubtitle = new JLabel("Thời khóa biểu lớp nhóm Yoga, Zumba, Cardio, Boxing, Pilates • Ghi danh & Điểm danh học viên theo thời gian thực");
         lblSubtitle.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         lblSubtitle.setForeground(new Color(100, 116, 139));
 
@@ -162,6 +167,81 @@ public class LichLopHocPanel extends JPanel {
     }
 
     // =========================================================================
+    // THANH CHỌN BỘ MÔN NHANH DẠNG PILLS HIỆN ĐẠI (YOGA, ZUMBA, CARDIO, BOXING, PILATES)
+    // =========================================================================
+    private JPanel taoPillsBoMon() {
+        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
+        p.setOpaque(false);
+        p.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel lblQuick = new JLabel("Lọc nhanh bộ môn:");
+        lblQuick.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblQuick.setForeground(new Color(71, 85, 105));
+        p.add(lblQuick);
+
+        String[] categories = {"Tất Cả", "Yoga", "Zumba", "Cardio", "Boxing", "Pilates"};
+        String[] icons = {"", "🧘 ", "💃 ", "🔥 ", "🥊 ", "🤸 "};
+
+        boMonPillButtons.clear();
+        for (int i = 0; i < categories.length; i++) {
+            String cat = categories[i];
+            String label = icons[i] + cat;
+            JButton btnPill = new JButton(label);
+            btnPill.setFont(new Font("Segoe UI", Font.BOLD, 11));
+            btnPill.setFocusPainted(false);
+            btnPill.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            btnPill.putClientProperty("category", cat);
+
+            updatePillStyle(btnPill, cat.equalsIgnoreCase(boMonDangChon));
+
+            btnPill.addActionListener(e -> {
+                boMonDangChon = cat;
+                for (JButton b : boMonPillButtons) {
+                    String c = (String) b.getClientProperty("category");
+                    updatePillStyle(b, c != null && c.equalsIgnoreCase(boMonDangChon));
+                }
+                if ("Tất Cả".equalsIgnoreCase(cat)) {
+                    cbFilterBoMon.setSelectedIndex(0);
+                } else {
+                    cbFilterBoMon.setSelectedItem(cat);
+                }
+                filterMaster();
+            });
+
+            boMonPillButtons.add(btnPill);
+            p.add(btnPill);
+        }
+
+        return p;
+    }
+
+    private void updatePillStyle(JButton btn, boolean active) {
+        String cat = (String) btn.getClientProperty("category");
+        if (active) {
+            Color bg = new Color(37, 99, 235);
+            if ("Yoga".equalsIgnoreCase(cat)) bg = new Color(124, 58, 237);
+            else if ("Zumba".equalsIgnoreCase(cat)) bg = new Color(234, 88, 12);
+            else if ("Cardio".equalsIgnoreCase(cat)) bg = new Color(220, 38, 38);
+            else if ("Boxing".equalsIgnoreCase(cat)) bg = new Color(180, 83, 9);
+            else if ("Pilates".equalsIgnoreCase(cat)) bg = new Color(13, 148, 136);
+
+            btn.setBackground(bg);
+            btn.setForeground(Color.WHITE);
+            btn.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(bg.darker(), 1),
+                    new EmptyBorder(5, 12, 5, 12)
+            ));
+        } else {
+            btn.setBackground(Color.WHITE);
+            btn.setForeground(new Color(71, 85, 105));
+            btn.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(203, 213, 225), 1),
+                    new EmptyBorder(5, 12, 5, 12)
+            ));
+        }
+    }
+
+    // =========================================================================
     // 1. TẦNG TRÊN: MASTER LỚP HỌC
     // =========================================================================
     private JPanel taoPanelMasterLop() {
@@ -216,7 +296,17 @@ public class LichLopHocPanel extends JPanel {
 
         cbFilterBoMon = new JComboBox<>(new String[]{"Tất Cả Bộ Môn", "Yoga", "Zumba", "Boxing", "Cardio", "Pilates"});
         cbFilterBoMon.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        cbFilterBoMon.addActionListener(e -> filterMaster());
+        cbFilterBoMon.addActionListener(e -> {
+            String sel = (String) cbFilterBoMon.getSelectedItem();
+            if (sel != null) {
+                boMonDangChon = sel.startsWith("Tất Cả") ? "Tất Cả" : sel;
+                for (JButton b : boMonPillButtons) {
+                    String c = (String) b.getClientProperty("category");
+                    updatePillStyle(b, c != null && c.equalsIgnoreCase(boMonDangChon));
+                }
+            }
+            filterMaster();
+        });
 
         pFilter.add(lSearch);
         pFilter.add(txtSearchLop);
@@ -224,6 +314,12 @@ public class LichLopHocPanel extends JPanel {
         pFilter.add(cbFilterChiNhanh);
         pFilter.add(lBoMon);
         pFilter.add(cbFilterBoMon);
+
+        // Hàng 1: Nút Pills danh mục bộ môn (Yoga, Zumba, Cardio, Boxing, Pilates)
+        pTool.add(taoPillsBoMon());
+        pTool.add(Box.createRigidArea(new Dimension(0, 4)));
+
+        // Hàng 2: Thanh tìm kiếm & lọc cơ sở
         pTool.add(pFilter);
         pTool.add(Box.createRigidArea(new Dimension(0, 6)));
 
@@ -285,7 +381,7 @@ public class LichLopHocPanel extends JPanel {
         };
 
         tableLop = new JTable(modelLop);
-        tableLop.setRowHeight(34);
+        tableLop.setRowHeight(36);
         tableLop.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         tableLop.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
         tableLop.getTableHeader().setBackground(new Color(241, 245, 249));
@@ -294,19 +390,62 @@ public class LichLopHocPanel extends JPanel {
         sorterLop = new TableRowSorter<>(modelLop);
         tableLop.setRowSorter(sorterLop);
 
-        // Căn giữa các cột Mã, Cơ Sở, Bộ Môn, Phòng, Sĩ Số, Tình trạng
+        // Căn giữa các cột Mã, Cơ Sở, Phòng, Sĩ Số
         DefaultTableCellRenderer centerRender = new DefaultTableCellRenderer();
         centerRender.setHorizontalAlignment(SwingConstants.CENTER);
         tableLop.getColumnModel().getColumn(0).setCellRenderer(centerRender);
         tableLop.getColumnModel().getColumn(0).setPreferredWidth(70);
         tableLop.getColumnModel().getColumn(1).setCellRenderer(centerRender);
-        tableLop.getColumnModel().getColumn(1).setPreferredWidth(130);
-        tableLop.getColumnModel().getColumn(2).setCellRenderer(centerRender);
-        tableLop.getColumnModel().getColumn(2).setPreferredWidth(85);
-        tableLop.getColumnModel().getColumn(3).setPreferredWidth(160);
+        tableLop.getColumnModel().getColumn(1).setPreferredWidth(125);
+
+        // Custom Renderer Badge Màu cho Bộ Môn (Col 2)
+        tableLop.getColumnModel().getColumn(2).setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel l = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                l.setHorizontalAlignment(SwingConstants.CENTER);
+                String val = (value != null) ? value.toString() : "";
+                l.setOpaque(true);
+                if (isSelected) {
+                    l.setBackground(table.getSelectionBackground());
+                    l.setForeground(table.getSelectionForeground());
+                    return l;
+                }
+                l.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                if ("Yoga".equalsIgnoreCase(val) || val.contains("Yoga")) {
+                    l.setBackground(new Color(243, 232, 255));
+                    l.setForeground(new Color(109, 40, 217));
+                    l.setText("🧘 Yoga");
+                } else if ("Zumba".equalsIgnoreCase(val) || val.contains("Zumba")) {
+                    l.setBackground(new Color(255, 237, 213));
+                    l.setForeground(new Color(194, 65, 12));
+                    l.setText("💃 Zumba");
+                } else if ("Cardio".equalsIgnoreCase(val) || val.contains("Cardio")) {
+                    l.setBackground(new Color(254, 226, 226));
+                    l.setForeground(new Color(185, 28, 28));
+                    l.setText("🔥 Cardio");
+                } else if ("Boxing".equalsIgnoreCase(val) || val.contains("Boxing")) {
+                    l.setBackground(new Color(254, 243, 199));
+                    l.setForeground(new Color(180, 83, 9));
+                    l.setText("🥊 Boxing");
+                } else if ("Pilates".equalsIgnoreCase(val) || val.contains("Pilates")) {
+                    l.setBackground(new Color(204, 251, 241));
+                    l.setForeground(new Color(15, 118, 110));
+                    l.setText("🤸 Pilates");
+                } else {
+                    l.setBackground(new Color(241, 245, 249));
+                    l.setForeground(new Color(51, 65, 85));
+                    l.setText(val);
+                }
+                return l;
+            }
+        });
+        tableLop.getColumnModel().getColumn(2).setPreferredWidth(100);
+
+        tableLop.getColumnModel().getColumn(3).setPreferredWidth(165);
         tableLop.getColumnModel().getColumn(4).setPreferredWidth(130);
-        tableLop.getColumnModel().getColumn(5).setPreferredWidth(120);
-        tableLop.getColumnModel().getColumn(6).setPreferredWidth(155);
+        tableLop.getColumnModel().getColumn(5).setPreferredWidth(125);
+        tableLop.getColumnModel().getColumn(6).setPreferredWidth(160);
         tableLop.getColumnModel().getColumn(7).setCellRenderer(centerRender);
         tableLop.getColumnModel().getColumn(7).setPreferredWidth(75);
 
@@ -317,17 +456,30 @@ public class LichLopHocPanel extends JPanel {
                 JLabel l = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 l.setHorizontalAlignment(SwingConstants.CENTER);
                 String val = (value != null) ? value.toString() : "";
-                if ("ĐẦY LỚP".equalsIgnoreCase(val)) {
+                l.setOpaque(true);
+                if (isSelected) {
+                    l.setBackground(table.getSelectionBackground());
+                    l.setForeground(table.getSelectionForeground());
+                    return l;
+                }
+                l.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                if (val.contains("ĐẦY LỚP")) {
+                    l.setBackground(new Color(254, 226, 226));
                     l.setForeground(new Color(220, 38, 38));
-                    l.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                    l.setText("● ĐẦY LỚP (0)");
+                } else if (val.contains("CÒN CHỖ")) {
+                    l.setBackground(new Color(220, 252, 231));
+                    l.setForeground(new Color(22, 163, 74));
+                    l.setText("● " + val);
                 } else {
-                    l.setForeground(new Color(16, 185, 129));
-                    l.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                    l.setBackground(new Color(241, 245, 249));
+                    l.setForeground(new Color(71, 85, 105));
+                    l.setText(val);
                 }
                 return l;
             }
         });
-        tableLop.getColumnModel().getColumn(8).setPreferredWidth(100);
+        tableLop.getColumnModel().getColumn(8).setPreferredWidth(125);
 
         tableLop.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -418,7 +570,7 @@ public class LichLopHocPanel extends JPanel {
         pActions.add(pSearchHV);
         pActions.add(Box.createRigidArea(new Dimension(0, 6)));
 
-        // Bộ nút hành động học viên: Thêm, Hủy, Điểm danh, Báo vắng, Điểm danh tất cả, Xuất Excel (căn trái thoáng đãng)
+        // Bộ nút hành động học viên: Thêm, Hủy, Điểm danh, Báo vắng, Hủy điểm danh, Điểm danh tất cả, Xuất Excel (căn trái thoáng đãng)
         JPanel pBtns = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 4));
         pBtns.setOpaque(false);
         pBtns.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -426,17 +578,20 @@ public class LichLopHocPanel extends JPanel {
         btnThemHocVien = taoButtonFlat("+ Ghi Danh Học Viên", new Color(16, 185, 129), Color.WHITE);
         btnThemHocVien.addActionListener(e -> moDialogGhiDanhHocVien());
 
-        btnHuyDangKy = taoButtonFlat("Hủy Đăng Ký", new Color(239, 68, 68), Color.WHITE);
-        btnHuyDangKy.addActionListener(e -> actionHuyDangKyHocVien());
-
-        btnDiemDanhCoMat = taoButtonFlat("Điểm Danh (Có Mặt)", new Color(5, 150, 105), Color.WHITE);
+        btnDiemDanhCoMat = taoButtonFlat("✔ Điểm Danh (Có Mặt)", new Color(5, 150, 105), Color.WHITE);
         btnDiemDanhCoMat.addActionListener(e -> actionCapNhatDiemDanh("Đã điểm danh"));
 
-        btnBaoVang = taoButtonFlat("Báo Vắng", new Color(220, 38, 38), Color.WHITE);
+        btnBaoVang = taoButtonFlat("✖ Báo Vắng", new Color(220, 38, 38), Color.WHITE);
         btnBaoVang.addActionListener(e -> actionCapNhatDiemDanh("Vắng mặt"));
 
-        btnDiemDanhTatCa = taoButtonFlat("Điểm Danh Tất Cả", new Color(37, 99, 235), Color.WHITE);
+        btnHuyDiemDanh = taoButtonFlat("⏳ Hủy Điểm Danh", new Color(217, 119, 6), Color.WHITE);
+        btnHuyDiemDanh.addActionListener(e -> actionCapNhatDiemDanh("Chưa điểm danh"));
+
+        btnDiemDanhTatCa = taoButtonFlat("⚡ Điểm Danh Tất Cả", new Color(37, 99, 235), Color.WHITE);
         btnDiemDanhTatCa.addActionListener(e -> actionDiemDanhTatCa());
+
+        btnHuyDangKy = taoButtonFlat("Hủy Đăng Ký Lớp", new Color(239, 68, 68), Color.WHITE);
+        btnHuyDangKy.addActionListener(e -> actionHuyDangKyHocVien());
 
         btnXuatExcelHocVien = taoButtonFlat("Xuất Excel Điểm Danh", new Color(15, 118, 110), Color.WHITE);
         btnXuatExcelHocVien.addActionListener(e -> {
@@ -448,10 +603,11 @@ public class LichLopHocPanel extends JPanel {
         });
 
         pBtns.add(btnThemHocVien);
-        pBtns.add(btnHuyDangKy);
         pBtns.add(btnDiemDanhCoMat);
         pBtns.add(btnBaoVang);
+        pBtns.add(btnHuyDiemDanh);
         pBtns.add(btnDiemDanhTatCa);
+        pBtns.add(btnHuyDangKy);
         pBtns.add(btnXuatExcelHocVien);
         pActions.add(pBtns);
 
@@ -466,7 +622,7 @@ public class LichLopHocPanel extends JPanel {
         };
 
         tableHocVien = new JTable(modelHocVien);
-        tableHocVien.setRowHeight(32);
+        tableHocVien.setRowHeight(34);
         tableHocVien.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         tableHocVien.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
         tableHocVien.getTableHeader().setBackground(new Color(241, 245, 249));
@@ -489,32 +645,65 @@ public class LichLopHocPanel extends JPanel {
         tableHocVien.getColumnModel().getColumn(4).setCellRenderer(centerRender);
         tableHocVien.getColumnModel().getColumn(4).setPreferredWidth(130);
 
-        // Renderer màu cho Trạng Thái Điểm Danh
+        // Renderer màu cho Trạng Thái Điểm Danh (Col 5)
         tableHocVien.getColumnModel().getColumn(5).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel l = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 l.setHorizontalAlignment(SwingConstants.CENTER);
                 String val = (value != null) ? value.toString() : "";
-                if ("Đã điểm danh".equalsIgnoreCase(val)) {
-                    l.setForeground(new Color(5, 150, 105));
-                    l.setFont(new Font("Segoe UI", Font.BOLD, 12));
-                } else if ("Vắng mặt".equalsIgnoreCase(val)) {
+                l.setOpaque(true);
+                if (isSelected) {
+                    l.setBackground(table.getSelectionBackground());
+                    l.setForeground(table.getSelectionForeground());
+                    return l;
+                }
+                l.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                if ("Đã điểm danh".equalsIgnoreCase(val) || val.contains("Đã điểm danh")) {
+                    l.setBackground(new Color(220, 252, 231));
+                    l.setForeground(new Color(21, 128, 61));
+                    l.setText("✔ Đã điểm danh");
+                } else if ("Vắng mặt".equalsIgnoreCase(val) || val.contains("Vắng")) {
+                    l.setBackground(new Color(254, 226, 226));
                     l.setForeground(new Color(220, 38, 38));
-                    l.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                    l.setText("✖ Vắng mặt");
                 } else {
+                    l.setBackground(new Color(254, 243, 199));
                     l.setForeground(new Color(180, 83, 9));
-                    l.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+                    l.setText("⏳ Chưa điểm danh");
                 }
                 return l;
             }
         });
-        tableHocVien.getColumnModel().getColumn(5).setPreferredWidth(130);
+        tableHocVien.getColumnModel().getColumn(5).setPreferredWidth(140);
         tableHocVien.getColumnModel().getColumn(6).setPreferredWidth(180);
+
+        // Click đúp vào học viên để đảo nhanh trạng thái điểm danh
+        tableHocVien.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (e.getClickCount() == 2 && tableHocVien.getSelectedRow() != -1) {
+                    int r = tableHocVien.getSelectedRow();
+                    int mr = tableHocVien.convertRowIndexToModel(r);
+                    String curStatus = String.valueOf(modelHocVien.getValueAt(mr, 5));
+                    String newStatus = curStatus.contains("Đã điểm danh") ? "Chưa điểm danh" : "Đã điểm danh";
+                    actionCapNhatDiemDanh(newStatus);
+                }
+            }
+        });
 
         JScrollPane scroll = new JScrollPane(tableHocVien);
         scroll.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240)));
         panel.add(scroll, BorderLayout.CENTER);
+
+        // Mẹo thao tác nghiệp vụ nhanh ở chân bảng
+        JPanel pTip = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
+        pTip.setOpaque(false);
+        JLabel lblTip = new JLabel("💡 Mẹo nghiệp vụ: Click đúp vào một lớp học để chọn nhanh • Click đúp trực tiếp vào học viên để đảo trạng thái Điểm Danh.");
+        lblTip.setFont(new Font("Segoe UI", Font.ITALIC, 11));
+        lblTip.setForeground(new Color(100, 116, 139));
+        pTip.add(lblTip);
+        panel.add(pTip, BorderLayout.SOUTH);
 
         capNhatTrangThaiNutDetail(false);
         return panel;
@@ -525,6 +714,7 @@ public class LichLopHocPanel extends JPanel {
         btnHuyDangKy.setEnabled(enabled);
         btnDiemDanhCoMat.setEnabled(enabled);
         btnBaoVang.setEnabled(enabled);
+        btnHuyDiemDanh.setEnabled(enabled);
         btnDiemDanhTatCa.setEnabled(enabled);
         btnXuatExcelHocVien.setEnabled(enabled);
     }
@@ -572,6 +762,28 @@ public class LichLopHocPanel extends JPanel {
             if ("Đã điểm danh".equalsIgnoreCase(dk.getTrangThaiDiemDanh())) {
                 tongDaDiemDanh++;
             }
+        }
+
+        // Đếm số lượng lớp theo từng bộ môn để hiển thị số lượng trên Pills
+        int cntYoga = 0, cntZumba = 0, cntCardio = 0, cntBoxing = 0, cntPilates = 0;
+        for (LopHoc lh : danhSachLop) {
+            String bm = lh.getBoMon();
+            if (bm != null) {
+                if (bm.equalsIgnoreCase("Yoga")) cntYoga++;
+                else if (bm.equalsIgnoreCase("Zumba")) cntZumba++;
+                else if (bm.equalsIgnoreCase("Cardio")) cntCardio++;
+                else if (bm.equalsIgnoreCase("Boxing")) cntBoxing++;
+                else if (bm.equalsIgnoreCase("Pilates")) cntPilates++;
+            }
+        }
+        for (JButton b : boMonPillButtons) {
+            String cat = (String) b.getClientProperty("category");
+            if ("Tất Cả".equalsIgnoreCase(cat)) b.setText("Tất Cả (" + danhSachLop.size() + ")");
+            else if ("Yoga".equalsIgnoreCase(cat)) b.setText("🧘 Yoga (" + cntYoga + ")");
+            else if ("Zumba".equalsIgnoreCase(cat)) b.setText("💃 Zumba (" + cntZumba + ")");
+            else if ("Cardio".equalsIgnoreCase(cat)) b.setText("🔥 Cardio (" + cntCardio + ")");
+            else if ("Boxing".equalsIgnoreCase(cat)) b.setText("🥊 Boxing (" + cntBoxing + ")");
+            else if ("Pilates".equalsIgnoreCase(cat)) b.setText("🤸 Pilates (" + cntPilates + ")");
         }
 
         lblCardTongLop.setText(tongLop + " Lớp");

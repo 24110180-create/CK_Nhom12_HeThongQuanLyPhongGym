@@ -62,18 +62,22 @@ public class PhanCaLamViecPanel extends JPanel {
                 "Tuần sau nữa (12/10 - 18/10/2026)"
         });
         cbWeek.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        cbWeek.putClientProperty("JComponent.roundRect", true);
+        cbWeek.setPreferredSize(new java.awt.Dimension(cbWeek.getPreferredSize().width, 38));
         topToolBar.add(cbWeek);
 
         btnExport = new JButton("Xuất File Excel Bảng Phân Ca");
         btnExport.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnExport.setBackground(new Color(16, 185, 129));
         btnExport.setForeground(Color.WHITE);
+        styleActionButton(btnExport);
         topToolBar.add(btnExport);
 
         btnSave = new JButton("Lưu Bảng Phân Ca");
         btnSave.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnSave.setBackground(new Color(37, 99, 235));
         btnSave.setForeground(Color.WHITE);
+        styleActionButton(btnSave);
         topToolBar.add(btnSave);
 
         centerPanel.add(topToolBar, BorderLayout.NORTH);
@@ -88,26 +92,43 @@ public class PhanCaLamViecPanel extends JPanel {
         model = new DefaultTableModel(data, cols);
         table = new JTable(model);
         table.setRowHeight(90);
-        table.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
-        table.getTableHeader().setBackground(new Color(37, 99, 235));
+        table.getTableHeader().setBackground(new Color(15, 23, 42));
         table.getTableHeader().setForeground(Color.WHITE);
-        table.setSelectionBackground(new Color(254, 240, 138));
+        table.getTableHeader().setPreferredSize(new java.awt.Dimension(0, 44));
+        table.setShowVerticalLines(false);
+        table.setGridColor(new Color(226, 232, 240));
+        table.setSelectionBackground(new Color(219, 234, 254));
+        table.setSelectionForeground(new Color(15, 23, 42));
+        table.setFillsViewportHeight(true);
+        table.setIntercellSpacing(new java.awt.Dimension(1, 1));
 
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setHorizontalAlignment(CENTER);
-                if (column == 0) {
-                    setBackground(new Color(241, 245, 249));
-                    setForeground(new Color(30, 41, 59));
+                setBorder(BorderFactory.createEmptyBorder(8, 6, 8, 6));
+                setFont(table.getFont().deriveFont(column == 0 ? Font.BOLD : Font.PLAIN));
+                if (isSelected) {
+                    c.setBackground(table.getSelectionBackground());
+                    c.setForeground(table.getSelectionForeground());
+                } else if (column == 0) {
+                    c.setBackground(new Color(226, 232, 240));
+                    c.setForeground(new Color(30, 41, 59));
                 } else {
-                    setBackground(isSelected ? new Color(254, 240, 138) : Color.WHITE);
-                    if (value != null && value.toString().contains("Nghỉ")) {
-                        setForeground(new Color(239, 68, 68));
+                    Color[] shiftColors = {
+                            new Color(239, 246, 255),
+                            new Color(236, 253, 245),
+                            new Color(255, 251, 235)
+                    };
+                    c.setBackground(shiftColors[row % shiftColors.length]);
+                    String assignment = value == null ? "" : value.toString();
+                    if (assignment.contains("Nghỉ")) {
+                        c.setForeground(new Color(185, 28, 28));
                     } else {
-                        setForeground(new Color(37, 99, 235));
+                        c.setForeground(new Color(30, 41, 59));
                     }
                 }
                 return c;
@@ -131,6 +152,25 @@ public class PhanCaLamViecPanel extends JPanel {
 
         btnSave.addActionListener(e -> {
             JOptionPane.showMessageDialog(this, "Đã lưu và công bố lịch trực ca tuần [" + cbWeek.getSelectedItem() + "] thành công tới toàn bộ nhân viên phòng gym!", "Lưu Lịch Trực", JOptionPane.INFORMATION_MESSAGE);
+        });
+    }
+
+    private void styleActionButton(JButton button) {
+        Color normalColor = button.getBackground();
+        button.putClientProperty("JButton.buttonType", "roundRect");
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                if (button.isEnabled()) button.setBackground(normalColor.brighter());
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                button.setBackground(normalColor);
+            }
         });
     }
 }

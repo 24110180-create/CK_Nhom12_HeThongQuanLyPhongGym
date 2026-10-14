@@ -30,11 +30,14 @@ public class DangKyLopDAO {
 
     private static void khoiTaoDuLieuMauNeuTrong() {
         if (!memoryCache.isEmpty()) return;
-        memoryCache.add(new DangKyLop(1, "LH01", 1, "Lê Anh Duy", "0974482749", new Date(), "Đã điểm danh", "Đi học đúng giờ"));
-        memoryCache.add(new DangKyLop(2, "LH01", 2, "Võ Lê Ngọc Hưng", "0912345678", new Date(), "Đã điểm danh", "Mang thảm riêng"));
-        memoryCache.add(new DangKyLop(3, "LH01", 5, "Hoàng Thùy Linh", "0977112233", new Date(), "Chưa điểm danh", ""));
-        memoryCache.add(new DangKyLop(4, "LH02", 1, "Lê Anh Duy", "0974482749", new Date(), "Chưa điểm danh", ""));
-        memoryCache.add(new DangKyLop(5, "LH03", 4, "Trần Minh Quân", "0933221100", new Date(), "Đã điểm danh", "Đầy đủ găng tập"));
+        memoryCache.addAll(com.nhom12.gym.service.SampleDataService.getDanhSachDangKyChuan());
+    }
+
+    public static void capNhatMemoryCache(List<DangKyLop> list) {
+        if (list != null && !list.isEmpty()) {
+            memoryCache.clear();
+            memoryCache.addAll(list);
+        }
     }
 
     public List<DangKyLop> layDanhSachTheoHoiVien(int maHoiVien) {

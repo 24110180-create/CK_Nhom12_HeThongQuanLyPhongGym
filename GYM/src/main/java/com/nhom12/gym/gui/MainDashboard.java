@@ -502,11 +502,9 @@ public class MainDashboard extends JFrame {
     // 2. MENU LỄ TÂN (THAO TÁC TRỰC TIẾP TẠI QUẦY)
     // =========================================================================
     private void setupReceptionistMenu(JPanel menuContainer, Color accent) {
-        addSidebarCategoryHeader(menuContainer, "Nghiệp Vụ Hội Viên");
+        addSidebarCategoryHeader(menuContainer, "Vận Hành Quầy & Dịch Vụ");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên & cửa flap barrier", () -> new CheckInForm(), accent, true);
-        addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ thẻ QR, gia hạn & tra cứu hội viên", () -> new QuanLyHoiVienPanel(), accent, false);
-
-        addSidebarCategoryHeader(menuContainer, "Dịch Vụ & Lớp Học");
+        addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ hội viên, gói tập & tra cứu toàn diện", () -> new QuanLyHoiVienPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Lớp Học Theo Lịch", "Thời khóa biểu lớp Yoga, Zumba, Cardio & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Bán nước giải khát, whey & đồ tập", () -> new BanHangPOSPanel(), accent, false);
     }

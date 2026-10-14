@@ -81,10 +81,16 @@ GO
 INSERT INTO HoiVien (MaTheQR, HoTen, ChiNhanhDangKy, NgayHetHan, TrangThai) VALUES 
 ('QR001', N'Lê Anh Duy',       N'CN01 - Cơ sở 1 (Quận 1)',   '2026-12-31', N'Active'),
 ('QR002', N'Võ Lê Ngọc Hưng',  N'CN02 - Cơ sở 2 (Tân Bình)', '2026-10-15', N'Active'),
-('QR003', N'Võ Tấn Phát',      N'CN01 - Cơ sở 1 (Quận 1)',   '2025-01-01', N'Active'), -- Đã hết hạn để test
+('QR003', N'Võ Tấn Phát',      N'CN01 - Cơ sở 1 (Quận 1)',   '2025-01-01', N'Expired'), -- Đã hết hạn để test
 ('QR004', N'Trần Minh Quân',   N'CN01 - Cơ sở 1 (Quận 1)',   '2026-11-20', N'Active'),
 ('QR005', N'Hoàng Thùy Linh',  N'CN02 - Cơ sở 2 (Tân Bình)', '2026-08-15', N'Active'),
-('VIP007',N'Đỗ Minh Trí',      N'Toàn hệ thống (VIP)',      '2027-12-31', N'Active');
+('VIP007',N'Đỗ Minh Trí',      N'Toàn hệ thống (VIP)',      '2027-12-31', N'Active'),
+('QR006', N'Nguyễn Thu Hà',    N'CN01 - Cơ sở 1 (Quận 1)',   '2026-09-30', N'Active'),
+('QR007', N'Phạm Quốc Bảo',    N'CN02 - Cơ sở 2 (Tân Bình)', '2026-10-25', N'Active'),
+('QR008', N'Đặng Mai Phương',  N'CN01 - Cơ sở 1 (Quận 1)',   '2026-12-15', N'Active'),
+('QR009', N'Bùi Hoàng Nam',    N'CN02 - Cơ sở 2 (Tân Bình)', '2026-11-10', N'Active'),
+('QR010', N'Vũ Thị Kim Oanh',  N'CN01 - Cơ sở 1 (Quận 1)',   '2026-07-20', N'Active'),
+('QR011', N'Trương Đình Trọng',N'CN02 - Cơ sở 2 (Tân Bình)', '2026-12-05', N'Active');
 GO
 
 -- 4. BẢNG GÓI TẬP (CỘT TIỀN DÙNG DECIMAL(18, 2) ĐỂ CHỐNG SAI SỐ LÀM TRÒN)
@@ -145,11 +151,11 @@ CREATE TABLE LopHoc (
 GO
 
 INSERT INTO LopHoc (MaLop, TenLop, BoMon, HuanLuyenVien, ThoiGian, PhongTap, ChiNhanh, SiSoToiDa, SiSoHienTai) VALUES
-('LH01', N'Yoga Trị Liệu Cột Sống', N'Yoga', N'Nguyễn Thu Thảo', N'06:30 - 07:30 (T2-T4-T6)', N'Studio 1 (Tầng 2)', N'CN01 - Cơ sở 1 (Quận 1)', 20, 18),
-('LH02', N'Zumba Cardio Đốt Mỡ', N'Zumba', N'Lê Mai Hương', N'18:00 - 19:00 (T3-T5-T7)', N'Studio 2 (Tầng 2)', N'CN01 - Cơ sở 1 (Quận 1)', 25, 22),
-('LH03', N'Kickboxing Tự Vệ Nâng Cao', N'Boxing', N'Phan Thanh Sơn', N'19:15 - 20:15 (T2-T4-T6)', N'Khu Võ Thuật Ring A', N'CN02 - Cơ sở 2 (Tân Bình)', 15, 12),
-('LH04', N'HIIT Cardio Kháng Lực', N'Cardio', N'Trần Tuấn Kiệt', N'07:00 - 08:00 (T3-T5)', N'Khu Functional', N'CN02 - Cơ sở 2 (Tân Bình)', 15, 10),
-('LH05', N'Pilates Dẻo Dai & Thon Gọn', N'Pilates', N'Nguyễn Thu Thảo', N'17:30 - 18:30 (T2-T4-T6)', N'Studio 1 (Tầng 2)', N'CN01 - Cơ sở 1 (Quận 1)', 18, 15);
+('LH01', N'Yoga Trị Liệu Cột Sống', N'Yoga', N'Nguyễn Thu Thảo', N'06:30 - 07:30 (T2-T4-T6)', N'Studio 1 (Tầng 2)', N'CN01 - Cơ sở 1 (Quận 1)', 20, 7),
+('LH02', N'Zumba Cardio Đốt Mỡ', N'Zumba', N'Lê Mai Hương', N'18:00 - 19:00 (T3-T5-T7)', N'Studio 2 (Tầng 2)', N'CN01 - Cơ sở 1 (Quận 1)', 25, 8),
+('LH03', N'Kickboxing Tự Vệ Nâng Cao', N'Boxing', N'Phan Thanh Sơn', N'19:15 - 20:15 (T2-T4-T6)', N'Khu Võ Thuật Ring A', N'CN02 - Cơ sở 2 (Tân Bình)', 15, 5),
+('LH04', N'HIIT Cardio Kháng Lực', N'Cardio', N'Trần Tuấn Kiệt', N'07:00 - 08:00 (T3-T5)', N'Khu Functional', N'CN02 - Cơ sở 2 (Tân Bình)', 15, 6),
+('LH05', N'Pilates Dẻo Dai & Thon Gọn', N'Pilates', N'Nguyễn Thu Thảo', N'17:30 - 18:30 (T2-T4-T6)', N'Studio 1 (Tầng 2)', N'CN01 - Cơ sở 1 (Quận 1)', 18, 6);
 GO
 
 -- 7. BẢNG ĐĂNG KÝ VÀ ĐIỂM DANH LỚP HỌC (QUẢN LÝ BỞI DangKyLopDAO)
@@ -166,11 +172,43 @@ CREATE TABLE DangKyLop (
 GO
 
 INSERT INTO DangKyLop (MaLop, MaHoiVien, TenHoiVien, SoDienThoai, TrangThaiDiemDanh, GhiChu) VALUES
-('LH01', 1, N'Lê Anh Duy', '0901234567', N'Đã điểm danh', N'Đi học đúng giờ'),
-('LH01', 2, N'Võ Lê Ngọc Hưng', '0902345678', N'Đã điểm danh', N'Mang thảm riêng'),
-('LH01', 5, N'Hoàng Thùy Linh', '0905678901', N'Chưa điểm danh', N''),
-('LH02', 1, N'Lê Anh Duy', '0901234567', N'Chưa điểm danh', N''),
-('LH03', 4, N'Trần Minh Quân', '0904567890', N'Đã điểm danh', N'Đầy đủ găng tập');
+-- LH01: Yoga (7 học viên)
+('LH01', 1, N'Lê Anh Duy', '0974482749', N'Đã điểm danh', N'Có mặt sớm 15p, chuẩn bị thảm'),
+('LH01', 2, N'Võ Lê Ngọc Hưng', '0912345678', N'Đã điểm danh', N'Mang thảm cá nhân'),
+('LH01', 5, N'Hoàng Thùy Linh', '0977112233', N'Đã điểm danh', N'Động tác uốn dẻo tốt'),
+('LH01', 7, N'Nguyễn Thu Hà', '0918223344', N'Chưa điểm danh', N'Học viên mới buổi 2'),
+('LH01', 9, N'Đặng Mai Phương', '0989123456', N'Đã điểm danh', N'Có mặt đúng giờ'),
+('LH01', 11, N'Vũ Thị Kim Oanh', '0908778899', N'Vắng mặt', N'Bận việc công ty có phép'),
+('LH01', 6, N'Đỗ Minh Trí', '0909998877', N'Đã điểm danh', N'Thẻ VIP Diamond'),
+-- LH02: Zumba (8 học viên)
+('LH02', 1, N'Lê Anh Duy', '0974482749', N'Đã điểm danh', N'Rất năng nổ, nhiệt tình'),
+('LH02', 5, N'Hoàng Thùy Linh', '0977112233', N'Đã điểm danh', N'Vũ đạo chuẩn nhịp'),
+('LH02', 7, N'Nguyễn Thu Hà', '0918223344', N'Đã điểm danh', N'Đến sớm khởi động'),
+('LH02', 9, N'Đặng Mai Phương', '0989123456', N'Chưa điểm danh', N'Đang di chuyển tới phòng'),
+('LH02', 11, N'Vũ Thị Kim Oanh', '0908778899', N'Đã điểm danh', N'Có mặt đúng giờ'),
+('LH02', 2, N'Võ Lê Ngọc Hưng', '0912345678', N'Vắng mặt', N'Đi công tác Hà Nội'),
+('LH02', 10, N'Bùi Hoàng Nam', '0938556677', N'Đã điểm danh', N'Thể lực xung mãn'),
+('LH02', 6, N'Đỗ Minh Trí', '0909998877', N'Đã điểm danh', N'Khách VIP tập trải nghiệm'),
+-- LH03: Kickboxing (5 học viên)
+('LH03', 4, N'Trần Minh Quân', '0933221100', N'Đã điểm danh', N'Đầy đủ găng võ và băng quấn'),
+('LH03', 8, N'Phạm Quốc Bảo', '0903456789', N'Đã điểm danh', N'Kỹ thuật ra đòn nhanh'),
+('LH03', 10, N'Bùi Hoàng Nam', '0938556677', N'Đã điểm danh', N'Thể lực rất tốt'),
+('LH03', 12, N'Trương Đình Trọng', '0919334455', N'Chưa điểm danh', N'Chuẩn bị vào sàn võ'),
+('LH03', 1, N'Lê Anh Duy', '0974482749', N'Vắng mặt', N'Xin nghỉ do việc bận'),
+-- LH04: HIIT Cardio (6 học viên)
+('LH04', 4, N'Trần Minh Quân', '0933221100', N'Đã điểm danh', N'Cardio cường độ cao'),
+('LH04', 2, N'Võ Lê Ngọc Hưng', '0912345678', N'Đã điểm danh', N'Mang bình nước điện giải'),
+('LH04', 8, N'Phạm Quốc Bảo', '0903456789', N'Đã điểm danh', N'Hoàn thành 100% giáo án'),
+('LH04', 10, N'Bùi Hoàng Nam', '0938556677', N'Chưa điểm danh', N'Đăng ký ca sáng'),
+('LH04', 12, N'Trương Đình Trọng', '0919334455', N'Đã điểm danh', N'Tập sức bền tốt'),
+('LH04', 5, N'Hoàng Thùy Linh', '0977112233', N'Vắng mặt', N'Đau cơ xin nghỉ phục hồi'),
+-- LH05: Pilates (6 học viên)
+('LH05', 1, N'Lê Anh Duy', '0974482749', N'Đã điểm danh', N'Tập trên máy Reformer'),
+('LH05', 7, N'Nguyễn Thu Hà', '0918223344', N'Đã điểm danh', N'Có mặt đúng giờ'),
+('LH05', 9, N'Đặng Mai Phương', '0989123456', N'Đã điểm danh', N'Thân hình dẻo dai'),
+('LH05', 11, N'Vũ Thị Kim Oanh', '0908778899', N'Chưa điểm danh', N'Đang trên đường tới'),
+('LH05', 5, N'Hoàng Thùy Linh', '0977112233', N'Đã điểm danh', N'Tư thế chuẩn xác'),
+('LH05', 6, N'Đỗ Minh Trí', '0909998877', N'Vắng mặt', N'Có việc bận báo trước');
 GO
 
 -- 8. BẢNG NHẬT KÝ CHECK-IN (AUDIT LOG - CORE USE CASE)

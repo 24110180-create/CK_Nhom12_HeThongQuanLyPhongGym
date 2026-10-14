@@ -180,13 +180,11 @@ public class LichLopHocPanel extends JPanel {
         p.add(lblQuick);
 
         String[] categories = {"Tất Cả", "Yoga", "Zumba", "Cardio", "Boxing", "Pilates"};
-        String[] icons = {"", "🧘 ", "💃 ", "🔥 ", "🥊 ", "🤸 "};
 
         boMonPillButtons.clear();
         for (int i = 0; i < categories.length; i++) {
             String cat = categories[i];
-            String label = icons[i] + cat;
-            JButton btnPill = new JButton(label);
+            JButton btnPill = new JButton(cat);
             btnPill.setFont(new Font("Segoe UI", Font.BOLD, 11));
             btnPill.setFocusPainted(false);
             btnPill.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -346,6 +344,25 @@ public class LichLopHocPanel extends JPanel {
         JButton btnRefresh = taoButtonFlat("Làm Mới", new Color(100, 116, 139), Color.WHITE);
         btnRefresh.addActionListener(e -> taiDuLieuLopHoc());
 
+        JButton btnNapDuLieu = taoButtonFlat("Nạp Dữ Liệu Mẫu", new Color(99, 102, 241), Color.WHITE);
+        btnNapDuLieu.setToolTipText("Nạp và đồng bộ lại 5 lớp học và 32 lượt điểm danh học viên chuẩn");
+        btnNapDuLieu.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Hệ thống sẽ đồng bộ lại bộ dữ liệu mẫu chuẩn cho 5 lớp học (Yoga, Zumba, Cardio, Boxing, Pilates)\n" +
+                    "và khôi phục đầy đủ 32 lượt điểm danh học viên, xóa bỏ các lớp rác không hợp lệ.\n\n" +
+                    "Bạn có muốn tiếp tục không?",
+                    "Xác Nhận Nạp Dữ Liệu Mẫu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (confirm == JOptionPane.YES_OPTION) {
+                boolean ok = com.nhom12.gym.service.SampleDataService.napDuLieuMauDongBo(true);
+                if (ok) {
+                    JOptionPane.showMessageDialog(this, "Đã nạp và đồng bộ thành công dữ liệu mẫu chuẩn toàn hệ thống!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                    taiDuLieuLopHoc();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi nạp dữ liệu mẫu!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
         JButton btnXuatExcelLop = taoButtonFlat("Xuất Excel Lịch Lớp", new Color(15, 118, 110), Color.WHITE);
         btnXuatExcelLop.addActionListener(e -> ExcelExportHelper.exportTableToExcel(this, tableLop, "LichLopHoc_FitLife"));
 
@@ -368,6 +385,7 @@ public class LichLopHocPanel extends JPanel {
         pBtns.add(btnXoaLop);
         pBtns.add(btnDiemDanh);
         pBtns.add(btnRefresh);
+        pBtns.add(btnNapDuLieu);
         pBtns.add(btnXuatExcelLop);
         pTool.add(pBtns);
 
@@ -415,23 +433,23 @@ public class LichLopHocPanel extends JPanel {
                 if ("Yoga".equalsIgnoreCase(val) || val.contains("Yoga")) {
                     l.setBackground(new Color(243, 232, 255));
                     l.setForeground(new Color(109, 40, 217));
-                    l.setText("🧘 Yoga");
+                    l.setText("Yoga");
                 } else if ("Zumba".equalsIgnoreCase(val) || val.contains("Zumba")) {
                     l.setBackground(new Color(255, 237, 213));
                     l.setForeground(new Color(194, 65, 12));
-                    l.setText("💃 Zumba");
+                    l.setText("Zumba");
                 } else if ("Cardio".equalsIgnoreCase(val) || val.contains("Cardio")) {
                     l.setBackground(new Color(254, 226, 226));
                     l.setForeground(new Color(185, 28, 28));
-                    l.setText("🔥 Cardio");
+                    l.setText("Cardio");
                 } else if ("Boxing".equalsIgnoreCase(val) || val.contains("Boxing")) {
                     l.setBackground(new Color(254, 243, 199));
                     l.setForeground(new Color(180, 83, 9));
-                    l.setText("🥊 Boxing");
+                    l.setText("Boxing");
                 } else if ("Pilates".equalsIgnoreCase(val) || val.contains("Pilates")) {
                     l.setBackground(new Color(204, 251, 241));
                     l.setForeground(new Color(15, 118, 110));
-                    l.setText("🤸 Pilates");
+                    l.setText("Pilates");
                 } else {
                     l.setBackground(new Color(241, 245, 249));
                     l.setForeground(new Color(51, 65, 85));
@@ -578,16 +596,16 @@ public class LichLopHocPanel extends JPanel {
         btnThemHocVien = taoButtonFlat("+ Ghi Danh Học Viên", new Color(16, 185, 129), Color.WHITE);
         btnThemHocVien.addActionListener(e -> moDialogGhiDanhHocVien());
 
-        btnDiemDanhCoMat = taoButtonFlat("✔ Điểm Danh (Có Mặt)", new Color(5, 150, 105), Color.WHITE);
+        btnDiemDanhCoMat = taoButtonFlat("Điểm Danh (Có Mặt)", new Color(5, 150, 105), Color.WHITE);
         btnDiemDanhCoMat.addActionListener(e -> actionCapNhatDiemDanh("Đã điểm danh"));
 
-        btnBaoVang = taoButtonFlat("✖ Báo Vắng", new Color(220, 38, 38), Color.WHITE);
+        btnBaoVang = taoButtonFlat("Báo Vắng", new Color(220, 38, 38), Color.WHITE);
         btnBaoVang.addActionListener(e -> actionCapNhatDiemDanh("Vắng mặt"));
 
-        btnHuyDiemDanh = taoButtonFlat("⏳ Hủy Điểm Danh", new Color(217, 119, 6), Color.WHITE);
+        btnHuyDiemDanh = taoButtonFlat("Hủy Điểm Danh", new Color(217, 119, 6), Color.WHITE);
         btnHuyDiemDanh.addActionListener(e -> actionCapNhatDiemDanh("Chưa điểm danh"));
 
-        btnDiemDanhTatCa = taoButtonFlat("⚡ Điểm Danh Tất Cả", new Color(37, 99, 235), Color.WHITE);
+        btnDiemDanhTatCa = taoButtonFlat("Điểm Danh Tất Cả", new Color(37, 99, 235), Color.WHITE);
         btnDiemDanhTatCa.addActionListener(e -> actionDiemDanhTatCa());
 
         btnHuyDangKy = taoButtonFlat("Hủy Đăng Ký Lớp", new Color(239, 68, 68), Color.WHITE);
@@ -662,15 +680,15 @@ public class LichLopHocPanel extends JPanel {
                 if ("Đã điểm danh".equalsIgnoreCase(val) || val.contains("Đã điểm danh")) {
                     l.setBackground(new Color(220, 252, 231));
                     l.setForeground(new Color(21, 128, 61));
-                    l.setText("✔ Đã điểm danh");
+                    l.setText("Đã điểm danh");
                 } else if ("Vắng mặt".equalsIgnoreCase(val) || val.contains("Vắng")) {
                     l.setBackground(new Color(254, 226, 226));
                     l.setForeground(new Color(220, 38, 38));
-                    l.setText("✖ Vắng mặt");
+                    l.setText("Vắng mặt");
                 } else {
                     l.setBackground(new Color(254, 243, 199));
                     l.setForeground(new Color(180, 83, 9));
-                    l.setText("⏳ Chưa điểm danh");
+                    l.setText("Chưa điểm danh");
                 }
                 return l;
             }
@@ -779,11 +797,11 @@ public class LichLopHocPanel extends JPanel {
         for (JButton b : boMonPillButtons) {
             String cat = (String) b.getClientProperty("category");
             if ("Tất Cả".equalsIgnoreCase(cat)) b.setText("Tất Cả (" + danhSachLop.size() + ")");
-            else if ("Yoga".equalsIgnoreCase(cat)) b.setText("🧘 Yoga (" + cntYoga + ")");
-            else if ("Zumba".equalsIgnoreCase(cat)) b.setText("💃 Zumba (" + cntZumba + ")");
-            else if ("Cardio".equalsIgnoreCase(cat)) b.setText("🔥 Cardio (" + cntCardio + ")");
-            else if ("Boxing".equalsIgnoreCase(cat)) b.setText("🥊 Boxing (" + cntBoxing + ")");
-            else if ("Pilates".equalsIgnoreCase(cat)) b.setText("🤸 Pilates (" + cntPilates + ")");
+            else if ("Yoga".equalsIgnoreCase(cat)) b.setText("Yoga (" + cntYoga + ")");
+            else if ("Zumba".equalsIgnoreCase(cat)) b.setText("Zumba (" + cntZumba + ")");
+            else if ("Cardio".equalsIgnoreCase(cat)) b.setText("Cardio (" + cntCardio + ")");
+            else if ("Boxing".equalsIgnoreCase(cat)) b.setText("Boxing (" + cntBoxing + ")");
+            else if ("Pilates".equalsIgnoreCase(cat)) b.setText("Pilates (" + cntPilates + ")");
         }
 
         lblCardTongLop.setText(tongLop + " Lớp");

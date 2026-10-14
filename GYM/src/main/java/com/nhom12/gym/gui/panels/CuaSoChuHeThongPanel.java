@@ -339,7 +339,7 @@ public class CuaSoChuHeThongPanel extends JPanel {
         btnViewAll.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnViewAll.addActionListener(e -> {
             if (MainDashboard.getInstance() != null) {
-                MainDashboard.getInstance().navigateTo("Quản Lý Hội Viên & Lớp Học", 2);
+                MainDashboard.getInstance().navigateTo("Quản Lý Hội Viên", 2);
             }
         });
 
@@ -363,7 +363,7 @@ public class CuaSoChuHeThongPanel extends JPanel {
 
         card.add(list, BorderLayout.CENTER);
 
-        JLabel lblFoot = new JLabel("💡 Bảng dữ liệu chi tiết đã được chuyển tập trung sang 'Quản Lý Hội Viên & Lớp Học'.");
+        JLabel lblFoot = new JLabel("💡 Bảng dữ liệu chi tiết đã được chuyển tập trung sang 'Quản Lý Hội Viên'.");
         lblFoot.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         lblFoot.setForeground(new Color(100, 116, 139));
         card.add(lblFoot, BorderLayout.SOUTH);
@@ -414,7 +414,7 @@ public class CuaSoChuHeThongPanel extends JPanel {
         btnAction.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnAction.addActionListener(e -> {
             if (MainDashboard.getInstance() != null) {
-                MainDashboard.getInstance().navigateTo("Quản Lý Hội Viên & Lớp Học", 2);
+                MainDashboard.getInstance().navigateTo("Quản Lý Hội Viên", 2);
             }
         });
 
@@ -442,8 +442,8 @@ public class CuaSoChuHeThongPanel extends JPanel {
         JPanel grid = new JPanel(new GridLayout(2, 2, 10, 10));
         grid.setOpaque(false);
 
-        grid.add(createActionTile("👥 Quản Lý Hội Viên & Lớp Học", "Gia hạn, thẻ QR & ghi danh lớp", new Color(37, 99, 235), () -> {
-            if (MainDashboard.getInstance() != null) MainDashboard.getInstance().navigateTo("Quản Lý Hội Viên & Lớp Học");
+        grid.add(createActionTile("👥 Quản Lý Hội Viên", "Hồ sơ hội viên, thẻ QR & tái ký", new Color(37, 99, 235), () -> {
+            if (MainDashboard.getInstance() != null) MainDashboard.getInstance().navigateTo("Quản Lý Hội Viên");
         }));
 
         grid.add(createActionTile("📊 Báo Cáo Doanh Thu Chuỗi", "Doanh thu cơ sở & danh sách hết hạn", new Color(16, 185, 129), () -> {

@@ -20,6 +20,15 @@ class TextSanitizerTest {
         assertEquals("CN01 - Cơ sở 1 (Quận 1)", TextSanitizer.sanitize("CN01 - Qu?n 1"));
         assertEquals("CN02 - Cơ sở 2 (Tân Bình)", TextSanitizer.sanitize("CN02 - T?n B?nh"));
         assertEquals("Toàn hệ thống (VIP)", TextSanitizer.sanitize("To?n h? th?ng"));
+
+        // Kiểm tra các chuỗi thực tế từ giao diện
+        assertEquals("Nguyễn Thu Thảo", TextSanitizer.sanitize("Nguy?n Thu Th?o"));
+        assertEquals("Trần Tuấn Kiệt", TextSanitizer.sanitize("Tr?n Tu?n Ki?t"));
+        assertEquals("HIIT Cardio Kháng Lực", TextSanitizer.sanitize("HIIT Cardio Kháng L?c"));
+        assertEquals("Studio 1 (Tầng 2)", TextSanitizer.sanitize("Studio 1 (T?ng 2)"));
+        assertEquals("Gói Trải Nghiệm 1 Tháng", TextSanitizer.sanitize("Gói Tr?i Nghi?m 1 Tháng"));
+        assertEquals("Chuyển khoản VietQR", TextSanitizer.sanitize("Chuy?n kho?n (VietQR)"));
+        assertEquals("CN03 - Cơ sở 3 (Bình Thạnh)", TextSanitizer.sanitize("Cơ s? 3 - B?nh Th?nh"));
     }
 
     @Test

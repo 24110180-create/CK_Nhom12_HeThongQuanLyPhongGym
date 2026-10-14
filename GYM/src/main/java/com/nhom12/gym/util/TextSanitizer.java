@@ -34,16 +34,107 @@ public class TextSanitizer {
         if (s.toLowerCase().contains("toàn hệ thống") || s.toLowerCase().contains("to?n") || s.toLowerCase().contains("vip")) {
             return "Toàn hệ thống (VIP)";
         }
-        if (s.toLowerCase().contains("cn01") || s.toLowerCase().contains("quận 1") || s.toLowerCase().contains("qu?n") ||
+        if (s.toLowerCase().contains("b?nh th?nh") || s.toLowerCase().contains("bình thạnh") || s.toLowerCase().contains("cn03") ||
+            (s.toLowerCase().contains("cơ s") && s.contains("3"))) {
+            return "CN03 - Cơ sở 3 (Bình Thạnh)";
+        }
+        if (s.toLowerCase().contains("cn01") || s.toLowerCase().contains("quận 1") || s.toLowerCase().contains("qu?n 1") ||
             (s.toLowerCase().contains("cơ s") && s.contains("1")) || s.toLowerCase().contains("gò vấp") || s.toLowerCase().contains("g? v")) {
             return "CN01 - Cơ sở 1 (Quận 1)";
         }
-        if (s.toLowerCase().contains("cn02") || s.toLowerCase().contains("tân bình") || s.toLowerCase().contains("t?n") ||
+        if (s.toLowerCase().contains("cn02") || s.toLowerCase().contains("tân bình") || s.toLowerCase().contains("t?n b") ||
             (s.toLowerCase().contains("cơ s") && s.contains("2"))) {
             return "CN02 - Cơ sở 2 (Tân Bình)";
         }
 
-        return s;
+        // 3. Khắc phục phương thức thanh toán
+        if (s.toLowerCase().contains("chuy?n") || s.toLowerCase().contains("chuyen khoan") || s.toLowerCase().contains("vietqr")) {
+            return "Chuyển khoản VietQR";
+        }
+        if (s.toLowerCase().contains("ti?n m?t") || s.toLowerCase().contains("tien mat")) {
+            return "Tiền mặt";
+        }
+        if (s.toLowerCase().contains("qu?t th?") || s.toLowerCase().contains("quet the") || s.toLowerCase().contains("pos")) {
+            return "Quẹt thẻ POS";
+        }
+
+        // 4. Khắc phục chuỗi tổng quát chứa dấu '?' (Tên hội viên, lớp học, phòng tập, gói tập, HLV)
+        return restoreCorruptedVietnamese(s);
+    }
+
+    /**
+     * Khôi phục các từ tiếng Việt thông dụng bị chuyển thành dấu '?' do lỗi encoding từ CSDL
+     */
+    public static String restoreCorruptedVietnamese(String text) {
+        if (text == null || !text.contains("?")) {
+            return text;
+        }
+
+        String res = text;
+        // Gói tập & dịch vụ
+        res = res.replace("Tr?i Nghi?m", "Trải Nghiệm");
+        res = res.replace("Tr?i nghi?m", "Trải nghiệm");
+        res = res.replace("Kim C??ng", "Kim Cương");
+        res = res.replace("Kim C?ng", "Kim Cương");
+        res = res.replace("Tiêu Chu?n", "Tiêu Chuẩn");
+        res = res.replace("Cơ B?n", "Cơ Bản");
+        res = res.replace("Th?ng", "Tháng");
+
+        // Lớp học & bộ môn
+        res = res.replace("Kháng L?c", "Kháng Lực");
+        res = res.replace("Kháng l?c", "Kháng lực");
+        res = res.replace("Tr? Li?u", "Trị Liệu");
+        res = res.replace("C?t S?ng", "Cột Sống");
+        res = res.replace("Đ?t M?", "Đốt Mỡ");
+        res = res.replace("T? V?", "Tự Vệ");
+        res = res.replace("D?o Dai", "Dẻo Dai");
+        res = res.replace("Thon G?n", "Thon Gọn");
+
+        // Phòng tập & vị trí
+        res = res.replace("T?ng 1", "Tầng 1");
+        res = res.replace("T?ng 2", "Tầng 2");
+        res = res.replace("T?ng 3", "Tầng 3");
+        res = res.replace("T?ng", "Tầng");
+        res = res.replace("V? Thu?t", "Võ Thuật");
+        res = res.replace("Ph?ng", "Phòng");
+        res = res.replace("Qu?n 1", "Quận 1");
+        res = res.replace("Qu?n 2", "Quận 2");
+        res = res.replace("Qu?n", "Quận");
+        res = res.replace("Cơ s?", "Cơ sở");
+        res = res.replace("B?nh Th?nh", "Bình Thạnh");
+
+        // Họ và tên người (Hội viên, HLV, nhân viên)
+        res = res.replace("Nguy?n", "Nguyễn");
+        res = res.replace("Thu Th?o", "Thu Thảo");
+        res = res.replace("Th?o", "Thảo");
+        res = res.replace("Tr?n", "Trần");
+        res = res.replace("Tu?n Ki?t", "Tuấn Kiệt");
+        res = res.replace("Tu?n", "Tuấn");
+        res = res.replace("Ki?t", "Kiệt");
+        res = res.replace("Ho?ng", "Hoàng");
+        res = res.replace("Huy?n", "Huyền");
+        res = res.replace("D??ng", "Dương");
+        res = res.replace("H??ng", "Hương");
+        res = res.replace("Ph??ng", "Phương");
+        res = res.replace("V?n", "Văn");
+        res = res.replace("Th?", "Thị");
+        res = res.replace("Qu?n", "Quân");
+        res = res.replace("S?n", "Sơn");
+        res = res.replace("Thành", "Thành");
+        res = res.replace("Đ?c", "Đức");
+        res = res.replace("Ph?t", "Phát");
+        res = res.replace("B?o", "Bảo");
+        res = res.replace("Lu?n", "Luận");
+
+        // Điểm danh
+        res = res.replace("Đã đi?m danh", "Đã điểm danh");
+        res = res.replace("Chưa đi?m danh", "Chưa điểm danh");
+        res = res.replace("Đi?m danh", "Điểm danh");
+        res = res.replace("V?ng m?t", "Vắng mặt");
+        res = res.replace("C? m?t", "Có mặt");
+        res = res.replace("H?c viên", "Học viên");
+
+        return res;
     }
 
     /**
@@ -58,6 +149,9 @@ public class TextSanitizer {
         if (b.contains("toàn hệ thống") || b.contains("to?n") || b.contains("vip") || b.contains("all")) {
             return "Toàn hệ thống (VIP)";
         }
+        if (b.contains("cn03") || b.contains("bình thạnh") || b.contains("b?nh th?nh") || (b.contains("cơ s") && b.contains("3")) || b.contains("cs3")) {
+            return "CN03 - Cơ sở 3 (Bình Thạnh)";
+        }
         if (b.contains("cn02") || b.contains("tân bình") || b.contains("t?n") || (b.contains("cơ s") && b.contains("2")) || b.contains("cs2")) {
             return "CN02 - Cơ sở 2 (Tân Bình)";
         }
@@ -65,7 +159,7 @@ public class TextSanitizer {
             return "CN01 - Cơ sở 1 (Quận 1)";
         }
 
-        return branch.trim();
+        return restoreCorruptedVietnamese(branch.trim());
     }
 
     /**

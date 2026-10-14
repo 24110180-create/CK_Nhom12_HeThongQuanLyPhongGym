@@ -181,6 +181,12 @@ public class HoiVienDAO {
         if (hv.getTrangThai() != null) {
             hv.setTrangThai(com.nhom12.gym.util.TextSanitizer.sanitize(hv.getTrangThai()));
         }
+        if (hv.getGoiTapDangKy() != null) {
+            hv.setGoiTapDangKy(com.nhom12.gym.util.TextSanitizer.sanitize(hv.getGoiTapDangKy()));
+        }
+        if (hv.getHinhThucThanhToan() != null) {
+            hv.setHinhThucThanhToan(com.nhom12.gym.util.TextSanitizer.sanitize(hv.getHinhThucThanhToan()));
+        }
         return hv;
     }
 

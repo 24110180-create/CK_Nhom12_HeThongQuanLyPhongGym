@@ -51,12 +51,25 @@ public class LopHocDAO {
         if (list == null || list.isEmpty()) {
             list = new ArrayList<>(memoryClasses);
         }
+        List<LopHoc> result = new ArrayList<>();
         // Đồng bộ sĩ số thực tế từ danh sách đăng ký
         for (LopHoc lh : list) {
             int actualCount = dangKyLopDAO.layDanhSachTheoLop(lh.getMaLop()).size();
             lh.setSiSoHienTai(actualCount);
+            result.add(sanitizeLopHoc(lh));
         }
-        return list;
+        return result;
+    }
+
+    private LopHoc sanitizeLopHoc(LopHoc lh) {
+        if (lh == null) return null;
+        lh.setTenLop(com.nhom12.gym.util.TextSanitizer.sanitize(lh.getTenLop()));
+        lh.setBoMon(com.nhom12.gym.util.TextSanitizer.sanitize(lh.getBoMon()));
+        lh.setHuanLuyenVien(com.nhom12.gym.util.TextSanitizer.sanitize(lh.getHuanLuyenVien()));
+        lh.setPhongTap(com.nhom12.gym.util.TextSanitizer.sanitize(lh.getPhongTap()));
+        lh.setChiNhanh(com.nhom12.gym.util.TextSanitizer.normalizeBranch(lh.getChiNhanh()));
+        lh.setThoiGian(com.nhom12.gym.util.TextSanitizer.sanitize(lh.getThoiGian()));
+        return lh;
     }
 
     public LopHoc timTheoMa(String maLop) {
@@ -67,14 +80,14 @@ public class LopHocDAO {
         if (sf != null) {
             try (Session session = sf.openSession()) {
                 LopHoc lh = session.get(LopHoc.class, code);
-                if (lh != null) return lh;
+                if (lh != null) return sanitizeLopHoc(lh);
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Lỗi tìm lớp theo mã ''{0}'': {1}", new Object[]{code, e.getMessage()});
             }
         }
 
         for (LopHoc lh : memoryClasses) {
-            if (lh.getMaLop().equalsIgnoreCase(code)) return lh;
+            if (lh.getMaLop().equalsIgnoreCase(code)) return sanitizeLopHoc(lh);
         }
         return null;
     }

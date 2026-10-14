@@ -48,10 +48,24 @@ public class DangKyLopDAO {
         return res;
     }
 
+    private DangKyLop sanitizeDangKyLop(DangKyLop dk) {
+        if (dk == null) return null;
+        dk.setTenHoiVien(com.nhom12.gym.util.TextSanitizer.sanitize(dk.getTenHoiVien()));
+        dk.setTrangThaiDiemDanh(com.nhom12.gym.util.TextSanitizer.sanitize(dk.getTrangThaiDiemDanh()));
+        if (dk.getGhiChu() != null) {
+            dk.setGhiChu(com.nhom12.gym.util.TextSanitizer.sanitize(dk.getGhiChu()));
+        }
+        return dk;
+    }
+
     public List<DangKyLop> layTatCa() {
+        List<DangKyLop> result = new ArrayList<>();
         SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf == null) {
-            return new ArrayList<>(memoryCache);
+            for (DangKyLop dk : memoryCache) {
+                result.add(sanitizeDangKyLop(dk));
+            }
+            return result;
         }
 
         try (Session session = sf.openSession()) {
@@ -59,17 +73,24 @@ public class DangKyLopDAO {
             if (list != null && !list.isEmpty()) {
                 memoryCache.clear();
                 memoryCache.addAll(list);
-                return list;
+                for (DangKyLop dk : list) {
+                    result.add(sanitizeDangKyLop(dk));
+                }
+                return result;
             }
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Không thể tải danh sách đăng ký lớp từ CSDL, dùng cache: {0}", e.getMessage());
         }
-        return new ArrayList<>(memoryCache);
+        for (DangKyLop dk : memoryCache) {
+            result.add(sanitizeDangKyLop(dk));
+        }
+        return result;
     }
 
     public List<DangKyLop> layDanhSachTheoLop(String maLop) {
         if (maLop == null || maLop.trim().isEmpty()) return new ArrayList<>();
         String code = maLop.trim();
+        List<DangKyLop> result = new ArrayList<>();
 
         SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf != null) {
@@ -80,7 +101,10 @@ public class DangKyLopDAO {
                 query.setParameter("ma", code);
                 List<DangKyLop> list = query.list();
                 if (list != null && !list.isEmpty()) {
-                    return list;
+                    for (DangKyLop dk : list) {
+                        result.add(sanitizeDangKyLop(dk));
+                    }
+                    return result;
                 }
             } catch (Exception e) {
                 LOGGER.log(Level.FINE, "Lỗi lấy danh sách học viên lớp từ CSDL: {0}", e.getMessage());
@@ -88,10 +112,9 @@ public class DangKyLopDAO {
         }
 
         // Fallback bộ nhớ đệm
-        List<DangKyLop> result = new ArrayList<>();
         for (DangKyLop dk : memoryCache) {
             if (dk.getMaLop() != null && dk.getMaLop().equalsIgnoreCase(code)) {
-                result.add(dk);
+                result.add(sanitizeDangKyLop(dk));
             }
         }
         return result;

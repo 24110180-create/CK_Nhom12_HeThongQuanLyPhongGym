@@ -9,6 +9,7 @@ import com.nhom12.gym.entity.LopHoc;
 import com.nhom12.gym.util.Auth;
 import com.nhom12.gym.util.ExcelExportHelper;
 import com.nhom12.gym.util.SoundHelper;
+import com.nhom12.gym.util.TextSanitizer;
 
 import java.awt.*;
 import java.text.SimpleDateFormat;
@@ -99,7 +100,7 @@ public class LichLopHocPanel extends JPanel {
         JPanel pTitle = new JPanel(new BorderLayout(5, 5));
         pTitle.setOpaque(false);
 
-        JLabel lblTitle = new JLabel("LỊCH LỚP HỌC & ĐIỂM DANH HỘI VIÊN (HUẤN LUYỆN VIÊN)");
+        JLabel lblTitle = new JLabel("LỊCH LỚP HỌC & ĐIỂM DANH HỘI VIÊN");
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
         lblTitle.setForeground(new Color(15, 23, 42));
 
@@ -545,15 +546,21 @@ public class LichLopHocPanel extends JPanel {
             tongHocVien += cur;
 
             String tinhTrang = (cur >= max) ? "ĐẦY LỚP" : "CÒN CHỖ (" + (max - cur) + ")";
-            String branchName = (lh.getChiNhanh() != null) ? lh.getChiNhanh() : "CN01 - Cơ sở 1 (Quận 1)";
+            String branchName = TextSanitizer.normalizeBranch(lh.getChiNhanh());
+            String boMon = TextSanitizer.sanitize(lh.getBoMon() != null ? lh.getBoMon() : "Khác");
+            String tenLop = TextSanitizer.sanitize(lh.getTenLop());
+            String hlv = TextSanitizer.sanitize(lh.getHuanLuyenVien());
+            String phong = TextSanitizer.sanitize(lh.getPhongTap());
+            String thoiGian = TextSanitizer.sanitize(lh.getThoiGian());
+
             modelLop.addRow(new Object[]{
                     lh.getMaLop(),
                     branchName,
-                    lh.getBoMon() != null ? lh.getBoMon() : "Khác",
-                    lh.getTenLop(),
-                    lh.getHuanLuyenVien(),
-                    lh.getPhongTap(),
-                    lh.getThoiGian(),
+                    boMon,
+                    tenLop,
+                    hlv,
+                    phong,
+                    thoiGian,
                     cur + "/" + max,
                     tinhTrang
             });
@@ -611,14 +618,17 @@ public class LichLopHocPanel extends JPanel {
                 daDiemDanhCuaLop++;
             }
             String ngayStr = (dk.getNgayDangKy() != null) ? dateFormat.format(dk.getNgayDangKy()) : "";
+            String tenHV = TextSanitizer.sanitize(dk.getTenHoiVien());
+            String ttDiemDanh = TextSanitizer.sanitize(dk.getTrangThaiDiemDanh());
+            String ghiChu = TextSanitizer.sanitize(dk.getGhiChu() != null ? dk.getGhiChu() : "");
             modelHocVien.addRow(new Object[]{
                     dk.getId(),
                     "HV" + String.format("%02d", dk.getMaHoiVien()),
-                    dk.getTenHoiVien(),
+                    tenHV,
                     dk.getSoDienThoai(),
                     ngayStr,
-                    dk.getTrangThaiDiemDanh(),
-                    dk.getGhiChu() != null ? dk.getGhiChu() : ""
+                    ttDiemDanh,
+                    ghiChu
             });
         }
 
@@ -1094,14 +1104,18 @@ public class LichLopHocPanel extends JPanel {
 
         List<HoiVien> tatCaHoiVien = hoiVienDAO.layTatCa();
         for (HoiVien hv : tatCaHoiVien) {
+            String hoTen = TextSanitizer.sanitize(hv.getHoTen());
+            String goiTap = TextSanitizer.sanitize(hv.getGoiTapDangKy() != null ? hv.getGoiTapDangKy() : "Gói Tiêu Chuẩn");
+            String chiNhanh = TextSanitizer.normalizeBranch(hv.getChiNhanhDangKy());
+            String trangThai = TextSanitizer.sanitize(hv.getTrangThai() != null ? hv.getTrangThai() : "Active");
             hvModel.addRow(new Object[]{
                     hv.getMaHoiVien(),
                     hv.getMaTheQR(),
-                    hv.getHoTen(),
+                    hoTen,
                     hv.getSoDienThoai(),
-                    hv.getGoiTapDangKy() != null ? hv.getGoiTapDangKy() : "Gói Tiêu Chuẩn",
-                    hv.getChiNhanhDangKy() != null ? hv.getChiNhanhDangKy() : "CN01 - Quận 1",
-                    hv.getTrangThai() != null ? hv.getTrangThai() : "Active"
+                    goiTap,
+                    chiNhanh,
+                    trangThai
             });
         }
 

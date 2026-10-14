@@ -4,6 +4,7 @@ import com.nhom12.gym.dao.HoiVienDAO;
 import com.nhom12.gym.entity.HoiVien;
 import com.nhom12.gym.service.DataSyncManager;
 import com.nhom12.gym.util.ExcelExportHelper;
+import com.nhom12.gym.util.TextSanitizer;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -18,7 +19,7 @@ import java.util.List;
 
 /**
  * TRUNG TÂM QUẢN LÝ HỘI VIÊN SẮP HẾT HẠN & TÁI KÝ HỢP ĐỒNG FITLIFE
- * Chuyển giao từ Trang Chủ sang Quản Lý Hội Viên & Lớp Học nhằm đảm bảo tính
+ * Chuyển giao từ Trang Chủ sang Quản Lý Hội Viên nhằm đảm bảo tính
  * tập trung, khoa học và chuyên nghiệp của quy trình chăm sóc khách hàng.
  */
 public class HoiVienSapHetHanPanel extends JPanel {
@@ -313,13 +314,17 @@ public class HoiVienSapHetHanPanel extends JPanel {
                     alertLevel = "🟢 TRONG HẠN ĐỊNH";
                 }
 
+                String hoTen = TextSanitizer.sanitize(hv.getHoTen());
+                String goiTap = TextSanitizer.sanitize(hv.getGoiTapDangKy() != null ? hv.getGoiTapDangKy() : "Gói Tiêu Chuẩn");
+                String chiNhanh = TextSanitizer.normalizeBranch(hv.getChiNhanhDangKy());
+
                 model.addRow(new Object[]{
                         hv.getMaHoiVien(),
                         hv.getMaTheQR() != null ? hv.getMaTheQR() : ("HV" + hv.getMaHoiVien()),
-                        hv.getHoTen(),
+                        hoTen,
                         hv.getSoDienThoai() != null ? hv.getSoDienThoai() : "--",
-                        hv.getGoiTapDangKy() != null ? hv.getGoiTapDangKy() : "Gói Tiêu Chuẩn",
-                        hv.getChiNhanhDangKy() != null ? hv.getChiNhanhDangKy() : "CN01 - Quận 1",
+                        goiTap,
+                        chiNhanh,
                         sdf.format(exp),
                         remainText,
                         alertLevel

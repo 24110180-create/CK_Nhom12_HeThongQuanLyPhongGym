@@ -401,16 +401,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnLamMoi.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnLamMoi.addActionListener(e -> loadDataToTable());
 
-        JButton btnDangKyLop = new JButton("Đăng Ký Vào Lớp");
-        btnDangKyLop.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnDangKyLop.setBackground(new Color(14, 165, 233));
-        btnDangKyLop.setForeground(Color.WHITE);
-        btnDangKyLop.setFocusPainted(false);
-        btnDangKyLop.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnDangKyLop.addActionListener(e -> moDialogGhiDanhLopChoHoiVien());
-
         btnActions.add(btnXemTheQR);
-        btnActions.add(btnDangKyLop);
         btnActions.add(btnCapNhat);
         btnActions.add(btnToggleLock);
         btnActions.add(btnQuetCheckIn);
@@ -449,11 +440,13 @@ public class QuanLyHoiVienPanel extends JPanel {
                 String sdt = (hv.getSoDienThoai() != null && !hv.getSoDienThoai().isEmpty())
                         ? hv.getSoDienThoai() : "0901234567";
 
-                String goiTap = (hv.getGoiTapDangKy() != null && !hv.getGoiTapDangKy().isEmpty())
+                String rawGoi = (hv.getGoiTapDangKy() != null && !hv.getGoiTapDangKy().isEmpty())
                         ? hv.getGoiTapDangKy() : "Gói Standard 3 Tháng";
+                String goiTap = TextSanitizer.sanitize(rawGoi);
 
-                String hinhThucTT = (hv.getHinhThucThanhToan() != null && !hv.getHinhThucThanhToan().isEmpty())
+                String rawHT = (hv.getHinhThucThanhToan() != null && !hv.getHinhThucThanhToan().isEmpty())
                         ? hv.getHinhThucThanhToan() : "Chuyển khoản VietQR";
+                String hinhThucTT = TextSanitizer.sanitize(rawHT);
 
                 if (hinhThucTT.contains("VietQR") || hinhThucTT.contains("Chuyển khoản")) {
                     tongVietQR += tien;

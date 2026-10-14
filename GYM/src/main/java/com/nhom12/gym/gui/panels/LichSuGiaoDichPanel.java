@@ -126,6 +126,18 @@ public class LichSuGiaoDichPanel extends JPanel {
         sorter = new TableRowSorter<>(model);
         table.setRowSorter(sorter);
 
+        // Đảm bảo hiển thị chuẩn tiếng Việt, tự động khôi phục lỗi ký tự '?' nếu có
+        table.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
+            @Override
+            public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+                java.awt.Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+                if (value != null) {
+                    setText(com.nhom12.gym.util.TextSanitizer.sanitize(value.toString()));
+                }
+                return c;
+            }
+        });
+
         tablePanel.add(new JScrollPane(table), BorderLayout.CENTER);
 
         JPanel centerContainer = new JPanel(new BorderLayout(0, 15));
@@ -159,11 +171,11 @@ public class LichSuGiaoDichPanel extends JPanel {
             int mr = table.convertRowIndexToModel(sel);
             String code = model.getValueAt(mr, 0).toString();
             String time = model.getValueAt(mr, 1).toString();
-            String customer = model.getValueAt(mr, 2).toString();
-            String type = model.getValueAt(mr, 3).toString();
-            String staff = model.getValueAt(mr, 4).toString();
+            String customer = com.nhom12.gym.util.TextSanitizer.sanitize(model.getValueAt(mr, 2).toString());
+            String type = com.nhom12.gym.util.TextSanitizer.sanitize(model.getValueAt(mr, 3).toString());
+            String staff = com.nhom12.gym.util.TextSanitizer.sanitize(model.getValueAt(mr, 4).toString());
             String total = model.getValueAt(mr, 5).toString();
-            String payType = model.getValueAt(mr, 6).toString();
+            String payType = com.nhom12.gym.util.TextSanitizer.sanitize(model.getValueAt(mr, 6).toString());
 
             double num = 0;
             double originalPrice = 0;
@@ -209,11 +221,19 @@ public class LichSuGiaoDichPanel extends JPanel {
         if (list != null && !list.isEmpty()) {
             for (com.nhom12.gym.entity.HoaDon hd : list) {
                 String time = hd.getNgayLap() != null ? sdf.format(hd.getNgayLap()) : sdf.format(new java.util.Date());
-                String cus = (hd.getTenHoiVien() != null && !hd.getTenHoiVien().isEmpty()) ? hd.getTenHoiVien() : "Khách vãng lai";
-                String type = (hd.getLoaiGiaoDich() != null && !hd.getLoaiGiaoDich().isEmpty()) ? hd.getLoaiGiaoDich() : "Giao dịch FitLife";
-                String staff = (hd.getNguoiLap() != null && !hd.getNguoiLap().isEmpty()) ? hd.getNguoiLap() : "letan1";
+                String cus = (hd.getTenHoiVien() != null && !hd.getTenHoiVien().isEmpty()) 
+                        ? com.nhom12.gym.util.TextSanitizer.sanitize(hd.getTenHoiVien()) 
+                        : "Khách vãng lai";
+                String type = (hd.getLoaiGiaoDich() != null && !hd.getLoaiGiaoDich().isEmpty()) 
+                        ? com.nhom12.gym.util.TextSanitizer.sanitize(hd.getLoaiGiaoDich()) 
+                        : "Giao dịch FitLife";
+                String staff = (hd.getNguoiLap() != null && !hd.getNguoiLap().isEmpty()) 
+                        ? com.nhom12.gym.util.TextSanitizer.sanitize(hd.getNguoiLap()) 
+                        : "letan1";
                 String total = df.format(hd.getThanhTien());
-                String payMethod = (hd.getHinhThucThanhToan() != null && !hd.getHinhThucThanhToan().isEmpty()) ? hd.getHinhThucThanhToan() : "Tiền mặt";
+                String payMethod = (hd.getHinhThucThanhToan() != null && !hd.getHinhThucThanhToan().isEmpty()) 
+                        ? com.nhom12.gym.util.TextSanitizer.sanitize(hd.getHinhThucThanhToan()) 
+                        : "Tiền mặt";
                 model.addRow(new Object[]{
                         hd.getMaHoaDon(),
                         time,

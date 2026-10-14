@@ -51,6 +51,7 @@ public class HoaDonDAO {
      */
     public boolean them(HoaDon hd) {
         if (hd == null) return false;
+        sanitizeHoaDon(hd);
 
         org.hibernate.SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf == null) {
@@ -86,21 +87,53 @@ public class HoaDonDAO {
         }
     }
 
+    public static HoaDon sanitizeHoaDon(HoaDon hd) {
+        if (hd == null) return null;
+        if (hd.getTenHoiVien() != null) {
+            hd.setTenHoiVien(com.nhom12.gym.util.TextSanitizer.sanitize(hd.getTenHoiVien()));
+        }
+        if (hd.getLoaiGiaoDich() != null) {
+            hd.setLoaiGiaoDich(com.nhom12.gym.util.TextSanitizer.sanitize(hd.getLoaiGiaoDich()));
+        }
+        if (hd.getHinhThucThanhToan() != null) {
+            hd.setHinhThucThanhToan(com.nhom12.gym.util.TextSanitizer.sanitize(hd.getHinhThucThanhToan()));
+        }
+        if (hd.getNguoiLap() != null) {
+            hd.setNguoiLap(com.nhom12.gym.util.TextSanitizer.sanitize(hd.getNguoiLap()));
+        }
+        if (hd.getChiNhanh() != null) {
+            hd.setChiNhanh(com.nhom12.gym.util.TextSanitizer.normalizeBranch(hd.getChiNhanh()));
+        }
+        if (hd.getGhiChu() != null) {
+            hd.setGhiChu(com.nhom12.gym.util.TextSanitizer.sanitize(hd.getGhiChu()));
+        }
+        return hd;
+    }
+
     /**
      * Lấy toàn bộ danh sách hóa đơn sắp xếp giảm dần theo ngày lập
      */
     public List<HoaDon> layTatCa() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            List<HoaDon> list = session.createQuery("FROM HoaDon ORDER BY ngayLap DESC", HoaDon.class).list();
-            if (list != null && !list.isEmpty()) {
-                memoryCache.clear();
-                memoryCache.addAll(list);
-                return list;
+        org.hibernate.SessionFactory sf = HibernateUtil.getSessionFactory();
+        if (sf != null) {
+            try (Session session = sf.openSession()) {
+                List<HoaDon> list = session.createQuery("FROM HoaDon ORDER BY ngayLap DESC", HoaDon.class).list();
+                if (list != null && !list.isEmpty()) {
+                    memoryCache.clear();
+                    for (HoaDon h : list) {
+                        memoryCache.add(sanitizeHoaDon(h));
+                    }
+                    return new ArrayList<>(memoryCache);
+                }
+            } catch (Exception e) {
+                System.err.println("[HoaDonDAO] Không thể tải danh sách hóa đơn từ CSDL, dùng cache: " + e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("[HoaDonDAO] Không thể tải danh sách hóa đơn từ CSDL, dùng cache: " + e.getMessage());
         }
-        return new ArrayList<>(memoryCache);
+        List<HoaDon> result = new ArrayList<>();
+        for (HoaDon h : memoryCache) {
+            result.add(sanitizeHoaDon(h));
+        }
+        return result;
     }
 
     /**

@@ -5,7 +5,10 @@
     <session-factory>
         <!-- Cấu hình kết nối SQL Server -->
         <property name="hibernate.connection.driver_class">com.microsoft.sqlserver.jdbc.SQLServerDriver</property>
-        <property name="hibernate.connection.url">jdbc:sqlserver://localhost;databaseName=FitLifeGym;encrypt=true;trustServerCertificate=true;</property>
+        <property name="hibernate.connection.url">jdbc:sqlserver://localhost;databaseName=FitLifeGym;encrypt=true;trustServerCertificate=true;sendStringParametersAsUnicode=true;useUnicode=true;characterEncoding=UTF-8;</property>
+        <property name="hibernate.connection.characterEncoding">UTF-8</property>
+        <property name="hibernate.connection.useUnicode">true</property>
+        <property name="hibernate.connection.CharSet">UTF-8</property>
 
         <!-- Tài khoản và mật khẩu SQL Server (Được ghi đè bằng database.properties nếu có) -->
         <property name="hibernate.connection.username">admin123</property>

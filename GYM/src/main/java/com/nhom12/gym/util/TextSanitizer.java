@@ -48,17 +48,17 @@ public class TextSanitizer {
         }
 
         // 3. Khắc phục phương thức thanh toán
-        if (s.toLowerCase().contains("chuy?n") || s.toLowerCase().contains("chuyen khoan") || s.toLowerCase().contains("vietqr")) {
+        if (s.equalsIgnoreCase("Chuyển khoản VietQR") || s.toLowerCase().contains("chuy?n kho?n") || s.equalsIgnoreCase("vietqr") || s.equalsIgnoreCase("chuyen khoan")) {
             return "Chuyển khoản VietQR";
         }
-        if (s.toLowerCase().contains("ti?n m?t") || s.toLowerCase().contains("tien mat")) {
+        if (s.equalsIgnoreCase("Tiền mặt") || s.toLowerCase().contains("ti?n m?t") || s.equalsIgnoreCase("tien mat")) {
             return "Tiền mặt";
         }
-        if (s.toLowerCase().contains("qu?t th?") || s.toLowerCase().contains("quet the") || s.toLowerCase().contains("pos")) {
+        if (s.equalsIgnoreCase("Quẹt thẻ POS") || s.toLowerCase().contains("qu?t th?") || s.equalsIgnoreCase("quet the")) {
             return "Quẹt thẻ POS";
         }
 
-        // 4. Khắc phục chuỗi tổng quát chứa dấu '?' (Tên hội viên, lớp học, phòng tập, gói tập, HLV)
+        // 4. Khắc phục chuỗi tổng quát chứa dấu '?' (Tên hội viên, lớp học, phòng tập, gói tập, HLV, hóa đơn)
         return restoreCorruptedVietnamese(s);
     }
 
@@ -71,6 +71,101 @@ public class TextSanitizer {
         }
 
         String res = text;
+        // Giao dịch, POS, Hóa đơn & Bán hàng
+        res = res.replace("Đăng k?", "Đăng ký");
+        res = res.replace("đăng k?", "đăng ký");
+        res = res.replace(" k?", " ký");
+        res = res.replace("Khách L? Qu?y POS", "Khách Lẻ Quầy POS");
+        res = res.replace("Khách L?", "Khách Lẻ");
+        res = res.replace("khách l?", "khách lẻ");
+        res = res.replace("L? Qu?y", "Lẻ Quầy");
+        res = res.replace("l? qu?y", "lẻ quầy");
+        res = res.replace("Qu?y POS", "Quầy POS");
+        res = res.replace("qu?y POS", "quầy POS");
+        res = res.replace("Qu?y", "Quầy");
+        res = res.replace("qu?y", "quầy");
+        res = res.replace("Thanh to?n mua h?ng", "Thanh toán mua hàng");
+        res = res.replace("thanh to?n mua h?ng", "thanh toán mua hàng");
+        res = res.replace("Thanh to?n", "Thanh toán");
+        res = res.replace("thanh to?n", "thanh toán");
+        res = res.replace("mua h?ng", "mua hàng");
+        res = res.replace("Mua h?ng", "Mua hàng");
+        res = res.replace("m?t h?ng", "mặt hàng");
+        res = res.replace("M?t h?ng", "Mặt hàng");
+        res = res.replace("B?n h?ng nư?c & th?c ph?m", "Bán hàng nước & thực phẩm");
+        res = res.replace("b?n h?ng nư?c & th?c ph?m", "bán hàng nước & thực phẩm");
+        res = res.replace("b?n h?ng", "bán hàng");
+        res = res.replace("B?n h?ng", "Bán hàng");
+        res = res.replace("B?n l?", "Bán lẻ");
+        res = res.replace("b?n l?", "bán lẻ");
+        res = res.replace("nư?c", "nước");
+        res = res.replace("Nư?c", "Nước");
+        res = res.replace("th?c ph?m", "thực phẩm");
+        res = res.replace("Th?c ph?m", "Thực phẩm");
+        res = res.replace("th?c", "thực");
+        res = res.replace("Th?c", "Thực");
+        res = res.replace("ph?m", "phẩm");
+        res = res.replace("Ph?m", "Phẩm");
+        res = res.replace("Chuy?n kho?n VietQR", "Chuyển khoản VietQR");
+        res = res.replace("Chuy?n kho?n", "Chuyển khoản");
+        res = res.replace("chuy?n kho?n", "chuyển khoản");
+        res = res.replace("Chuy?n", "Chuyển");
+        res = res.replace("chuy?n", "chuyển");
+        res = res.replace("kho?n", "khoản");
+        res = res.replace("Kho?n", "Khoản");
+        res = res.replace("Ti?n m?t", "Tiền mặt");
+        res = res.replace("ti?n m?t", "tiền mặt");
+        res = res.replace("ti?n", "tiền");
+        res = res.replace("Ti?n", "Tiền");
+        res = res.replace("Qu?t th?", "Quẹt thẻ");
+        res = res.replace("qu?t th?", "quẹt thẻ");
+        res = res.replace("Qu?t", "Quẹt");
+        res = res.replace("qu?t", "quẹt");
+        res = res.replace("H?a đ?n", "Hóa đơn");
+        res = res.replace("h?a đ?n", "hóa đơn");
+        res = res.replace("Gia h?n", "Gia hạn");
+        res = res.replace("gia h?n", "gia hạn");
+        res = res.replace("Khách v?ng lai", "Khách vãng lai");
+        res = res.replace("khách v?ng lai", "khách vãng lai");
+        res = res.replace("v?ng lai", "vãng lai");
+        res = res.replace("v?ng", "vãng");
+        res = res.replace("V?ng", "Vãng");
+        res = res.replace("D?ch v?", "Dịch vụ");
+        res = res.replace("d?ch v?", "dịch vụ");
+        res = res.replace("Khuy?n m?i", "Khuyến mãi");
+        res = res.replace("khuy?n m?i", "khuyến mãi");
+        res = res.replace("Gi?m gi?", "Giảm giá");
+        res = res.replace("gi?m gi?", "giảm giá");
+        res = res.replace("T?ng ti?n", "Tổng tiền");
+        res = res.replace("t?ng ti?n", "tổng tiền");
+        res = res.replace("Th?nh ti?n", "Thành tiền");
+        res = res.replace("th?nh ti?n", "thành tiền");
+        res = res.replace("N?i dung", "Nội dung");
+        res = res.replace("n?i dung", "nội dung");
+        res = res.replace("Ng?y l?p", "Ngày lập");
+        res = res.replace("ng?y l?p", "ngày lập");
+        res = res.replace("Tr?ng th?i", "Trạng thái");
+        res = res.replace("tr?ng th?i", "trạng thái");
+        res = res.replace("Đ? thanh to?n", "Đã thanh toán");
+        res = res.replace("đ? thanh to?n", "đã thanh toán");
+        res = res.replace("Chưa thanh to?n", "Chưa thanh toán");
+        res = res.replace("chưa thanh to?n", "chưa thanh toán");
+        res = res.replace("H?i viên", "Hội viên");
+        res = res.replace("h?i viên", "hội viên");
+        res = res.replace("H?i Viên", "Hội Viên");
+        res = res.replace("Chi nh?nh", "Chi nhánh");
+        res = res.replace("chi nh?nh", "chi nhánh");
+        res = res.replace("Chi Nh?nh", "Chi Nhánh");
+        res = res.replace("Nh?n viên", "Nhân viên");
+        res = res.replace("nh?n viên", "nhân viên");
+        res = res.replace("Nh?n Viên", "Nhân Viên");
+        res = res.replace("T?i kho?n", "Tài khoản");
+        res = res.replace("t?i kho?n", "tài khoản");
+        res = res.replace("M?t kh?u", "Mật khẩu");
+        res = res.replace("m?t kh?u", "mật khẩu");
+        res = res.replace("th?ng", "tháng");
+        res = res.replace("Th?ng", "Tháng");
+
         // Gói tập & dịch vụ
         res = res.replace("Tr?i Nghi?m", "Trải Nghiệm");
         res = res.replace("Tr?i nghi?m", "Trải nghiệm");

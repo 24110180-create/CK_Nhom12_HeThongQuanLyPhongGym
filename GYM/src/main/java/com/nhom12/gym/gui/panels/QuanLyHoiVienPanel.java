@@ -129,12 +129,14 @@ public class QuanLyHoiVienPanel extends JPanel {
         ));
 
         // --- TOP TOOLBAR: BỘ LỌC + TÌM KIẾM + NÚT ĐĂNG KÝ MỚI ---
-        JPanel toolBar = new JPanel(new BorderLayout(10, 0));
+        JPanel toolBar = new JPanel();
+        toolBar.setLayout(new BoxLayout(toolBar, BoxLayout.Y_AXIS));
         toolBar.setOpaque(false);
 
         // Bên trái toolbar: Bộ lọc cơ sở & trạng thái
         JPanel filterBox = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
         filterBox.setOpaque(false);
+        filterBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel lblFBranch = new JLabel("Cơ sở:");
         lblFBranch.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -155,11 +157,10 @@ public class QuanLyHoiVienPanel extends JPanel {
         filterBox.add(lblFStatus);
         filterBox.add(cbFilterStatus);
 
-        toolBar.add(filterBox, BorderLayout.WEST);
-
         // Bên phải toolbar: Tìm kiếm + Nút Đăng ký mới + Xuất Excel
-        JPanel actionBox = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 4));
+        JPanel actionBox = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
         actionBox.setOpaque(false);
+        actionBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JTextField txtSearch = new JTextField(16);
         txtSearch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
@@ -191,7 +192,8 @@ public class QuanLyHoiVienPanel extends JPanel {
         actionBox.add(btnDangKyMoi);
         actionBox.add(btnExport);
 
-        toolBar.add(actionBox, BorderLayout.EAST);
+        toolBar.add(filterBox);
+        toolBar.add(actionBox);
         panel.add(toolBar, BorderLayout.NORTH);
 
         // --- BẢNG DỮ LIỆU ĐẦY ĐỦ 11 CỘT ---
@@ -317,7 +319,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         });
 
         // Tinh chỉnh độ rộng các cột
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.getColumnModel().getColumn(0).setPreferredWidth(55);  // Mã HV
         table.getColumnModel().getColumn(1).setPreferredWidth(95);  // Mã Thẻ QR
         table.getColumnModel().getColumn(2).setPreferredWidth(140); // Họ Và Tên
@@ -340,20 +342,25 @@ public class QuanLyHoiVienPanel extends JPanel {
             }
         });
 
-        panel.add(new JScrollPane(table), BorderLayout.CENTER);
+        JScrollPane tableScroll = new JScrollPane(table);
+        tableScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        panel.add(tableScroll, BorderLayout.CENTER);
 
         // --- BOTTOM ACTIONS: THAO TÁC HỒ SƠ & THẺ ---
-        JPanel bottomActions = new JPanel(new BorderLayout());
+        JPanel bottomActions = new JPanel();
+        bottomActions.setLayout(new BoxLayout(bottomActions, BoxLayout.Y_AXIS));
         bottomActions.setOpaque(false);
         bottomActions.setBorder(new EmptyBorder(6, 0, 0, 0));
 
-        JLabel lblHint = new JLabel("💡 Mẹo: Nhấp đúp chuột vào hàng hoặc chọn nút dưới đây để cập nhật hồ sơ, khóa thẻ hoặc gửi mã QR:");
+        JLabel lblHint = new JLabel("💡 Mẹo: Nhấp đúp vào hội viên để cập nhật hồ sơ; chọn hội viên rồi dùng các nút bên dưới.");
         lblHint.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         lblHint.setForeground(new Color(100, 116, 139));
-        bottomActions.add(lblHint, BorderLayout.WEST);
+        lblHint.setAlignmentX(Component.LEFT_ALIGNMENT);
+        bottomActions.add(lblHint);
 
-        JPanel btnActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        JPanel btnActions = new JPanel(new GridLayout(2, 3, 8, 6));
         btnActions.setOpaque(false);
+        btnActions.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JButton btnXemTheQR = new JButton("📱 Xem & Gửi Thẻ QR");
         btnXemTheQR.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -410,7 +417,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnActions.add(btnXoa);
         btnActions.add(btnLamMoi);
 
-        bottomActions.add(btnActions, BorderLayout.EAST);
+        bottomActions.add(btnActions);
         panel.add(bottomActions, BorderLayout.SOUTH);
 
         return panel;

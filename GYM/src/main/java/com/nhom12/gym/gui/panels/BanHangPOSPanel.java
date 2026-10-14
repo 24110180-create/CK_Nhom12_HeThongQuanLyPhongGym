@@ -8,6 +8,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import com.nhom12.gym.dao.HoaDonDAO;
@@ -74,12 +76,25 @@ public class BanHangPOSPanel extends JPanel implements KhoHangService.KhoHangLis
         scrollProduct.setOpaque(false);
         scrollProduct.getViewport().setOpaque(false);
         scrollProduct.getVerticalScrollBar().setUnitIncrement(16);
+        scrollProduct.getViewport().addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                int width = scrollProduct.getViewport().getWidth();
+                int columns = Math.max(1, Math.min(3, (width + 14) / 194));
+                GridLayout layout = (GridLayout) productGridPanel.getLayout();
+                if (layout.getColumns() != columns) {
+                    productGridPanel.setLayout(new GridLayout(0, columns, 14, 14));
+                    productGridPanel.revalidate();
+                }
+            }
+        });
         leftContainer.add(scrollProduct, BorderLayout.CENTER);
 
         // BÊN PHẢI: GIỎ HÀNG & THANH TOÁN
         JPanel rightPanel = new JPanel(new BorderLayout(12, 12));
         rightPanel.setBackground(Color.WHITE);
-        rightPanel.setPreferredSize(new Dimension(460, 0));
+        rightPanel.setPreferredSize(new Dimension(420, 0));
+        rightPanel.setMinimumSize(new Dimension(360, 0));
         rightPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(226, 232, 240)),
                 new EmptyBorder(15, 15, 15, 15)

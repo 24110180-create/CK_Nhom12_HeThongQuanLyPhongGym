@@ -96,7 +96,7 @@ public class MainDashboard extends JFrame {
         this.currentRole = (initialRole != null && !initialRole.trim().isEmpty()) ? initialRole : "Chủ";
         setTitle("FitLife Gym Management - " + getRoleDisplayName(currentRole));
         setSize(1400, 850);
-        setMinimumSize(new Dimension(1100, 700));
+        setMinimumSize(new Dimension(960, 620));
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -578,7 +578,7 @@ public class MainDashboard extends JFrame {
                 workspaceScroll.setBorder(null);
                 workspaceScroll.setOpaque(false);
                 workspaceScroll.getViewport().setOpaque(false);
-                workspaceScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+                workspaceScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
                 workspaceScroll.getVerticalScrollBar().setUnitIncrement(16);
                 selectedItem.cachedScroll = workspaceScroll;
             }

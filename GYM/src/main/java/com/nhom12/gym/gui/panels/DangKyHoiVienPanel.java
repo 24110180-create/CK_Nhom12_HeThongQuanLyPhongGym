@@ -72,6 +72,8 @@ public class DangKyHoiVienPanel extends JPanel {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(520);
         splitPane.setDividerSize(6);
+        splitPane.setResizeWeight(0.58);
+        splitPane.setContinuousLayout(true);
         splitPane.setOpaque(false);
         splitPane.setBorder(null);
 
@@ -105,6 +107,7 @@ public class DangKyHoiVienPanel extends JPanel {
         formGrid.add(l1, gbc);
         gbc.gridy = r++;
         txtFullName = new JTextField(); txtFullName.setFont(fontInput);
+        styleInput(txtFullName);
         formGrid.add(txtFullName, gbc);
 
         // Phone & Gender (2 columns in one row)
@@ -113,11 +116,13 @@ public class DangKyHoiVienPanel extends JPanel {
         JPanel pPhone = new JPanel(new BorderLayout(0, 3)); pPhone.setOpaque(false);
         JLabel lPhone = new JLabel("Số Điện Thoại (*):"); lPhone.setFont(fontLabel);
         txtPhone = new JTextField(); txtPhone.setFont(fontInput);
+        styleInput(txtPhone);
         pPhone.add(lPhone, BorderLayout.NORTH); pPhone.add(txtPhone, BorderLayout.CENTER);
 
         JPanel pGender = new JPanel(new BorderLayout(0, 3)); pGender.setOpaque(false);
         JLabel lGender = new JLabel("Giới Tính:"); lGender.setFont(fontLabel);
         cbGender = new JComboBox<>(new String[]{"Nam", "Nữ", "Khác"}); cbGender.setFont(fontInput);
+        styleInput(cbGender);
         pGender.add(lGender, BorderLayout.NORTH); pGender.add(cbGender, BorderLayout.CENTER);
 
         rowPhoneGender.add(pPhone); rowPhoneGender.add(pGender);
@@ -130,11 +135,13 @@ public class DangKyHoiVienPanel extends JPanel {
         JPanel pBranch = new JPanel(new BorderLayout(0, 3)); pBranch.setOpaque(false);
         JLabel lBranch = new JLabel("Chi Nhánh:"); lBranch.setFont(fontLabel);
         cbBranch = new JComboBox<>(new String[]{"CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)"}); cbBranch.setFont(fontInput);
+        styleInput(cbBranch);
         pBranch.add(lBranch, BorderLayout.NORTH); pBranch.add(cbBranch, BorderLayout.CENTER);
 
         JPanel pBirth = new JPanel(new BorderLayout(0, 3)); pBirth.setOpaque(false);
         JLabel lBirth = new JLabel("Ngày Sinh (dd/MM/yyyy):"); lBirth.setFont(fontLabel);
         txtBirth = new JTextField("15/05/2000"); txtBirth.setFont(fontInput);
+        styleInput(txtBirth);
         pBirth.add(lBirth, BorderLayout.NORTH); pBirth.add(txtBirth, BorderLayout.CENTER);
 
         rowBranchBirth.add(pBranch); rowBranchBirth.add(pBirth);
@@ -148,6 +155,7 @@ public class DangKyHoiVienPanel extends JPanel {
         gbc.gridy = r++;
         cbPackage = new JComboBox<>();
         cbPackage.setFont(fontInput);
+        styleInput(cbPackage);
         formGrid.add(cbPackage, gbc);
 
         // Start Date & Trainer
@@ -156,11 +164,13 @@ public class DangKyHoiVienPanel extends JPanel {
         JPanel pDate = new JPanel(new BorderLayout(0, 3)); pDate.setOpaque(false);
         JLabel lDate = new JLabel("Ngày Bắt Đầu:"); lDate.setFont(fontLabel);
         txtStartDate = new JTextField(new SimpleDateFormat("dd/MM/yyyy").format(new Date())); txtStartDate.setFont(fontInput);
+        styleInput(txtStartDate);
         pDate.add(lDate, BorderLayout.NORTH); pDate.add(txtStartDate, BorderLayout.CENTER);
 
         JPanel pPT = new JPanel(new BorderLayout(0, 3)); pPT.setOpaque(false);
         JLabel lPT = new JLabel("HLV Kèm (Nếu có):"); lPT.setFont(fontLabel);
         cbTrainer = new JComboBox<>(new String[]{"Không kèm HLV", "HLV John Smith", "HLV Phạm Quốc Bảo", "HLV Anh Tuấn"}); cbTrainer.setFont(fontInput);
+        styleInput(cbTrainer);
         pPT.add(lPT, BorderLayout.NORTH); pPT.add(cbTrainer, BorderLayout.CENTER);
 
         rowDatePT.add(pDate); rowDatePT.add(pPT);
@@ -173,15 +183,18 @@ public class DangKyHoiVienPanel extends JPanel {
         JPanel pPay = new JPanel(new BorderLayout(0, 3)); pPay.setOpaque(false);
         JLabel lPay = new JLabel("Hình Thức Thanh Toán:"); lPay.setFont(fontLabel);
         cbPayment = new JComboBox<>(new String[]{"Tiền mặt", "Chuyển khoản (VietQR)", "Quẹt thẻ POS"}); cbPayment.setFont(fontInput);
+        styleInput(cbPayment);
         pPay.add(lPay, BorderLayout.NORTH); pPay.add(cbPayment, BorderLayout.CENTER);
 
         JPanel pVoucher = new JPanel(new BorderLayout(0, 3)); pVoucher.setOpaque(false);
         JLabel lVoucher = new JLabel("Mã Giảm Giá (Voucher):"); lVoucher.setFont(fontLabel);
         JPanel vSub = new JPanel(new BorderLayout(5, 0)); vSub.setOpaque(false);
         txtVoucher = new JTextField("SUMMER26"); txtVoucher.setFont(fontInput);
+        styleInput(txtVoucher);
         btnApplyVoucher = new JButton("Áp Dụng");
         btnApplyVoucher.setBackground(new Color(245, 158, 11));
         btnApplyVoucher.setForeground(Color.WHITE);
+        styleActionButton(btnApplyVoucher);
         vSub.add(txtVoucher, BorderLayout.CENTER); vSub.add(btnApplyVoucher, BorderLayout.EAST);
         pVoucher.add(lVoucher, BorderLayout.NORTH); pVoucher.add(vSub, BorderLayout.CENTER);
 
@@ -226,11 +239,13 @@ public class DangKyHoiVienPanel extends JPanel {
         btnReset.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnReset.setBackground(new Color(100, 116, 139));
         btnReset.setForeground(Color.WHITE);
+        styleActionButton(btnReset);
 
         JButton btnSubmit = new JButton("Xác Nhận Đăng Ký");
         btnSubmit.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnSubmit.setBackground(new Color(16, 185, 129));
         btnSubmit.setForeground(Color.WHITE);
+        styleActionButton(btnSubmit);
 
         actionButtons.add(btnReset);
         actionButtons.add(btnSubmit);
@@ -260,12 +275,19 @@ public class DangKyHoiVienPanel extends JPanel {
         rightContainer.add(lblPreviewTitle, BorderLayout.NORTH);
 
         // Visual Card Panel
-        JPanel cardPreview = new JPanel(new BorderLayout());
-        cardPreview.setBackground(new Color(30, 41, 59));
-        cardPreview.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(15, 23, 42), 2),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20)
-        ));
+        JPanel cardPreview = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics graphics) {
+                super.paintComponent(graphics);
+                Graphics2D g2 = (Graphics2D) graphics.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setPaint(new GradientPaint(0, 0, new Color(15, 23, 42), getWidth(), getHeight(), new Color(30, 64, 92)));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                g2.dispose();
+            }
+        };
+        cardPreview.setOpaque(false);
+        cardPreview.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         cardPreview.setPreferredSize(new Dimension(380, 230));
 
         // Card Top: Brand & Code
@@ -382,6 +404,7 @@ public class DangKyHoiVienPanel extends JPanel {
         btnSendQR.setFocusPainted(false);
         btnSendQR.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnSendQR.setPreferredSize(new Dimension(0, 42));
+        styleActionButton(btnSendQR);
         btnSendQR.addActionListener(e -> moDialogGuiQR());
 
         JButton btnPrintCard = new JButton("In Thẻ Cứng");
@@ -391,6 +414,7 @@ public class DangKyHoiVienPanel extends JPanel {
         btnPrintCard.setFocusPainted(false);
         btnPrintCard.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnPrintCard.setPreferredSize(new Dimension(0, 42));
+        styleActionButton(btnPrintCard);
         btnPrintCard.addActionListener(e -> printCard());
 
         pnlBtns.add(btnSendQR);
@@ -584,5 +608,29 @@ public class DangKyHoiVienPanel extends JPanel {
         updateCalculations();
         lblCardName.setText("NGUYỄN VĂN A");
         lblCardPhone.setText("SĐT: 0901 234 567");
+    }
+
+    private void styleInput(JComponent component) {
+        component.putClientProperty("JComponent.roundRect", true);
+        component.setPreferredSize(new Dimension(component.getPreferredSize().width, 38));
+    }
+
+    private void styleActionButton(JButton button) {
+        Color normalColor = button.getBackground();
+        button.putClientProperty("JButton.buttonType", "roundRect");
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                if (button.isEnabled()) button.setBackground(normalColor.brighter());
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                button.setBackground(normalColor);
+            }
+        });
     }
 }

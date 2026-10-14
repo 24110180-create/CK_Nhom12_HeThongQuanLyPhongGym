@@ -479,6 +479,7 @@ public class MainDashboard extends JFrame {
         addSidebarCategoryHeader(menuContainer, "Khách Hàng & Hội Viên");
         addSidebarItem(menuContainer, "Đăng Ký Hội Viên Mới", "Tiếp nhận hội viên mới & biểu phí thu ngân", () -> new DangKyHoiVienPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Hội Viên & Lớp Học", "Danh bạ thẻ QR, gói tập & liên kết ghi danh lớp", () -> new QuanLyHoiVienHubPanel(), accent, false);
+        addSidebarItem(menuContainer, "Lịch Lớp Học & Điểm Danh", "Thời khóa biểu lớp nhóm & điểm danh học viên", () -> new LichLopHocPanel(), accent, false);
 
         addSidebarCategoryHeader(menuContainer, "Chiến Lược Kinh Doanh");
         addSidebarItem(menuContainer, "Quản Lý Gói Tập & Giá Tiền", "Quyết định chính sách giá & bảng giá dịch vụ", () -> new QuanLyGoiTapPanel(), accent, false);
@@ -488,7 +489,6 @@ public class MainDashboard extends JFrame {
         addSidebarItem(menuContainer, "Quản Lý Nhân Sự & Bảng Lương", "Danh sách HLV, nhân viên & bảng lương hệ thống", () -> new QuanLyNhanSuPanel(), accent, false);
         addSidebarItem(menuContainer, "Lịch Làm Việc & Phân Ca HLV", "Quản lý ca trực, phân công lớp và lịch làm việc HLV", () -> new PhanCaLamViecPanel(), accent, false);
         addSidebarItem(menuContainer, "Tài Khoản Nhân Sự & Phân Quyền", "Quản trị tài khoản 4 vai trò nhân sự nội bộ", () -> new QuanLyTaiKhoanVaNhanSuPanel(), accent, false);
-        addSidebarItem(menuContainer, "Phân Quyền Người Dùng", "Quản trị an ninh & phân quyền 5 vai trò", () -> new PhanQuyenPanel(), accent, false);
         addSidebarItem(menuContainer, "Cài Đặt Chung", "Cấu hình chuỗi phòng tập & hệ thống", () -> new CaiDatHeThongPanel(), accent, false);
     }
 
@@ -505,7 +505,6 @@ public class MainDashboard extends JFrame {
         addSidebarCategoryHeader(menuContainer, "Dịch Vụ & Lớp Học");
         addSidebarItem(menuContainer, "Lịch Lớp Học & Điểm Danh", "Thời khóa biểu lớp nhóm & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Bán nước giải khát, whey & đồ tập", () -> new BanHangPOSPanel(), accent, false);
-        addSidebarItem(menuContainer, "Quản Lý Tủ Đồ Locker", "20 tủ đồ cá nhân thông minh", () -> new QuanLyLockerPanel(), accent, false);
     }
 
     // =========================================================================
@@ -529,7 +528,6 @@ public class MainDashboard extends JFrame {
         addSidebarItem(menuContainer, "Gia Hạn Gói Tập", "Nâng cấp gói & gia hạn thẻ", () -> new GiaHanGoiTapPanel(), accent, false);
         addSidebarItem(menuContainer, "Lịch Lớp Học & Điểm Danh", "Điều phối lớp nhóm & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Thu ngân quầy bar & sản phẩm", () -> new BanHangPOSPanel(), accent, false);
-        addSidebarItem(menuContainer, "Quản Lý Tủ Đồ Locker", "Tủ đồ cá nhân chi nhánh", () -> new QuanLyLockerPanel(), accent, false);
 
         addSidebarCategoryHeader(menuContainer, "Điều Hành Cơ Sở");
         addSidebarItem(menuContainer, "Quản Lý Kho Hàng", "Kiểm kê xuất nhập tồn kho cơ sở", () -> new QuanLyKhoHangPanel(), accent, false);

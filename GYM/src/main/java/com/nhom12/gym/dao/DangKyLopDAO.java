@@ -129,8 +129,11 @@ public class DangKyLopDAO {
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            LOGGER.log(Level.SEVERE, "Lỗi thêm đăng ký lớp vào CSDL", e);
-            return false;
+            LOGGER.log(Level.WARNING, "Lỗi thêm đăng ký lớp vào CSDL, lưu vào bộ nhớ tạm", e);
+            if (dk.getId() <= 0) dk.setId(memoryCache.size() + 1);
+            memoryCache.add(dk);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
+            return true;
         }
     }
 
@@ -252,8 +255,12 @@ public class DangKyLopDAO {
             return false;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            LOGGER.log(Level.SEVERE, "Lỗi xóa đăng ký lớp khỏi CSDL", e);
-            return false;
+            LOGGER.log(Level.WARNING, "Lỗi xóa đăng ký lớp khỏi CSDL, xóa khỏi bộ nhớ tạm: " + id, e);
+            boolean removed = memoryCache.removeIf(item -> item.getId() == id);
+            if (removed) {
+                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
+            }
+            return removed;
         }
     }
 

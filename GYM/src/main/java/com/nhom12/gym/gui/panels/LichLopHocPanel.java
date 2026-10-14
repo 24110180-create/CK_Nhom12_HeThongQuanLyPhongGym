@@ -123,23 +123,20 @@ public class LichLopHocPanel extends JPanel {
         pTop.add(pCards, BorderLayout.SOUTH);
         this.add(pTop, BorderLayout.NORTH);
 
-        // 2. Thân chính: Chuyển sang JTabbedPane 2 Tab thoáng đãng, khoa học (không bị rối chồng chéo 2 bảng)
-        mainTabs = new JTabbedPane();
-        mainTabs.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        mainTabs.setBackground(Color.WHITE);
-
-        // Tab 1: Danh Sách & Lịch Các Lớp Học
+        // 2. Thân chính: Bố cục Master - Detail phân cấp trực quan bằng JSplitPane
         JPanel pMaster = taoPanelMasterLop();
-        mainTabs.addTab("  1. Thời Khóa Biểu & Danh Sách Lớp Học Nhóm  ", pMaster);
-
-        // Tab 2: Danh Sách Học Viên & Điểm Danh Trực Tiếp
         JPanel pDetail = taoPanelDetailHocVien();
-        mainTabs.addTab("  2. Điểm Danh Học Viên Theo Lớp  ", pDetail);
 
-        this.add(mainTabs, BorderLayout.CENTER);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, pMaster, pDetail);
+        splitPane.setDividerLocation(310);
+        splitPane.setDividerSize(6);
+        splitPane.setContinuousLayout(true);
+        splitPane.setResizeWeight(0.48);
+        splitPane.setOpaque(false);
+        splitPane.setBorder(null);
+
+        this.add(splitPane, BorderLayout.CENTER);
     }
-
-    private JTabbedPane mainTabs;
 
     private JLabel taoKpiCard(JPanel parent, String title, String value, Color accentColor, Color bgCard) {
         JPanel card = new JPanel(new BorderLayout(5, 4));
@@ -255,13 +252,18 @@ public class LichLopHocPanel extends JPanel {
         JButton btnXuatExcelLop = taoButtonFlat("Xuất Excel Lịch Lớp", new Color(15, 118, 110), Color.WHITE);
         btnXuatExcelLop.addActionListener(e -> ExcelExportHelper.exportTableToExcel(this, tableLop, "LichLopHoc_FitLife"));
 
-        JButton btnDiemDanh = taoButtonFlat("Điểm Danh Lớp Này ->", new Color(147, 51, 234), Color.WHITE);
+        JButton btnDiemDanh = taoButtonFlat("Điểm Danh Lớp Này", new Color(147, 51, 234), Color.WHITE);
         btnDiemDanh.addActionListener(e -> {
             if (lopDangChon == null) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn một lớp học trong bảng để điểm danh!", "Chưa chọn lớp", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            if (mainTabs != null) mainTabs.setSelectedIndex(1);
+            if (tableHocVien != null) {
+                tableHocVien.requestFocusInWindow();
+                if (tableHocVien.getRowCount() > 0) {
+                    tableHocVien.setRowSelectionInterval(0, 0);
+                }
+            }
         });
 
         pBtns.add(btnThemLop);
@@ -326,16 +328,24 @@ public class LichLopHocPanel extends JPanel {
         });
         tableLop.getColumnModel().getColumn(8).setPreferredWidth(100);
 
-        // Sự kiện chọn dòng lớp học -> Nạp danh sách học viên
         tableLop.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 int row = tableLop.getSelectedRow();
-                if (row != -1) {
-                    int mr = tableLop.convertRowIndexToModel(row);
-                    String maLop = modelLop.getValueAt(mr, 0).toString();
-                    lopDangChon = lopHocDAO.timTheoMa(maLop);
-                    taiDanhSachHocVienCuaLop(lopDangChon);
-                } else {
+                if (row != -1 && row < tableLop.getRowCount()) {
+                    try {
+                        int mr = tableLop.convertRowIndexToModel(row);
+                        if (mr >= 0 && mr < modelLop.getRowCount()) {
+                            Object val = modelLop.getValueAt(mr, 0);
+                            if (val != null) {
+                                String maLop = val.toString();
+                                lopDangChon = lopHocDAO.timTheoMa(maLop);
+                                taiDanhSachHocVienCuaLop(lopDangChon);
+                            }
+                        }
+                    } catch (Exception ex) {
+                        // ignore race during table reload
+                    }
+                } else if (tableLop.getRowCount() == 0) {
                     lopDangChon = null;
                     xoaTrangBangHocVien();
                 }
@@ -345,8 +355,11 @@ public class LichLopHocPanel extends JPanel {
         tableLop.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
-                if (e.getClickCount() == 2 && tableLop.getSelectedRow() != -1 && mainTabs != null) {
-                    mainTabs.setSelectedIndex(1);
+                if (e.getClickCount() == 2 && tableLop.getSelectedRow() != -1 && tableHocVien != null) {
+                    tableHocVien.requestFocusInWindow();
+                    if (tableHocVien.getRowCount() > 0) {
+                        tableHocVien.setRowSelectionInterval(0, 0);
+                    }
                 }
             }
         });
@@ -433,12 +446,6 @@ public class LichLopHocPanel extends JPanel {
             ExcelExportHelper.exportTableToExcel(this, tableHocVien, "DiemDanh_" + lopDangChon.getMaLop());
         });
 
-        JButton btnBackMaster = taoButtonFlat("<- Xem Lịch Các Lớp", new Color(100, 116, 139), Color.WHITE);
-        btnBackMaster.addActionListener(e -> {
-            if (mainTabs != null) mainTabs.setSelectedIndex(0);
-        });
-
-        pBtns.add(btnBackMaster);
         pBtns.add(btnThemHocVien);
         pBtns.add(btnHuyDangKy);
         pBtns.add(btnDiemDanhCoMat);
@@ -730,14 +737,14 @@ public class LichLopHocPanel extends JPanel {
         }
 
         int mr = tableHocVien.convertRowIndexToModel(row);
-        int idDangKy = (int) modelHocVien.getValueAt(mr, 0);
+        int idDangKy = Integer.parseInt(modelHocVien.getValueAt(mr, 0).toString());
         String tenHV = modelHocVien.getValueAt(mr, 2).toString();
 
         boolean ok = lopHocDAO.capNhatDiemDanh(idDangKy, trangThai);
         if (ok) {
             SoundHelper.playSuccessBeep();
             modelHocVien.setValueAt(trangThai, mr, 5);
-            taiDuLieuLopHoc(); // Đồng bộ lại đếm KPI
+            capNhatKpiSauDiemDanh();
         } else {
             SoundHelper.playErrorBeep();
             JOptionPane.showMessageDialog(this, "Cập nhật điểm danh thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -757,9 +764,35 @@ public class LichLopHocPanel extends JPanel {
         if (confirm == JOptionPane.YES_OPTION) {
             lopHocDAO.diemDanhTatCa(lopDangChon.getMaLop(), "Đã điểm danh");
             SoundHelper.playSuccessBeep();
-            taiDuLieuLopHoc();
+            for (int i = 0; i < modelHocVien.getRowCount(); i++) {
+                modelHocVien.setValueAt("Đã điểm danh", i, 5);
+            }
+            capNhatKpiSauDiemDanh();
             JOptionPane.showMessageDialog(this, "Đã điểm danh thành công cho toàn bộ học viên trong lớp!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
         }
+    }
+
+    private void capNhatKpiSauDiemDanh() {
+        if (lopDangChon == null) return;
+        int daDiemDanhCuaLop = 0;
+        for (int i = 0; i < modelHocVien.getRowCount(); i++) {
+            if ("Đã điểm danh".equalsIgnoreCase(String.valueOf(modelHocVien.getValueAt(i, 5)))) {
+                daDiemDanhCuaLop++;
+            }
+        }
+        int cur = modelHocVien.getRowCount();
+        int max = lopDangChon.getSiSoToiDa();
+        lblDetailTitle.setText("HỌC VIÊN LỚP: " + lopDangChon.getTenLop().toUpperCase() + " (" + lopDangChon.getMaLop() + ") • SĨ SỐ: " + cur + "/" + max + " • ĐÃ ĐIỂM DANH: " + daDiemDanhCuaLop + "/" + cur);
+        lblCardLopDangChon.setText(lopDangChon.getTenLop() + " (" + cur + "/" + max + ")");
+
+        int tongDaDiemDanh = 0;
+        List<DangKyLop> tatCaDK = dangKyLopDAO.layTatCa();
+        for (DangKyLop dk : tatCaDK) {
+            if ("Đã điểm danh".equalsIgnoreCase(dk.getTrangThaiDiemDanh())) {
+                tongDaDiemDanh++;
+            }
+        }
+        lblCardDaDiemDanh.setText(tongDaDiemDanh + " / " + tatCaDK.size());
     }
 
     // =========================================================================
@@ -769,7 +802,9 @@ public class LichLopHocPanel extends JPanel {
         boolean isEdit = (lopCanSua != null);
         String title = isEdit ? "CẬP NHẬT LỚP HỌC: " + lopCanSua.getMaLop() : "THÊM LỚP HỌC MỚI";
 
-        JDialog dlg = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), title, true);
+        Window win = SwingUtilities.getWindowAncestor(this);
+        Frame parentFrame = (win instanceof Frame) ? (Frame) win : null;
+        JDialog dlg = new JDialog(parentFrame, title, true);
         dlg.setSize(520, 560);
         dlg.setLocationRelativeTo(this);
         dlg.setLayout(new BorderLayout(15, 15));
@@ -1010,7 +1045,9 @@ public class LichLopHocPanel extends JPanel {
             return;
         }
 
-        JDialog dlg = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Ghi Danh Hội Viên Vào Lớp: " + lopDangChon.getTenLop(), true);
+        Window win = SwingUtilities.getWindowAncestor(this);
+        Frame parentFrame = (win instanceof Frame) ? (Frame) win : null;
+        JDialog dlg = new JDialog(parentFrame, "Ghi Danh Hội Viên Vào Lớp: " + lopDangChon.getTenLop(), true);
         dlg.setSize(780, 500);
         dlg.setLocationRelativeTo(this);
         dlg.setLayout(new BorderLayout(14, 14));

@@ -102,8 +102,11 @@ public class LopHocDAO {
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            LOGGER.log(Level.SEVERE, "Lỗi thêm lớp học vào CSDL: " + lop.getMaLop(), e);
-            return false;
+            LOGGER.log(Level.WARNING, "Lỗi thêm lớp học vào CSDL, dùng bộ nhớ tạm: " + lop.getMaLop(), e);
+            memoryClasses.removeIf(item -> item.getMaLop().equalsIgnoreCase(lop.getMaLop()));
+            memoryClasses.add(lop);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
+            return true;
         }
     }
 
@@ -139,8 +142,15 @@ public class LopHocDAO {
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            LOGGER.log(Level.SEVERE, "Lỗi cập nhật lớp học: " + lop.getMaLop(), e);
-            return false;
+            LOGGER.log(Level.WARNING, "Lỗi cập nhật lớp học vào CSDL, dùng bộ nhớ tạm: " + lop.getMaLop(), e);
+            for (int i = 0; i < memoryClasses.size(); i++) {
+                if (memoryClasses.get(i).getMaLop().equalsIgnoreCase(lop.getMaLop())) {
+                    memoryClasses.set(i, lop);
+                    break;
+                }
+            }
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
+            return true;
         }
     }
 
@@ -168,11 +178,19 @@ public class LopHocDAO {
                 com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
                 return true;
             }
-            return false;
+            boolean removed = memoryClasses.removeIf(item -> item.getMaLop().equalsIgnoreCase(maLop.trim()));
+            if (removed) {
+                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
+            }
+            return removed;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            LOGGER.log(Level.SEVERE, "Lỗi xóa lớp học: " + maLop, e);
-            return false;
+            LOGGER.log(Level.WARNING, "Lỗi xóa lớp học trên CSDL, xóa khỏi bộ nhớ tạm: " + maLop, e);
+            boolean removed = memoryClasses.removeIf(item -> item.getMaLop().equalsIgnoreCase(maLop.trim()));
+            if (removed) {
+                com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
+            }
+            return removed;
         }
     }
 

@@ -11,12 +11,12 @@ import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import com.nhom12.gym.dao.HoaDonDAO;
-import com.nhom12.gym.entity.HoaDon;
 import com.nhom12.gym.util.Auth;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Quầy Bán Hàng POS (Point of Sale)
@@ -26,6 +26,8 @@ import java.util.Map;
  * - Tự động GIẢM số lượng tồn kho & ghi nhận Sản Phẩm Đã Bán khi thanh toán thành công.
  */
 public class BanHangPOSPanel extends JPanel implements KhoHangService.KhoHangListener {
+    private static final Logger LOGGER = Logger.getLogger(BanHangPOSPanel.class.getName());
+
     private final KhoHangService khoService = KhoHangService.getInstance();
     private final DecimalFormat df = new DecimalFormat("#,### đ");
 
@@ -251,41 +253,44 @@ public class BanHangPOSPanel extends JPanel implements KhoHangService.KhoHangLis
                     itemsDialog,
                     success -> {
                         if (success) {
-                            // THỰC HIỆN LOGIC GIẢM KHO TỰ ĐỘNG & GHI NHẬN SẢN PHẨM ĐÃ BÁN:
-                            String staffName = (Auth.hoTen != null && !Auth.hoTen.isEmpty()) ? Auth.hoTen : ((Auth.tenDangNhap != null) ? Auth.tenDangNhap : "Nhân viên");
-                            String loi = khoService.xuatKhoBanHang(itemsXuatKho, "VietQR / Tiền mặt", staffName);
-                            if (loi != null) {
-                                JOptionPane.showMessageDialog(this, "Lỗi trừ tồn kho: " + loi, "Lỗi tồn kho", JOptionPane.ERROR_MESSAGE);
-                            } else {
-                                // TẠO VÀ LƯU HÓA ĐƠN ĐỂ ĐỒNG BỘ DOANH THU TOÀN HỆ THỐNG
-                                try {
-                                    String maHD = "HD-POS-" + System.currentTimeMillis();
-                                    HoaDon hd = new HoaDon(
-                                            maHD,
-                                            0,
-                                            "Khách Lẻ Quầy POS",
-                                            "Bán lẻ sản phẩm POS (" + itemsXuatKho.size() + " món)",
-                                            tongTien,
-                                            0.0,
-                                            tongTien,
-                                            "VietQR / Tiền mặt",
-                                            Auth.tenDangNhap != null ? Auth.tenDangNhap : "letan1",
-                                            Auth.getChiNhanhHienTai() != null ? Auth.getChiNhanhHienTai() : "CN01 - Cơ sở 1 (Quận 1)",
-                                            new Date(),
-                                            "Đã thanh toán",
-                                            "Bán lẻ quầy POS: " + itemsXuatKho.size() + " mặt hàng"
-                                    );
-                                    HoaDonDAO.getInstance().them(hd);
-                                } catch (Exception ignored) {
-                                }
-
-                                cartModel.setRowCount(0);
-                                tinhLaiTongTien();
-                                JOptionPane.showMessageDialog(this,
-                                        "Đã xuất kho & ghi nhận thanh toán thành công!\nSố lượng tồn kho và doanh thu toàn hệ thống đã được đồng bộ tự động.",
-                                        "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                            }
+                            cartModel.setRowCount(0);
+                            tinhLaiTongTien();
                         }
+                    },
+                    invoice -> {
+                        String staffName = (Auth.hoTen != null && !Auth.hoTen.isEmpty())
+                                ? Auth.hoTen
+                                : (Auth.tenDangNhap != null ? Auth.tenDangNhap : "Nhân viên");
+                        String loi = khoService.xuatKhoBanHang(
+                                itemsXuatKho, invoice.getHinhThucThanhToan(), staffName);
+                        if (loi != null) {
+                            return new com.nhom12.gym.gui.ThanhToanHoaDonDialog.PaymentResult(
+                                    com.nhom12.gym.gui.ThanhToanHoaDonDialog.PaymentStatus.FAILED,
+                                    "Chưa hoàn tất giao dịch: " + loi
+                                            + "\n\nHệ thống chưa lưu hóa đơn thanh toán. Kiểm tra lại giỏ hàng và tồn kho trước khi xác nhận lại."
+                            );
+                        }
+
+                        invoice.setMaHoiVien(0);
+                        invoice.setGhiChu("Bán lẻ quầy POS: " + itemsXuatKho.size() + " mặt hàng");
+                        try {
+                            if (HoaDonDAO.getInstance().them(invoice)) {
+                                return new com.nhom12.gym.gui.ThanhToanHoaDonDialog.PaymentResult(
+                                        com.nhom12.gym.gui.ThanhToanHoaDonDialog.PaymentStatus.SUCCESS,
+                                        "Đã thanh toán và lưu hóa đơn " + invoice.getMaHoaDon()
+                                                + " vào cơ sở dữ liệu.\nTồn kho đã được cập nhật."
+                                );
+                            }
+                        } catch (RuntimeException ex) {
+                            LOGGER.log(Level.SEVERE, "Lỗi lưu hóa đơn POS " + invoice.getMaHoaDon(), ex);
+                        }
+
+                        return new com.nhom12.gym.gui.ThanhToanHoaDonDialog.PaymentResult(
+                                com.nhom12.gym.gui.ThanhToanHoaDonDialog.PaymentStatus.BUFFERED,
+                                "Giao dịch " + invoice.getMaHoaDon() + " đã được ghi vào bộ nhớ tạm và tồn kho đã cập nhật,"
+                                        + " nhưng chưa xác nhận lưu bền vững vào cơ sở dữ liệu.\n"
+                                        + "Không đóng ứng dụng cho đến khi kết nối lại và xác minh hóa đơn."
+                        );
                     }
             );
             dialog.setVisible(true);

@@ -17,12 +17,41 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Cửa sổ Hóa Đơn & Cổng Thanh Toán VietQR Cá Nhân Hóa (Tác giả: LÊ ANH DUY - MB Bank)
  * Cung cấp trải nghiệm thanh toán chuẩn ngân hàng, in phiếu thu và lưu trữ dữ liệu tự động.
  */
 public class ThanhToanHoaDonDialog extends JDialog {
+
+    private static final Logger LOGGER = Logger.getLogger(ThanhToanHoaDonDialog.class.getName());
+
+    public enum PaymentStatus {
+        SUCCESS,
+        BUFFERED,
+        FAILED
+    }
+
+    public static class PaymentResult {
+        private final PaymentStatus status;
+        private final String message;
+
+        public PaymentResult(PaymentStatus status, String message) {
+            this.status = status;
+            this.message = message;
+        }
+
+        public PaymentStatus getStatus() {
+            return status;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+    }
 
     public static class ChiTietMucHang {
         public String ten;
@@ -55,6 +84,7 @@ public class ThanhToanHoaDonDialog extends JDialog {
     private final String nguoiLap;
     private final List<ChiTietMucHang> danhSachMuc;
     private final Consumer<Boolean> onThanhToanThanhCong;
+    private final Function<HoaDon, PaymentResult> paymentProcessor;
 
     private final DecimalFormat df = new DecimalFormat("#,### đ");
     private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -68,6 +98,14 @@ public class ThanhToanHoaDonDialog extends JDialog {
     public ThanhToanHoaDonDialog(Window parent, String maHoaDon, String tenKhachHang, String loaiGiaoDich,
                                  double tongTien, double giamGia, double thanhTien,
                                  List<ChiTietMucHang> danhSachMuc, Consumer<Boolean> onThanhToanThanhCong) {
+        this(parent, maHoaDon, tenKhachHang, loaiGiaoDich, tongTien, giamGia, thanhTien,
+                danhSachMuc, onThanhToanThanhCong, null);
+    }
+
+    public ThanhToanHoaDonDialog(Window parent, String maHoaDon, String tenKhachHang, String loaiGiaoDich,
+                                 double tongTien, double giamGia, double thanhTien,
+                                 List<ChiTietMucHang> danhSachMuc, Consumer<Boolean> onThanhToanThanhCong,
+                                 Function<HoaDon, PaymentResult> paymentProcessor) {
         super(parent, "Xác Nhận Hóa Đơn & Thanh Toán - " + (maHoaDon != null ? maHoaDon : "FitLife Gym"), ModalityType.APPLICATION_MODAL);
 
         this.maHoaDon = (maHoaDon != null && !maHoaDon.trim().isEmpty())
@@ -89,6 +127,7 @@ public class ThanhToanHoaDonDialog extends JDialog {
                     add(new ChiTietMucHang(loaiGiaoDich, 1, thanhTien, thanhTien));
                 }};
         this.onThanhToanThanhCong = onThanhToanThanhCong;
+        this.paymentProcessor = paymentProcessor;
 
         initUI();
     }
@@ -142,7 +181,7 @@ public class ThanhToanHoaDonDialog extends JDialog {
         bottomBar.setOpaque(false);
         bottomBar.setBorder(new EmptyBorder(8, 0, 0, 0));
 
-        JLabel lblSecurity = new JLabel("🔒 Giao dịch mã hóa an toàn • Đã đồng bộ với CSDL FitLife Gym");
+        JLabel lblSecurity = new JLabel("Kiểm tra thông tin đơn hàng trước khi xác nhận thanh toán");
         lblSecurity.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         lblSecurity.setForeground(new Color(100, 116, 139));
         bottomBar.add(lblSecurity, BorderLayout.WEST);
@@ -464,28 +503,65 @@ public class ThanhToanHoaDonDialog extends JDialog {
     }
 
     private void xacNhanThanhToan() {
-        daThanhToan = true;
+        HoaDon hd = new HoaDon(
+                maHoaDon,
+                1,
+                tenKhachHang,
+                loaiGiaoDich,
+                tongTien,
+                giamGia,
+                thanhTien,
+                phuongThuc,
+                nguoiLap,
+                chiNhanh,
+                ngayTao,
+                "Đã thanh toán",
+                "Thanh toán thành công qua " + phuongThuc
+        );
 
-        // Lưu vào CSDL HoaDon và Memory Cache
+        if (paymentProcessor != null) {
+            PaymentResult result;
+            try {
+                result = paymentProcessor.apply(hd);
+                if (result == null) {
+                    result = new PaymentResult(PaymentStatus.FAILED, "Không nhận được kết quả xử lý giao dịch.");
+                }
+            } catch (RuntimeException ex) {
+                LOGGER.log(Level.SEVERE, "Lỗi xử lý giao dịch thanh toán", ex);
+                result = new PaymentResult(
+                        PaymentStatus.FAILED,
+                        "Có lỗi khi xử lý giao dịch. Kiểm tra trạng thái tồn kho và hóa đơn trước khi thử lại."
+                );
+            }
+
+            daThanhToan = result.getStatus() != PaymentStatus.FAILED;
+            if (daThanhToan && onThanhToanThanhCong != null) {
+                try {
+                    onThanhToanThanhCong.accept(true);
+                } catch (RuntimeException ex) {
+                    LOGGER.log(Level.SEVERE, "Giao dịch đã xử lý nhưng lỗi cập nhật giao diện sau thanh toán", ex);
+                }
+            }
+
+            int messageType = result.getStatus() == PaymentStatus.FAILED
+                    ? JOptionPane.ERROR_MESSAGE
+                    : result.getStatus() == PaymentStatus.BUFFERED
+                        ? JOptionPane.WARNING_MESSAGE
+                        : JOptionPane.INFORMATION_MESSAGE;
+            JOptionPane.showMessageDialog(this, result.getMessage(),
+                    result.getStatus() == PaymentStatus.SUCCESS ? "Giao dịch thành công"
+                            : result.getStatus() == PaymentStatus.BUFFERED ? "Giao dịch đang lưu tạm" : "Giao dịch chưa hoàn tất",
+                    messageType);
+            dispose();
+            return;
+        }
+
+        daThanhToan = true;
+        boolean invoiceSaved = false;
         try {
-            HoaDon hd = new HoaDon(
-                    maHoaDon,
-                    1,
-                    tenKhachHang,
-                    loaiGiaoDich,
-                    tongTien,
-                    giamGia,
-                    thanhTien,
-                    phuongThuc,
-                    nguoiLap,
-                    chiNhanh,
-                    ngayTao,
-                    "Đã thanh toán",
-                    "Thanh toán thành công qua " + phuongThuc
-            );
-            HoaDonDAO.getInstance().them(hd);
+            invoiceSaved = HoaDonDAO.getInstance().them(hd);
         } catch (Exception ex) {
-            System.err.println("[ThanhToanDialog] Lỗi ghi nhận hóa đơn: " + ex.getMessage());
+            LOGGER.log(Level.SEVERE, "Lỗi ghi nhận hóa đơn", ex);
         }
 
         if (onThanhToanThanhCong != null) {
@@ -502,7 +578,9 @@ public class ThanhToanHoaDonDialog extends JDialog {
                         + "• Khách hàng: " + tenKhachHang + "\n"
                         + "• Tổng tiền: " + df.format(thanhTien) + "\n"
                         + "• Hình thức: " + phuongThuc + "\n"
-                        + "Hệ thống đã tự động lưu hóa đơn và cập nhật sổ sách kế toán.",
+                        + (invoiceSaved
+                            ? "Hóa đơn đã được lưu vào cơ sở dữ liệu."
+                            : "Hóa đơn đang nằm trong bộ nhớ tạm; cần kết nối lại cơ sở dữ liệu để bảo đảm lưu bền vững."),
                 "Thanh Toán Hoàn Tất", JOptionPane.INFORMATION_MESSAGE);
 
         dispose();

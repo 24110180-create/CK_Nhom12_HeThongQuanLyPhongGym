@@ -509,9 +509,11 @@ public class QuanLyHoiVienPanel extends JPanel {
         String sdt = (String) tableModel.getValueAt(modelRow, 3);
         String goiTap = (String) tableModel.getValueAt(modelRow, 4);
         String chiNhanh = (String) tableModel.getValueAt(modelRow, 8);
+        Object expireObj = tableModel.getValueAt(modelRow, 9);
+        String ngayHetHan = expireObj != null ? expireObj.toString() : "Theo gói đăng ký";
 
-        Frame parentFrame = (Frame) SwingUtilities.getWindowAncestor(this);
-        GuiMaQRDialog dialog = new GuiMaQRDialog(parentFrame, maQR, hoTen, sdt, goiTap, chiNhanh);
+        Window parentWindow = SwingUtilities.getWindowAncestor(this);
+        GuiMaQRDialog dialog = new GuiMaQRDialog(parentWindow, maQR, hoTen, sdt, goiTap, chiNhanh, ngayHetHan);
         dialog.setVisible(true);
     }
 

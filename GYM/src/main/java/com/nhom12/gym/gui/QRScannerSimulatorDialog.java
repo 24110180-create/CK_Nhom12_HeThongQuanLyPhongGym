@@ -49,6 +49,13 @@ public class QRScannerSimulatorDialog extends JDialog {
         this(parent, null);
     }
 
+    public QRScannerSimulatorDialog(Window parent, String preselectedCode, String preselectedName) {
+        this(parent, null);
+        if (preselectedCode != null && !preselectedCode.isEmpty()) {
+            chonThe(preselectedCode, preselectedName != null ? preselectedName : "Hội viên mới", "Gói tập vừa đăng ký", "Toàn hệ thống");
+        }
+    }
+
     public QRScannerSimulatorDialog(Window parent, Consumer<String> onScanCallback) {
         super(parent, "BỘ QUÉT MÃ QR & MÔ PHỎNG MÁY QUÉT HONEYWELL VOYAGER 1450G", ModalityType.APPLICATION_MODAL);
         this.onScanCallback = onScanCallback;
@@ -474,7 +481,7 @@ public class QRScannerSimulatorDialog extends JDialog {
         return pnl;
     }
 
-    private void chonThe(String code, String name, String pkg, String branch) {
+    public void chonThe(String code, String name, String pkg, String branch) {
         this.currentSelectedCode = code;
         this.currentSelectedName = name;
         this.currentSelectedPkg = pkg;

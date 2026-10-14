@@ -5,7 +5,6 @@ import com.nhom12.gym.dao.GoiTapDAO;
 import com.nhom12.gym.dao.HoiVienDAO;
 import com.nhom12.gym.entity.GoiTap;
 import com.nhom12.gym.entity.HoiVien;
-import com.nhom12.gym.entity.TaiKhoan;
 import com.nhom12.gym.service.VipPolicyService;
 import com.nhom12.gym.util.Auth;
 import java.awt.*;
@@ -22,7 +21,6 @@ import javax.swing.event.DocumentListener;
 public class DangKyHoiVienPanel extends JPanel {
     private final HoiVienDAO hoiVienDAO = new HoiVienDAO();
     private final GoiTapDAO goiTapDAO = new GoiTapDAO();
-    private final com.nhom12.gym.dao.TaiKhoanDAO taiKhoanDAO = new com.nhom12.gym.dao.TaiKhoanDAO();
     private final DecimalFormat df = new DecimalFormat("#,### đ");
 
     private List<GoiTap> danhSachGoiTap = new ArrayList<>();
@@ -592,7 +590,8 @@ public class DangKyHoiVienPanel extends JPanel {
                                 cal.setTime(new Date());
                             }
                             cal.add(Calendar.MONTH, currentMonths);
-                            hv.setNgayHetHan(cal.getTime());
+                            Date expireDate = cal.getTime();
+                            hv.setNgayHetHan(expireDate);
                             hoiVienDAO.them(hv);
 
                             // Đồng bộ tạo Hóa đơn vào HoaDonDAO cho toàn hệ thống
@@ -613,13 +612,16 @@ public class DangKyHoiVienPanel extends JPanel {
                                     "Đăng ký thẻ mới thành công"
                             );
                             com.nhom12.gym.dao.HoaDonDAO.getInstance().them(hd);
+
+                            String expireStr = new SimpleDateFormat("dd/MM/yyyy").format(expireDate);
+                            Window f = SwingUtilities.getWindowAncestor(this);
+                            new GuiMaQRDialog(f, finalCode, name, phone, pkgName, cbBranch.getSelectedItem().toString(), expireStr).setVisible(true);
                         } catch (Exception ex) {
                             System.err.println("[DangKyHoiVienPanel] Lỗi lưu hội viên hoặc hóa đơn: " + ex.getMessage());
                             ex.printStackTrace();
+                            Window f = SwingUtilities.getWindowAncestor(this);
+                            new GuiMaQRDialog(f, finalCode, name, phone, pkgName, cbBranch.getSelectedItem().toString()).setVisible(true);
                         }
-
-                        Frame f = (Frame) SwingUtilities.getWindowAncestor(this);
-                        new GuiMaQRDialog(f, finalCode, name, phone, cbPackage.getSelectedItem().toString(), cbBranch.getSelectedItem().toString()).setVisible(true);
 
                         if (onRegistrationSuccess != null) {
                             onRegistrationSuccess.run();
@@ -636,11 +638,12 @@ public class DangKyHoiVienPanel extends JPanel {
         String phone = txtPhone.getText().trim();
         if (phone.isEmpty()) phone = "0901234567";
         String code = lblCardCode.getText();
-        String pkg = cbPackage.getSelectedItem().toString();
-        String br = cbBranch.getSelectedItem().toString();
+        String pkg = cbPackage.getSelectedItem() != null ? cbPackage.getSelectedItem().toString() : "Gói Tiêu Chuẩn";
+        String br = cbBranch.getSelectedItem() != null ? cbBranch.getSelectedItem().toString() : "Toàn hệ thống";
+        String expire = (lblCardExpire != null && !lblCardExpire.getText().isEmpty()) ? lblCardExpire.getText() : "Theo gói đăng ký";
 
-        Frame topFrame = (Frame) SwingUtilities.getWindowAncestor(this);
-        new GuiMaQRDialog(topFrame, code, name, phone, pkg, br).setVisible(true);
+        Window topFrame = SwingUtilities.getWindowAncestor(this);
+        new GuiMaQRDialog(topFrame, code, name, phone, pkg, br, expire).setVisible(true);
     }
 
     private void printCard() {

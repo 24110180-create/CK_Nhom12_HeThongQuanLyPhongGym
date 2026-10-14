@@ -2,6 +2,8 @@ package com.nhom12.gym.gui.panels;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -11,6 +13,7 @@ import java.util.Date;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -54,6 +57,7 @@ public class GhiChuTienDoPTPanel extends JPanel {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(360);
         splitPane.setDividerSize(6);
+        splitPane.setResizeWeight(0.30);
         splitPane.setOpaque(false);
         splitPane.setBorder(null);
 
@@ -89,6 +93,33 @@ public class GhiChuTienDoPTPanel extends JPanel {
         tableHV.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         tableHV.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         tableHV.getTableHeader().setBackground(new Color(241, 245, 249));
+        styleDataTable(tableHV, 1);
+        tableHV.getColumnModel().getColumn(2).setCellRenderer(new javax.swing.table.DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable source, Object value, boolean selected, boolean focus, int row, int column) {
+                Component component = super.getTableCellRendererComponent(source, value, selected, focus, row, column);
+                setFont(source.getFont().deriveFont(Font.BOLD));
+                setHorizontalAlignment(JLabel.CENTER);
+                setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+                if (selected) {
+                    component.setBackground(source.getSelectionBackground());
+                    component.setForeground(source.getSelectionForeground());
+                } else {
+                    String[] sessions = value.toString().split("/");
+                    try {
+                        int remaining = Integer.parseInt(sessions[0]);
+                        int total = Integer.parseInt(sessions[1]);
+                        double ratio = total == 0 ? 0 : (double) remaining / total;
+                        component.setBackground(ratio <= 0.25 ? new Color(254, 242, 242) : new Color(240, 253, 244));
+                        component.setForeground(ratio <= 0.25 ? new Color(185, 28, 28) : new Color(21, 128, 61));
+                    } catch (RuntimeException ex) {
+                        component.setBackground(Color.WHITE);
+                        component.setForeground(new Color(51, 65, 85));
+                    }
+                }
+                return component;
+            }
+        });
         tableHV.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         leftPanel.add(new JScrollPane(tableHV), BorderLayout.CENTER);
         splitPane.setLeftComponent(leftPanel);
@@ -122,6 +153,9 @@ public class GhiChuTienDoPTPanel extends JPanel {
         lblTenHV = new JLabel("Nguyễn Văn Tuấn (Buổi 6/20)");
         lblTenHV.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblTenHV.setForeground(new Color(37, 99, 235));
+        lblTenHV.setOpaque(true);
+        lblTenHV.setBackground(new Color(239, 246, 255));
+        lblTenHV.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
         formPanel.add(lblTenHV, gbc);
 
         r++; gbc.gridx = 0; gbc.gridy = r; gbc.weightx = 0.25;
@@ -131,6 +165,7 @@ public class GhiChuTienDoPTPanel extends JPanel {
         gbc.gridx = 1; gbc.weightx = 0.75;
         txtNhomCo = new JTextField("Ngực - Vai - Tay sau (Push Day)");
         txtNhomCo.setFont(fontInput);
+        styleInput(txtNhomCo);
         formPanel.add(txtNhomCo, gbc);
 
         r++; gbc.gridx = 0; gbc.gridy = r; gbc.weightx = 0.25;
@@ -140,6 +175,7 @@ public class GhiChuTienDoPTPanel extends JPanel {
         gbc.gridx = 1; gbc.weightx = 0.75;
         txtPR = new JTextField("Bench Press 65kg (Tăng 5kg so với tuần trước)");
         txtPR.setFont(fontInput);
+        styleInput(txtPR);
         formPanel.add(txtPR, gbc);
 
         r++; gbc.gridx = 0; gbc.gridy = r; gbc.weightx = 0.25;
@@ -152,13 +188,17 @@ public class GhiChuTienDoPTPanel extends JPanel {
         txtNhanXet.setLineWrap(true);
         txtNhanXet.setWrapStyleWord(true);
         txtNhanXet.setText("Thể lực tốt, nhịp thở đều, form tạ chuẩn an toàn.");
-        formPanel.add(new JScrollPane(txtNhanXet), gbc);
+        JScrollPane noteScrollPane = new JScrollPane(txtNhanXet);
+        noteScrollPane.setBorder(BorderFactory.createLineBorder(new Color(203, 213, 225)));
+        noteScrollPane.setPreferredSize(new Dimension(0, 72));
+        formPanel.add(noteScrollPane, gbc);
 
         r++; gbc.gridx = 1; gbc.gridy = r;
         btnSave = new JButton("Lưu Nhật Ký Buổi Tập Hôm Nay");
         btnSave.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnSave.setBackground(new Color(16, 185, 129));
         btnSave.setForeground(Color.WHITE);
+        styleActionButton(btnSave);
         formPanel.add(btnSave, gbc);
 
         rightPanel.add(formPanel, BorderLayout.NORTH);
@@ -194,6 +234,21 @@ public class GhiChuTienDoPTPanel extends JPanel {
         tableLog.setFont(fontInput);
         tableLog.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         tableLog.getTableHeader().setBackground(new Color(241, 245, 249));
+        styleDataTable(tableLog, 0, 2, 4);
+        tableLog.getColumnModel().getColumn(2).setCellRenderer(new javax.swing.table.DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable source, Object value, boolean selected, boolean focus, int row, int column) {
+                Component component = super.getTableCellRendererComponent(source, value, selected, focus, row, column);
+                setFont(source.getFont().deriveFont(Font.BOLD));
+                setHorizontalAlignment(JLabel.CENTER);
+                if (!selected) {
+                    component.setBackground(row % 2 == 0 ? Color.WHITE : new Color(248, 250, 252));
+                    component.setForeground(new Color(15, 118, 110));
+                }
+                setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+                return component;
+            }
+        });
         historyPanel.add(new JScrollPane(tableLog), BorderLayout.CENTER);
 
         rightPanel.add(historyPanel, BorderLayout.CENTER);
@@ -240,6 +295,55 @@ public class GhiChuTienDoPTPanel extends JPanel {
             }
 
             JOptionPane.showMessageDialog(this, "Đã lưu nhật ký buổi tập thành công và trừ 01 buổi tập của học viên!", "Ghi Nhận Thành Công", JOptionPane.INFORMATION_MESSAGE);
+        });
+    }
+
+    private void styleDataTable(JTable dataTable, int... centeredColumns) {
+        dataTable.getTableHeader().setForeground(new Color(30, 41, 59));
+        dataTable.getTableHeader().setPreferredSize(new Dimension(0, 40));
+        dataTable.setShowVerticalLines(false);
+        dataTable.setGridColor(new Color(226, 232, 240));
+        dataTable.setSelectionBackground(new Color(219, 234, 254));
+        dataTable.setSelectionForeground(new Color(15, 23, 42));
+        dataTable.setFillsViewportHeight(true);
+        dataTable.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable source, Object value, boolean selected, boolean focus, int row, int column) {
+                Component component = super.getTableCellRendererComponent(source, value, selected, focus, row, column);
+                setFont(source.getFont());
+                if (!selected) component.setBackground(row % 2 == 0 ? Color.WHITE : new Color(248, 250, 252));
+                boolean centered = false;
+                for (int centeredColumn : centeredColumns) {
+                    if (column == centeredColumn) centered = true;
+                }
+                setHorizontalAlignment(centered ? JLabel.CENTER : JLabel.LEFT);
+                setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+                return component;
+            }
+        });
+    }
+
+    private void styleInput(JComponent component) {
+        component.putClientProperty("JComponent.roundRect", true);
+        component.setPreferredSize(new Dimension(component.getPreferredSize().width, 38));
+    }
+
+    private void styleActionButton(JButton button) {
+        Color normalColor = button.getBackground();
+        button.putClientProperty("JButton.buttonType", "roundRect");
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
+        button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                if (button.isEnabled()) button.setBackground(normalColor.brighter());
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                button.setBackground(normalColor);
+            }
         });
     }
 }

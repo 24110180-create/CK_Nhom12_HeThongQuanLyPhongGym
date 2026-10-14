@@ -43,6 +43,7 @@ public class MainDashboard extends JFrame {
         public String subtitle;
         public Supplier<JPanel> supplier;
         public Color accent;
+        public JScrollPane cachedScroll;
     }
 
     private static MainDashboard instance;
@@ -529,18 +530,17 @@ public class MainDashboard extends JFrame {
         item.button = btn;
         sidebarMenuItems.add(item);
 
-        btn.addActionListener(e -> selectSidebarItem(item));
-
-        // Click trên textPanel và các label con cũng kích hoạt
-        java.awt.event.MouseAdapter ma = new java.awt.event.MouseAdapter() {
+        // Click mượt mà, phản hồi tức thì trên toàn bộ diện tích button và nhãn chữ
+        java.awt.event.MouseAdapter clickHandler = new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent e) {
                 selectSidebarItem(item);
             }
         };
-        textPanel.addMouseListener(ma);
-        lblMain.addMouseListener(ma);
-        lblSub.addMouseListener(ma);
+        btn.addMouseListener(clickHandler);
+        textPanel.addMouseListener(clickHandler);
+        lblMain.addMouseListener(clickHandler);
+        lblSub.addMouseListener(clickHandler);
 
         container.add(btn);
         container.add(Box.createRigidArea(new Dimension(0, 3)));
@@ -553,6 +553,11 @@ public class MainDashboard extends JFrame {
     }
 
     private void selectSidebarItem(SidebarMenuItem selectedItem) {
+        if (selectedItem == null) return;
+        if (selectedItem == currentSelectedItem && workspaceContainer.getComponentCount() > 0) {
+            return; // Đang ở đúng tab này, không làm gì cả, chống lag và reload lặp lại
+        }
+
         this.currentSelectedItem = selectedItem;
         for (SidebarMenuItem item : sidebarMenuItems) {
             boolean isSel = (item == selectedItem);
@@ -563,16 +568,19 @@ public class MainDashboard extends JFrame {
         lblWorkspaceBreadcrumb.setText("Hệ thống > " + currentRole + " > " + selectedItem.title + " (" + selectedItem.subtitle + ")");
 
         try {
-            JPanel panel = selectedItem.supplier.get();
-            JScrollPane workspaceScroll = new JScrollPane(panel);
-            workspaceScroll.setBorder(null);
-            workspaceScroll.setOpaque(false);
-            workspaceScroll.getViewport().setOpaque(false);
-            workspaceScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-            workspaceScroll.getVerticalScrollBar().setUnitIncrement(16);
+            if (selectedItem.cachedScroll == null) {
+                JPanel panel = selectedItem.supplier.get();
+                JScrollPane workspaceScroll = new JScrollPane(panel);
+                workspaceScroll.setBorder(null);
+                workspaceScroll.setOpaque(false);
+                workspaceScroll.getViewport().setOpaque(false);
+                workspaceScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+                workspaceScroll.getVerticalScrollBar().setUnitIncrement(16);
+                selectedItem.cachedScroll = workspaceScroll;
+            }
 
             workspaceContainer.removeAll();
-            workspaceContainer.add(workspaceScroll, BorderLayout.CENTER);
+            workspaceContainer.add(selectedItem.cachedScroll, BorderLayout.CENTER);
             workspaceContainer.revalidate();
             workspaceContainer.repaint();
         } catch (Exception ex) {

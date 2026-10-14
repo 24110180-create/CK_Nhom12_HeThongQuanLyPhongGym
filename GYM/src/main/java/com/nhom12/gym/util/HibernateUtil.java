@@ -17,6 +17,7 @@ import org.hibernate.cfg.Configuration;
 public class HibernateUtil {
     private static final Logger LOGGER = Logger.getLogger(HibernateUtil.class.getName());
     private static volatile SessionFactory sessionFactory;
+    private static volatile boolean initAttempted = false;
 
     private static Properties loadDatabaseProperties() {
         Properties props = new Properties();
@@ -44,54 +45,63 @@ public class HibernateUtil {
     }
 
     public static synchronized SessionFactory getSessionFactory() {
-        if (sessionFactory == null) {
-            try {
-                Configuration cfg = new Configuration().configure();
-                cfg.addAnnotatedClass(ChiNhanh.class);
-                cfg.addAnnotatedClass(TaiKhoan.class);
-                cfg.addAnnotatedClass(HoiVien.class);
-                cfg.addAnnotatedClass(GoiTap.class);
-                cfg.addAnnotatedClass(LopHoc.class);
-                cfg.addAnnotatedClass(LichSuCheckIn.class);
-                cfg.addAnnotatedClass(HoaDon.class);
-                cfg.addAnnotatedClass(HuanLuyenVien.class);
-                cfg.addAnnotatedClass(DangKyLop.class);
+        if (sessionFactory != null) {
+            return sessionFactory;
+        }
+        if (initAttempted) {
+            return null; // Đã thử khởi tạo trước đó và CSDL offline, trả về null tức thì để DAO dùng buffer không làm treo UI
+        }
+        initAttempted = true;
+        try {
+            Configuration cfg = new Configuration().configure();
+            cfg.addAnnotatedClass(ChiNhanh.class);
+            cfg.addAnnotatedClass(TaiKhoan.class);
+            cfg.addAnnotatedClass(HoiVien.class);
+            cfg.addAnnotatedClass(GoiTap.class);
+            cfg.addAnnotatedClass(LopHoc.class);
+            cfg.addAnnotatedClass(LichSuCheckIn.class);
+            cfg.addAnnotatedClass(HoaDon.class);
+            cfg.addAnnotatedClass(HuanLuyenVien.class);
+            cfg.addAnnotatedClass(DangKyLop.class);
 
-                // Nạp cấu hình từ database.properties (hoặc ghi đè từ biến môi trường)
-                Properties dbProps = loadDatabaseProperties();
-                String url = System.getenv("DB_URL");
-                if (url == null) url = dbProps.getProperty("db.url");
-                if (url != null && !url.trim().isEmpty()) {
-                    cfg.setProperty("hibernate.connection.url", url.trim());
-                }
-
-                String username = System.getenv("DB_USERNAME");
-                if (username == null) username = dbProps.getProperty("db.username");
-                if (username != null && !username.trim().isEmpty() && !username.contains("YOUR_")) {
-                    cfg.setProperty("hibernate.connection.username", username.trim());
-                }
-
-                String password = System.getenv("DB_PASSWORD");
-                if (password == null) password = dbProps.getProperty("db.password");
-                if (password != null && !password.trim().isEmpty() && !password.contains("YOUR_")) {
-                    cfg.setProperty("hibernate.connection.password", password.trim());
-                }
-
-                // Cấu hình Connection Pool (Tối ưu số lượng kết nối đồng thời và chống leak connection)
-                String poolSize = dbProps.getProperty("hibernate.connection.pool_size");
-                if (poolSize != null && !poolSize.trim().isEmpty()) {
-                    cfg.setProperty("hibernate.connection.pool_size", poolSize.trim());
-                } else {
-                    cfg.setProperty("hibernate.connection.pool_size", "10");
-                }
-
-                sessionFactory = cfg.buildSessionFactory();
-            } catch (Throwable ex) {
-                LOGGER.log(Level.WARNING, "Không thể kết nối CSDL SQL Server: {0}", ex.getMessage());
-                return null; // Trả về null an toàn cho DAO fallback sang buffer
+            // Nạp cấu hình từ database.properties (hoặc ghi đè từ biến môi trường)
+            Properties dbProps = loadDatabaseProperties();
+            String url = System.getenv("DB_URL");
+            if (url == null) url = dbProps.getProperty("db.url");
+            if (url != null && !url.trim().isEmpty()) {
+                cfg.setProperty("hibernate.connection.url", url.trim());
             }
+
+            String username = System.getenv("DB_USERNAME");
+            if (username == null) username = dbProps.getProperty("db.username");
+            if (username != null && !username.trim().isEmpty() && !username.contains("YOUR_")) {
+                cfg.setProperty("hibernate.connection.username", username.trim());
+            }
+
+            String password = System.getenv("DB_PASSWORD");
+            if (password == null) password = dbProps.getProperty("db.password");
+            if (password != null && !password.trim().isEmpty() && !password.contains("YOUR_")) {
+                cfg.setProperty("hibernate.connection.password", password.trim());
+            }
+
+            // Cấu hình Connection Pool (Tối ưu số lượng kết nối đồng thời và chống leak connection)
+            String poolSize = dbProps.getProperty("hibernate.connection.pool_size");
+            if (poolSize != null && !poolSize.trim().isEmpty()) {
+                cfg.setProperty("hibernate.connection.pool_size", poolSize.trim());
+            } else {
+                cfg.setProperty("hibernate.connection.pool_size", "10");
+            }
+
+            sessionFactory = cfg.buildSessionFactory();
+        } catch (Throwable ex) {
+            LOGGER.log(Level.WARNING, "Không thể kết nối CSDL SQL Server (Hệ thống chuyển sang chế độ Offline Buffer cục bộ): {0}", ex.getMessage());
+            return null; // Trả về null an toàn cho DAO fallback sang buffer
         }
         return sessionFactory;
+    }
+
+    public static synchronized void resetConnectionAttempt() {
+        initAttempted = false;
     }
 
     /**

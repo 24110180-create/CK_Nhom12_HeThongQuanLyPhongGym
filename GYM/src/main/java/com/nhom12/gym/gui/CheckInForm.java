@@ -13,18 +13,22 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Giao diện Quét Thẻ & Check-In Hội Viên (Use Case Cốt Lõi Của Đồ Án)
- * Hỗ trợ máy quét mã vạch USB Honeywell Voyager 1450g (Tự động nhận diện Enter)
- * Kiểm tra 5 Business Rules: Tồn tại thẻ, Chưa bị khóa, Còn hạn, Đúng chi nhánh, Giờ mở cửa
- * Tích hợp Xử lý ngoại lệ, Chế độ Offline khi Wifi yếu, và Yêu cầu ẩn VIP của Anh Đức
+ * Giao diện Quét Thẻ & Check-In Tự Động (Flap Barrier & Máy quét Honeywell Voyager 1450g)
+ * Thiết kế Full-Width, tự động co giãn vừa vặn 100% cửa sổ màn hình, không bao giờ bị tràn ngang.
+ * Tích hợp:
+ * 1. Dropdown chọn Trạm Quét (CN01 / CN02 / Toàn hệ thống) để mô phỏng và kiểm tra đúng/sai cơ sở ra vào.
+ * 2. 5 Business Rules: Tồn tại thẻ, Chưa khóa, Còn hạn, Đúng chi nhánh, Giờ hoạt động.
+ * 3. Chế độ Ngoại Tuyến (Offline Buffer), Bán vé lẻ 1 ngày (Guest Pass VietQR), Ưu đãi VIP ẩn 50%.
  */
-public class CheckInForm extends JPanel {
+public class CheckInForm extends JPanel implements Scrollable {
 
     private final CheckInService checkInService = new CheckInService();
 
     private JTextField txtMaQR;
+    private JComboBox<String> cbStationBranch;
     private JLabel lblNetworkStatus;
     private JLabel lblPerfMs;
+    private JLabel lblHwStatus;
     private JButton btnGuestPass;
     private JButton btnToggleOffline;
     private JButton btnAutoSync;
@@ -49,111 +53,194 @@ public class CheckInForm extends JPanel {
     private JTable logTable;
     private DefaultTableModel logModel;
     private JLabel lblLogSummary;
-    private JLabel lblBarrierAudit;
 
     public CheckInForm() {
-        setLayout(new BorderLayout(15, 15));
+        setLayout(new BorderLayout(0, 10));
         setBackground(new Color(248, 250, 252));
-        setBorder(new EmptyBorder(20, 25, 20, 25));
+        setBorder(new EmptyBorder(10, 12, 10, 12));
 
-        // 1. TOP HEADER TOOLBAR 2 TẦNG (CHỐNG ĐÈ TIÊU ĐỀ VÀ CÁC NÚT ĐIỀU KHIỂN)
+        initUI();
+
+        // Tự động focus vào ô quét thẻ
+        SwingUtilities.invokeLater(() -> txtMaQR.requestFocusInWindow());
+    }
+
+    @Override
+    public Dimension getPreferredScrollableViewportSize() {
+        return getPreferredSize();
+    }
+
+    @Override
+    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+        return 16;
+    }
+
+    @Override
+    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+        return 60;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportWidth() {
+        // BẮT BUỘC TRUE: Ép toàn bộ giao diện CheckInForm vừa khít 100% viewport, triệt tiêu thanh cuộn ngang
+        return true;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportHeight() {
+        return false;
+    }
+
+    private void initUI() {
+        // =========================================================================
+        // 1. TOP HEADER TOOLBAR (2 HÀNG GỌN GÀNG - CÓ DROPDOWN CHỌN TRẠM QUÉT)
+        // =========================================================================
         JPanel topToolbar = new JPanel();
         topToolbar.setLayout(new BoxLayout(topToolbar, BoxLayout.Y_AXIS));
         topToolbar.setBackground(Color.WHITE);
         topToolbar.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
-                new EmptyBorder(12, 18, 12, 18)
+                new EmptyBorder(8, 12, 8, 12)
         ));
 
-        JPanel titleGroup = new JPanel(new GridLayout(2, 1, 0, 2));
-        titleGroup.setOpaque(false);
-        titleGroup.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // Hàng 1: Tiêu đề trạm (Bên trái) + Bộ chọn Trạm Quét (Bên phải)
+        JPanel row1 = new JPanel(new BorderLayout(10, 0));
+        row1.setOpaque(false);
 
-        JLabel lblTitle = new JLabel("TRẠM QUÉT CHECK-IN TỰ ĐỘNG (FLAP BARRIER & HONEYWELL SCANNER)");
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        JPanel titleGroup = new JPanel(new GridLayout(2, 1, 0, 1));
+        titleGroup.setOpaque(false);
+        JLabel lblTitle = new JLabel("TRẠM QUÉT CHECK-IN TỰ ĐỘNG (FLAP BARRIER & HONEYWELL)");
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 15));
         lblTitle.setForeground(new Color(15, 23, 42));
 
-        JLabel lblSub = new JLabel("Kiểm soát cổng Flap Barrier • Tương thích máy quét USB Honeywell Voyager 1450g");
-        lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        JLabel lblSub = new JLabel("Kiểm soát cổng Flap Barrier • Tự động đối soát chi nhánh & hạn thẻ • Phản hồi < 2.0s");
+        lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblSub.setForeground(new Color(100, 116, 139));
         titleGroup.add(lblTitle);
         titleGroup.add(lblSub);
-        topToolbar.add(titleGroup);
-        topToolbar.add(Box.createRigidArea(new Dimension(0, 10)));
+        row1.add(titleGroup, BorderLayout.WEST);
 
-        JPanel rightControls = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-        rightControls.setOpaque(false);
-        rightControls.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // Bộ chọn Trạm Quét (Quan trọng để mô phỏng và kiểm tra đúng/sai chi nhánh)
+        JPanel pnlStationSelect = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
+        pnlStationSelect.setOpaque(false);
 
-        // Yêu cầu ẩn 3: Nút Bán Vé Lẻ Ngày chống bán chui
-        btnGuestPass = new JButton("Bán Vé Lẻ Ngày (80,000 đ)");
-        btnGuestPass.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        JLabel lblStationPrompt = new JLabel("Trạm quét:");
+        lblStationPrompt.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblStationPrompt.setForeground(new Color(30, 41, 59));
+
+        cbStationBranch = new JComboBox<>(new String[]{
+                "CN01 - Cơ sở 1 (Quận 1)",
+                "CN02 - Cơ sở 2 (Tân Bình)",
+                "Toàn hệ thống"
+        });
+        cbStationBranch.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        cbStationBranch.setPreferredSize(new Dimension(180, 30));
+
+        // Tự động nạp theo chi nhánh đăng nhập hiện tại của phiên làm việc
+        String currentLoginBranch = com.nhom12.gym.util.Auth.getChiNhanhHienTai();
+        if (currentLoginBranch != null && currentLoginBranch.contains("CN02")) {
+            cbStationBranch.setSelectedIndex(1);
+        } else {
+            cbStationBranch.setSelectedIndex(0);
+        }
+
+        cbStationBranch.addActionListener(e -> {
+            String br = (String) cbStationBranch.getSelectedItem();
+            if (lblHwStatus != null) {
+                lblHwStatus.setText("Súng quét Honeywell tại " + br + ": Sẵn sàng");
+            }
+        });
+
+        pnlStationSelect.add(lblStationPrompt);
+        pnlStationSelect.add(cbStationBranch);
+        row1.add(pnlStationSelect, BorderLayout.EAST);
+
+        topToolbar.add(row1);
+        topToolbar.add(Box.createRigidArea(new Dimension(0, 6)));
+
+        // Hàng 2: Trạng thái mạng / tốc độ (Bên trái) + Các nút tác vụ nhanh (Bên phải)
+        JPanel row2 = new JPanel(new BorderLayout(10, 0));
+        row2.setOpaque(false);
+
+        JPanel pStatusLeft = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        pStatusLeft.setOpaque(false);
+
+        lblNetworkStatus = new JLabel("● Online (Đồng bộ)");
+        lblNetworkStatus.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        lblNetworkStatus.setForeground(new Color(16, 185, 129));
+
+        lblPerfMs = new JLabel("Phản hồi: 0ms (< 2.0s)");
+        lblPerfMs.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        lblPerfMs.setForeground(new Color(71, 85, 105));
+
+        pStatusLeft.add(lblNetworkStatus);
+        pStatusLeft.add(lblPerfMs);
+        row2.add(pStatusLeft, BorderLayout.WEST);
+
+        JPanel pControlsRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
+        pControlsRight.setOpaque(false);
+
+        btnGuestPass = new JButton("Bán Vé Lẻ (80,000 đ)");
+        btnGuestPass.setFont(new Font("Segoe UI", Font.BOLD, 11));
         btnGuestPass.setBackground(new Color(245, 158, 11));
         btnGuestPass.setForeground(Color.WHITE);
         btnGuestPass.setFocusPainted(false);
         btnGuestPass.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnGuestPass.setPreferredSize(new Dimension(150, 30));
         btnGuestPass.addActionListener(e -> moDialogBanVeLe());
 
-        // Yêu cầu ẩn 2: Chế độ Ngoại Tuyến khi Wifi CN02 yếu
         btnToggleOffline = new JButton("Mạng: Online");
         btnToggleOffline.setFont(new Font("Segoe UI", Font.BOLD, 11));
         btnToggleOffline.setBackground(new Color(16, 185, 129));
         btnToggleOffline.setForeground(Color.WHITE);
         btnToggleOffline.setFocusPainted(false);
         btnToggleOffline.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnToggleOffline.setPreferredSize(new Dimension(115, 30));
         btnToggleOffline.addActionListener(e -> toggleOfflineNetwork());
 
-        btnAutoSync = new JButton("Đồng Bộ (Auto-Sync)");
+        btnAutoSync = new JButton("Đồng Bộ (0)");
         btnAutoSync.setFont(new Font("Segoe UI", Font.BOLD, 11));
         btnAutoSync.setBackground(new Color(37, 99, 235));
         btnAutoSync.setForeground(Color.WHITE);
         btnAutoSync.setFocusPainted(false);
         btnAutoSync.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnAutoSync.setVisible(false);
+        btnAutoSync.setPreferredSize(new Dimension(110, 30));
         btnAutoSync.addActionListener(e -> dongBoOffline());
 
-        lblNetworkStatus = new JLabel("Online (Đồng bộ)");
-        lblNetworkStatus.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        lblNetworkStatus.setForeground(new Color(16, 185, 129));
+        pControlsRight.add(btnGuestPass);
+        pControlsRight.add(btnToggleOffline);
+        pControlsRight.add(btnAutoSync);
+        row2.add(pControlsRight, BorderLayout.EAST);
 
-        lblPerfMs = new JLabel("Phản hồi: 0ms");
-        lblPerfMs.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        lblPerfMs.setForeground(new Color(71, 85, 105));
-
-        rightControls.add(btnGuestPass);
-        rightControls.add(btnToggleOffline);
-        rightControls.add(btnAutoSync);
-        rightControls.add(lblNetworkStatus);
-        rightControls.add(lblPerfMs);
-        topToolbar.add(rightControls);
-
+        topToolbar.add(row2);
         add(topToolbar, BorderLayout.NORTH);
 
-        // 2. MAIN CENTER: 2 CỘT (Cột trái: Ô quét mã USB, nút test, Cổng Flap Barrier; Cột phải: Thẻ hội viên chi tiết)
-        JPanel centerGrid = new JPanel(new GridLayout(1, 2, 20, 0));
+        // =========================================================================
+        // 2. MAIN CENTER: 2 CỘT TỰ ĐỘNG FIT WIDTH (50% - 50%)
+        // =========================================================================
+        JPanel centerGrid = new JPanel(new GridLayout(1, 2, 10, 0));
         centerGrid.setOpaque(false);
 
-        // === CỘT TRÁI: Ô QUÉT MÃ & TRẠNG THÁI CỔNG BẢO VỆ ===
-        JPanel pnlLeft = new JPanel();
-        pnlLeft.setLayout(new BoxLayout(pnlLeft, BoxLayout.Y_AXIS));
+        // === CỘT TRÁI: Ô QUÉT MÃ USB HONEYWELL + TRẠNG THÁI CỔNG FLAP BARRIER ===
+        JPanel pnlLeft = new JPanel(new BorderLayout(0, 8));
         pnlLeft.setOpaque(false);
 
-        // Khung nhập / quét mã
-        JPanel pnlScanBox = new JPanel(new BorderLayout(10, 10));
+        // Khung quét mã
+        JPanel pnlScanBox = new JPanel(new BorderLayout(0, 8));
         pnlScanBox.setBackground(Color.WHITE);
         pnlScanBox.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
-                new EmptyBorder(16, 18, 16, 18)
+                new EmptyBorder(10, 12, 10, 12)
         ));
 
         JPanel scanTitleGroup = new JPanel(new BorderLayout());
         scanTitleGroup.setOpaque(false);
-
         JLabel lblScanTitle = new JLabel("QUÉT MÃ THẺ / MÃ QR HỘI VIÊN (TỰ ĐỘNG FOCUS)");
-        lblScanTitle.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        lblScanTitle.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblScanTitle.setForeground(new Color(15, 23, 42));
 
-        JLabel lblHwStatus = new JLabel("Súng quét USB Honeywell: Sẵn sàng");
+        lblHwStatus = new JLabel("Súng quét Honeywell: Sẵn sàng");
         lblHwStatus.setFont(new Font("Segoe UI", Font.BOLD, 11));
         lblHwStatus.setForeground(new Color(16, 185, 129));
 
@@ -161,34 +248,36 @@ public class CheckInForm extends JPanel {
         scanTitleGroup.add(lblHwStatus, BorderLayout.EAST);
         pnlScanBox.add(scanTitleGroup, BorderLayout.NORTH);
 
-        JPanel inputRow = new JPanel(new BorderLayout(10, 0));
+        // Hàng nhập mã + Nút Simulator + Nút Check-in
+        JPanel inputRow = new JPanel(new BorderLayout(6, 0));
         inputRow.setOpaque(false);
 
         txtMaQR = new JTextField();
-        txtMaQR.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        txtMaQR.setFont(new Font("Segoe UI", Font.BOLD, 15));
         txtMaQR.setForeground(new Color(37, 99, 235));
-        txtMaQR.setPreferredSize(new Dimension(0, 44));
-        txtMaQR.putClientProperty("JTextField.placeholderText", "Đưa thẻ QR vào máy quét hoặc nhập mã rồi Enter...");
+        txtMaQR.setPreferredSize(new Dimension(0, 36));
+        txtMaQR.putClientProperty("JTextField.placeholderText", "Đưa mã QR vào máy quét hoặc nhập mã rồi Enter...");
 
-        JPanel actionBtns = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
+        JPanel actionBtns = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
         actionBtns.setOpaque(false);
 
-        JButton btnOpenScanner = new JButton("Mở Máy Quét Ảo (Simulator)");
-        btnOpenScanner.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btnOpenScanner.setBackground(new Color(124, 58, 237)); // Tím Neon công nghệ #7C3AED
+        JButton btnOpenScanner = new JButton("Máy Quét Ảo");
+        btnOpenScanner.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnOpenScanner.setBackground(new Color(124, 58, 237));
         btnOpenScanner.setForeground(Color.WHITE);
         btnOpenScanner.setFocusPainted(false);
         btnOpenScanner.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnOpenScanner.setPreferredSize(new Dimension(210, 44));
+        btnOpenScanner.setPreferredSize(new Dimension(120, 36));
+        btnOpenScanner.setToolTipText("Mở bộ mô phỏng súng quét mã QR Honeywell Voyager 1450g");
         btnOpenScanner.addActionListener(e -> moMayQuetAo());
 
         JButton btnSubmit = new JButton("Check-in");
-        btnSubmit.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnSubmit.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnSubmit.setBackground(new Color(37, 99, 235));
         btnSubmit.setForeground(Color.WHITE);
         btnSubmit.setFocusPainted(false);
         btnSubmit.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnSubmit.setPreferredSize(new Dimension(105, 44));
+        btnSubmit.setPreferredSize(new Dimension(85, 36));
 
         actionBtns.add(btnOpenScanner);
         actionBtns.add(btnSubmit);
@@ -197,100 +286,104 @@ public class CheckInForm extends JPanel {
         inputRow.add(actionBtns, BorderLayout.EAST);
         pnlScanBox.add(inputRow, BorderLayout.CENTER);
 
-        // Khởi tạo trước 1 vé test mẫu PASS-8888 chống bán chui
-        checkInService.banVeLeNgay("Võ Hoàng Yến (Khách Vãng Lai)", "0901112233", "CN01 - Cơ sở 1 (Quận 1)", 80000);
+        // Hàng nút Test Use Case phân bổ 2 hàng 4 cột gọn gàng, không bao giờ tràn ngang
+        JPanel quickTestContainer = new JPanel(new BorderLayout(0, 4));
+        quickTestContainer.setOpaque(false);
 
-        // Hàng nút test nhanh cho Ban Giám khảo chấm điểm đồ án
-        JPanel quickTestRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 6));
-        quickTestRow.setOpaque(false);
-        JLabel lblQuick = new JLabel("Test Use Case:");
+        JLabel lblQuick = new JLabel("Thẻ mẫu kiểm thử Use Case Flap Barrier:");
         lblQuick.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblQuick.setForeground(new Color(100, 116, 139));
-        quickTestRow.add(lblQuick);
+        quickTestContainer.add(lblQuick, BorderLayout.NORTH);
 
-        quickTestRow.add(createTestBadge("QR001 (VIP Hợp lệ)", "QR001", new Color(16, 185, 129)));
-        quickTestRow.add(createTestBadge("QR002 (Hết Hạn)", "QR002", new Color(239, 68, 68)));
-        quickTestRow.add(createTestBadge("QR003 (Bị Khóa)", "QR003", new Color(245, 158, 11)));
-        quickTestRow.add(createTestBadge("QR004 (Sai Chi Nhánh)", "QR004", new Color(139, 92, 246)));
-        quickTestRow.add(createTestBadge("VIP007 (Ẩn 50% Anh Đức)", "VIP007", new Color(14, 165, 233)));
-        quickTestRow.add(createTestBadge("PASS-8888 (Vé Lẻ 1 Ngày)", "PASS-8888", new Color(217, 119, 6)));
+        JPanel quickTestGrid = new JPanel(new GridLayout(2, 4, 4, 4));
+        quickTestGrid.setOpaque(false);
 
-        JButton btnScanImgFile = new JButton("Quét Ảnh QR...");
+        quickTestGrid.add(createTestBadge("QR001 (VIP)", "QR001", new Color(16, 185, 129)));
+        quickTestGrid.add(createTestBadge("QR002 (Hết Hạn)", "QR002", new Color(239, 68, 68)));
+        quickTestGrid.add(createTestBadge("QR003 (Khóa)", "QR003", new Color(245, 158, 11)));
+        quickTestGrid.add(createTestBadge("QR004 (Sai Trạm)", "QR004", new Color(139, 92, 246)));
+        quickTestGrid.add(createTestBadge("VIP007 (Ẩn 50%)", "VIP007", new Color(14, 165, 233)));
+        quickTestGrid.add(createTestBadge("PASS-8888 (Vé Lẻ)", "PASS-8888", new Color(217, 119, 6)));
+
+        JButton btnScanImgFile = new JButton("Quét Ảnh QR");
         btnScanImgFile.setFont(new Font("Segoe UI", Font.BOLD, 11));
         btnScanImgFile.setBackground(new Color(241, 245, 249));
         btnScanImgFile.setForeground(new Color(15, 118, 110));
         btnScanImgFile.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnScanImgFile.setToolTipText("Quét mã QR từ tệp hình ảnh lưu trong máy");
         btnScanImgFile.addActionListener(e -> moQuetTuAnhFile());
-        quickTestRow.add(btnScanImgFile);
+        quickTestGrid.add(btnScanImgFile);
 
-        pnlScanBox.add(quickTestRow, BorderLayout.SOUTH);
+        btnManualOpen = new JButton("Mở Khẩn Cấp");
+        btnManualOpen.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        btnManualOpen.setBackground(new Color(241, 245, 249));
+        btnManualOpen.setForeground(new Color(71, 85, 105));
+        btnManualOpen.setFocusPainted(false);
+        btnManualOpen.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnManualOpen.setToolTipText("Mở cửa Flap Barrier thủ công có lưu vết kiểm toán");
+        btnManualOpen.addActionListener(e -> moCuaThuCong());
+        quickTestGrid.add(btnManualOpen);
 
-        pnlLeft.add(pnlScanBox);
-        pnlLeft.add(Box.createRigidArea(new Dimension(0, 15)));
+        quickTestContainer.add(quickTestGrid, BorderLayout.CENTER);
+        pnlScanBox.add(quickTestContainer, BorderLayout.SOUTH);
+
+        pnlLeft.add(pnlScanBox, BorderLayout.NORTH);
 
         // Khung hiển thị trạng thái Cửa tự động Flap Barrier
-        pnlGateStatus = new JPanel(new BorderLayout(10, 10)) {
+        pnlGateStatus = new JPanel(new BorderLayout(8, 8)) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(getBackground());
-                g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 16, 16));
+                g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 14, 14));
                 g2.dispose();
             }
         };
         pnlGateStatus.setBackground(new Color(241, 245, 249));
-        pnlGateStatus.setBorder(new EmptyBorder(22, 25, 22, 25));
+        pnlGateStatus.setBorder(new EmptyBorder(16, 18, 16, 18));
         pnlGateStatus.setOpaque(false);
 
-        JPanel gateTextGroup = new JPanel(new GridLayout(2, 1, 0, 6));
+        JPanel gateTextGroup = new JPanel(new GridLayout(2, 1, 0, 4));
         gateTextGroup.setOpaque(false);
 
         lblGateStatusText = new JLabel("TRẠM ĐANG SẴN SÀNG QUÉT THẺ...", SwingConstants.CENTER);
-        lblGateStatusText.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblGateStatusText.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblGateStatusText.setForeground(new Color(71, 85, 105));
 
-        lblGateSubText = new JLabel("Hệ thống sẽ tự động kiểm tra 5 điều kiện nghiệp vụ kinh doanh", SwingConstants.CENTER);
-        lblGateSubText.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        lblGateSubText = new JLabel("Hệ thống tự động đối soát 5 điều kiện nghiệp vụ để mở cổng Flap Barrier", SwingConstants.CENTER);
+        lblGateSubText.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblGateSubText.setForeground(new Color(100, 116, 139));
 
         gateTextGroup.add(lblGateStatusText);
         gateTextGroup.add(lblGateSubText);
         pnlGateStatus.add(gateTextGroup, BorderLayout.CENTER);
 
-        // Hàng nút cứu cánh khi bị từ chối
-        JPanel gateActions = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        // Nút cứu cánh khi thẻ hết hạn
+        JPanel gateActions = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 0));
         gateActions.setOpaque(false);
 
         btnQuickRenew = new JButton("Gia Hạn Gói Tập Ngay");
-        btnQuickRenew.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnQuickRenew.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnQuickRenew.setBackground(new Color(245, 158, 11));
         btnQuickRenew.setForeground(Color.WHITE);
         btnQuickRenew.setFocusPainted(false);
         btnQuickRenew.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnQuickRenew.setVisible(false);
-
-        btnManualOpen = new JButton("Mở Cửa Thủ Công (Bảo Trì / Khẩn Cấp)");
-        btnManualOpen.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        btnManualOpen.setBackground(Color.WHITE);
-        btnManualOpen.setForeground(new Color(71, 85, 105));
-        btnManualOpen.setFocusPainted(false);
-        btnManualOpen.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
         gateActions.add(btnQuickRenew);
-        gateActions.add(btnManualOpen);
-        pnlGateStatus.add(gateActions, BorderLayout.SOUTH);
 
-        pnlLeft.add(pnlGateStatus);
+        pnlGateStatus.add(gateActions, BorderLayout.SOUTH);
+        pnlLeft.add(pnlGateStatus, BorderLayout.CENTER);
+
         centerGrid.add(pnlLeft);
 
-        // === CỘT PHẢI: HỒ SƠ THẺ HỘI VIÊN VỪA CHECK-IN ===
-        JPanel pnlRight = new JPanel(new BorderLayout(0, 12));
+        // === CỘT PHẢI: HỒ SƠ THẺ HỘI VIÊN VỪA CHECK-IN (DATABASE LOOKUP) ===
+        JPanel pnlRight = new JPanel(new BorderLayout(0, 10));
         pnlRight.setBackground(Color.WHITE);
         pnlRight.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
-                new EmptyBorder(18, 20, 18, 20)
+                new EmptyBorder(16, 18, 16, 18)
         ));
 
         JLabel lblProfileTitle = new JLabel("KẾT QUẢ TRA CỨU HỘI VIÊN (DATABASE LOOKUP)");
@@ -298,7 +391,7 @@ public class CheckInForm extends JPanel {
         lblProfileTitle.setForeground(new Color(15, 23, 42));
         pnlRight.add(lblProfileTitle, BorderLayout.NORTH);
 
-        JPanel pnlCardBody = new JPanel(new GridLayout(6, 1, 0, 6));
+        JPanel pnlCardBody = new JPanel(new GridLayout(6, 1, 0, 8));
         pnlCardBody.setOpaque(false);
 
         lblMemberName = new JLabel("Họ Và Tên: ---");
@@ -314,7 +407,7 @@ public class CheckInForm extends JPanel {
 
         lblMemberPackage = new JLabel("Gói Tập: ---");
         lblMemberPackage.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        lblMemberPackage.setForeground(new Color(245, 158, 11));
+        lblMemberPackage.setForeground(new Color(217, 119, 6));
 
         lblMemberExpire = new JLabel("Thời Hạn Sử Dụng: ---");
         lblMemberExpire.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -330,7 +423,6 @@ public class CheckInForm extends JPanel {
         pnlCardBody.add(lblMemberBranch);
         pnlRight.add(pnlCardBody, BorderLayout.CENTER);
 
-        // Hộp thông báo bí mật VIP của anh Đức
         lblSecretVipNote = new JLabel("");
         lblSecretVipNote.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         lblSecretVipNote.setForeground(new Color(14, 165, 233));
@@ -340,22 +432,24 @@ public class CheckInForm extends JPanel {
         centerGrid.add(pnlRight);
         add(centerGrid, BorderLayout.CENTER);
 
-        // 3. BOTTOM PANEL: BẢNG NHẬT KÝ CHECK-IN REAL-TIME TRONG NGÀY
-        JPanel bottomContainer = new JPanel(new BorderLayout(0, 8));
+        // =========================================================================
+        // 3. BOTTOM PANEL: BẢNG NHẬT KÝ CHECK-IN REAL-TIME (TỰ ĐỘNG CO GIÃN 100%)
+        // =========================================================================
+        JPanel bottomContainer = new JPanel(new BorderLayout(0, 6));
         bottomContainer.setOpaque(false);
-        bottomContainer.setPreferredSize(new Dimension(0, 180));
+        bottomContainer.setPreferredSize(new Dimension(0, 150));
 
         JPanel logHeader = new JPanel(new BorderLayout());
         logHeader.setOpaque(false);
         JLabel lblLogTitle = new JLabel("NHẬT KÝ QUÉT THẺ HÔM NAY (CHECK-IN AUDIT LOG)");
-        lblLogTitle.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        lblLogTitle.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblLogTitle.setForeground(new Color(15, 23, 42));
 
         JPanel logRightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         logRightPanel.setOpaque(false);
 
         lblLogSummary = new JLabel("Hôm nay: 0 lượt quét • 0 hợp lệ • 0 từ chối");
-        lblLogSummary.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblLogSummary.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblLogSummary.setForeground(new Color(100, 116, 139));
 
         JButton btnExportExcel = new JButton("Xuất Excel Lịch Sử");
@@ -381,12 +475,13 @@ public class CheckInForm extends JPanel {
         };
 
         logTable = new JTable(logModel);
-        logTable.setRowHeight(30);
+        logTable.setRowHeight(28);
         logTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        logTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        logTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 11));
         logTable.getTableHeader().setBackground(new Color(241, 245, 249));
+        logTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
-        // Màu sắc cột kết quả
+        // Định dạng màu sắc kết quả
         logTable.getColumnModel().getColumn(4).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable t, Object val, boolean isSel, boolean hasFocus, int r, int c) {
@@ -409,6 +504,7 @@ public class CheckInForm extends JPanel {
         JScrollPane scrollLog = new JScrollPane(logTable);
         scrollLog.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240), 1));
         bottomContainer.add(scrollLog, BorderLayout.CENTER);
+
         add(bottomContainer, BorderLayout.SOUTH);
 
         // --- SỰ KIỆN TƯƠNG TÁC ---
@@ -421,138 +517,8 @@ public class CheckInForm extends JPanel {
                     "Chuyển Sang Gia Hạn", JOptionPane.INFORMATION_MESSAGE);
         });
 
-        btnManualOpen.addActionListener(e -> moCuaThuCong());
-
-        // Tự động focus vào ô quét thẻ
-        SwingUtilities.invokeLater(() -> txtMaQR.requestFocusInWindow());
-    }
-
-    // Yêu cầu ẩn 3: Bán vé lẻ 1 ngày xuất VietQR và sinh mã QR dùng 1 lần chống bán chui
-    private void moDialogBanVeLe() {
-        JTextField txtTenKhach = new JTextField("Nguyễn Văn Lẻ");
-        JTextField txtSdt = new JTextField("0988776655");
-        String currentBranch = com.nhom12.gym.util.Auth.getChiNhanhHienTai();
-
-        JPanel pnlInput = new JPanel(new GridLayout(2, 2, 8, 8));
-        pnlInput.add(new JLabel("Họ Tên Khách Vãng Lai:"));
-        pnlInput.add(txtTenKhach);
-        pnlInput.add(new JLabel("Số Điện Thoại:"));
-        pnlInput.add(txtSdt);
-
-        int opt = JOptionPane.showConfirmDialog(this, pnlInput,
-                "Bán Vé Lẻ Ngày (Guest Pass 1 Ngày - 80,000 đ)",
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-        if (opt != JOptionPane.OK_OPTION) return;
-
-        String name = txtTenKhach.getText().trim();
-        String phone = txtSdt.getText().trim();
-        if (name.isEmpty()) name = "Khách Vãng Lai";
-
-        final String finalName = name;
-        final String finalPhone = phone;
-
-        // Mở hộp thoại thanh toán VietQR 80.000đ
-        java.util.List<com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang> items = new java.util.ArrayList<>();
-        items.add(new com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang("Vé Lẻ Tập Gym 1 Ngày (Guest Pass)", 1, 80000, 80000));
-
-        Window topFrame = SwingUtilities.getWindowAncestor(this);
-        com.nhom12.gym.gui.ThanhToanHoaDonDialog payDialog = new com.nhom12.gym.gui.ThanhToanHoaDonDialog(
-                topFrame,
-                null,
-                finalName + " (" + finalPhone + ")",
-                "Vé Lẻ 1 Ngày (" + currentBranch + ")",
-                80000,
-                0,
-                80000,
-                items,
-                success -> {
-                    if (success) {
-                        CheckInService.GuestPassTicket ticket = checkInService.banVeLeNgay(finalName, finalPhone, currentBranch, 80000);
-                        JOptionPane.showMessageDialog(this,
-                                "ĐÃ XUẤT VÉ LẺ 1 NGÀY THÀNH CÔNG!\n"
-                                        + "• Mã Vé Quét QR: " + ticket.ticketCode + "\n"
-                                        + "• Khách Hàng: " + ticket.customerName + "\n"
-                                        + "• Giá Vé: 80,000 đ (Đã xuất hóa đơn VietQR)\n"
-                                        + "• Chi Nhánh: " + ticket.branch + "\n\n"
-                                        + "LƯU Ý: Mã vé này chỉ có hiệu lực mở cổng Flap Barrier đúng 1 lần duy nhất trong ngày hôm nay!",
-                                "Xuất Vé Lẻ Thành Công", JOptionPane.INFORMATION_MESSAGE);
-
-                        // Tự động nạp mã vé vào ô quét và kích hoạt check-in
-                        txtMaQR.setText(ticket.ticketCode);
-                        xuLyCheckIn();
-                    }
-                }
-        );
-        payDialog.setVisible(true);
-    }
-
-    // Yêu cầu ẩn 2: Chế độ Ngoại Tuyến khi Wifi CN02 (Tân Bình) yếu
-    private void toggleOfflineNetwork() {
-        boolean newState = !checkInService.isNetworkOnline();
-        checkInService.setNetworkOnline(newState);
-
-        if (newState) {
-            lblNetworkStatus.setText("Online (Đồng bộ)");
-            lblNetworkStatus.setForeground(new Color(16, 185, 129));
-            btnToggleOffline.setText("Mạng: Online");
-            btnToggleOffline.setBackground(new Color(16, 185, 129));
-            btnAutoSync.setVisible(false);
-            if (checkInService.getOfflineBufferSize() > 0) {
-                dongBoOffline();
-            }
-        } else {
-            lblNetworkStatus.setText("Ngoại tuyến (Wifi CN02 yếu)");
-            lblNetworkStatus.setForeground(new Color(245, 158, 11));
-            btnToggleOffline.setText("Mạng: Ngoại Tuyến (Offline)");
-            btnToggleOffline.setBackground(new Color(239, 68, 68));
-            btnAutoSync.setVisible(true);
-            btnAutoSync.setText("Đồng Bộ (" + checkInService.getOfflineBufferSize() + ")");
-            JOptionPane.showMessageDialog(this,
-                    "ĐÃ BẬT CHẾ ĐỘ OFFLINE CỤC BỘ!\n"
-                            + "Các lượt quét thẻ tại CN02 (Tân Bình) sẽ tiếp tục xử lý tức thì (< 50ms)\n"
-                            + "và lưu an toàn vào Offline Sync Buffer để tự động đồng bộ khi có mạng lại.",
-                    "Chế Độ Ngoại Tuyến Kích Hoạt", JOptionPane.WARNING_MESSAGE);
-        }
-    }
-
-    private void dongBoOffline() {
-        int count = checkInService.dongBoOfflineLenHeThong();
-        btnAutoSync.setText("Đồng Bộ (0)");
-        btnAutoSync.setVisible(false);
-        JOptionPane.showMessageDialog(this,
-                "ĐÃ TỰ ĐỘNG ĐỒNG BỘ " + count + " LƯỢT CHECK-IN NGOẠI TUYẾN VỀ CSDL CHÍNH THÀNH CÔNG!",
-                "Auto-Sync Hoàn Tất", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    private void moCuaThuCong() {
-        String reason = JOptionPane.showInputDialog(this,
-                "Nhập lý do Mở Cửa Thủ Công (Hệ thống lưu vết kiểm toán chống gian lận):",
-                "Xác Nhận Mở Cửa Khẩn Cấp", JOptionPane.WARNING_MESSAGE);
-
-        if (reason == null || reason.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Hủy thao tác: Bắt buộc phải có lý do để mở cửa thủ công!", "Hủy Thao Tác", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-
-        checkInService.ghiNhanMoCongThuCong(com.nhom12.gym.util.Auth.vaiTro != null ? com.nhom12.gym.util.Auth.vaiTro : "Lễ tân", reason.trim());
-
-        pnlGateStatus.setBackground(new Color(254, 243, 199));
-        lblGateStatusText.setText("CỬA FLAP BARRIER: MỞ THỦ CÔNG");
-        lblGateStatusText.setForeground(new Color(180, 83, 9));
-        lblGateSubText.setText("[CẢNH BÁO KIỂM TOÁN]: Mở bởi Lễ tân - Lý do: " + reason.trim());
-        pnlGateStatus.repaint();
-        com.nhom12.gym.util.SoundHelper.playNotice();
-
-        capNhatThongKeAudit();
-    }
-
-    private void capNhatThongKeAudit() {
-        lblLogSummary.setText("Hôm nay: " + logModel.getRowCount() + " lượt quét - "
-                + checkInService.getSuccessCountToday() + " hợp lệ - "
-                + checkInService.getFailCountToday() + " từ chối - "
-                + "Barrier mở: " + checkInService.getTotalBarrierOpenSuccess() + " - "
-                + "Mở thủ công: " + checkInService.getManualGateOpenCount() + " (Đối soát)");
+        // Khởi tạo trước 1 vé test mẫu PASS-8888 chống bán chui
+        checkInService.banVeLeNgay("Võ Hoàng Yến (Khách Vãng Lai)", "0901112233", "CN01 - Cơ sở 1 (Quận 1)", 80000);
     }
 
     private JButton createTestBadge(String label, String code, Color bg) {
@@ -564,7 +530,7 @@ public class CheckInForm extends JPanel {
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(203, 213, 225), 1),
-                BorderFactory.createEmptyBorder(3, 8, 3, 8)
+                BorderFactory.createEmptyBorder(4, 4, 4, 4)
         ));
         btn.addActionListener(e -> {
             txtMaQR.setText(code);
@@ -575,7 +541,12 @@ public class CheckInForm extends JPanel {
 
     private void xuLyCheckIn() {
         String code = txtMaQR.getText().trim();
-        String currentBranch = com.nhom12.gym.util.Auth.getChiNhanhHienTai();
+        if (code.isEmpty()) return;
+
+        // Lấy chi nhánh trực tiếp từ Dropdown Trạm Quét đang chọn
+        String currentBranch = (cbStationBranch != null && cbStationBranch.getSelectedItem() != null)
+                ? (String) cbStationBranch.getSelectedItem()
+                : com.nhom12.gym.util.Auth.getChiNhanhHienTai();
 
         CheckInService.CheckInResult res = checkInService.thucHienCheckIn(code, currentBranch);
         lblPerfMs.setText("Phản hồi: " + res.responseTimeMs + "ms (< 2.0s)");
@@ -663,6 +634,136 @@ public class CheckInForm extends JPanel {
         txtMaQR.requestFocusInWindow();
     }
 
+    // Bán vé lẻ 1 ngày xuất VietQR và sinh mã QR dùng 1 lần chống bán chui
+    private void moDialogBanVeLe() {
+        JTextField txtTenKhach = new JTextField("Nguyễn Văn Lẻ");
+        JTextField txtSdt = new JTextField("0988776655");
+        String currentBranch = (cbStationBranch != null && cbStationBranch.getSelectedItem() != null)
+                ? (String) cbStationBranch.getSelectedItem()
+                : com.nhom12.gym.util.Auth.getChiNhanhHienTai();
+
+        JPanel pnlInput = new JPanel(new GridLayout(2, 2, 8, 8));
+        pnlInput.add(new JLabel("Họ Tên Khách Vãng Lai:"));
+        pnlInput.add(txtTenKhach);
+        pnlInput.add(new JLabel("Số Điện Thoại:"));
+        pnlInput.add(txtSdt);
+
+        int opt = JOptionPane.showConfirmDialog(this, pnlInput,
+                "Bán Vé Lẻ Ngày (Guest Pass 1 Ngày - 80,000 đ)",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (opt != JOptionPane.OK_OPTION) return;
+
+        String name = txtTenKhach.getText().trim();
+        String phone = txtSdt.getText().trim();
+        if (name.isEmpty()) name = "Khách Vãng Lai";
+
+        final String finalName = name;
+        final String finalPhone = phone;
+
+        // Mở hộp thoại thanh toán VietQR 80.000đ
+        java.util.List<com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang> items = new java.util.ArrayList<>();
+        items.add(new com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang("Vé Lẻ Tập Gym 1 Ngày (Guest Pass)", 1, 80000, 80000));
+
+        Window topFrame = SwingUtilities.getWindowAncestor(this);
+        com.nhom12.gym.gui.ThanhToanHoaDonDialog payDialog = new com.nhom12.gym.gui.ThanhToanHoaDonDialog(
+                topFrame,
+                null,
+                finalName + " (" + finalPhone + ")",
+                "Vé Lẻ 1 Ngày (" + currentBranch + ")",
+                80000,
+                0,
+                80000,
+                items,
+                success -> {
+                    if (success) {
+                        CheckInService.GuestPassTicket ticket = checkInService.banVeLeNgay(finalName, finalPhone, currentBranch, 80000);
+                        JOptionPane.showMessageDialog(this,
+                                "ĐÃ XUẤT VÉ LẺ 1 NGÀY THÀNH CÔNG!\n"
+                                        + "• Mã Vé Quét QR: " + ticket.ticketCode + "\n"
+                                        + "• Khách Hàng: " + ticket.customerName + "\n"
+                                        + "• Giá Vé: 80,000 đ (Đã xuất hóa đơn VietQR)\n"
+                                        + "• Chi Nhánh: " + ticket.branch + "\n\n"
+                                        + "LƯU Ý: Mã vé này chỉ có hiệu lực mở cổng Flap Barrier đúng 1 lần duy nhất trong ngày hôm nay!",
+                                "Xuất Vé Lẻ Thành Công", JOptionPane.INFORMATION_MESSAGE);
+
+                        // Tự động nạp mã vé vào ô quét và kích hoạt check-in
+                        txtMaQR.setText(ticket.ticketCode);
+                        xuLyCheckIn();
+                    }
+                }
+        );
+        payDialog.setVisible(true);
+    }
+
+    // Chế độ Ngoại Tuyến khi Wifi CN02 (Tân Bình) yếu
+    private void toggleOfflineNetwork() {
+        boolean newState = !checkInService.isNetworkOnline();
+        checkInService.setNetworkOnline(newState);
+
+        if (newState) {
+            lblNetworkStatus.setText("● Online (Đồng bộ)");
+            lblNetworkStatus.setForeground(new Color(16, 185, 129));
+            btnToggleOffline.setText("Mạng: Online");
+            btnToggleOffline.setBackground(new Color(16, 185, 129));
+            btnAutoSync.setVisible(false);
+            if (checkInService.getOfflineBufferSize() > 0) {
+                dongBoOffline();
+            }
+        } else {
+            lblNetworkStatus.setText("● Ngoại tuyến (Wifi CN02 yếu)");
+            lblNetworkStatus.setForeground(new Color(245, 158, 11));
+            btnToggleOffline.setText("Mạng: Ngoại Tuyến (Offline)");
+            btnToggleOffline.setBackground(new Color(239, 68, 68));
+            btnAutoSync.setVisible(true);
+            btnAutoSync.setText("Đồng Bộ (" + checkInService.getOfflineBufferSize() + ")");
+            JOptionPane.showMessageDialog(this,
+                    "ĐÃ BẬT CHẾ ĐỘ OFFLINE CỤC BỘ!\n"
+                            + "Các lượt quét thẻ tại CN02 (Tân Bình) sẽ tiếp tục xử lý tức thì (< 50ms)\n"
+                            + "và lưu an toàn vào Offline Sync Buffer để tự động đồng bộ khi có mạng lại.",
+                    "Chế Độ Ngoại Tuyến Kích Hoạt", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void dongBoOffline() {
+        int count = checkInService.dongBoOfflineLenHeThong();
+        btnAutoSync.setText("Đồng Bộ (0)");
+        btnAutoSync.setVisible(false);
+        JOptionPane.showMessageDialog(this,
+                "ĐÃ TỰ ĐỘNG ĐỒNG BỘ " + count + " LƯỢT CHECK-IN NGOẠI TUYẾN VỀ CSDL CHÍNH THÀNH CÔNG!",
+                "Auto-Sync Hoàn Tất", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void moCuaThuCong() {
+        String reason = JOptionPane.showInputDialog(this,
+                "Nhập lý do Mở Cửa Thủ Công (Hệ thống lưu vết kiểm toán chống gian lận):",
+                "Xác Nhận Mở Cửa Khẩn Cấp", JOptionPane.WARNING_MESSAGE);
+
+        if (reason == null || reason.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Hủy thao tác: Bắt buộc phải có lý do để mở cửa thủ công!", "Hủy Thao Tác", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        checkInService.ghiNhanMoCongThuCong(com.nhom12.gym.util.Auth.vaiTro != null ? com.nhom12.gym.util.Auth.vaiTro : "Lễ tân", reason.trim());
+
+        pnlGateStatus.setBackground(new Color(254, 243, 199));
+        lblGateStatusText.setText("CỬA FLAP BARRIER: MỞ THỦ CÔNG");
+        lblGateStatusText.setForeground(new Color(180, 83, 9));
+        lblGateSubText.setText("[CẢNH BÁO KIỂM TOÁN]: Mở bởi Lễ tân - Lý do: " + reason.trim());
+        pnlGateStatus.repaint();
+        com.nhom12.gym.util.SoundHelper.playNotice();
+
+        capNhatThongKeAudit();
+    }
+
+    private void capNhatThongKeAudit() {
+        lblLogSummary.setText("Hôm nay: " + logModel.getRowCount() + " lượt quét - "
+                + checkInService.getSuccessCountToday() + " hợp lệ - "
+                + checkInService.getFailCountToday() + " từ chối - "
+                + "Barrier mở: " + checkInService.getTotalBarrierOpenSuccess() + " - "
+                + "Mở thủ công: " + checkInService.getManualGateOpenCount() + " (Đối soát)");
+    }
+
     /**
      * Mở Bộ Mô Phỏng Máy Quét Mã QR Honeywell Voyager 1450g trực quan
      */
@@ -704,7 +805,7 @@ public class CheckInForm extends JPanel {
     }
 
     /**
-     * Hỗ trợ kích hoạt quét mã nhanh từ các màn hình khác (như Danh Sách Hội Viên)
+     * Hỗ trợ kích hoạt quét mã nhanh từ các màn hình khác
      */
     public void thucHienQuetMaTuNgoai(String code) {
         txtMaQR.setText(code);

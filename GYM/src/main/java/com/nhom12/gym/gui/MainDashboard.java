@@ -95,6 +95,7 @@ public class MainDashboard extends JFrame {
         setTitle("FitLife Gym Management - " + getRoleDisplayName(currentRole));
         setSize(1400, 850);
         setMinimumSize(new Dimension(1100, 700));
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -336,8 +337,23 @@ public class MainDashboard extends JFrame {
         btnQuickCheckIn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnQuickCheckIn.setPreferredSize(new Dimension(140, 32));
         btnQuickCheckIn.addActionListener(e -> {
-            Window top = SwingUtilities.getWindowAncestor(this);
-            new QRScannerSimulatorDialog(top).setVisible(true);
+            navigateTo("Quét Thẻ & Check-in");
+            SwingUtilities.invokeLater(() -> {
+                for (Component comp : workspaceContainer.getComponents()) {
+                    if (comp instanceof JScrollPane) {
+                        Component view = ((JScrollPane) comp).getViewport().getView();
+                        if (view instanceof CheckInForm) {
+                            ((CheckInForm) view).moMayQuetAo();
+                            return;
+                        }
+                    } else if (comp instanceof CheckInForm) {
+                        ((CheckInForm) comp).moMayQuetAo();
+                        return;
+                    }
+                }
+                Window top = SwingUtilities.getWindowAncestor(this);
+                new QRScannerSimulatorDialog(top).setVisible(true);
+            });
         });
 
         // Bỏ nút đăng ký hội viên ở header đối với role Quản lý, Lễ tân và HLV
@@ -552,8 +568,8 @@ public class MainDashboard extends JFrame {
             workspaceScroll.setBorder(null);
             workspaceScroll.setOpaque(false);
             workspaceScroll.getViewport().setOpaque(false);
+            workspaceScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
             workspaceScroll.getVerticalScrollBar().setUnitIncrement(16);
-            workspaceScroll.getHorizontalScrollBar().setUnitIncrement(16);
 
             workspaceContainer.removeAll();
             workspaceContainer.add(workspaceScroll, BorderLayout.CENTER);

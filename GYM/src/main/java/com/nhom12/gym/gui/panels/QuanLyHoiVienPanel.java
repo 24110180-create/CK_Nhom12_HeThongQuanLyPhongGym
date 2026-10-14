@@ -9,6 +9,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -39,6 +40,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerLocation(380);
         splitPane.setDividerSize(5);
+        splitPane.setResizeWeight(0.34);
         splitPane.setOpaque(false);
         splitPane.setBorder(null);
 
@@ -82,6 +84,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         txtMaHV.setEditable(false);
         txtMaHV.setBackground(new Color(241, 245, 249));
         txtMaHV.setFont(fontInput);
+        styleInput(txtMaHV);
         panel.add(txtMaHV, gbc);
 
         gbc.gridy = 2;
@@ -89,6 +92,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         gbc.gridy = 3;
         txtQR = new JTextField();
         txtQR.setFont(fontInput);
+        styleInput(txtQR);
         panel.add(txtQR, gbc);
 
         gbc.gridy = 4;
@@ -96,6 +100,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         gbc.gridy = 5;
         txtHoTen = new JTextField();
         txtHoTen.setFont(fontInput);
+        styleInput(txtHoTen);
         panel.add(txtHoTen, gbc);
 
         gbc.gridy = 6;
@@ -103,6 +108,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         gbc.gridy = 7;
         txtChiNhanh = new JTextField("CN01");
         txtChiNhanh.setFont(fontInput);
+        styleInput(txtChiNhanh);
         panel.add(txtChiNhanh, gbc);
 
         gbc.gridy = 8;
@@ -110,6 +116,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         gbc.gridy = 9;
         cbTrangThai = new JComboBox<>(new String[]{"Active", "Expired", "Pending", "Locked"});
         cbTrangThai.setFont(fontInput);
+        styleInput(cbTrangThai);
         panel.add(cbTrangThai, gbc);
 
         // Nút chức năng
@@ -121,24 +128,28 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnThem.setForeground(Color.WHITE);
         btnThem.setFont(fontLabel);
         btnThem.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        styleActionButton(btnThem);
 
         btnSua = new JButton("Cập Nhật");
         btnSua.setBackground(new Color(37, 99, 235));
         btnSua.setForeground(Color.WHITE);
         btnSua.setFont(fontLabel);
         btnSua.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        styleActionButton(btnSua);
 
         btnXoa = new JButton("Xóa Hội Viên");
         btnXoa.setBackground(new Color(239, 68, 68));
         btnXoa.setForeground(Color.WHITE);
         btnXoa.setFont(fontLabel);
         btnXoa.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        styleActionButton(btnXoa);
 
         btnLamMoi = new JButton("Làm Mới Form");
         btnLamMoi.setBackground(new Color(241, 245, 249));
         btnLamMoi.setForeground(new Color(51, 65, 85));
         btnLamMoi.setFont(fontLabel);
         btnLamMoi.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        styleActionButton(btnLamMoi);
 
         btnPanel.add(btnThem);
         btnPanel.add(btnSua);
@@ -172,15 +183,25 @@ public class QuanLyHoiVienPanel extends JPanel {
         JTextField txtSearchTable = new JTextField(15);
         txtSearchTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         txtSearchTable.putClientProperty("JTextField.placeholderText", "Tìm tên hoặc mã QR...");
+        styleInput(txtSearchTable);
 
         JButton btnExport = new JButton("📊 Xuất File Excel (.csv)");
         btnExport.setFont(new Font("Segoe UI", Font.BOLD, 11));
         btnExport.setBackground(new Color(241, 245, 249));
         btnExport.setForeground(new Color(15, 118, 110));
         btnExport.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        styleActionButton(btnExport);
+
+        JComboBox<String> filterStatus = new JComboBox<>(new String[]{
+            "Tất cả trạng thái", "Active", "Expired", "Pending", "Locked", "Hoạt động", "Tạm khóa"
+        });
+        filterStatus.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        styleInput(filterStatus);
 
         toolBar.add(new JLabel("Tìm kiếm:"));
         toolBar.add(txtSearchTable);
+        toolBar.add(new JLabel("Trạng thái:"));
+        toolBar.add(filterStatus);
         toolBar.add(btnExport);
         panel.add(toolBar, BorderLayout.NORTH);
 
@@ -197,35 +218,77 @@ public class QuanLyHoiVienPanel extends JPanel {
         table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         table.getTableHeader().setBackground(new Color(241, 245, 249));
+        table.getTableHeader().setForeground(new Color(30, 41, 59));
+        table.getTableHeader().setPreferredSize(new Dimension(0, 40));
+        table.setShowVerticalLines(false);
+        table.setGridColor(new Color(226, 232, 240));
+        table.setSelectionBackground(new Color(219, 234, 254));
+        table.setSelectionForeground(new Color(15, 23, 42));
+        table.setFillsViewportHeight(true);
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable source, Object value, boolean selected, boolean focus, int row, int column) {
+                Component component = super.getTableCellRendererComponent(source, value, selected, focus, row, column);
+                if (!selected) component.setBackground(row % 2 == 0 ? Color.WHITE : new Color(248, 250, 252));
+                setHorizontalAlignment(column == 2 ? JLabel.LEFT : JLabel.CENTER);
+                return component;
+            }
+        });
 
         javax.swing.table.TableRowSorter<DefaultTableModel> sorter = new javax.swing.table.TableRowSorter<>(tableModel);
         table.setRowSorter(sorter);
 
+        Runnable applyFilters = () -> {
+            List<RowFilter<Object, Object>> filters = new ArrayList<>();
+            String text = txtSearchTable.getText().trim();
+            if (!text.isEmpty()) {
+                filters.add(RowFilter.regexFilter("(?i)" + java.util.regex.Pattern.quote(text)));
+            }
+            String status = (String) filterStatus.getSelectedItem();
+            if (status != null && !"Tất cả trạng thái".equals(status)) {
+                filters.add(RowFilter.regexFilter("^" + java.util.regex.Pattern.quote(status) + "$", 5));
+            }
+            sorter.setRowFilter(filters.isEmpty() ? null : RowFilter.andFilter(filters));
+        };
+
         txtSearchTable.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             private void filter() {
-                String text = txtSearchTable.getText().trim();
-                if (text.isEmpty()) {
-                    sorter.setRowFilter(null);
-                } else {
-                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
-                }
+                applyFilters.run();
             }
             public void insertUpdate(javax.swing.event.DocumentEvent e) { filter(); }
             public void removeUpdate(javax.swing.event.DocumentEvent e) { filter(); }
             public void changedUpdate(javax.swing.event.DocumentEvent e) { filter(); }
         });
+        filterStatus.addActionListener(e -> applyFilters.run());
 
         btnExport.addActionListener(e -> com.nhom12.gym.util.ExcelExportHelper.exportTableToExcel(this, table, "DanhSach_HoiVien_FitLife"));
 
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-        table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
-        table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
-        table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
-
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
         return panel;
+    }
+
+    private void styleInput(JComponent component) {
+        component.putClientProperty("JComponent.roundRect", true);
+        component.setPreferredSize(new Dimension(component.getPreferredSize().width, 36));
+    }
+
+    private void styleActionButton(JButton button) {
+        Color normalColor = button.getBackground();
+        button.putClientProperty("JButton.buttonType", "roundRect");
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                if (button.isEnabled()) button.setBackground(normalColor.brighter());
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                button.setBackground(normalColor);
+            }
+        });
     }
 
     private void loadDataToTable() {
@@ -321,7 +384,8 @@ public class QuanLyHoiVienPanel extends JPanel {
 
         // 2. NÚT CẬP NHẬT
         btnSua.addActionListener(e -> {
-            int row = table.getSelectedRow();
+            int selectedRow = table.getSelectedRow();
+            int row = selectedRow >= 0 ? table.convertRowIndexToModel(selectedRow) : -1;
             if (row < 0 && txtMaHV.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 hội viên trên bảng để cập nhật!", "Thông báo", JOptionPane.WARNING_MESSAGE);
                 return;
@@ -367,11 +431,12 @@ public class QuanLyHoiVienPanel extends JPanel {
 
         // 3. NÚT XÓA HỘI VIÊN
         btnXoa.addActionListener(e -> {
-            int row = table.getSelectedRow();
-            if (row < 0) {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow < 0) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn hội viên cần xóa trên bảng!", "Thông báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            int row = table.convertRowIndexToModel(selectedRow);
 
             String name = tableModel.getValueAt(row, 2).toString();
             int confirm = JOptionPane.showConfirmDialog(this,

@@ -32,6 +32,12 @@ public class TaiKhoan implements Serializable {
     @Column(name = "ChiNhanh", length = 100)
     private String chiNhanh = "Toàn hệ thống";
 
+    @Column(name = "MaHoiVien")
+    private Integer maHoiVien;
+
+    @Column(name = "TrangThaiTaiKhoan", length = 30)
+    private String trangThaiTaiKhoan = "Đang hoạt động";
+
     public TaiKhoan() {
     }
 
@@ -85,6 +91,22 @@ public class TaiKhoan implements Serializable {
 
     public void setChiNhanh(String chiNhanh) {
         this.chiNhanh = chiNhanh != null ? chiNhanh : "Toàn hệ thống";
+    }
+
+    public Integer getMaHoiVien() {
+        return maHoiVien;
+    }
+
+    public void setMaHoiVien(Integer maHoiVien) {
+        this.maHoiVien = maHoiVien;
+    }
+
+    public String getTrangThaiTaiKhoan() {
+        return trangThaiTaiKhoan == null ? "Đang hoạt động" : trangThaiTaiKhoan;
+    }
+
+    public void setTrangThaiTaiKhoan(String trangThaiTaiKhoan) {
+        this.trangThaiTaiKhoan = trangThaiTaiKhoan != null ? trangThaiTaiKhoan : "Đang hoạt động";
     }
 
     @Override

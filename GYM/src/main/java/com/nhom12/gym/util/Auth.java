@@ -13,6 +13,7 @@ public class Auth {
     public static volatile String hoTen = null;
     public static volatile String chiNhanh = "Toàn hệ thống";
     public static volatile String chiNhanhDangChon = "Toàn hệ thống";
+    public static volatile Integer maHoiVien = null;
     public static volatile boolean isOffline = false;
     private static volatile TaiKhoan currentUser = null;
 
@@ -29,6 +30,7 @@ public class Auth {
             hoTen = tk.getHoTen();
             chiNhanh = tk.getChiNhanh() != null ? tk.getChiNhanh() : "Toàn hệ thống";
             chiNhanhDangChon = chiNhanh;
+            maHoiVien = tk.getMaHoiVien();
             isOffline = offline;
         } else {
             clear();
@@ -83,6 +85,7 @@ public class Auth {
         hoTen = null;
         chiNhanh = "Toàn hệ thống";
         chiNhanhDangChon = "Toàn hệ thống";
+        maHoiVien = null;
         isOffline = false;
     }
 }

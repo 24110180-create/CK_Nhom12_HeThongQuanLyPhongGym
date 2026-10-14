@@ -1,6 +1,7 @@
 package com.nhom12.gym.service;
 
 import com.nhom12.gym.dao.TaiKhoanDAO;
+import com.nhom12.gym.dao.HoiVienDAO;
 import com.nhom12.gym.entity.TaiKhoan;
 import com.nhom12.gym.util.Auth;
 import com.nhom12.gym.util.HibernateUtil;
@@ -58,17 +59,11 @@ public class AuthService {
         // 2. KHI CSDL HOẠT ĐỘNG BÌNH THƯỜNG (ONLINE)
         if (!isDbError) {
             if (tk != null) {
-                // Xác thực thành công: Ghi nhận phiên làm việc Auth
+                LoginResult validation = validateAccount(tk, false);
+                if (validation != null) return validation;
                 Auth.setSession(tk, false);
                 return new LoginResult(true, "Đăng nhập thành công!", false, tk);
             } else {
-                // Kiểm tra dự phòng trong bộ nhớ đệm (hỗ trợ tài khoản mẫu hoặc vừa tạo mới)
-                TaiKhoan cachedTK = taiKhoanDAO.timTheoTenDangNhap(user);
-                if (cachedTK != null && PasswordUtil.checkPassword(pass, cachedTK.getMatKhau())) {
-                    Auth.setSession(cachedTK, false);
-                    taiKhoanDAO.them(cachedTK); // Tự động đồng bộ vào CSDL
-                    return new LoginResult(true, "Đăng nhập thành công!", false, cachedTK);
-                }
                 return new LoginResult(false, "Tên đăng nhập hoặc mật khẩu không chính xác!", false, null);
             }
         }
@@ -78,7 +73,10 @@ public class AuthService {
 
         // Kiểm tra trong bộ nhớ đệm tài khoản (hỗ trợ cả các tài khoản hội viên mới đăng ký)
         TaiKhoan cachedTK = taiKhoanDAO.timTheoTenDangNhap(user);
-        if (cachedTK != null && PasswordUtil.checkPassword(pass, cachedTK.getMatKhau())) {
+        if (cachedTK != null && "Đang hoạt động".equalsIgnoreCase(cachedTK.getTrangThaiTaiKhoan())
+                && PasswordUtil.checkPassword(pass, cachedTK.getMatKhau())) {
+            LoginResult validation = validateAccount(cachedTK, true);
+            if (validation != null) return validation;
             Auth.setSession(cachedTK, true);
             return new LoginResult(true, "Đăng nhập thành công (Bộ nhớ đệm ngoại tuyến)!", true, cachedTK);
         }
@@ -109,5 +107,42 @@ public class AuthService {
         }
 
         return new LoginResult(false, "Không thể kết nối CSDL và tài khoản ngoại tuyến không khớp!", true, null);
+    }
+
+    private LoginResult validateAccount(TaiKhoan account, boolean offline) {
+        if (!isKnownRole(account.getVaiTro())) {
+            return new LoginResult(false, "Tài khoản chưa được gán vai trò hợp lệ. Vui lòng liên hệ quản trị viên.",
+                    offline, null);
+        }
+        if ("Hội viên".equalsIgnoreCase(account.getVaiTro())) {
+            if (account.getMaHoiVien() == null || account.getMaHoiVien() <= 0
+                    || new HoiVienDAO().timTheoId(account.getMaHoiVien()) == null) {
+                return new LoginResult(false,
+                        "Tài khoản hội viên chưa được liên kết với hồ sơ hợp lệ. Vui lòng liên hệ lễ tân.",
+                        offline, null);
+            }
+        }
+        return null;
+    }
+
+    public boolean doiMatKhau(String tenDangNhap, String matKhauHienTai, String matKhauMoi) {
+        if (!Auth.isLogin() || tenDangNhap == null || !tenDangNhap.equals(Auth.tenDangNhap)
+                || matKhauHienTai == null || matKhauMoi == null || matKhauMoi.length() < 8
+                || matKhauMoi.length() > 72 || !matKhauMoi.matches(".*[A-Za-z].*")
+                || !matKhauMoi.matches(".*\\d.*")) {
+            return false;
+        }
+        TaiKhoan account = taiKhoanDAO.timTheoTenDangNhap(tenDangNhap);
+        if (account == null || !"Đang hoạt động".equalsIgnoreCase(account.getTrangThaiTaiKhoan())
+                || !PasswordUtil.checkPassword(matKhauHienTai, account.getMatKhau())) {
+            return false;
+        }
+        return taiKhoanDAO.capNhatMatKhau(tenDangNhap, matKhauMoi);
+    }
+
+    public static boolean isKnownRole(String role) {
+        return "Chủ".equalsIgnoreCase(role) || "Quản lý".equalsIgnoreCase(role)
+                || "Lễ tân".equalsIgnoreCase(role) || "HLV".equalsIgnoreCase(role)
+                || "Hội viên".equalsIgnoreCase(role);
     }
 }

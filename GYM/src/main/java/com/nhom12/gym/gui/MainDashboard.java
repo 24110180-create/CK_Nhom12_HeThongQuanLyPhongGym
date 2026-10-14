@@ -23,7 +23,7 @@ import java.util.function.Supplier;
  * 3. Huấn Luyện Viên: 4 mô-đun chuyên môn PT & InBody
  * 4. Quản Lý Chi Nhánh: 13 mô-đun (8 quầy + 3 cơ sở + 2 báo cáo khóa theo chi nhánh phụ trách)
  * 5. Hội Viên VIP: 5 mô-đun cổng dịch vụ cá nhân
- * Dropdown "Góc nhìn" trên Header cho phép chuyển đổi tức thời giữa các trạm để kiểm tra & demo.
+ * Quyền truy cập được xác định bởi vai trò của phiên đăng nhập.
  */
 public class MainDashboard extends JFrame {
 
@@ -92,6 +92,10 @@ public class MainDashboard extends JFrame {
     }
 
     public MainDashboard(String initialRole) {
+        if (!Auth.isLogin() || Auth.isMember() || !com.nhom12.gym.service.AuthService.isKnownRole(initialRole)
+                || !initialRole.equalsIgnoreCase(Auth.vaiTro)) {
+            throw new SecurityException("Chỉ tài khoản nhân sự đã đăng nhập hợp lệ mới được mở bảng điều hành.");
+        }
         instance = this;
         this.currentRole = (initialRole != null && !initialRole.trim().isEmpty()) ? initialRole : "Chủ";
         setTitle("FitLife Gym Management - " + getRoleDisplayName(currentRole));
@@ -160,7 +164,11 @@ public class MainDashboard extends JFrame {
     // GIAO DIỆN CHUẨN MENU DỌC (VERTICAL SIDEBAR + EMBEDDED WORKSPACE)
     // Áp dụng đồng bộ cho tất cả các vai trò (Chủ, Lễ tân, HLV, Quản lý, Hội viên)
     // =========================================================================
-    public void buildVerticalWorkstationLayout(String role) {
+    private void buildVerticalWorkstationLayout(String role) {
+        if (!Auth.isLogin() || role == null || !role.equalsIgnoreCase(Auth.vaiTro)
+                || Auth.isMember()) {
+            throw new SecurityException("Không thể đổi vai trò hiển thị ngoài vai trò của phiên đăng nhập.");
+        }
         this.currentRole = role;
         setTitle("FitLife Gym Management - " + getRoleDisplayName(role));
 
@@ -422,6 +430,7 @@ public class MainDashboard extends JFrame {
         addSidebarCategoryHeader(menuContainer, "Vận Hành Quầy & Dịch Vụ");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên & flap barrier", () -> new CheckInForm(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ hội viên, gói tập & tra cứu toàn diện", () -> new QuanLyHoiVienPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý Tài Khoản App Hội Viên", "Cấp, khóa và đặt lại tài khoản từ hồ sơ hội viên", () -> new QuanLyTaiKhoanAppPanel(), accent, false);
         addSidebarItem(menuContainer, "Gia Hạn Gói Tập", "Tra cứu hội viên và gia hạn thẻ tập", () -> new GiaHanGoiTapPanel(), accent, false);
         addSidebarItem(menuContainer, "Lịch Huấn Luyện PT", "Đặt và quản lý lịch tập cá nhân cho hội viên", () -> new QuanLyLichPTPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Lớp Học Theo Lịch", "Thời khóa biểu lớp Yoga, Zumba, Cardio & điểm danh", () -> new LichLopHocPanel(), accent, false);
@@ -445,6 +454,7 @@ public class MainDashboard extends JFrame {
         addSidebarCategoryHeader(menuContainer, "Vận Hành Quầy & Dịch Vụ");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên & cửa flap barrier", () -> new CheckInForm(), accent, true);
         addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ hội viên, gói tập & tra cứu toàn diện", () -> new QuanLyHoiVienPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý Tài Khoản App Hội Viên", "Cấp, khóa và đặt lại tài khoản từ hồ sơ hội viên", () -> new QuanLyTaiKhoanAppPanel(), accent, false);
         addSidebarItem(menuContainer, "Gia Hạn Gói Tập", "Tra cứu hội viên và gia hạn thẻ tập", () -> new GiaHanGoiTapPanel(), accent, false);
         addSidebarItem(menuContainer, "Lịch Huấn Luyện PT", "Đặt lịch PT thay hội viên tại quầy", () -> new QuanLyLichPTPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Lớp Học Theo Lịch", "Thời khóa biểu lớp Yoga, Zumba, Cardio & điểm danh", () -> new LichLopHocPanel(), accent, false);
@@ -470,6 +480,7 @@ public class MainDashboard extends JFrame {
         addSidebarCategoryHeader(menuContainer, "Vận Hành Quầy & Dịch Vụ");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên tại quầy", () -> new CheckInForm(), accent, true);
         addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ hội viên, gói tập & tra cứu toàn diện", () -> new QuanLyHoiVienPanel(), accent, false);
+        addSidebarItem(menuContainer, "Quản Lý Tài Khoản App Hội Viên", "Cấp, khóa và đặt lại tài khoản trong chi nhánh", () -> new QuanLyTaiKhoanAppPanel(), accent, false);
         addSidebarItem(menuContainer, "Gia Hạn Gói Tập", "Tra cứu hội viên và gia hạn thẻ tập", () -> new GiaHanGoiTapPanel(), accent, false);
         addSidebarItem(menuContainer, "Lịch Huấn Luyện PT", "Đặt lịch PT thay hội viên tại chi nhánh", () -> new QuanLyLichPTPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Lớp Học Theo Lịch", "Điều phối lớp nhóm Yoga, Zumba, Cardio & điểm danh", () -> new LichLopHocPanel(), accent, false);
@@ -496,6 +507,9 @@ public class MainDashboard extends JFrame {
     }
 
     private void addSidebarItem(JPanel container, String title, String subtitle, Supplier<JPanel> supplier, Color accent, boolean isDefault) {
+        if (!PermissionService.getInstance().hasAccessToModule(currentRole, title)) {
+            return;
+        }
         SidebarMenuItem item = new SidebarMenuItem();
         item.title = title;
         item.subtitle = subtitle;

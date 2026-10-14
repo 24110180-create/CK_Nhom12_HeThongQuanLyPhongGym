@@ -8,6 +8,7 @@ import com.nhom12.gym.entity.PhanCaLamViec;
 import com.nhom12.gym.entity.TaiKhoan;
 import com.nhom12.gym.util.Auth;
 import com.nhom12.gym.util.ExcelExportHelper;
+import com.nhom12.gym.service.PermissionService;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -54,6 +55,10 @@ public class PhanCaLamViecPanel extends JPanel {
     private LocalDate weekStart = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
 
     public PhanCaLamViecPanel() {
+        if (!(Auth.isManager() || Auth.isBranchManager())
+                || !PermissionService.getInstance().hasPermission(Auth.vaiTro, PermissionService.PERM_SHIFTS)) {
+            throw new SecurityException("Vai trò hiện tại không có quyền quản lý phân ca.");
+        }
         setLayout(new BorderLayout(15, 15));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         setBackground(new Color(245, 247, 250));
@@ -179,14 +184,17 @@ public class PhanCaLamViecPanel extends JPanel {
         }
         String activeBranch = Auth.getChiNhanhHienTai();
         branchCombo.removeAllItems();
-        if (isBranch(activeBranch)) {
+        if (Auth.isManager()) {
+            branches.forEach(branchCombo::addItem);
+        } else if (isBranch(activeBranch)) {
             branches.add(activeBranch);
+            branchCombo.addItem(activeBranch);
+            branchCombo.setEnabled(false);
         }
-        branches.forEach(branchCombo::addItem);
         if (branchCombo.getItemCount() == 0) {
             branchCombo.addItem("CN01 - Cơ sở 1 (Quận 1)");
         }
-        if (branches.contains(activeBranch)) {
+        if (Auth.isManager() && branches.contains(activeBranch)) {
             branchCombo.setSelectedItem(activeBranch);
         }
     }

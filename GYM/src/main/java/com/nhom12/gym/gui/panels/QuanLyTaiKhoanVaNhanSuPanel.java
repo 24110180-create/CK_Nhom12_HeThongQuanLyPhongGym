@@ -13,7 +13,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.util.ArrayList;
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * Màn hình Quản Trị Tài Khoản & Phân Quyền Nhân Sự Nội Bộ Toàn Chuỗi (Chủ phòng Anh Đức).
  * Tích hợp toàn diện:
- * 1. Form Cột Trái: Hồ Sơ & Cấp Phát Tài Khoản Nhân Sự (Thêm mới, Cập nhật, Đặt lại MK 123456, Khóa/Mở khóa, Xóa).
+ * 1. Form Cột Trái: Hồ Sơ & Cấp Phát Tài Khoản Nhân Sự (thêm, cập nhật, reset mật khẩu, khóa/mở khóa, xóa).
  * 2. Cột Phải: Phân loại 4 tab vai trò nhân sự nòng cốt (Lễ Tân, HLV, Quản Lý, Chủ Phòng) kèm bộ lọc & ma trận quyền hạn.
  */
 public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
@@ -60,16 +60,22 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
     private JTextField txtSearch;
     private final JLabel lblSummaryStats = new JLabel();
 
-    // Lưu trữ số điện thoại và trạng thái giả lập cho tài khoản nội bộ
+    // Số điện thoại nhân sự chưa có trường lưu trữ riêng trong mô hình tài khoản.
     private final Map<String, String> phoneMap = new HashMap<>();
-    private final Map<String, String> statusMap = new HashMap<>();
+    private static final SecureRandom RANDOM = new SecureRandom();
+    private static final String TEMP_PASSWORD_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
 
     public QuanLyTaiKhoanVaNhanSuPanel() {
+        if (!com.nhom12.gym.util.Auth.isManager()
+                || !com.nhom12.gym.service.PermissionService.getInstance().hasPermission(
+                        com.nhom12.gym.util.Auth.vaiTro,
+                        com.nhom12.gym.service.PermissionService.PERM_STAFF_ACCOUNTS)) {
+            throw new SecurityException("Chỉ chủ phòng tập được quản lý tài khoản nhân sự và phân quyền.");
+        }
         setLayout(new BorderLayout(0, 14));
         setBackground(new Color(248, 250, 252));
         setBorder(new EmptyBorder(16, 20, 18, 20));
 
-        initDefaultMetadata();
         initUI();
         loadAllData();
 
@@ -79,24 +85,6 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
                 loadAllData();
             }
         });
-    }
-
-    private void initDefaultMetadata() {
-        phoneMap.put("admin", "0909000001");
-        phoneMap.put("letan1", "0912345601");
-        phoneMap.put("letan2", "0912345602");
-        phoneMap.put("hlv1", "0912345603");
-        phoneMap.put("hlv2", "0912345604");
-        phoneMap.put("hlv3", "0912345605");
-        phoneMap.put("quanly1", "0912345606");
-
-        statusMap.put("admin", "Đang hoạt động");
-        statusMap.put("letan1", "Đang hoạt động");
-        statusMap.put("letan2", "Đang hoạt động");
-        statusMap.put("hlv1", "Đang hoạt động");
-        statusMap.put("hlv2", "Đang hoạt động");
-        statusMap.put("hlv3", "Đang hoạt động");
-        statusMap.put("quanly1", "Đang hoạt động");
     }
 
     private void initUI() {
@@ -194,8 +182,9 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
         formGrid.add(lPass, gbc);
 
         gbc.gridy = r++;
-        txtPassword = new JTextField("123456");
+        txtPassword = new JTextField();
         txtPassword.setFont(fInput);
+        txtPassword.setToolTipText("8–72 ký tự, gồm ít nhất một chữ cái và một chữ số.");
         formGrid.add(txtPassword, gbc);
 
         // 3. Họ và tên
@@ -308,7 +297,7 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
         btnToggleLock.setForeground(Color.WHITE);
         btnToggleLock.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        btnResetPassword = new JButton("🔑 Reset MK (123456)");
+        btnResetPassword = new JButton("🔑 Tạo mật khẩu tạm");
         btnResetPassword.setFont(new Font("Segoe UI", Font.BOLD, 11));
         btnResetPassword.setBackground(new Color(139, 92, 246));
         btnResetPassword.setForeground(Color.WHITE);
@@ -545,8 +534,8 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
         for (TaiKhoan tk : list) {
             String role = tk.getVaiTro() != null ? tk.getVaiTro() : "";
             String branch = tk.getChiNhanh() != null ? tk.getChiNhanh() : "Toàn hệ thống";
-            String phone = phoneMap.getOrDefault(tk.getTenDangNhap(), "090" + (1000000 + Math.abs(tk.getTenDangNhap().hashCode() % 8999999)));
-            String status = statusMap.getOrDefault(tk.getTenDangNhap(), "Đang hoạt động");
+            String phone = phoneMap.getOrDefault(tk.getTenDangNhap(), "");
+            String status = tk.getTrangThaiTaiKhoan();
 
             Object[] row = new Object[]{
                     tk.getTenDangNhap(),
@@ -608,15 +597,23 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
             return;
         }
 
-        if (password.isEmpty() || password.contains("••••")) {
-            password = "123456";
+        if (password.length() < 8 || password.length() > 72
+                || !password.matches(".*[A-Za-z].*") || !password.matches(".*\\d.*")) {
+            JOptionPane.showMessageDialog(this, "Mật khẩu cần từ 8 đến 72 ký tự và có cả chữ lẫn số.",
+                    "Mật khẩu chưa đạt yêu cầu", JOptionPane.WARNING_MESSAGE);
+            txtPassword.requestFocus();
+            return;
         }
 
         TaiKhoan tk = new TaiKhoan(username, PasswordUtil.hashPassword(password), role, fullName, branch);
-        taiKhoanDAO.them(tk);
+        tk.setTrangThaiTaiKhoan(status);
+        if (!taiKhoanDAO.them(tk)) {
+            JOptionPane.showMessageDialog(this, "Không thể lưu tài khoản. Kiểm tra kết nối cơ sở dữ liệu và thử lại.",
+                    "Cấp tài khoản thất bại", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         phoneMap.put(username, phone);
-        statusMap.put(username, status);
 
         loadAllData();
         com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
@@ -662,15 +659,28 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
         tk.setHoTen(fullName);
         tk.setVaiTro(role);
         tk.setChiNhanh(branch);
-        taiKhoanDAO.capNhat(tk);
+        tk.setTrangThaiTaiKhoan(status);
+        if (!taiKhoanDAO.capNhat(tk)) {
+            JOptionPane.showMessageDialog(this, "Không thể lưu thay đổi tài khoản.",
+                    "Cập nhật thất bại", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         phoneMap.put(username, phone);
-        statusMap.put(username, status);
 
         loadAllData();
         com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.NHAN_SU);
 
         JOptionPane.showMessageDialog(this, "Đã cập nhật thành công hồ sơ tài khoản: " + username, "Thành Công", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private String generateTemporaryPassword() {
+        StringBuilder password = new StringBuilder(12);
+        password.append("Aa").append(RANDOM.nextInt(10));
+        while (password.length() < 12) {
+            password.append(TEMP_PASSWORD_CHARS.charAt(RANDOM.nextInt(TEMP_PASSWORD_CHARS.length())));
+        }
+        return password.toString();
     }
 
     private void xuLyResetMatKhauMacDinh() {
@@ -688,17 +698,20 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
             return;
         }
 
+        String temporaryPassword = generateTemporaryPassword();
         int opt = JOptionPane.showConfirmDialog(this,
-                "Bạn có chắc muốn đặt lại mật khẩu cho tài khoản [" + username + "] về mặc định: 123456 ?",
+                "Đặt lại mật khẩu cho tài khoản [" + username + "] và tạo mật khẩu tạm mới?",
                 "Xác Nhận Đặt Lại Mật Khẩu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
         if (opt == JOptionPane.YES_OPTION) {
-            TaiKhoan tk = taiKhoanDAO.timTheoTenDangNhap(username);
-            if (tk != null) {
-                tk.setMatKhau(PasswordUtil.hashPassword("123456"));
-                taiKhoanDAO.capNhat(tk);
-                JOptionPane.showMessageDialog(this, "Mật khẩu của tài khoản [" + username + "] đã được đặt lại thành: 123456", "Thành Công", JOptionPane.INFORMATION_MESSAGE);
+            if (taiKhoanDAO.capNhatMatKhau(username, temporaryPassword)) {
+                JOptionPane.showMessageDialog(this, "Mật khẩu tạm mới của [" + username + "]: "
+                        + temporaryPassword + "\nHãy chuyển riêng cho nhân sự.",
+                        "Đặt lại thành công", JOptionPane.INFORMATION_MESSAGE);
                 loadAllData();
+            } else {
+                JOptionPane.showMessageDialog(this, "Không thể đặt lại mật khẩu tài khoản.",
+                        "Thất bại", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -723,9 +736,18 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
             return;
         }
 
-        String curStatus = statusMap.getOrDefault(username, "Đang hoạt động");
+        TaiKhoan account = taiKhoanDAO.timTheoTenDangNhap(username);
+        if (account == null) {
+            JOptionPane.showMessageDialog(this, "Không tìm thấy tài khoản.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        String curStatus = account.getTrangThaiTaiKhoan();
         String nextStatus = "Đang hoạt động".equalsIgnoreCase(curStatus) ? "Tạm khóa" : "Đang hoạt động";
-        statusMap.put(username, nextStatus);
+        if (!taiKhoanDAO.doiTrangThai(username, nextStatus)) {
+            JOptionPane.showMessageDialog(this, "Không thể cập nhật trạng thái tài khoản.",
+                    "Thất bại", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         cbStatus.setSelectedItem(nextStatus);
 
         loadAllData();
@@ -760,7 +782,6 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
             boolean ok = taiKhoanDAO.xoa(username);
             if (ok) {
                 phoneMap.remove(username);
-                statusMap.remove(username);
                 JOptionPane.showMessageDialog(this, "Đã xóa thành công tài khoản: " + username, "Thành Công", JOptionPane.INFORMATION_MESSAGE);
                 loadAllData();
                 lamMoiForm();
@@ -774,7 +795,7 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
     private void lamMoiForm() {
         txtUsername.setText("");
         txtUsername.setEnabled(true);
-        txtPassword.setText("123456");
+        txtPassword.setText("");
         txtPassword.setEnabled(true);
         txtFullName.setText("");
         txtPhone.setText("");
@@ -838,14 +859,6 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
         JPanel pnlBtns = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         pnlBtns.setOpaque(false);
 
-        JButton btnDefault = new JButton("Đặt Mặc Định (123456)");
-        btnDefault.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        btnDefault.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnDefault.addActionListener(ev -> {
-            txtNewPass.setText("123456");
-            txtConfirmPass.setText("123456");
-        });
-
         JButton btnCancel = new JButton("Hủy");
         btnCancel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         btnCancel.addActionListener(ev -> dlg.dispose());
@@ -862,8 +875,10 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
                 JOptionPane.showMessageDialog(dlg, "Vui lòng nhập đầy đủ mật khẩu mới!", "Thiếu thông tin", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            if (pass1.length() < 4) {
-                JOptionPane.showMessageDialog(dlg, "Mật khẩu phải có độ dài tối thiểu 4 ký tự!", "Mật khẩu quá ngắn", JOptionPane.WARNING_MESSAGE);
+            if (pass1.length() < 8 || pass1.length() > 72
+                    || !pass1.matches(".*[A-Za-z].*") || !pass1.matches(".*\\d.*")) {
+                JOptionPane.showMessageDialog(dlg, "Mật khẩu cần từ 8 đến 72 ký tự và có cả chữ lẫn số.",
+                        "Mật khẩu chưa đạt yêu cầu", JOptionPane.WARNING_MESSAGE);
                 txtNewPass.requestFocus();
                 return;
             }
@@ -873,21 +888,18 @@ public class QuanLyTaiKhoanVaNhanSuPanel extends JPanel {
                 return;
             }
 
-            TaiKhoan tk = taiKhoanDAO.timTheoTenDangNhap(username);
-            if (tk != null) {
-                tk.setMatKhau(PasswordUtil.hashPassword(pass1));
-                taiKhoanDAO.capNhat(tk);
+            if (taiKhoanDAO.capNhatMatKhau(username, pass1)) {
                 JOptionPane.showMessageDialog(dlg, "Đã cập nhật mật khẩu mới thành công cho tài khoản: " + username, "Thành Công", JOptionPane.INFORMATION_MESSAGE);
                 dlg.dispose();
                 loadAllData();
             } else {
-                JOptionPane.showMessageDialog(dlg, "Không tìm thấy tài khoản để cập nhật!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(dlg, "Không thể cập nhật mật khẩu. Tài khoản không tồn tại hoặc cơ sở dữ liệu không lưu được thay đổi.",
+                        "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         });
 
         JPanel bottomRow = new JPanel(new BorderLayout());
         bottomRow.setOpaque(false);
-        bottomRow.add(btnDefault, BorderLayout.WEST);
         pnlBtns.add(btnCancel);
         pnlBtns.add(btnSave);
         bottomRow.add(pnlBtns, BorderLayout.EAST);

@@ -2,7 +2,6 @@ package com.nhom12.gym.service;
 
 import com.nhom12.gym.entity.HoiVien;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -99,20 +98,20 @@ public class HoiVienServiceTest {
     }
 
     @Test
-    @DisplayName("Kiểm tra đăng ký tài khoản hội viên mới và đăng nhập thành công vào App")
-    void testDangKyTaiKhoanHoiVienMoiVaDangNhap() {
+    @DisplayName("Tài khoản hội viên chưa liên kết hồ sơ phải bị từ chối đăng nhập")
+    void testTaiKhoanHoiVienChuaLienKetHoSoBiTuChoi() {
         String phone = "0989" + (System.currentTimeMillis() % 1000000);
         String pass = "memberPass123";
         String name = "Trần Hội Viên Mới";
 
         com.nhom12.gym.dao.TaiKhoanDAO tkDAO = new com.nhom12.gym.dao.TaiKhoanDAO();
         boolean saved = tkDAO.them(new com.nhom12.gym.entity.TaiKhoan(phone, pass, "Hội viên", name));
-        assertTrue(saved, "Tài khoản hội viên mới phải được lưu thành công");
+        assertTrue(saved, "Tài khoản do nhân viên tạo phải được lưu thành công");
 
         AuthService authService = new AuthService();
         AuthService.LoginResult res = authService.dangNhap(phone, pass);
-        assertTrue(res.success, "Hội viên mới tạo phải đăng nhập thành công");
-        assertEquals("Hội viên", res.taiKhoan.getVaiTro(), "Vai trò phải là Hội viên");
+        assertFalse(res.success, "Tài khoản không gắn với hồ sơ hội viên không được đăng nhập");
+        assertTrue(res.message.contains("liên kết"), "Thông báo phải hướng người dùng liên hệ nhân viên");
 
         // Đăng nhập sai mật khẩu phải bị từ chối
         AuthService.LoginResult failRes = authService.dangNhap(phone, "wrongPassword");

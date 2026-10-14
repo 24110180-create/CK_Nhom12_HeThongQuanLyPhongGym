@@ -68,12 +68,15 @@ public class DangKyTaiKhoanDialog extends JDialog {
             "Toàn hệ thống (Chủ chuỗi / Quản trị)"
     });
 
-    private final Frame parentFrame;
     private final BiConsumer<String, String> onSuccessCallback;
 
     public DangKyTaiKhoanDialog(Frame parent, BiConsumer<String, String> onSuccessCallback) {
         super(parent, "ĐĂNG KÝ TÀI KHOẢN NHÂN SỰ NỘI BỘ FITLIFE GYM - 4 VAI TRÒ", true);
-        this.parentFrame = parent;
+        if (!Auth.isManager()
+                || !com.nhom12.gym.service.PermissionService.getInstance().hasPermission(
+                        Auth.vaiTro, com.nhom12.gym.service.PermissionService.PERM_STAFF_ACCOUNTS)) {
+            throw new SecurityException("Chỉ chủ phòng tập được cấp tài khoản nhân sự.");
+        }
         this.onSuccessCallback = onSuccessCallback;
 
         setSize(920, 720);
@@ -382,8 +385,10 @@ public class DangKyTaiKhoanDialog extends JDialog {
             return;
         }
 
-        if (pass.length() < 4) {
-            JOptionPane.showMessageDialog(this, "Mật khẩu phải có độ dài tối thiểu 4 ký tự!", "Mật khẩu quá ngắn", JOptionPane.WARNING_MESSAGE);
+        if (pass.length() < 8 || pass.length() > 72
+                || !pass.matches(".*[A-Za-z].*") || !pass.matches(".*\\d.*")) {
+            JOptionPane.showMessageDialog(this, "Mật khẩu cần từ 8 đến 72 ký tự và có cả chữ lẫn số.",
+                    "Mật khẩu chưa đạt yêu cầu", JOptionPane.WARNING_MESSAGE);
             txtPassword.requestFocus();
             return;
         }
@@ -407,9 +412,7 @@ public class DangKyTaiKhoanDialog extends JDialog {
             return;
         }
 
-        // Hộp thoại tùy chọn sau đăng ký thành công
-        String[] options = {"Khởi Chạy " + selectedRole.title + " Ngay", "Quay Lại Đăng Nhập"};
-        int choice = JOptionPane.showOptionDialog(this,
+        JOptionPane.showMessageDialog(this,
                 "<html><body style='width: 340px; padding: 4px;'>" +
                         "<h3 style='color: " + toHexColor(selectedRole.color) + "; margin: 0;'>ĐĂNG KÝ TÀI KHOẢN NHÂN SỰ THÀNH CÔNG!</h3>" +
                         "<p>Họ tên: <b>" + fullName + "</b></p>" +
@@ -417,33 +420,14 @@ public class DangKyTaiKhoanDialog extends JDialog {
                         "<p>Vai trò phân hệ: <b>" + selectedRole.title + " (" + selectedRole.badge + ")</b></p>" +
                         "<p>Cơ sở hoạt động: <b>" + branch + "</b></p>" +
                         "<hr style='border: 0; border-top: 1px solid #e2e8f0; margin: 8px 0;'/>" +
-                        "<p style='color: #0284c7; font-weight: bold;'>Bạn có muốn mở trực tiếp Ứng Dụng dành riêng cho " + selectedRole.title + " ngay bây giờ không?</p>" +
+                        "<p style='color: #0284c7; font-weight: bold;'>Tài khoản đã được cấp. Người dùng cần đăng nhập bằng thông tin được bàn giao.</p>" +
                         "</body></html>",
                 "Đăng Ký Thành Công",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.INFORMATION_MESSAGE,
-                null,
-                options,
-                options[0]
-        );
-
-        if (choice == 0) {
-            // MỞ THẲNG ỨNG DỤNG CHO VAI TRÒ ĐÓ!
-            Auth.setSession(newAccount, false);
-            dispose();
-            if (parentFrame != null) {
-                parentFrame.dispose();
-            }
-            SwingUtilities.invokeLater(() -> {
-                new MainDashboard(selectedRole.roleKey).setVisible(true);
-            });
-        } else {
-            // Quay về màn hình đăng nhập, điền sẵn thông tin
-            if (onSuccessCallback != null) {
-                onSuccessCallback.accept(username, pass);
-            }
-            dispose();
+                JOptionPane.INFORMATION_MESSAGE);
+        if (onSuccessCallback != null) {
+            onSuccessCallback.accept(username, pass);
         }
+        dispose();
     }
 
     private String toHexColor(Color c) {

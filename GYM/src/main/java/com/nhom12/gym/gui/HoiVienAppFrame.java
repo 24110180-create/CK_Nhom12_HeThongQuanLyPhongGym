@@ -1,6 +1,8 @@
 package com.nhom12.gym.gui;
 
 import com.formdev.flatlaf.FlatLightLaf;
+import com.nhom12.gym.dao.HoiVienDAO;
+import com.nhom12.gym.entity.HoiVien;
 import com.nhom12.gym.gui.panels.*;
 import com.nhom12.gym.util.Auth;
 
@@ -35,7 +37,6 @@ public class HoiVienAppFrame extends JFrame {
     private static final String TAB_PT = "TAB_PT";
     private static final String TAB_INBODY = "TAB_INBODY";
     private static final String TAB_PACKAGE = "TAB_PACKAGE";
-    private static final String TAB_FEEDBACK = "TAB_FEEDBACK";
 
     public static class SidebarMenuItem {
         public JButton button;
@@ -45,13 +46,16 @@ public class HoiVienAppFrame extends JFrame {
     }
 
     public HoiVienAppFrame() {
-        if (Auth.vaiTro == null || Auth.vaiTro.trim().isEmpty()) {
-            Auth.vaiTro = "Hội viên";
-            Auth.hoTen = "Lê Anh Duy";
-            Auth.tenDangNhap = "hoivien1";
-            Auth.soDienThoai = "0974482749";
-            Auth.chiNhanh = "CN01 - Cơ sở 1 (Quận 1)";
+        if (!Auth.isMember() || Auth.maHoiVien == null || Auth.maHoiVien <= 0) {
+            throw new SecurityException("Cần đăng nhập bằng tài khoản hội viên đã được liên kết với hồ sơ.");
         }
+        HoiVien member = new HoiVienDAO().timTheoId(Auth.maHoiVien);
+        if (member == null) {
+            throw new IllegalStateException("Không tìm thấy hồ sơ hội viên được liên kết với tài khoản này.");
+        }
+        Auth.hoTen = member.getHoTen();
+        Auth.soDienThoai = member.getSoDienThoai();
+        Auth.chiNhanh = member.getChiNhanhDangKy();
 
         setTitle("FITLIFE MEMBER - CỔNG THÀNH VIÊN ĐIỆN TỬ (" + Auth.hoTen + ")");
         setSize(1350, 820);
@@ -67,8 +71,8 @@ public class HoiVienAppFrame extends JFrame {
         root.setBackground(new Color(248, 250, 252));
 
         Color accentColor = new Color(234, 179, 8); // Vàng Gold
-        String memberName = (Auth.hoTen != null && !Auth.hoTen.isEmpty()) ? Auth.hoTen : "Lê Anh Duy";
-        String memberPhone = (Auth.soDienThoai != null && !Auth.soDienThoai.isEmpty()) ? Auth.soDienThoai : "0974482749";
+        String memberName = (Auth.hoTen != null && !Auth.hoTen.isEmpty()) ? Auth.hoTen : "Hội viên";
+        String memberPhone = (Auth.soDienThoai != null && !Auth.soDienThoai.isEmpty()) ? Auth.soDienThoai : "Chưa cập nhật";
 
         // --- A. SIDEBAR DỌC BÊN TRÁI (275px) ---
         JPanel sidebar = new JPanel(new BorderLayout());
@@ -87,7 +91,7 @@ public class HoiVienAppFrame extends JFrame {
         lblBrand.setForeground(Color.WHITE);
         lblBrand.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel lblBadge = new JLabel("  VIP DIAMOND MEMBER  ");
+        JLabel lblBadge = new JLabel("  TÀI KHOẢN HỘI VIÊN  ");
         lblBadge.setFont(new Font("Segoe UI", Font.BOLD, 10));
         lblBadge.setForeground(new Color(15, 23, 42));
         lblBadge.setBackground(accentColor);
@@ -115,7 +119,7 @@ public class HoiVienAppFrame extends JFrame {
         lblStaff.setFont(new Font("Segoe UI", Font.BOLD, 13));
         lblStaff.setForeground(new Color(241, 245, 249));
 
-        JLabel lblShift = new JLabel("Thành viên VIP • Kích hoạt");
+        JLabel lblShift = new JLabel("Hồ sơ hội viên FitLife Gym");
         lblShift.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblShift.setForeground(new Color(52, 211, 153));
 
@@ -350,17 +354,25 @@ public class HoiVienAppFrame extends JFrame {
                 "Đổi Mật Khẩu Tài Khoản Hội Viên", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if (opt == JOptionPane.OK_OPTION) {
-            String passNew = new String(pfNew.getPassword()).trim();
+            String passCurrent = new String(pfOld.getPassword());
+            String passNew = new String(pfNew.getPassword());
             String passConfirm = new String(pfConfirm.getPassword()).trim();
-            if (passNew.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Mật khẩu mới không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            if (passNew.length() < 8 || passNew.length() > 72
+                    || !passNew.matches(".*[A-Za-z].*") || !passNew.matches(".*\\d.*")) {
+                JOptionPane.showMessageDialog(this, "Mật khẩu mới cần từ 8 đến 72 ký tự và có cả chữ lẫn số.",
+                        "Mật khẩu chưa đạt yêu cầu", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             if (!passNew.equals(passConfirm)) {
                 JOptionPane.showMessageDialog(this, "Xác nhận mật khẩu mới không trùng khớp!", "Lỗi", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            JOptionPane.showMessageDialog(this, "Đã đổi mật khẩu thành công! Vui lòng ghi nhớ mật khẩu mới của bạn.",
+            if (!new com.nhom12.gym.service.AuthService().doiMatKhau(Auth.tenDangNhap, passCurrent, passNew)) {
+                JOptionPane.showMessageDialog(this, "Mật khẩu hiện tại không đúng hoặc không thể lưu mật khẩu mới.",
+                        "Đổi mật khẩu thất bại", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            JOptionPane.showMessageDialog(this, "Đã đổi mật khẩu thành công. Vui lòng sử dụng mật khẩu mới lần đăng nhập sau.",
                     "Thành Công", JOptionPane.INFORMATION_MESSAGE);
         }
     }
@@ -373,6 +385,6 @@ public class HoiVienAppFrame extends JFrame {
             UIManager.setLookAndFeel(new FlatLightLaf());
         } catch (Exception ignored) {}
 
-        SwingUtilities.invokeLater(() -> new HoiVienAppFrame().setVisible(true));
+        SwingUtilities.invokeLater(() -> new LoginForm().setVisible(true));
     }
 }

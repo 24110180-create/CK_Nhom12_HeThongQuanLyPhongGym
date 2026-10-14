@@ -156,9 +156,9 @@ public class LoginForm extends JFrame {
         rightPanel.add(btnLogin);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 14)));
 
-        JLabel lblSecNote = new JLabel("🔒 Hệ thống quản trị nội bộ. Tài khoản do Chủ phòng tập (Anh Đức) cấp phát.");
-        lblSecNote.setFont(new Font("Segoe UI", Font.ITALIC, 11));
-        lblSecNote.setForeground(new Color(148, 163, 184));
+        JLabel lblSecNote = new JLabel("🔒 Đăng nhập dành cho nội bộ");
+        lblSecNote.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblSecNote.setForeground(new Color(100, 116, 139));
         lblSecNote.setAlignmentX(Component.LEFT_ALIGNMENT);
         rightPanel.add(lblSecNote);
 

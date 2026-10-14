@@ -9,6 +9,7 @@ import com.nhom12.gym.entity.HoiVien;
 import com.nhom12.gym.util.Auth;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -23,6 +24,7 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -79,11 +81,11 @@ public class GiaHanGoiTapPanel extends JPanel {
         centerPanel.setOpaque(false);
 
         // Search Panel
-        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 12));
+        JPanel searchPanel = new JPanel(new BorderLayout(12, 0));
         searchPanel.setBackground(Color.WHITE);
         searchPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(226, 232, 240)),
-                BorderFactory.createEmptyBorder(5, 10, 5, 10)
+            BorderFactory.createEmptyBorder(12, 14, 12, 14)
         ));
 
         JLabel lblPrompt = new JLabel("Tra cứu Hội Viên (Mã HV / Mã QR / Họ Tên):");
@@ -91,15 +93,20 @@ public class GiaHanGoiTapPanel extends JPanel {
         txtSearch = new JTextField(20);
         txtSearch.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         txtSearch.putClientProperty("JTextField.placeholderText", "Ví dụ: 12, HV861, QR001 hoặc Lê Anh Duy");
+        styleInput(txtSearch);
 
         btnSearch = new JButton("Tra Cứu");
         btnSearch.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnSearch.setBackground(new Color(37, 99, 235));
         btnSearch.setForeground(Color.WHITE);
+        styleActionButton(btnSearch);
 
-        searchPanel.add(lblPrompt);
-        searchPanel.add(txtSearch);
-        searchPanel.add(btnSearch);
+        JPanel searchControls = new JPanel(new BorderLayout(8, 0));
+        searchControls.setOpaque(false);
+        searchControls.add(txtSearch, BorderLayout.CENTER);
+        searchControls.add(btnSearch, BorderLayout.EAST);
+        searchPanel.add(lblPrompt, BorderLayout.WEST);
+        searchPanel.add(searchControls, BorderLayout.CENTER);
         centerPanel.add(searchPanel, BorderLayout.NORTH);
 
         // Form Panel
@@ -128,6 +135,9 @@ public class GiaHanGoiTapPanel extends JPanel {
         lblTen = new JLabel("Đang tải dữ liệu hội viên...");
         lblTen.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblTen.setForeground(new Color(30, 41, 59));
+        lblTen.setOpaque(true);
+        lblTen.setBackground(new Color(239, 246, 255));
+        lblTen.setBorder(BorderFactory.createEmptyBorder(9, 12, 9, 12));
         formPanel.add(lblTen, gbc);
 
         // Current status row
@@ -139,6 +149,9 @@ public class GiaHanGoiTapPanel extends JPanel {
         lblCurrentStatus = new JLabel("---");
         lblCurrentStatus.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         lblCurrentStatus.setForeground(new Color(100, 116, 139));
+        lblCurrentStatus.setOpaque(true);
+        lblCurrentStatus.setBackground(new Color(240, 253, 244));
+        lblCurrentStatus.setBorder(BorderFactory.createEmptyBorder(9, 12, 9, 12));
         formPanel.add(lblCurrentStatus, gbc);
 
         // New Package Selection
@@ -149,6 +162,7 @@ public class GiaHanGoiTapPanel extends JPanel {
         gbc.gridx = 1; gbc.weightx = 0.75;
         cbGoi = new JComboBox<>();
         cbGoi.setFont(fontInput);
+        styleInput(cbGoi);
         formPanel.add(cbGoi, gbc);
 
         // Start Date
@@ -159,6 +173,7 @@ public class GiaHanGoiTapPanel extends JPanel {
         gbc.gridx = 1; gbc.weightx = 0.75;
         txtNgay = new JTextField(sdf.format(new Date()));
         txtNgay.setFont(fontInput);
+        styleInput(txtNgay);
         formPanel.add(txtNgay, gbc);
 
         // Payment Method
@@ -169,6 +184,7 @@ public class GiaHanGoiTapPanel extends JPanel {
         gbc.gridx = 1; gbc.weightx = 0.75;
         cbThanhToan = new JComboBox<>(new String[]{"Tiền mặt", "Chuyển khoản (VietQR)", "Quẹt thẻ POS"});
         cbThanhToan.setFont(fontInput);
+        styleInput(cbThanhToan);
         formPanel.add(cbThanhToan, gbc);
 
         // Voucher Coupon
@@ -181,9 +197,11 @@ public class GiaHanGoiTapPanel extends JPanel {
         vSub.setOpaque(false);
         txtVoucher = new JTextField("SUMMER26");
         txtVoucher.setFont(fontInput);
+        styleInput(txtVoucher);
         btnApplyVoucher = new JButton("Áp Dụng Mã");
         btnApplyVoucher.setBackground(new Color(245, 158, 11));
         btnApplyVoucher.setForeground(Color.WHITE);
+        styleActionButton(btnApplyVoucher);
         vSub.add(txtVoucher, BorderLayout.CENTER);
         vSub.add(btnApplyVoucher, BorderLayout.EAST);
         formPanel.add(vSub, gbc);
@@ -197,6 +215,9 @@ public class GiaHanGoiTapPanel extends JPanel {
         lblThanhTien = new JLabel(df.format(basePrice));
         lblThanhTien.setFont(new Font("Segoe UI", Font.BOLD, 22));
         lblThanhTien.setForeground(new Color(16, 185, 129));
+        lblThanhTien.setOpaque(true);
+        lblThanhTien.setBackground(new Color(236, 253, 245));
+        lblThanhTien.setBorder(BorderFactory.createEmptyBorder(7, 12, 7, 12));
         formPanel.add(lblThanhTien, gbc);
 
         // Action Buttons
@@ -208,11 +229,13 @@ public class GiaHanGoiTapPanel extends JPanel {
         btnCancel.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnCancel.setBackground(new Color(100, 116, 139));
         btnCancel.setForeground(Color.WHITE);
+        styleActionButton(btnCancel);
 
         btnConfirm = new JButton("Chốt Gia Hạn & In Hóa Đơn");
         btnConfirm.setBackground(new Color(16, 185, 129));
         btnConfirm.setForeground(Color.WHITE);
         btnConfirm.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        styleActionButton(btnConfirm);
 
         btnGroup.add(btnCancel);
         btnGroup.add(btnConfirm);
@@ -285,14 +308,17 @@ public class GiaHanGoiTapPanel extends JPanel {
                 long diff = (System.currentTimeMillis() - hv.getNgayHetHan().getTime()) / (1000 * 60 * 60 * 24);
                 lblCurrentStatus.setText("ĐÃ HẾT HẠN vào ngày " + expStr + " (Đã quá hạn " + diff + " ngày — Cần gia hạn ngay!)");
                 lblCurrentStatus.setForeground(new Color(239, 68, 68));
+                lblCurrentStatus.setBackground(new Color(254, 242, 242));
             } else {
                 long diff = (hv.getNgayHetHan().getTime() - System.currentTimeMillis()) / (1000 * 60 * 60 * 24);
                 lblCurrentStatus.setText("Đang hoạt động — Hạn thẻ đến ngày: " + expStr + " (Còn " + diff + " ngày)");
                 lblCurrentStatus.setForeground(new Color(16, 185, 129));
+                lblCurrentStatus.setBackground(new Color(240, 253, 244));
             }
         } else {
             lblCurrentStatus.setText("Chưa kích hoạt hạn thẻ");
             lblCurrentStatus.setForeground(new Color(245, 158, 11));
+            lblCurrentStatus.setBackground(new Color(255, 251, 235));
         }
     }
 
@@ -443,5 +469,29 @@ public class GiaHanGoiTapPanel extends JPanel {
         txtNgay.setText(sdf.format(new Date()));
         updatePrice();
         loadInitialMember();
+    }
+
+    private void styleInput(JComponent component) {
+        component.putClientProperty("JComponent.roundRect", true);
+        component.setPreferredSize(new Dimension(component.getPreferredSize().width, 38));
+    }
+
+    private void styleActionButton(JButton button) {
+        Color normalColor = button.getBackground();
+        button.putClientProperty("JButton.buttonType", "roundRect");
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
+        button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                if (button.isEnabled()) button.setBackground(normalColor.brighter());
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                button.setBackground(normalColor);
+            }
+        });
     }
 }

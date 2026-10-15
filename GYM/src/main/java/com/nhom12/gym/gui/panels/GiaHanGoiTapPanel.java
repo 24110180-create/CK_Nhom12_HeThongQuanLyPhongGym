@@ -525,6 +525,14 @@ public class GiaHanGoiTapPanel extends JPanel {
         updatePrice();
     }
 
+    public void chonHoiVienDeGiaHan(HoiVien hv) {
+        if (hv == null) return;
+        displayMember(hv);
+        if (txtSearch != null) {
+            txtSearch.setText(hv.getMaTheQR() != null ? hv.getMaTheQR() : String.valueOf(hv.getMaHoiVien()));
+        }
+    }
+
     private void actionSearch() {
         String keyword = txtSearch.getText().trim();
         if (keyword.isEmpty()) {
@@ -586,14 +594,14 @@ public class GiaHanGoiTapPanel extends JPanel {
                         BorderFactory.createEmptyBorder(6, 10, 6, 10)
                 ));
             } else {
-                // LỄ TÂN / NHÂN VIÊN: BẢO MẬT TUYỆT ĐỐI - ẨN HOÀN TOÀN GIÁ GỐC VÀ CHIẾT KHẤU 50%
-                pnlRowGiaGoc.setVisible(false); // Ẩn hoàn toàn dòng giá gốc
-                pnlRowGiamGia.setVisible(false); // Ẩn hoàn toàn dòng giảm giá
+                // LỄ TÂN / QUẢN LÝ: HỆ THỐNG NHẬN DIỆN VIP, HIỂN THỊ TRỰC TIẾP GIÁ 3M VÀ THU ĐÚNG 3M (ẨN 6M & 50%)
+                pnlRowGiaGoc.setVisible(false); // Ẩn hoàn toàn dòng giá gốc 6M
+                pnlRowGiamGia.setVisible(false); // Ẩn hoàn toàn dòng giảm giá -50%
 
-                lblVipPolicyNotice.setText("🔒 HỢP ĐỒNG ƯU ĐÃI NỘI BỘ - ĐÃ ĐƯỢC PHÊ DUYỆT (Thu đúng số tiền thực)");
-                lblVipPolicyNotice.setForeground(new Color(217, 119, 6)); // Amber
+                lblVipPolicyNotice.setText("👑 HỘI VIÊN VIP - ÁP DỤNG ĐƠN GIÁ PHÊ DUYỆT: " + df.format(giaInfo.soTienThucThu));
+                lblVipPolicyNotice.setForeground(new Color(16, 185, 129)); // Emerald
 
-                lblSecurityBanner.setText("<html>🔒 <b>[BẢO MẬT BẬC CAO]:</b> Giá niêm yết gốc và mức chiết khấu 50% đã được <b>TỰ ĐỘNG ẨN HOÀN TOÀN</b> với Lễ tân. Thu ngân chỉ thu đúng số tiền thực theo hợp đồng đã duyệt.</html>");
+                lblSecurityBanner.setText("<html>👑 <b>[HỆ THỐNG ĐÃ NHẬN DIỆN HỘI VIÊN VIP]:</b> Tự động áp dụng mức phí hợp đồng đã phê duyệt (<b>" + df.format(giaInfo.soTienThucThu) + "</b>). Lễ tân và Quản lý thực hiện thanh toán đúng <b>" + df.format(giaInfo.soTienThucThu) + "</b> (đã giảm 50%). Giá niêm yết gốc và tỷ lệ -50% được ẩn bảo mật theo đúng chính sách.</html>");
                 lblSecurityBanner.setBackground(new Color(254, 243, 199));
                 lblSecurityBanner.setForeground(new Color(180, 83, 9));
                 lblSecurityBanner.setBorder(BorderFactory.createCompoundBorder(

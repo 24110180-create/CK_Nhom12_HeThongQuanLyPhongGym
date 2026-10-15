@@ -32,6 +32,7 @@ public class QuanLyHoiVienPanel extends JPanel {
     private final SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy");
 
     private final Runnable onOpenRegistration;
+    private final java.util.function.Consumer<HoiVien> onOpenRenewal;
 
     private JTable table;
     private DefaultTableModel tableModel;
@@ -46,11 +47,16 @@ public class QuanLyHoiVienPanel extends JPanel {
     private JComboBox<String> cbFilterStatus;
 
     public QuanLyHoiVienPanel() {
-        this(null);
+        this(null, null);
     }
 
     public QuanLyHoiVienPanel(Runnable onOpenRegistration) {
+        this(onOpenRegistration, null);
+    }
+
+    public QuanLyHoiVienPanel(Runnable onOpenRegistration, java.util.function.Consumer<HoiVien> onOpenRenewal) {
         this.onOpenRegistration = onOpenRegistration;
+        this.onOpenRenewal = onOpenRenewal;
         setLayout(new BorderLayout(12, 12));
         setBorder(new EmptyBorder(12, 14, 14, 14));
         setBackground(new Color(248, 250, 252));
@@ -480,7 +486,17 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnKiemTraGiaVip.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnKiemTraGiaVip.addActionListener(e -> moDialogKiemTraBaoMatGiaVip());
 
+        JButton btnGiaHan = new JButton("⚡ Gia Hạn Thẻ Tập");
+        btnGiaHan.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnGiaHan.setBackground(new Color(139, 92, 246)); // Purple
+        btnGiaHan.setForeground(Color.WHITE);
+        btnGiaHan.setFocusPainted(false);
+        btnGiaHan.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnGiaHan.setToolTipText("Gia hạn gói tập cho hội viên đang chọn (Tự động áp dụng giá VIP nếu có)");
+        btnGiaHan.addActionListener(e -> giaHanHoiVienDangChon());
+
         btnActions.add(btnKiemTraGiaVip);
+        btnActions.add(btnGiaHan);
         btnActions.add(btnXemTheQR);
         btnActions.add(btnCapNhat);
         btnActions.add(btnToggleLock);
@@ -492,6 +508,32 @@ public class QuanLyHoiVienPanel extends JPanel {
         panel.add(bottomActions, BorderLayout.SOUTH);
 
         return panel;
+    }
+
+    private void giaHanHoiVienDangChon() {
+        HoiVien hv = getSelectedHoiVien();
+        if (hv == null) {
+            JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn một hội viên trong bảng danh sách để thực hiện gia hạn gói tập!",
+                    "Chưa Chọn Hội Viên", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (onOpenRenewal != null) {
+            onOpenRenewal.accept(hv);
+            return;
+        }
+
+        // Mở popup gia hạn độc lập
+        Window parent = SwingUtilities.getWindowAncestor(this);
+        JDialog dlg = new JDialog(parent, "Gia Hạn Gói Tập - " + hv.getHoTen(), Dialog.ModalityType.APPLICATION_MODAL);
+        dlg.setSize(950, 700);
+        dlg.setLocationRelativeTo(parent);
+        GiaHanGoiTapPanel pnlRenew = new GiaHanGoiTapPanel();
+        pnlRenew.chonHoiVienDeGiaHan(hv);
+        dlg.setContentPane(pnlRenew);
+        dlg.setVisible(true);
+        loadDataToTable();
     }
 
     private void moDialogKiemTraBaoMatGiaVip() {

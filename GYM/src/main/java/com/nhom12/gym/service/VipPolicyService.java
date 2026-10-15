@@ -178,7 +178,7 @@ public class VipPolicyService {
         );
 
         if (isChu) {
-            // Chủ đăng nhập: Xem đầy đủ giá niêm yết gốc, chiết khấu và số tiền thực thu
+            // Chủ đăng nhập: Xem đầy đủ giá niêm yết gốc (ví dụ: 6M), chiết khấu VIP (-50%) và số tiền thực thu (3M)
             return new ThongTinGiaHienThi(
                     true,
                     giaGoc,
@@ -189,14 +189,16 @@ public class VipPolicyService {
                     true
             );
         } else {
-            // Lễ tân / nhân viên đăng nhập: Giới hạn hiển thị chi tiết, chỉ thấy số tiền thực thu
+            // Lễ tân / Quản lý đăng nhập: Hệ thống nhận diện hội viên VIP, hiển thị trực tiếp giá sau giảm 50% (ví dụ: 3M) và thu đúng 3M
+            // Hoàn toàn ẩn giá gốc niêm yết 6M và ẩn tỷ lệ -50% để bảo mật nội bộ
+            String giaFmt = String.format("%,d đ", (long) giaSauGiam50).replace(',', '.');
             return new ThongTinGiaHienThi(
                     true,
-                    giaSauGiam50, // Hiển thị giá thực thu thay cho giá gốc
-                    giaSauGiam50,
+                    giaSauGiam50, // Hiển thị giá thực thu (đã giảm 50%) thay cho giá gốc
+                    giaSauGiam50, // Thu đúng 3M
                     0,            // Ẩn chi tiết mức giảm
                     0,            // Ẩn tỷ lệ phần trăm giảm
-                    "🔒 Hợp đồng ưu đãi nội bộ - Đã được phê duyệt",
+                    "👑 Hội Viên VIP - Đơn giá hợp đồng phê duyệt: " + giaFmt,
                     false         // Giới hạn quyền xem chi tiết giá gốc
             );
         }

@@ -1,5 +1,6 @@
 package com.nhom12.gym.gui.panels;
 
+import com.nhom12.gym.entity.HoiVien;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -86,7 +87,16 @@ public class QuanLyHoiVienHubPanel extends JPanel {
         add(topBar, BorderLayout.NORTH);
 
         // --- 2. CARDS CONTAINER ---
-        listPanel = new QuanLyHoiVienPanel(() -> selectTab(1));
+        renewPanel = new GiaHanGoiTapPanel();
+        listPanel = new QuanLyHoiVienPanel(
+                () -> selectTab(1),
+                (HoiVien hv) -> {
+                    if (renewPanel != null && hv != null) {
+                        renewPanel.chonHoiVienDeGiaHan(hv);
+                    }
+                    selectTab(3);
+                }
+        );
         registerPanel = new DangKyHoiVienPanel(
                 () -> selectTab(0),
                 () -> {
@@ -95,7 +105,6 @@ public class QuanLyHoiVienHubPanel extends JPanel {
                 }
         );
         expiringPanel = new HoiVienSapHetHanPanel();
-        renewPanel = new GiaHanGoiTapPanel();
 
         cardsPanel.setOpaque(false);
         cardsPanel.add(listPanel, CARD_LIST);

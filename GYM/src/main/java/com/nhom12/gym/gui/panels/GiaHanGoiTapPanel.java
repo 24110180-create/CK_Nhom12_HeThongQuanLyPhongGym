@@ -57,9 +57,6 @@ public class GiaHanGoiTapPanel extends JPanel {
     // Controls
     private JTextField txtSearch;
     private JButton btnSearch;
-    private JButton btnQuickVip;
-    private JButton btnQuickNormal;
-    private JComboBox<String> cbRolePreview;
     private JLabel lblRoleStatus;
 
     private JLabel lblTen;
@@ -119,21 +116,9 @@ public class GiaHanGoiTapPanel extends JPanel {
         titleBox.add(lblTitle);
         titleBox.add(lblSubtitle);
 
-        // Góc phải Header: Hiển thị quyền đăng nhập & Công cụ mô phỏng phân quyền nhanh (chỉ dành cho Chủ)
+        // Góc phải Header: Hiển thị quyền đăng nhập hiện tại của người dùng
         JPanel roleToolBox = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         roleToolBox.setOpaque(false);
-
-        JButton btnCheckPrice = new JButton("🔍 Kiểm Tra Giá VIP (50%)");
-        btnCheckPrice.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnCheckPrice.setBackground(new Color(245, 158, 11)); // Amber
-        btnCheckPrice.setForeground(Color.WHITE);
-        btnCheckPrice.setFocusPainted(false);
-        btnCheckPrice.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnCheckPrice.setToolTipText("Mở bảng kiểm tra bảo mật giá thực theo phân quyền: Chủ vs Quản lý vs Lễ tân");
-        btnCheckPrice.addActionListener(e -> {
-            Window parent = SwingUtilities.getWindowAncestor(this);
-            new com.nhom12.gym.gui.KiemTraBaoMatGiaVipDialog(parent).setVisible(true);
-        });
 
         String currentLoginRole = Auth.vaiTro != null ? Auth.vaiTro : "Lễ tân";
         boolean isMaster = "Chủ".equalsIgnoreCase(currentLoginRole);
@@ -148,28 +133,7 @@ public class GiaHanGoiTapPanel extends JPanel {
                 new EmptyBorder(4, 10, 4, 10)
         ));
 
-        JLabel lblPreviewPrompt = new JLabel("Góc nhìn kiểm thử:");
-        lblPreviewPrompt.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        lblPreviewPrompt.setForeground(new Color(71, 85, 105));
-
-        cbRolePreview = new JComboBox<>(new String[]{
-                "Tự động (" + currentLoginRole + ")",
-                "👑 Xem như CHỦ HỆ THỐNG (Hiện giá gốc & Giảm 50%)",
-                "💼 Xem như QUẢN LÝ (Bảo mật - Ẩn giá gốc & Ẩn chiết khấu)",
-                "👔 Xem như LỄ TÂN (Bảo mật - Ẩn giá gốc & Ẩn chiết khấu)"
-        });
-        cbRolePreview.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        cbRolePreview.setFocusable(false);
-        cbRolePreview.addActionListener(e -> updatePrice());
-
-        if (isMaster) {
-            roleToolBox.add(btnCheckPrice);
-            roleToolBox.add(lblRoleStatus);
-            roleToolBox.add(lblPreviewPrompt);
-            roleToolBox.add(cbRolePreview);
-        } else {
-            roleToolBox.add(lblRoleStatus);
-        }
+        roleToolBox.add(lblRoleStatus);
 
         headerPanel.add(titleBox, BorderLayout.WEST);
         headerPanel.add(roleToolBox, BorderLayout.EAST);
@@ -192,7 +156,7 @@ public class GiaHanGoiTapPanel extends JPanel {
         searchLeft.setOpaque(false);
         JLabel lblPrompt = new JLabel("Tra cứu Hội Viên:");
         lblPrompt.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        txtSearch = new JTextField(22);
+        txtSearch = new JTextField(25);
         txtSearch.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         txtSearch.putClientProperty("JTextField.placeholderText", "Ví dụ: VIP007, 6, QR001, Đỗ Minh Trí...");
 
@@ -206,50 +170,7 @@ public class GiaHanGoiTapPanel extends JPanel {
         searchLeft.add(txtSearch);
         searchLeft.add(btnSearch);
 
-        // Nút chọn nhanh để test tức thì
-        JPanel searchRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
-        searchRight.setOpaque(false);
-
-        btnQuickVip = new JButton("⚡ Mẫu VIP007 (Đỗ Minh Trí - 50%)");
-        btnQuickVip.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnQuickVip.setBackground(new Color(254, 243, 199)); // Amber light
-        btnQuickVip.setForeground(new Color(180, 83, 9));
-        btnQuickVip.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(245, 158, 11), 1),
-                new EmptyBorder(5, 8, 5, 8)
-        ));
-        btnQuickVip.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        JButton btnQuickVip2 = new JButton("⚡ Mẫu VIP006 (Thanh Tâm - 50%)");
-        btnQuickVip2.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnQuickVip2.setBackground(new Color(254, 243, 199)); // Amber light
-        btnQuickVip2.setForeground(new Color(180, 83, 9));
-        btnQuickVip2.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(245, 158, 11), 1),
-                new EmptyBorder(5, 8, 5, 8)
-        ));
-        btnQuickVip2.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnQuickVip2.addActionListener(e -> selectQuickMember("VIP006"));
-
-        btnQuickNormal = new JButton("👤 Mẫu Thường (Lê Anh Duy)");
-        btnQuickNormal.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        btnQuickNormal.setBackground(new Color(241, 245, 249));
-        btnQuickNormal.setForeground(new Color(71, 85, 105));
-        btnQuickNormal.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(203, 213, 225), 1),
-                new EmptyBorder(5, 8, 5, 8)
-        ));
-        btnQuickNormal.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        boolean isMaster = "Chủ".equalsIgnoreCase(Auth.vaiTro);
-        if (isMaster) {
-            searchRight.add(btnQuickVip);
-            searchRight.add(btnQuickVip2);
-        }
-        searchRight.add(btnQuickNormal);
-
         searchPanel.add(searchLeft, BorderLayout.WEST);
-        searchPanel.add(searchRight, BorderLayout.EAST);
         centerPanel.add(searchPanel, BorderLayout.NORTH);
 
         // --- 2. FORM BODY PANEL ---
@@ -356,8 +277,6 @@ public class GiaHanGoiTapPanel extends JPanel {
         // Wire Actions
         btnSearch.addActionListener(e -> actionSearch());
         txtSearch.addActionListener(e -> actionSearch());
-        btnQuickVip.addActionListener(e -> selectQuickMember("VIP007"));
-        btnQuickNormal.addActionListener(e -> selectQuickMember("QR001"));
         cbGoi.addActionListener(e -> updatePrice());
         btnCancel.addActionListener(e -> resetForm());
         btnConfirm.addActionListener(e -> confirmRenewal());
@@ -440,11 +359,6 @@ public class GiaHanGoiTapPanel extends JPanel {
     }
 
     private String getEffectiveRole() {
-        if (cbRolePreview != null && cbRolePreview.getSelectedIndex() > 0) {
-            if (cbRolePreview.getSelectedIndex() == 1) return "Chủ";
-            if (cbRolePreview.getSelectedIndex() == 2) return "Quản lý";
-            if (cbRolePreview.getSelectedIndex() == 3) return "Lễ tân";
-        }
         return Auth.vaiTro != null ? Auth.vaiTro : "Lễ tân";
     }
 
@@ -595,7 +509,7 @@ public class GiaHanGoiTapPanel extends JPanel {
                 lblVipPolicyNotice.setForeground(new Color(16, 185, 129));
 
                 lblSecurityBanner.setVisible(true);
-                lblSecurityBanner.setText("<html>👑 <b>[GÓC NHÌN CHỦ HỆ THỐNG]:</b> Đang hiển thị đầy đủ thông tin bảo mật. Hội viên này được hưởng đặc quyền giảm giá 50% trọn đời của Chủ.</html>");
+                lblSecurityBanner.setText("<html>👑 <b>ĐẶC QUYỀN VIP CỦA CHỦ:</b> Đang hiển thị chi tiết giá gốc và mức giảm 50%. Thông tin này được bảo mật và ẩn đối với Lễ tân & Quản lý.</html>");
                 lblSecurityBanner.setBackground(new Color(240, 253, 244));
                 lblSecurityBanner.setForeground(new Color(22, 101, 52));
                 lblSecurityBanner.setBorder(BorderFactory.createCompoundBorder(

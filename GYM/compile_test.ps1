@@ -1,8 +1,17 @@
-# FitLife Gym Management System - Đã hoàn thành 99%
+$userProfile = $env:USERPROFILE
 if (!(Test-Path "target\classes")) {
     New-Item -ItemType Directory -Path "target\classes" -Force | Out-Null
 }
-$jars = (Get-ChildItem -Path "$env:USERPROFILE\.m2\repository" -Filter *.jar -Recurse | ForEach-Object { $_.FullName.Replace('\', '/') }) -join ';'
+$allJars = Get-ChildItem -Path "$userProfile\.m2\repository" -Filter *.jar -Recurse
+$filtered = $allJars | Where-Object {
+    $p = $_.FullName.Replace('\', '/')
+    -not ($p -match '/hibernate-core/5\.' -or 
+          $p -match '/hibernate-core/6\.2\.' -or
+          $p -match 'hibernate-commons-annotations/5\.' -or
+          $p -match 'javax/persistence' -or
+          $p -match 'jakarta\.persistence-api/2\.')
+}
+$jars = ($filtered | ForEach-Object { $_.FullName.Replace('\', '/') }) -join ';'
 $sources = Get-ChildItem -Path "src\main\java" -Filter *.java -Recurse | ForEach-Object { $_.FullName.Replace('\', '/') }
 
 $argsFile = "$PSScriptRoot/javac_args.txt"

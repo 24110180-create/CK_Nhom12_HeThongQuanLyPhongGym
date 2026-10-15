@@ -5,13 +5,10 @@ cd /d "%~dp0"
 if exist "GYM" cd /d "%~dp0GYM"
 
 echo ========================================================
-echo   DANG KHOI DONG FITLIFE GYM MANAGEMENT SYSTEM
+echo   DANG KHOI DONG FITLIFE GYM MANAGEMENT SYSTEM (ONLINE)
 echo ========================================================
 
-powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-  "$cp = (Get-ChildItem -Path '%USERPROFILE%\.m2\repository' -Filter '*.jar' -Recurse | Select-Object -ExpandProperty FullName) -join ';'; " ^
-  "$cp = 'src\main\resources;target\classes;' + $cp; " ^
-  "& java '-Dfile.encoding=UTF-8' -cp $cp com.nhom12.gym.gui.LoginForm"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0run.ps1"
 
 if %ERRORLEVEL% NEQ 0 (
     echo.

@@ -298,21 +298,21 @@ public class KiemTraBaoMatGiaVipDialog extends JDialog {
             lblSecurityVerdict.setText("👑 [GÓC NHÌN CHỦ HỆ THỐNG]: Hiển thị đầy đủ minh bạch giá gốc " + df.format(info.giaGoc) + " và mức giảm 50% (" + df.format(info.soTienGiam) + ").");
             lblSecurityVerdict.setForeground(new Color(22, 101, 52));
         } else {
-            // Lễ tân hoặc Quản lý
-            lblGiaGocResult.setText("Giá niêm yết gốc: [ĐÃ ẨN HOÀN TOÀN - CHỈ CHỦ MỚI THẤY]");
-            lblGiaGocResult.setForeground(new Color(156, 163, 175));
+            // Lễ tân hoặc Quản lý: Thấy đơn giá hợp đồng đã duyệt (đã giảm 50% thực tế), không lộ giá gốc 6M và không lộ -50%
+            lblGiaGocResult.setText("Đơn giá hợp đồng duyệt: " + df.format(info.soTienThucThu) + " [Đã ẩn giá gốc niêm yết " + df.format(giaGoc) + "]");
+            lblGiaGocResult.setForeground(new Color(71, 85, 105));
 
-            lblGiamGiaResult.setText("Chiết khấu VIP: 0 đ (Ẩn hoàn toàn mức giảm 50%)");
-            lblGiamGiaResult.setForeground(new Color(156, 163, 175));
+            lblGiamGiaResult.setText("Chiết khấu tại quầy: Đã định giá sẵn trong hợp đồng riêng (Ẩn hoàn toàn tỷ lệ 50%)");
+            lblGiamGiaResult.setForeground(new Color(180, 83, 9));
 
-            lblThucThuResult.setText("Số tiền cần thu (Theo hợp đồng): " + df.format(info.soTienThucThu));
-            lblThucThuResult.setForeground(new Color(180, 83, 9));
+            lblThucThuResult.setText("Số tiền Lễ tân cần thu: " + df.format(info.soTienThucThu) + " (Đã giảm 50% cho khách VIP)");
+            lblThucThuResult.setForeground(new Color(16, 185, 129));
 
-            lblNoticeResult.setText("Ghi chú: " + info.moTaGiaHienThi + " (BẢO MẬT THÀNH CÔNG VỚI " + roleName.toUpperCase() + ")");
+            lblNoticeResult.setText("Ghi chú hợp đồng: " + info.moTaGiaHienThi + " — Thu đúng " + df.format(info.soTienThucThu));
             lblNoticeResult.setForeground(new Color(180, 83, 9));
 
             pnlVerdictBox.setBackground(new Color(254, 243, 199));
-            lblSecurityVerdict.setText("🔒 [BẢO MẬT BẬC CAO VỚI " + roleName.toUpperCase() + "]: Ẩn hoàn toàn giá gốc " + df.format(giaGoc) + " và ẩn tỷ lệ -50%. Nhân viên chỉ thu đúng " + df.format(info.soTienThucThu) + " theo hợp đồng.");
+            lblSecurityVerdict.setText("🔒 [LOGIC BẢO MẬT CHUẨN]: Khách VIP ĐÃ ĐƯỢC GIẢM 50% THẬT (chỉ trả " + df.format(info.soTienThucThu) + " thay vì " + df.format(giaGoc) + "), nhưng Lễ tân chỉ thấy đây là hợp đồng đặc biệt giá " + df.format(info.soTienThucThu) + ", hoàn toàn không biết giá gốc là bao nhiêu và không biết tỷ lệ giảm 50%!");
             lblSecurityVerdict.setForeground(new Color(180, 83, 9));
         }
     }

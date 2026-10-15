@@ -335,8 +335,10 @@ public class QuanLyHoiVienPanel extends JPanel {
                 String s = val != null ? val.toString() : "";
                 int modelRow = t.convertRowIndexToModel(r);
                 String qr = String.valueOf(t.getModel().getValueAt(modelRow, 1));
+                boolean isChu = "Chủ".equalsIgnoreCase(com.nhom12.gym.util.Auth.vaiTro)
+                        || (com.nhom12.gym.util.Auth.tenDangNhap != null && com.nhom12.gym.util.Auth.tenDangNhap.contains("admin"));
                 if (qr != null && qr.startsWith("VIP")) {
-                    l.setText("👑 " + s + " [VIP 50%]");
+                    l.setText(isChu ? ("👑 " + s + " [VIP 50% - Đặc quyền Chủ]") : ("👑 " + s + " [Hội Viên VIP]"));
                     l.setForeground(new Color(180, 83, 9));
                     l.setFont(new Font("Segoe UI", Font.BOLD, 12));
                 } else {

@@ -78,6 +78,9 @@ public class MainDashboard extends JFrame {
                                 ((QuanLyHoiVienHubPanel) comp).selectTab(finalTab);
                             } else if (comp instanceof JScrollPane) {
                                 Component view = ((JScrollPane) comp).getViewport().getView();
+                                if (view instanceof ScrollableContentWrapper) {
+                                    view = ((ScrollableContentWrapper) view).getContent();
+                                }
                                 if (view instanceof QuanLyHoiVienPanel) {
                                     if (finalTab == 1) ((QuanLyHoiVienPanel) view).moDialogDangKyNhanh();
                                     else if (finalTab == 2) ((QuanLyHoiVienPanel) view).locHoiVienSapHetHan();
@@ -209,17 +212,17 @@ public class MainDashboard extends JFrame {
             statusText = "Quản lý cơ sở • @" + activeUser;
         }
 
-        // --- A. SIDEBAR DỌC BÊN TRÁI (275px) ---
+        // --- A. SIDEBAR DỌC BÊN TRÁI (250px) ---
         JPanel sidebar = new JPanel(new BorderLayout());
         sidebar.setBackground(new Color(15, 23, 42)); // Slate 900
-        sidebar.setPreferredSize(new Dimension(275, 0));
+        sidebar.setPreferredSize(new Dimension(250, 0));
         sidebar.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(30, 41, 59)));
 
         // Sidebar Top: Thương hiệu & Hồ sơ người dùng
         JPanel sidebarTop = new JPanel();
         sidebarTop.setLayout(new BoxLayout(sidebarTop, BoxLayout.Y_AXIS));
         sidebarTop.setOpaque(false);
-        sidebarTop.setBorder(new EmptyBorder(20, 18, 12, 18));
+        sidebarTop.setBorder(new EmptyBorder(20, 16, 12, 16));
 
         JLabel lblBrand = new JLabel("FITLIFE GYM");
         lblBrand.setFont(new Font("Segoe UI", Font.BOLD, 22));
@@ -235,9 +238,9 @@ public class MainDashboard extends JFrame {
         lblBadge.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Box hồ sơ nhân sự / người dùng
-        JPanel profileBox = new JPanel(new BorderLayout(12, 0));
+        JPanel profileBox = new JPanel(new BorderLayout(10, 0));
         profileBox.setBackground(new Color(30, 41, 59));
-        profileBox.setBorder(new EmptyBorder(10, 12, 10, 12));
+        profileBox.setBorder(new EmptyBorder(10, 10, 10, 10));
         profileBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel lblAvatar = new JLabel(avatarInitials, SwingConstants.CENTER);
@@ -280,13 +283,13 @@ public class MainDashboard extends JFrame {
         JPanel menuContainer = new JPanel();
         menuContainer.setLayout(new BoxLayout(menuContainer, BoxLayout.Y_AXIS));
         menuContainer.setOpaque(false);
-        menuContainer.setBorder(new EmptyBorder(8, 10, 8, 10));
+        menuContainer.setBorder(new EmptyBorder(6, 8, 6, 8));
 
         JScrollPane scrollMenu = new JScrollPane(menuContainer);
         scrollMenu.setBorder(null);
         scrollMenu.setOpaque(false);
         scrollMenu.getViewport().setOpaque(false);
-        scrollMenu.getVerticalScrollBar().setUnitIncrement(14);
+        scrollMenu.getVerticalScrollBar().setUnitIncrement(16);
         sidebar.add(scrollMenu, BorderLayout.CENTER);
 
         // Sidebar Bottom: Nút Đăng xuất
@@ -337,7 +340,7 @@ public class MainDashboard extends JFrame {
         btnQuickRegister.setForeground(Color.WHITE);
         btnQuickRegister.setFocusPainted(false);
         btnQuickRegister.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnQuickRegister.setPreferredSize(new Dimension(165, 32));
+        btnQuickRegister.setPreferredSize(new Dimension(150, 30));
         btnQuickRegister.addActionListener(e -> {
             navigateTo("Quản Lý Hội Viên", 1);
         });
@@ -349,13 +352,16 @@ public class MainDashboard extends JFrame {
         btnQuickCheckIn.setForeground(Color.WHITE);
         btnQuickCheckIn.setFocusPainted(false);
         btnQuickCheckIn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnQuickCheckIn.setPreferredSize(new Dimension(140, 32));
+        btnQuickCheckIn.setPreferredSize(new Dimension(135, 30));
         btnQuickCheckIn.addActionListener(e -> {
             navigateTo("Quét Thẻ & Check-in");
             SwingUtilities.invokeLater(() -> {
                 for (Component comp : workspaceContainer.getComponents()) {
                     if (comp instanceof JScrollPane) {
                         Component view = ((JScrollPane) comp).getViewport().getView();
+                        if (view instanceof ScrollableContentWrapper) {
+                            view = ((ScrollableContentWrapper) view).getContent();
+                        }
                         if (view instanceof CheckInForm) {
                             ((CheckInForm) view).moMayQuetAo();
                             return;
@@ -388,12 +394,12 @@ public class MainDashboard extends JFrame {
         // Nút Kiểm Tra Hiển Thị Giá Theo Phân Quyền (Bảo Mật VIP 50%) - Chỉ hiển thị cho vai trò Chủ phòng tập
         if ("Chủ".equalsIgnoreCase(role)) {
             JButton btnCheckVipPrice = new JButton("🔍 Kiểm Tra Hiển Thị Giá (VIP 50%)");
-            btnCheckVipPrice.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            btnCheckVipPrice.setFont(new Font("Segoe UI", Font.BOLD, 11));
             btnCheckVipPrice.setBackground(new Color(245, 158, 11)); // Amber
             btnCheckVipPrice.setForeground(Color.WHITE);
             btnCheckVipPrice.setFocusPainted(false);
             btnCheckVipPrice.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            btnCheckVipPrice.setPreferredSize(new Dimension(230, 32));
+            btnCheckVipPrice.setPreferredSize(new Dimension(220, 30));
             btnCheckVipPrice.setToolTipText("Kiểm tra và mô phỏng bảo mật giá thực theo phân quyền (Chủ vs Quản lý vs Lễ tân)");
             btnCheckVipPrice.addActionListener(e -> new KiemTraBaoMatGiaVipDialog(this).setVisible(true));
             headerRight.add(btnCheckVipPrice);
@@ -536,12 +542,12 @@ public class MainDashboard extends JFrame {
                 }
             }
         };
-        btn.setLayout(new BorderLayout(10, 0));
-        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 46));
-        btn.setPreferredSize(new Dimension(255, 46));
+        btn.setLayout(new BorderLayout(8, 0));
+        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
+        btn.setPreferredSize(new Dimension(232, 44));
         btn.setFocusPainted(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setBorder(new EmptyBorder(8, 14, 8, 14));
+        btn.setBorder(new EmptyBorder(6, 12, 6, 12));
 
         JPanel textPanel = new JPanel(new GridLayout(2, 1, 0, 1));
         textPanel.setOpaque(false);
@@ -582,6 +588,22 @@ public class MainDashboard extends JFrame {
         }
     }
 
+    public static class ScrollableContentWrapper extends JPanel implements Scrollable {
+        private final JPanel content;
+        public ScrollableContentWrapper(JPanel content) {
+            super(new BorderLayout());
+            this.content = content;
+            setOpaque(false);
+            add(content, BorderLayout.CENTER);
+        }
+        public JPanel getContent() { return content; }
+        @Override public Dimension getPreferredScrollableViewportSize() { return getPreferredSize(); }
+        @Override public int getScrollableUnitIncrement(Rectangle r, int o, int d) { return 16; }
+        @Override public int getScrollableBlockIncrement(Rectangle r, int o, int d) { return 64; }
+        @Override public boolean getScrollableTracksViewportWidth() { return true; }
+        @Override public boolean getScrollableTracksViewportHeight() { return false; }
+    }
+
     private void selectSidebarItem(SidebarMenuItem selectedItem) {
         if (selectedItem == null) return;
         if (selectedItem == currentSelectedItem && workspaceContainer.getComponentCount() > 0) {
@@ -600,11 +622,12 @@ public class MainDashboard extends JFrame {
         try {
             if (selectedItem.cachedScroll == null) {
                 JPanel panel = selectedItem.supplier.get();
-                JScrollPane workspaceScroll = new JScrollPane(panel);
+                ScrollableContentWrapper wrapper = new ScrollableContentWrapper(panel);
+                JScrollPane workspaceScroll = new JScrollPane(wrapper);
                 workspaceScroll.setBorder(null);
                 workspaceScroll.setOpaque(false);
                 workspaceScroll.getViewport().setOpaque(false);
-                workspaceScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+                workspaceScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
                 workspaceScroll.getVerticalScrollBar().setUnitIncrement(16);
                 selectedItem.cachedScroll = workspaceScroll;
             }

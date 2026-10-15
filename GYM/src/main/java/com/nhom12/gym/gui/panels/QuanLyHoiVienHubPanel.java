@@ -10,7 +10,7 @@ import java.awt.*;
  * Hợp nhất thông minh giữa "Danh Sách & Tra Cứu Hội Viên" và "Tiếp Nhận & Đăng Ký Mới",
  * loại bỏ hoàn toàn mâu thuẫn và trùng lặp trên giao diện điều hành.
  */
-public class QuanLyHoiVienHubPanel extends JPanel {
+public class QuanLyHoiVienHubPanel extends JPanel implements Scrollable {
 
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel cardsPanel = new JPanel(cardLayout);
@@ -30,14 +30,39 @@ public class QuanLyHoiVienHubPanel extends JPanel {
     private JButton btnTabExpiring;
     private JButton btnTabRenew;
 
+    @Override
+    public Dimension getPreferredScrollableViewportSize() {
+        return getPreferredSize();
+    }
+
+    @Override
+    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+        return 16;
+    }
+
+    @Override
+    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+        return 64;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportWidth() {
+        return true;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportHeight() {
+        return false;
+    }
+
     public QuanLyHoiVienHubPanel() {
         this(0);
     }
 
     public QuanLyHoiVienHubPanel(int initialTab) {
-        setLayout(new BorderLayout(0, 8));
+        setLayout(new BorderLayout(0, 6));
         setBackground(new Color(248, 250, 252));
-        setBorder(new EmptyBorder(10, 14, 12, 14));
+        setBorder(new EmptyBorder(8, 10, 10, 10));
 
         initHubUI();
         selectTab(initialTab);
@@ -45,19 +70,19 @@ public class QuanLyHoiVienHubPanel extends JPanel {
 
     private void initHubUI() {
         // --- 1. TOP NAVIGATION TAB BAR (HIỆN ĐẠI, TINH TẾ) ---
-        JPanel topBar = new JPanel(new BorderLayout(15, 0));
+        JPanel topBar = new JPanel(new BorderLayout(10, 0));
         topBar.setOpaque(false);
-        topBar.setBorder(new EmptyBorder(0, 4, 6, 4));
+        topBar.setBorder(new EmptyBorder(0, 2, 4, 2));
 
-        JPanel titlePanel = new JPanel(new GridLayout(2, 1, 0, 2));
+        JPanel titlePanel = new JPanel(new GridLayout(2, 1, 0, 1));
         titlePanel.setOpaque(false);
 
-        JLabel lblTitle = new JLabel("TRUNG TÂM QUẢN TRỊ & HỒ SƠ HỘI VIÊN FITLIFE");
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        JLabel lblTitle = new JLabel("TRUNG TÂM QUẢN TRỊ & HỒ SƠ HỘI VIÊN");
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 17));
         lblTitle.setForeground(new Color(15, 23, 42));
 
-        JLabel lblSub = new JLabel("Hồ sơ hội viên chuỗi cơ sở • Tra cứu thẻ QR, đăng ký mới & gia hạn gói tập bảo mật");
-        lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        JLabel lblSub = new JLabel("Hồ sơ chuỗi cơ sở • Tra cứu thẻ QR, đăng ký mới & gia hạn gói tập bảo mật");
+        lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblSub.setForeground(new Color(100, 116, 139));
 
         titlePanel.add(lblTitle);
@@ -68,10 +93,10 @@ public class QuanLyHoiVienHubPanel extends JPanel {
         JPanel tabSwitcher = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
         tabSwitcher.setOpaque(false);
 
-        btnTabList = createTabButton("Danh Sách & Tra Cứu", true);
-        btnTabRegister = createTabButton("+ Tiếp Nhận Mới", false);
-        btnTabExpiring = createTabButton("Sắp Hết Hạn & Tái Ký", false);
-        btnTabRenew = createTabButton("⚡ Gia Hạn & Nâng Cấp", false);
+        btnTabList = createTabButton("Danh Sách & Tra Cứu", 140, true);
+        btnTabRegister = createTabButton("+ Tiếp Nhận Mới", 115, false);
+        btnTabExpiring = createTabButton("Sắp Hết Hạn & Tái Ký", 135, false);
+        btnTabRenew = createTabButton("⚡ Gia Hạn & Nâng Cấp", 135, false);
 
         btnTabList.addActionListener(e -> selectTab(0));
         btnTabRegister.addActionListener(e -> selectTab(1));
@@ -115,12 +140,12 @@ public class QuanLyHoiVienHubPanel extends JPanel {
         add(cardsPanel, BorderLayout.CENTER);
     }
 
-    private JButton createTabButton(String text, boolean active) {
+    private JButton createTabButton(String text, int width, boolean active) {
         JButton btn = new JButton(text);
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 11));
         btn.setFocusPainted(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setPreferredSize(new Dimension(175, 34));
+        btn.setPreferredSize(new Dimension(width, 32));
         updateTabButtonStyle(btn, active);
         return btn;
     }
@@ -132,14 +157,14 @@ public class QuanLyHoiVienHubPanel extends JPanel {
             btn.setForeground(Color.WHITE);
             btn.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(new Color(29, 78, 216), 1),
-                    new EmptyBorder(6, 10, 6, 10)
+                    new EmptyBorder(5, 8, 5, 8)
             ));
         } else {
             btn.setBackground(Color.WHITE);
             btn.setForeground(new Color(71, 85, 105));
             btn.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(new Color(203, 213, 225), 1),
-                    new EmptyBorder(6, 10, 6, 10)
+                    new EmptyBorder(5, 8, 5, 8)
             ));
         }
     }

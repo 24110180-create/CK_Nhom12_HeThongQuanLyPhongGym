@@ -24,7 +24,7 @@ import java.util.List;
  * Tối ưu hiển thị toàn màn hình, tra cứu thông minh, kiểm toán phí hội viên
  * và tích hợp liên kết trực tiếp tới quy trình Tiếp nhận / Đăng ký mới.
  */
-public class QuanLyHoiVienPanel extends JPanel {
+public class QuanLyHoiVienPanel extends JPanel implements Scrollable {
 
     private final HoiVienService service = new HoiVienService();
     private final DecimalFormat df = new DecimalFormat("#,### đ");
@@ -46,6 +46,31 @@ public class QuanLyHoiVienPanel extends JPanel {
 
     private JComboBox<String> cbFilterStatus;
 
+    @Override
+    public Dimension getPreferredScrollableViewportSize() {
+        return getPreferredSize();
+    }
+
+    @Override
+    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+        return 16;
+    }
+
+    @Override
+    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+        return 64;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportWidth() {
+        return true;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportHeight() {
+        return false;
+    }
+
     public QuanLyHoiVienPanel() {
         this(null, null);
     }
@@ -57,16 +82,16 @@ public class QuanLyHoiVienPanel extends JPanel {
     public QuanLyHoiVienPanel(Runnable onOpenRegistration, java.util.function.Consumer<HoiVien> onOpenRenewal) {
         this.onOpenRegistration = onOpenRegistration;
         this.onOpenRenewal = onOpenRenewal;
-        setLayout(new BorderLayout(12, 12));
-        setBorder(new EmptyBorder(12, 14, 14, 14));
+        setLayout(new BorderLayout(10, 10));
+        setBorder(new EmptyBorder(10, 12, 12, 12));
         setBackground(new Color(248, 250, 252));
 
         // HEADER & KPI
-        JPanel topContainer = new JPanel(new BorderLayout(10, 10));
+        JPanel topContainer = new JPanel(new BorderLayout(8, 8));
         topContainer.setOpaque(false);
 
         JLabel lblTitle = new JLabel("HỆ THỐNG QUẢN LÝ DANH SÁCH HỘI VIÊN & DOANH THU HỘI PHÍ");
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 19));
         lblTitle.setForeground(new Color(15, 23, 42));
         topContainer.add(lblTitle, BorderLayout.NORTH);
 
@@ -89,9 +114,9 @@ public class QuanLyHoiVienPanel extends JPanel {
     }
 
     private JPanel createKpiPanel() {
-        JPanel kpiPanel = new JPanel(new GridLayout(1, 4, 12, 0));
+        JPanel kpiPanel = new JPanel(new GridLayout(1, 4, 8, 0));
         kpiPanel.setOpaque(false);
-        kpiPanel.setPreferredSize(new Dimension(0, 75));
+        kpiPanel.setPreferredSize(new Dimension(0, 64));
 
         lblKpiTongHoiVien = new JLabel("0 HV", SwingConstants.CENTER);
         lblKpiTongDoanhThu = new JLabel("0 đ", SwingConstants.CENTER);
@@ -101,24 +126,24 @@ public class QuanLyHoiVienPanel extends JPanel {
         kpiPanel.add(createKpiCard("Tổng Hội Viên Đã Đăng Ký", lblKpiTongHoiVien, new Color(37, 99, 235), new Color(239, 246, 255)));
         kpiPanel.add(createKpiCard("Tổng Tiền Đã Thanh Toán", lblKpiTongDoanhThu, new Color(16, 185, 129), new Color(236, 253, 245)));
         kpiPanel.add(createKpiCard("Hội Viên Đang Hoạt Động (Active)", lblKpiDangHoatDong, new Color(14, 165, 233), new Color(240, 249, 255)));
-        kpiPanel.add(createKpiCard("Thanh Toán VietQR / Chuyển Khoản", lblKpiChuyenKhoan, new Color(139, 92, 246), new Color(245, 243, 255)));
+        kpiPanel.add(createKpiCard("VietQR / Chuyển Khoản", lblKpiChuyenKhoan, new Color(139, 92, 246), new Color(245, 243, 255)));
 
         return kpiPanel;
     }
 
     private JPanel createKpiCard(String title, JLabel lblValue, Color primaryColor, Color bgColor) {
-        JPanel card = new JPanel(new BorderLayout(5, 5));
+        JPanel card = new JPanel(new BorderLayout(2, 2));
         card.setBackground(bgColor);
         card.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(primaryColor.brighter(), 1),
-                BorderFactory.createEmptyBorder(8, 12, 8, 12)
+                BorderFactory.createEmptyBorder(5, 8, 5, 8)
         ));
 
-        JLabel lblTitle = new JLabel(title);
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        JLabel lblTitle = new JLabel(title, SwingConstants.CENTER);
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 10));
         lblTitle.setForeground(new Color(71, 85, 105));
 
-        lblValue.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblValue.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblValue.setForeground(primaryColor);
 
         card.add(lblTitle, BorderLayout.NORTH);
@@ -127,32 +152,32 @@ public class QuanLyHoiVienPanel extends JPanel {
     }
 
     private JPanel createTablePanel() {
-        JPanel panel = new JPanel(new BorderLayout(0, 8));
+        JPanel panel = new JPanel(new BorderLayout(0, 6));
         panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
-                new EmptyBorder(10, 12, 10, 12)
+                new EmptyBorder(8, 10, 8, 10)
         ));
 
         // --- TOP TOOLBAR: BỘ LỌC + TÌM KIẾM + NÚT ĐĂNG KÝ MỚI ---
-        JPanel toolBar = new JPanel(new BorderLayout(10, 0));
+        JPanel toolBar = new JPanel(new BorderLayout(8, 0));
         toolBar.setOpaque(false);
 
         // Bên trái toolbar: Bộ lọc cơ sở & trạng thái
-        JPanel filterBox = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
+        JPanel filterBox = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
         filterBox.setOpaque(false);
 
         JLabel lblFBranch = new JLabel("Cơ sở:");
         lblFBranch.setFont(new Font("Segoe UI", Font.BOLD, 12));
         JComboBox<String> cbFilterBranch = new JComboBox<>(new String[]{
-                "Tất Cả Cơ Sở", "CN01 - Cơ sở 1 (Quận 1)", "CN02 - Cơ sở 2 (Tân Bình)", "Toàn hệ thống"
+                "Tất Cả Cơ Sở", "CN01 (Quận 1)", "CN02 (Tân Bình)", "Toàn hệ thống"
         });
         cbFilterBranch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
         JLabel lblFStatus = new JLabel("Trạng thái:");
         lblFStatus.setFont(new Font("Segoe UI", Font.BOLD, 12));
         cbFilterStatus = new JComboBox<>(new String[]{
-                "Tất Cả Trạng Thái", "Active (Đang hoạt động)", "Expired (Hết hạn)", "Locked (Tạm khóa)", "Sắp Hết Hạn (Trong 7 ngày tới)"
+                "Tất Cả Trạng Thái", "Active (Đang HĐ)", "Expired (Hết hạn)", "Locked (Tạm khóa)", "Sắp Hết Hạn (7 ngày)"
         });
         cbFilterStatus.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
@@ -161,19 +186,19 @@ public class QuanLyHoiVienPanel extends JPanel {
         filterBox.add(lblFStatus);
         filterBox.add(cbFilterStatus);
 
-        JTextField txtSearch = new JTextField(15);
+        JTextField txtSearch = new JTextField(12);
         txtSearch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtSearch.putClientProperty("JTextField.placeholderText", "Tìm tên, SĐT, mã QR, gói...");
+        txtSearch.putClientProperty("JTextField.placeholderText", "Tìm tên, SĐT, QR, gói...");
 
         boolean isOwner = com.nhom12.gym.util.Auth.vaiTro != null && "Chủ".equalsIgnoreCase(com.nhom12.gym.util.Auth.vaiTro);
         if (isOwner) {
-            JButton btnFilterVip = new JButton("👑 Lọc Khách VIP");
-            btnFilterVip.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            JButton btnFilterVip = new JButton("👑 Khách VIP");
+            btnFilterVip.setFont(new Font("Segoe UI", Font.BOLD, 11));
             btnFilterVip.setBackground(new Color(254, 243, 199));
             btnFilterVip.setForeground(new Color(180, 83, 9));
             btnFilterVip.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(new Color(245, 158, 11), 1),
-                    new EmptyBorder(4, 10, 4, 10)
+                    new EmptyBorder(4, 8, 4, 8)
             ));
             btnFilterVip.setCursor(new Cursor(Cursor.HAND_CURSOR));
             btnFilterVip.setToolTipText("Hiển thị nhanh danh sách khách VIP đặc quyền");
@@ -184,10 +209,10 @@ public class QuanLyHoiVienPanel extends JPanel {
         toolBar.add(filterBox, BorderLayout.WEST);
 
         // Bên phải toolbar: Tìm kiếm + Nút Đăng ký mới + Xuất Excel + Nút Kiểm Tra Giá
-        JPanel actionBox = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 4));
+        JPanel actionBox = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 2));
         actionBox.setOpaque(false);
 
-        JButton btnDangKyMoi = new JButton("+ Đăng Ký Hội Viên Mới");
+        JButton btnDangKyMoi = new JButton("+ Đăng Ký Mới");
         btnDangKyMoi.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnDangKyMoi.setBackground(new Color(16, 185, 129));
         btnDangKyMoi.setForeground(Color.WHITE);
@@ -201,7 +226,7 @@ public class QuanLyHoiVienPanel extends JPanel {
             }
         });
 
-        JButton btnExport = new JButton("Xuất Excel (.csv)");
+        JButton btnExport = new JButton("Xuất Excel");
         btnExport.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnExport.setBackground(new Color(241, 245, 249));
         btnExport.setForeground(new Color(15, 118, 110));
@@ -211,12 +236,16 @@ public class QuanLyHoiVienPanel extends JPanel {
         actionBox.add(new JLabel("Tìm kiếm:"));
         actionBox.add(txtSearch);
         if (isOwner) {
-            JButton btnCheckPriceTop = new JButton("🔍 Kiểm Tra Giá VIP (50%)");
-            btnCheckPriceTop.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            JButton btnCheckPriceTop = new JButton("🔍 Giá VIP (50%)");
+            btnCheckPriceTop.setFont(new Font("Segoe UI", Font.BOLD, 11));
             btnCheckPriceTop.setBackground(new Color(245, 158, 11)); // Amber
             btnCheckPriceTop.setForeground(Color.WHITE);
             btnCheckPriceTop.setFocusPainted(false);
             btnCheckPriceTop.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            btnCheckPriceTop.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(217, 119, 6), 1),
+                    new EmptyBorder(4, 6, 4, 6)
+            ));
             btnCheckPriceTop.setToolTipText("Mô phỏng bảo mật hiển thị giá thực tế: Chủ xem 6M/giảm 50% vs Lễ tân xem 3M/ẩn 50%");
             btnCheckPriceTop.addActionListener(e -> moDialogKiemTraBaoMatGiaVip());
             actionBox.add(btnCheckPriceTop);
@@ -390,19 +419,19 @@ public class QuanLyHoiVienPanel extends JPanel {
             }
         });
 
-        // Tinh chỉnh độ rộng các cột
+        // Tinh chỉnh độ rộng các cột tối ưu vừa vặn màn hình (hiển thị đầy đủ 11 cột bao gồm Trạng Thái)
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        table.getColumnModel().getColumn(0).setPreferredWidth(55);  // Mã HV
-        table.getColumnModel().getColumn(1).setPreferredWidth(95);  // Mã Thẻ QR
-        table.getColumnModel().getColumn(2).setPreferredWidth(140); // Họ Và Tên
-        table.getColumnModel().getColumn(3).setPreferredWidth(95);  // Số ĐT
-        table.getColumnModel().getColumn(4).setPreferredWidth(140); // Gói Tập
-        table.getColumnModel().getColumn(5).setPreferredWidth(130); // Ngày Giờ ĐK
-        table.getColumnModel().getColumn(6).setPreferredWidth(105); // Số Tiền Đã TT
-        table.getColumnModel().getColumn(7).setPreferredWidth(115); // Hình Thức TT
-        table.getColumnModel().getColumn(8).setPreferredWidth(135); // Chi Nhánh
-        table.getColumnModel().getColumn(9).setPreferredWidth(90);  // Ngày Hết Hạn
-        table.getColumnModel().getColumn(10).setPreferredWidth(100); // Trạng Thái
+        table.getColumnModel().getColumn(0).setPreferredWidth(50);  // Mã HV
+        table.getColumnModel().getColumn(1).setPreferredWidth(85);  // Mã Thẻ QR
+        table.getColumnModel().getColumn(2).setPreferredWidth(135); // Họ Và Tên
+        table.getColumnModel().getColumn(3).setPreferredWidth(90);  // Số ĐT
+        table.getColumnModel().getColumn(4).setPreferredWidth(125); // Gói Tập
+        table.getColumnModel().getColumn(5).setPreferredWidth(115); // Ngày Giờ ĐK
+        table.getColumnModel().getColumn(6).setPreferredWidth(95);  // Số Tiền Đã TT
+        table.getColumnModel().getColumn(7).setPreferredWidth(105); // Hình Thức TT
+        table.getColumnModel().getColumn(8).setPreferredWidth(120); // Chi Nhánh
+        table.getColumnModel().getColumn(9).setPreferredWidth(85);  // Ngày Hết Hạn
+        table.getColumnModel().getColumn(10).setPreferredWidth(90); // Trạng Thái
 
         // Double click mở dialog xem/cập nhật hồ sơ
         table.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -414,22 +443,24 @@ public class QuanLyHoiVienPanel extends JPanel {
             }
         });
 
-        panel.add(new JScrollPane(table), BorderLayout.CENTER);
+        JScrollPane scrollTable = new JScrollPane(table);
+        scrollTable.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        panel.add(scrollTable, BorderLayout.CENTER);
 
-        // --- BOTTOM ACTIONS: THAO TÁC HỒ SƠ & THẺ ---
-        JPanel bottomActions = new JPanel(new BorderLayout());
+        // --- BOTTOM ACTIONS: THAO TÁC HỒ SƠ & THẺ (TỐI ƯU KHÔNG BỊ TRÀN MẤT NÚT) ---
+        JPanel bottomActions = new JPanel(new BorderLayout(0, 4));
         bottomActions.setOpaque(false);
         bottomActions.setBorder(new EmptyBorder(6, 0, 0, 0));
 
-        JLabel lblHint = new JLabel("Mẹo: Nhấp đúp chuột vào hàng hoặc chọn nút dưới đây để cập nhật hồ sơ, khóa thẻ hoặc gửi mã QR:");
+        JLabel lblHint = new JLabel("Mẹo: Nhấp đúp chuột vào hàng để cập nhật hồ sơ, hoặc sử dụng các nút thao tác nhanh bên dưới:");
         lblHint.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         lblHint.setForeground(new Color(100, 116, 139));
-        bottomActions.add(lblHint, BorderLayout.WEST);
+        bottomActions.add(lblHint, BorderLayout.NORTH);
 
-        JPanel btnActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        JPanel btnActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 2));
         btnActions.setOpaque(false);
 
-        JButton btnXemTheQR = new JButton("Xem & Gửi Thẻ QR");
+        JButton btnXemTheQR = new JButton("Xem & Gửi QR");
         btnXemTheQR.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnXemTheQR.setBackground(new Color(37, 99, 235));
         btnXemTheQR.setForeground(Color.WHITE);
@@ -437,7 +468,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnXemTheQR.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnXemTheQR.addActionListener(e -> xemTheQRHoiVienDangChon());
 
-        JButton btnCapNhat = new JButton("Cập Nhật Hồ Sơ");
+        JButton btnCapNhat = new JButton("Cập Nhật");
         btnCapNhat.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnCapNhat.setBackground(new Color(14, 165, 233));
         btnCapNhat.setForeground(Color.WHITE);
@@ -445,7 +476,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnCapNhat.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnCapNhat.addActionListener(e -> moDialogCapNhatHoiVienDangChon());
 
-        JButton btnToggleLock = new JButton("Khóa / Mở Khóa");
+        JButton btnToggleLock = new JButton("Khóa / Mở Thẻ");
         btnToggleLock.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnToggleLock.setBackground(new Color(245, 158, 11));
         btnToggleLock.setForeground(Color.WHITE);
@@ -453,7 +484,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnToggleLock.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnToggleLock.addActionListener(e -> xuLyKhoaMoKhoaThe());
 
-        JButton btnQuetCheckIn = new JButton("Quét Thử Check-in");
+        JButton btnQuetCheckIn = new JButton("Quét Check-in");
         btnQuetCheckIn.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnQuetCheckIn.setBackground(new Color(16, 185, 129));
         btnQuetCheckIn.setForeground(Color.WHITE);
@@ -479,13 +510,13 @@ public class QuanLyHoiVienPanel extends JPanel {
 
         boolean isOwnerBottom = com.nhom12.gym.util.Auth.vaiTro != null && "Chủ".equalsIgnoreCase(com.nhom12.gym.util.Auth.vaiTro);
         if (isOwnerBottom) {
-            JButton btnKiemTraGiaVip = new JButton("🔍 Kiểm Tra Giá VIP (50%)");
+            JButton btnKiemTraGiaVip = new JButton("🔍 Giá VIP (50%)");
             btnKiemTraGiaVip.setFont(new Font("Segoe UI", Font.BOLD, 12));
             btnKiemTraGiaVip.setBackground(new Color(254, 243, 199)); // Amber
             btnKiemTraGiaVip.setForeground(new Color(180, 83, 9));
             btnKiemTraGiaVip.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(new Color(245, 158, 11), 1),
-                    new EmptyBorder(4, 10, 4, 10)
+                    new EmptyBorder(4, 8, 4, 8)
             ));
             btnKiemTraGiaVip.setFocusPainted(false);
             btnKiemTraGiaVip.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -510,7 +541,7 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnActions.add(btnXoa);
         btnActions.add(btnLamMoi);
 
-        bottomActions.add(btnActions, BorderLayout.EAST);
+        bottomActions.add(btnActions, BorderLayout.CENTER);
         panel.add(bottomActions, BorderLayout.SOUTH);
 
         return panel;

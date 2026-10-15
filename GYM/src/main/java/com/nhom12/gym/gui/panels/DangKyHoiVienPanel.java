@@ -76,6 +76,22 @@ public class DangKyHoiVienPanel extends JPanel {
         headerPanel.add(lblTitle, BorderLayout.NORTH);
         headerPanel.add(lblSubtitle, BorderLayout.SOUTH);
 
+        JPanel headerRightBtns = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        headerRightBtns.setOpaque(false);
+
+        JButton btnKiemTraGia = new JButton("🔍 Kiểm Tra Giá VIP (50%)");
+        btnKiemTraGia.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnKiemTraGia.setBackground(new Color(245, 158, 11)); // Amber
+        btnKiemTraGia.setForeground(Color.WHITE);
+        btnKiemTraGia.setFocusPainted(false);
+        btnKiemTraGia.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnKiemTraGia.setToolTipText("Mở bảng kiểm tra bảo mật giá thực theo phân quyền: Chủ vs Quản lý vs Lễ tân");
+        btnKiemTraGia.addActionListener(e -> {
+            Window parent = SwingUtilities.getWindowAncestor(this);
+            new com.nhom12.gym.gui.KiemTraBaoMatGiaVipDialog(parent).setVisible(true);
+        });
+        headerRightBtns.add(btnKiemTraGia);
+
         if (onBackToList != null) {
             JButton btnBack = new JButton("Xem Danh Sách Hội Viên");
             btnBack.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -84,9 +100,10 @@ public class DangKyHoiVienPanel extends JPanel {
             btnBack.setFocusPainted(false);
             btnBack.setCursor(new Cursor(Cursor.HAND_CURSOR));
             btnBack.addActionListener(e -> onBackToList.run());
-            headerPanel.add(btnBack, BorderLayout.EAST);
+            headerRightBtns.add(btnBack);
         }
 
+        headerPanel.add(headerRightBtns, BorderLayout.EAST);
         this.add(headerPanel, BorderLayout.NORTH);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -234,8 +251,33 @@ public class DangKyHoiVienPanel extends JPanel {
         formGrid.add(totalBar, gbc);
 
         // Buttons
-        JPanel actionButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        JPanel actionButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         actionButtons.setOpaque(false);
+
+        JButton btnQuickVip = new JButton("⚡ Nạp Mẫu VIP (50%)");
+        btnQuickVip.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnQuickVip.setBackground(new Color(254, 243, 199)); // Amber light
+        btnQuickVip.setForeground(new Color(180, 83, 9));
+        btnQuickVip.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(245, 158, 11), 1),
+                BorderFactory.createEmptyBorder(6, 10, 6, 10)
+        ));
+        btnQuickVip.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnQuickVip.setToolTipText("Điền nhanh khách VIP Đỗ Minh Trí (0909998877) để test tự động giảm 50%");
+        btnQuickVip.addActionListener(e -> napMauKhachVip());
+
+        JButton btnCheckPrice = new JButton("🔍 Kiểm Tra Giá (VIP 50%)");
+        btnCheckPrice.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnCheckPrice.setBackground(new Color(245, 158, 11)); // Amber
+        btnCheckPrice.setForeground(Color.WHITE);
+        btnCheckPrice.setFocusPainted(false);
+        btnCheckPrice.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnCheckPrice.setPreferredSize(new Dimension(190, 32));
+        btnCheckPrice.setToolTipText("Mở bảng kiểm tra bảo mật giá thực theo phân quyền: Chủ vs Quản lý vs Lễ tân");
+        btnCheckPrice.addActionListener(e -> {
+            Window parent = SwingUtilities.getWindowAncestor(this);
+            new com.nhom12.gym.gui.KiemTraBaoMatGiaVipDialog(parent).setVisible(true);
+        });
 
         JButton btnReset = new JButton("Làm Mới Form");
         btnReset.setFont(new Font("Segoe UI", Font.BOLD, 13));
@@ -247,6 +289,8 @@ public class DangKyHoiVienPanel extends JPanel {
         btnSubmit.setBackground(new Color(16, 185, 129));
         btnSubmit.setForeground(Color.WHITE);
 
+        actionButtons.add(btnQuickVip);
+        actionButtons.add(btnCheckPrice);
         actionButtons.add(btnReset);
         actionButtons.add(btnSubmit);
         gbc.gridy = r++;
@@ -678,5 +722,26 @@ public class DangKyHoiVienPanel extends JPanel {
         updateCalculations();
         lblCardName.setText("NGUYỄN VĂN A");
         lblCardPhone.setText("SĐT: 0901 234 567");
+    }
+
+    private void napMauKhachVip() {
+        txtFullName.setText("Đỗ Minh Trí");
+        txtPhone.setText("0909998877");
+        txtBirth.setText("10/10/1988");
+        cbGender.setSelectedItem("Nam");
+        cbBranch.setSelectedItem("CN01 - Cơ sở 1 (Quận 1)");
+        // Tìm và chọn gói 12 tháng VIP nếu có
+        if (cbPackage.getItemCount() > 0) {
+            for (int i = 0; i < cbPackage.getItemCount(); i++) {
+                String item = cbPackage.getItemAt(i);
+                if (item.contains("12 Tháng") || item.contains("VIP")) {
+                    cbPackage.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
+        updateCalculations();
+        lblCardName.setText("ĐỖ MINH TRÍ");
+        lblCardPhone.setText("SĐT: 0909 998 877");
     }
 }

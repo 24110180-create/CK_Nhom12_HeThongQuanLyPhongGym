@@ -126,13 +126,13 @@ public class VipPolicyService {
         }
         if (hoTen != null) {
             String n = hoTen.trim().toLowerCase();
-            if (n.contains("đỗ minh trí") || n.contains("do minh tri") || n.contains("nguyễn văn a") || n.contains("nguyen van a")) {
+            if (n.contains("đỗ minh trí") || n.contains("do minh tri") || n.contains("thanh tâm") || n.contains("thanh tam") || n.contains("nguyễn văn a") || n.contains("nguyen van a")) {
                 return true;
             }
         }
         if (sdt != null) {
             String s = sdt.trim();
-            if (s.equals("0909998877") || s.equals("0901000001") || s.equals("0902000002")) {
+            if (s.equals("0909998877") || s.equals("0832123456") || s.equals("0901000001") || s.equals("0902000002")) {
                 return true;
             }
         }

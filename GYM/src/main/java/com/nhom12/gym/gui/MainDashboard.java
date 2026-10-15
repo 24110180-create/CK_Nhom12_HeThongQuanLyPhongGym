@@ -385,6 +385,18 @@ public class MainDashboard extends JFrame {
             headerRight.add(btnQuickCheckIn);
         }
 
+        // Nút Kiểm Tra Hiển Thị Giá Theo Phân Quyền (Bảo Mật VIP 50%) - Hiển thị cho toàn bộ vai trò
+        JButton btnCheckVipPrice = new JButton("🔍 Kiểm Tra Hiển Thị Giá (VIP 50%)");
+        btnCheckVipPrice.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnCheckVipPrice.setBackground(new Color(245, 158, 11)); // Amber
+        btnCheckVipPrice.setForeground(Color.WHITE);
+        btnCheckVipPrice.setFocusPainted(false);
+        btnCheckVipPrice.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnCheckVipPrice.setPreferredSize(new Dimension(230, 32));
+        btnCheckVipPrice.setToolTipText("Kiểm tra và mô phỏng bảo mật giá thực theo phân quyền (Chủ vs Quản lý vs Lễ tân)");
+        btnCheckVipPrice.addActionListener(e -> new KiemTraBaoMatGiaVipDialog(this).setVisible(true));
+        headerRight.add(btnCheckVipPrice);
+
         String today = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
         JLabel lblDate = new JLabel("Ngày: " + today);
         lblDate.setFont(new Font("Segoe UI", Font.BOLD, 11));
@@ -418,9 +430,6 @@ public class MainDashboard extends JFrame {
         }
     }
 
-    // =========================================================================
-    // 1. MENU CHỦ PHÒNG (10 MÔ-ĐUN CẤP CAO - TẦM NHÌN CHIẾN LƯỢC)
-    // =========================================================================
     // =========================================================================
     // 1. MENU CHỦ PHÒNG (10 MÔ-ĐUN CẤP CAO - TẦM NHÌN CHIẾN LƯỢC)
     // =========================================================================
@@ -462,6 +471,7 @@ public class MainDashboard extends JFrame {
         addSidebarItem(menuContainer, "Quản Lý Lớp Học Theo Lịch", "Thời khóa biểu lớp Yoga, Zumba, Cardio & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Bán nước giải khát, whey & đồ tập", () -> new BanHangPOSPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Kho Hàng", "Kiểm kê xuất nhập tồn kho & hàng hóa", () -> new QuanLyKhoHangPanel(), accent, false);
+        addSidebarItem(menuContainer, "Chính Sách Giá & Ưu Đãi VIP", "Quy định giá thu hợp đồng nội bộ & bảo mật VIP", () -> new QuanLyKhuyenMaiPanel(), accent, false);
     }
 
     // =========================================================================
@@ -482,12 +492,14 @@ public class MainDashboard extends JFrame {
         addSidebarCategoryHeader(menuContainer, "Vận Hành Quầy & Dịch Vụ");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên tại quầy", () -> new CheckInForm(), accent, true);
         addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ hội viên, gói tập, tái ký & tra cứu toàn diện", () -> new QuanLyHoiVienHubPanel(), accent, false);
+        addSidebarItem(menuContainer, "Gia Hạn Gói Tập", "Gia hạn thẻ tập, nâng cấp gói & chiết khấu bảo mật VIP", () -> new GiaHanGoiTapPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Lớp Học Theo Lịch", "Điều phối lớp nhóm Yoga, Zumba, Cardio & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Thu ngân quầy bar & sản phẩm", () -> new BanHangPOSPanel(), accent, false);
 
         addSidebarCategoryHeader(menuContainer, "Điều Hành Cơ Sở");
         addSidebarItem(menuContainer, "Quản Lý Kho Hàng", "Kiểm kê xuất nhập tồn kho cơ sở", () -> new QuanLyKhoHangPanel(), accent, false);
         addSidebarItem(menuContainer, "Lịch Làm Việc & Phân Ca Trực", "Sắp xếp ca trực lễ tân, HLV sàn & xuất bảng phân ca", () -> new PhanCaLamViecPanel(), accent, false);
+        addSidebarItem(menuContainer, "Chính Sách Giá & Ưu Đãi VIP", "Kiểm tra chính sách giá cơ sở & bảo mật VIP", () -> new QuanLyKhuyenMaiPanel(), accent, false);
 
         addSidebarCategoryHeader(menuContainer, "Báo Cáo Chi Nhánh");
         addSidebarItem(menuContainer, "Phân Tích Giờ Cao Điểm", "Mật độ khách 6h-22h (Chi nhánh)", () -> new HeatmapGioCaoDiemPanel(), accent, false);

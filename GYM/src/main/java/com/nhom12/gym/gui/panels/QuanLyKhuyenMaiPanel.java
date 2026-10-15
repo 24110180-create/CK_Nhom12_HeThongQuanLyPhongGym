@@ -144,6 +144,9 @@ public class QuanLyKhuyenMaiPanel extends JPanel {
         JPanel bottomPanel = new JPanel(new BorderLayout(10, 10));
         bottomPanel.setOpaque(false);
 
+        String currentRole = Auth.vaiTro != null ? Auth.vaiTro : "Lễ tân";
+        boolean isChu = "Chủ".equalsIgnoreCase(currentRole) || (Auth.tenDangNhap != null && Auth.tenDangNhap.contains("admin"));
+
         // Form thêm VIP
         JPanel formAdd = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         formAdd.setOpaque(false);
@@ -170,6 +173,13 @@ public class QuanLyKhuyenMaiPanel extends JPanel {
         btnDeleteVip.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnDeleteVip.addActionListener(e -> actionXoaVip());
 
+        if (!isChu) {
+            btnAddVip.setEnabled(false);
+            btnDeleteVip.setEnabled(false);
+            btnAddVip.setToolTipText("Chỉ Chủ hệ thống (Anh Đức) mới có quyền chỉ định thêm khách VIP");
+            btnDeleteVip.setToolTipText("Chỉ Chủ hệ thống (Anh Đức) mới có quyền gỡ khách VIP");
+        }
+
         formAdd.add(new JLabel("Mã:")); formAdd.add(txtVipCode);
         formAdd.add(new JLabel("Tên:")); formAdd.add(txtVipName);
         formAdd.add(new JLabel("SĐT:")); formAdd.add(txtVipPhone);
@@ -187,35 +197,52 @@ public class QuanLyKhuyenMaiPanel extends JPanel {
 
         JLabel lblTestTitle = new JLabel("Mô Phỏng Bảo Mật Giá Thực:");
         lblTestTitle.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        JComboBox<String> cbRoleTest = new JComboBox<>(new String[]{"Lễ tân (Nhân viên)", "Chủ phòng tập (Anh Đức)"});
+        JComboBox<String> cbRoleTest = new JComboBox<>(new String[]{
+                "👔 Lễ tân (Nhân viên)",
+                "💼 Quản lý (Điều hành)",
+                "👑 Chủ phòng tập (Anh Đức)"
+        });
         cbRoleTest.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
-        JButton btnTestPrice = new JButton("Kiểm Tra Hiển Thị Giá (Gói 12 Tháng 6,000,000 đ)");
+        JButton btnTestPrice = new JButton("Kiểm Tra Nhanh (Gói 12T 6,000,000 đ)");
         btnTestPrice.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnTestPrice.setBackground(new Color(37, 99, 235));
         btnTestPrice.setForeground(Color.WHITE);
+
+        JButton btnOpenFullDialog = new JButton("🔍 Bảng Kiểm Tra Toàn Diện");
+        btnOpenFullDialog.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnOpenFullDialog.setBackground(new Color(245, 158, 11)); // Amber
+        btnOpenFullDialog.setForeground(Color.WHITE);
+        btnOpenFullDialog.setFocusPainted(false);
+        btnOpenFullDialog.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnOpenFullDialog.addActionListener(e -> {
+            Window parent = SwingUtilities.getWindowAncestor(this);
+            new com.nhom12.gym.gui.KiemTraBaoMatGiaVipDialog(parent).setVisible(true);
+        });
 
         lblVipSecurityDemo = new JLabel("Kết quả: Chọn vai trò và nhấn Kiểm Tra");
         lblVipSecurityDemo.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblVipSecurityDemo.setForeground(new Color(30, 41, 59));
 
         btnTestPrice.addActionListener(e -> {
-            String role = cbRoleTest.getSelectedItem().toString().contains("Lễ tân") ? "Lễ tân" : "Chủ";
-            VipPolicyService.ThongTinGiaHienThi info = vipService.tinhGiaTheoPhanQuyen(role, "0901000001", "Nguyễn Văn A", "VIP007", 6000000);
-            if ("Lễ tân".equals(role)) {
-                lblVipSecurityDemo.setText("<html>LỄ TÂN THẤY: <b>Giá thu: " + df.format(info.soTienThucThu)
-                        + "</b> | Chiết khấu: <b>0 đ</b> | Ghi chú: <i>" + info.moTaGiaHienThi + "</i> (ẨN GIÁ GỐC THÀNH CÔNG!)</html>");
-                lblVipSecurityDemo.setForeground(new Color(180, 83, 9));
-            } else {
-                lblVipSecurityDemo.setText("<html>CHỦ THẤY: <b>Giá gốc: " + df.format(info.giaGoc)
-                        + "</b> | Chiết khấu: <b>-50% (" + df.format(info.soTienGiam) + ")</b> | Thực thu: <b>" + df.format(info.soTienThucThu) + "</b></html>");
+            String sel = cbRoleTest.getSelectedItem().toString();
+            String role = sel.contains("Chủ") ? "Chủ" : (sel.contains("Quản lý") ? "Quản lý" : "Lễ tân");
+            VipPolicyService.ThongTinGiaHienThi info = vipService.tinhGiaTheoPhanQuyen(role, "0909998877", "Đỗ Minh Trí", "VIP007", 6000000);
+            if ("Chủ".equals(role)) {
+                lblVipSecurityDemo.setText("<html>👑 <b>CHỦ THẤY:</b> Giá gốc: <b>" + df.format(info.giaGoc)
+                        + "</b> | Chiết khấu: <b>-50% (" + df.format(info.soTienGiam) + ")</b> | Thực thu: <b>" + df.format(info.soTienThucThu) + "</b> (MINH BẠCH)</html>");
                 lblVipSecurityDemo.setForeground(new Color(16, 185, 129));
+            } else {
+                lblVipSecurityDemo.setText("<html>🔒 <b>" + role.toUpperCase() + " THẤY:</b> Giá thu hợp đồng: <b>" + df.format(info.soTienThucThu)
+                        + "</b> | Chiết khấu: <b>0 đ</b> | Ghi chú: <i>" + info.moTaGiaHienThi + "</i> (ẨN GIÁ GỐC 6M THÀNH CÔNG!)</html>");
+                lblVipSecurityDemo.setForeground(new Color(180, 83, 9));
             }
         });
 
         demoRoleBox.add(lblTestTitle);
         demoRoleBox.add(cbRoleTest);
         demoRoleBox.add(btnTestPrice);
+        demoRoleBox.add(btnOpenFullDialog);
         demoRoleBox.add(lblVipSecurityDemo);
 
         bottomPanel.add(formAdd, BorderLayout.NORTH);
@@ -228,14 +255,21 @@ public class QuanLyKhuyenMaiPanel extends JPanel {
     private void loadVipTableData() {
         vipModel.setRowCount(0);
         List<HoiVienVipDacQuyen> list = vipService.layDanhSachVip();
+        String currentRole = Auth.vaiTro != null ? Auth.vaiTro : "Lễ tân";
+        boolean isChu = "Chủ".equalsIgnoreCase(currentRole) || (Auth.tenDangNhap != null && Auth.tenDangNhap.contains("admin"));
+
         for (HoiVienVipDacQuyen v : list) {
+            String displayMoiQuanHe = isChu ? v.getMoiQuanHe() : "Hồ sơ nội bộ của Chủ";
+            String displayTiLe = isChu ? (v.getTiLeGiam() + "%") : "Ưu đãi nội bộ (Đã duyệt)";
+            String displayGhiChu = isChu ? v.getGhiChuBaoMat() : "Chính sách bảo mật cấp cao (Chỉ Chủ xem)";
+
             vipModel.addRow(new Object[]{
                     v.getMaTheQR(),
                     v.getHoTen(),
                     v.getSoDienThoai(),
-                    v.getMoiQuanHe(),
-                    v.getTiLeGiam() + "%",
-                    v.getGhiChuBaoMat()
+                    displayMoiQuanHe,
+                    displayTiLe,
+                    displayGhiChu
             });
         }
     }

@@ -386,21 +386,24 @@ public class GiaHanGoiTapPanel extends JPanel {
     private void loadInitialMember() {
         List<HoiVien> list = hoiVienDAO.layTatCa();
         if (list != null && !list.isEmpty()) {
-            // Mặc định nạp thử hội viên VIP007 nếu có trong danh sách
-            HoiVien defaultVip = null;
+            boolean isMasterUser = "Chủ".equalsIgnoreCase(Auth.vaiTro);
+            HoiVien defaultMember = null;
             for (HoiVien hv : list) {
-                if ("VIP007".equalsIgnoreCase(hv.getMaTheQR())) {
-                    defaultVip = hv;
+                boolean isVip = VipPolicyService.getInstance().laHoiVienVipDacQuyen(
+                        hv.getSoDienThoai(), hv.getHoTen(), hv.getMaTheQR());
+                if (isMasterUser && isVip) {
+                    defaultMember = hv;
+                    break;
+                } else if (!isMasterUser && !isVip) {
+                    defaultMember = hv;
                     break;
                 }
             }
-            if (defaultVip != null) {
-                displayMember(defaultVip);
-                txtSearch.setText(defaultVip.getMaTheQR());
-            } else {
-                displayMember(list.get(0));
-                txtSearch.setText(list.get(0).getMaTheQR() != null ? list.get(0).getMaTheQR() : String.valueOf(list.get(0).getMaHoiVien()));
+            if (defaultMember == null) {
+                defaultMember = list.get(0);
             }
+            displayMember(defaultMember);
+            txtSearch.setText(defaultMember.getMaTheQR() != null ? defaultMember.getMaTheQR() : String.valueOf(defaultMember.getMaHoiVien()));
         } else {
             lblTen.setText("Chưa có hội viên trong hệ thống");
             lblCurrentStatus.setText("Vui lòng nạp dữ liệu mẫu hoặc đăng ký hội viên trước.");
@@ -414,7 +417,6 @@ public class GiaHanGoiTapPanel extends JPanel {
 
     private void displayMember(HoiVien hv) {
         if (hv == null) return;
-        this.currentHoiVien = hv;
 
         String maHV = String.valueOf(hv.getMaHoiVien());
         String maQR = hv.getMaTheQR() != null ? hv.getMaTheQR() : ("HV" + maHV);
@@ -422,6 +424,20 @@ public class GiaHanGoiTapPanel extends JPanel {
 
         boolean isMasterUser = "Chủ".equalsIgnoreCase(Auth.vaiTro);
         boolean isVip = VipPolicyService.getInstance().laHoiVienVipDacQuyen(hv.getSoDienThoai(), hv.getHoTen(), maQR);
+
+        if (!isMasterUser && isVip) {
+            JOptionPane.showMessageDialog(this,
+                    "THÔNG BÁO QUYỀN HẠN:\n"
+                            + "Hội viên " + hv.getHoTen() + " (" + maQR + ") là Hội Viên VIP Đặc Quyền của hệ thống.\n\n"
+                            + "Theo quy định, nghiệp vụ Mua gói & Gia hạn cho Hội viên VIP chỉ do CHỦ PHÒNG (Anh Đức) trực tiếp thực hiện.\n"
+                            + "Trạm Lễ tân và Quản lý không có thẩm quyền thao tác gói tập cho Hội viên VIP.\n"
+                            + "Vui lòng hướng dẫn hội viên liên hệ trực tiếp Anh Đức để gia hạn gói tập!",
+                    "Chính Sách Đặc Quyền VIP", JOptionPane.INFORMATION_MESSAGE);
+            resetForm();
+            return;
+        }
+
+        this.currentHoiVien = hv;
         String vipBadge = (isVip && isMasterUser) ? " [⭐ HỘI VIÊN VIP ĐẶC QUYỀN]" : "";
 
         lblTen.setText("<html>" + hv.getHoTen() + "<span style='color:#7c3aed;font-weight:bold;'>" + vipBadge + "</span>"
@@ -585,6 +601,17 @@ public class GiaHanGoiTapPanel extends JPanel {
         boolean isChu = "Chủ".equalsIgnoreCase(effectiveRole)
                 || effectiveRole.toLowerCase().contains("chủ")
                 || effectiveRole.toLowerCase().contains("admin");
+
+        boolean isVipMember = VipPolicyService.getInstance().laHoiVienVipDacQuyen(sdt, hoTen, maQR);
+        if (!isChu && isVipMember) {
+            JOptionPane.showMessageDialog(this,
+                    "THÔNG BÁO QUYỀN HẠN:\n"
+                            + "Hội viên " + hoTen + " là Hội Viên VIP Đặc Quyền.\n"
+                            + "Nghiệp vụ Mua gói & Gia hạn cho Hội viên VIP bắt buộc phải do Chủ hệ thống (Anh Đức) trực tiếp thực hiện!\n"
+                            + "Giao dịch bị từ chối tại trạm Lễ tân / Quản lý.",
+                    "Từ chối quyền hạn", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
         VipPolicyService.ThongTinGiaHienThi giaInfo = VipPolicyService.getInstance().tinhGiaTheoPhanQuyen(
                 effectiveRole, sdt, hoTen, maQR, basePrice);

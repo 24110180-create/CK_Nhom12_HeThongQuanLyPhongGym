@@ -46,7 +46,6 @@ public class QuanLyKhuyenMaiPanel extends JPanel {
     private JTextField txtVipName;
     private JTextField txtVipPhone;
     private JTextField txtVipRelation;
-    private JLabel lblVipSecurityDemo;
 
     // Tab 2: Wifi CN02 & Offline Mode
     private JLabel lblOfflineStatus;
@@ -187,66 +186,7 @@ public class QuanLyKhuyenMaiPanel extends JPanel {
         formAdd.add(btnAddVip);
         formAdd.add(btnDeleteVip);
 
-        // Khung Test mô phỏng hiển thị theo quyền
-        JPanel demoRoleBox = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 8));
-        demoRoleBox.setBackground(new Color(248, 250, 252));
-        demoRoleBox.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(226, 232, 240)),
-                new EmptyBorder(5, 10, 5, 10)
-        ));
-
-        JLabel lblTestTitle = new JLabel("Mô Phỏng Bảo Mật Giá Thực:");
-        lblTestTitle.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        JComboBox<String> cbRoleTest = new JComboBox<>(new String[]{
-                "👔 Lễ tân (Nhân viên)",
-                "💼 Quản lý (Điều hành)",
-                "👑 Chủ phòng tập (Anh Đức)"
-        });
-        cbRoleTest.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-
-        JButton btnTestPrice = new JButton("Kiểm Tra Nhanh (Gói 12T 6,000,000 đ)");
-        btnTestPrice.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnTestPrice.setBackground(new Color(37, 99, 235));
-        btnTestPrice.setForeground(Color.WHITE);
-
-        JButton btnOpenFullDialog = new JButton("🔍 Bảng Kiểm Tra Toàn Diện");
-        btnOpenFullDialog.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnOpenFullDialog.setBackground(new Color(245, 158, 11)); // Amber
-        btnOpenFullDialog.setForeground(Color.WHITE);
-        btnOpenFullDialog.setFocusPainted(false);
-        btnOpenFullDialog.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnOpenFullDialog.addActionListener(e -> {
-            Window parent = SwingUtilities.getWindowAncestor(this);
-            new com.nhom12.gym.gui.KiemTraBaoMatGiaVipDialog(parent).setVisible(true);
-        });
-
-        lblVipSecurityDemo = new JLabel("Kết quả: Chọn vai trò và nhấn Kiểm Tra");
-        lblVipSecurityDemo.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        lblVipSecurityDemo.setForeground(new Color(30, 41, 59));
-
-        btnTestPrice.addActionListener(e -> {
-            String sel = cbRoleTest.getSelectedItem().toString();
-            String role = sel.contains("Chủ") ? "Chủ" : (sel.contains("Quản lý") ? "Quản lý" : "Lễ tân");
-            VipPolicyService.ThongTinGiaHienThi info = vipService.tinhGiaTheoPhanQuyen(role, "0909998877", "Đỗ Minh Trí", "VIP007", 6000000);
-            if ("Chủ".equals(role)) {
-                lblVipSecurityDemo.setText("<html>👑 <b>CHỦ THẤY:</b> Giá gốc: <b>" + df.format(info.giaGoc)
-                        + "</b> | Chiết khấu: <b>-50% (" + df.format(info.soTienGiam) + ")</b> | Thực thu: <b>" + df.format(info.soTienThucThu) + "</b> (MINH BẠCH)</html>");
-                lblVipSecurityDemo.setForeground(new Color(16, 185, 129));
-            } else {
-                lblVipSecurityDemo.setText("<html>🔒 <b>" + role.toUpperCase() + " THẤY:</b> Giá thu hợp đồng: <b>" + df.format(info.soTienThucThu)
-                        + "</b> | Chiết khấu: <b>0 đ</b> | Ghi chú: <i>" + info.moTaGiaHienThi + "</i> (ẨN GIÁ GỐC 6M THÀNH CÔNG!)</html>");
-                lblVipSecurityDemo.setForeground(new Color(180, 83, 9));
-            }
-        });
-
-        demoRoleBox.add(lblTestTitle);
-        demoRoleBox.add(cbRoleTest);
-        demoRoleBox.add(btnTestPrice);
-        demoRoleBox.add(btnOpenFullDialog);
-        demoRoleBox.add(lblVipSecurityDemo);
-
-        bottomPanel.add(formAdd, BorderLayout.NORTH);
-        bottomPanel.add(demoRoleBox, BorderLayout.SOUTH);
+        bottomPanel.add(formAdd, BorderLayout.CENTER);
         panel.add(bottomPanel, BorderLayout.SOUTH);
 
         return panel;

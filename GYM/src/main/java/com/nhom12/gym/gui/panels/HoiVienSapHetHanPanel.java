@@ -385,6 +385,20 @@ public class HoiVienSapHetHanPanel extends JPanel {
         }
         if (hv == null) return;
 
+        boolean isChu = "Chủ".equalsIgnoreCase(com.nhom12.gym.util.Auth.vaiTro);
+        boolean isVip = com.nhom12.gym.service.VipPolicyService.getInstance().laHoiVienVipDacQuyen(
+                hv.getSoDienThoai(), hv.getHoTen(), hv.getMaTheQR());
+        if (!isChu && isVip) {
+            JOptionPane.showMessageDialog(this,
+                    "THÔNG BÁO QUYỀN HẠN:\n"
+                            + "Hội viên " + hoTen + " là Hội Viên VIP Đặc Quyền của hệ thống.\n\n"
+                            + "Theo quy định, nghiệp vụ Gia hạn cho Hội viên VIP chỉ do CHỦ PHÒNG (Anh Đức) trực tiếp thực hiện.\n"
+                            + "Trạm Lễ tân và Quản lý không có thẩm quyền thao tác gói tập cho Hội viên VIP.\n"
+                            + "Vui lòng hướng dẫn hội viên liên hệ trực tiếp Anh Đức để gia hạn gói tập!",
+                    "Chính Sách Đặc Quyền VIP", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
         String[] options = {
                 "Gia hạn 1 Tháng (500,000 VNĐ)",
                 "Gia hạn 3 Tháng (1,350,000 VNĐ - Giảm 10%)",
@@ -432,7 +446,7 @@ public class HoiVienSapHetHanPanel extends JPanel {
         }
 
         String role = Auth.vaiTro != null ? Auth.vaiTro : "Lễ tân";
-        boolean isChu = "Chủ".equalsIgnoreCase(role) || (role != null && role.toLowerCase().contains("chủ"));
+        isChu = "Chủ".equalsIgnoreCase(role) || (role != null && role.toLowerCase().contains("chủ"));
         VipPolicyService.ThongTinGiaHienThi giaInfo = VipPolicyService.getInstance().tinhGiaTheoPhanQuyen(
                 role, hv.getSoDienThoai(), hv.getHoTen(), hv.getMaTheQR(), fee);
 

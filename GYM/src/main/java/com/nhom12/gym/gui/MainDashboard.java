@@ -391,19 +391,6 @@ public class MainDashboard extends JFrame {
             headerRight.add(btnQuickCheckIn);
         }
 
-        // Nút Kiểm Tra Hiển Thị Giá Theo Phân Quyền (Bảo Mật VIP 50%) - Chỉ hiển thị cho vai trò Chủ phòng tập
-        if ("Chủ".equalsIgnoreCase(role)) {
-            JButton btnCheckVipPrice = new JButton("🔍 Kiểm Tra Hiển Thị Giá (VIP 50%)");
-            btnCheckVipPrice.setFont(new Font("Segoe UI", Font.BOLD, 11));
-            btnCheckVipPrice.setBackground(new Color(245, 158, 11)); // Amber
-            btnCheckVipPrice.setForeground(Color.WHITE);
-            btnCheckVipPrice.setFocusPainted(false);
-            btnCheckVipPrice.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            btnCheckVipPrice.setPreferredSize(new Dimension(220, 30));
-            btnCheckVipPrice.setToolTipText("Kiểm tra và mô phỏng bảo mật giá thực theo phân quyền (Chủ vs Quản lý vs Lễ tân)");
-            btnCheckVipPrice.addActionListener(e -> new KiemTraBaoMatGiaVipDialog(this).setVisible(true));
-            headerRight.add(btnCheckVipPrice);
-        }
 
         String today = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
         JLabel lblDate = new JLabel("Ngày: " + today);

@@ -364,6 +364,21 @@ public class ChiTietHoiVienPanel extends JPanel {
             return;
         }
 
+        String role = Auth.vaiTro != null ? Auth.vaiTro : "Lễ tân";
+        boolean isChu = "Chủ".equalsIgnoreCase(role) || (role != null && role.toLowerCase().contains("chủ"));
+        boolean isVip = VipPolicyService.getInstance().laHoiVienVipDacQuyen(
+                currentMember.getSoDienThoai(), currentMember.getHoTen(), currentMember.getMaTheQR());
+        if (!isChu && isVip) {
+            JOptionPane.showMessageDialog(this,
+                    "THÔNG BÁO QUYỀN HẠN:\n"
+                            + "Hội viên " + currentMember.getHoTen() + " là Hội Viên VIP Đặc Quyền của hệ thống.\n\n"
+                            + "Theo quy định, nghiệp vụ Mua gói & Gia hạn cho Hội viên VIP chỉ do CHỦ PHÒNG (Anh Đức) trực tiếp thực hiện.\n"
+                            + "Trạm Lễ tân và Quản lý không có thẩm quyền thao tác gói tập cho Hội viên VIP.\n"
+                            + "Vui lòng hướng dẫn hội viên liên hệ trực tiếp Anh Đức để gia hạn gói tập!",
+                    "Chính Sách Đặc Quyền VIP", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
         String[] options = {"1 Tháng (500,000 đ)", "3 Tháng (1,350,000 đ)", "6 Tháng (2,500,000 đ)", "12 Tháng (4,500,000 đ)"};
         int sel = JOptionPane.showOptionDialog(this,
                 "Chọn gói thời gian gia hạn cho hội viên: " + currentMember.getHoTen(),
@@ -392,8 +407,8 @@ public class ChiTietHoiVienPanel extends JPanel {
         cal.add(Calendar.MONTH, months);
         Date newExp = cal.getTime();
 
-        String role = Auth.vaiTro != null ? Auth.vaiTro : "Lễ tân";
-        boolean isChu = "Chủ".equalsIgnoreCase(role) || (role != null && role.toLowerCase().contains("chủ"));
+        role = Auth.vaiTro != null ? Auth.vaiTro : "Lễ tân";
+        isChu = "Chủ".equalsIgnoreCase(role) || (role != null && role.toLowerCase().contains("chủ"));
         VipPolicyService.ThongTinGiaHienThi giaInfo = VipPolicyService.getInstance().tinhGiaTheoPhanQuyen(
                 role, currentMember.getSoDienThoai(), currentMember.getHoTen(), currentMember.getMaTheQR(), price);
 

@@ -235,21 +235,6 @@ public class QuanLyHoiVienPanel extends JPanel implements Scrollable {
 
         actionBox.add(new JLabel("Tìm kiếm:"));
         actionBox.add(txtSearch);
-        if (isOwner) {
-            JButton btnCheckPriceTop = new JButton("🔍 Giá VIP (50%)");
-            btnCheckPriceTop.setFont(new Font("Segoe UI", Font.BOLD, 11));
-            btnCheckPriceTop.setBackground(new Color(245, 158, 11)); // Amber
-            btnCheckPriceTop.setForeground(Color.WHITE);
-            btnCheckPriceTop.setFocusPainted(false);
-            btnCheckPriceTop.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            btnCheckPriceTop.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(217, 119, 6), 1),
-                    new EmptyBorder(4, 6, 4, 6)
-            ));
-            btnCheckPriceTop.setToolTipText("Mô phỏng bảo mật hiển thị giá thực tế: Chủ xem 6M/giảm 50% vs Lễ tân xem 3M/ẩn 50%");
-            btnCheckPriceTop.addActionListener(e -> moDialogKiemTraBaoMatGiaVip());
-            actionBox.add(btnCheckPriceTop);
-        }
         actionBox.add(btnDangKyMoi);
         actionBox.add(btnExport);
 
@@ -508,21 +493,6 @@ public class QuanLyHoiVienPanel extends JPanel implements Scrollable {
         btnLamMoi.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnLamMoi.addActionListener(e -> loadDataToTable());
 
-        boolean isOwnerBottom = com.nhom12.gym.util.Auth.vaiTro != null && "Chủ".equalsIgnoreCase(com.nhom12.gym.util.Auth.vaiTro);
-        if (isOwnerBottom) {
-            JButton btnKiemTraGiaVip = new JButton("🔍 Giá VIP (50%)");
-            btnKiemTraGiaVip.setFont(new Font("Segoe UI", Font.BOLD, 12));
-            btnKiemTraGiaVip.setBackground(new Color(254, 243, 199)); // Amber
-            btnKiemTraGiaVip.setForeground(new Color(180, 83, 9));
-            btnKiemTraGiaVip.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(245, 158, 11), 1),
-                    new EmptyBorder(4, 8, 4, 8)
-            ));
-            btnKiemTraGiaVip.setFocusPainted(false);
-            btnKiemTraGiaVip.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            btnKiemTraGiaVip.addActionListener(e -> moDialogKiemTraBaoMatGiaVip());
-            btnActions.add(btnKiemTraGiaVip);
-        }
 
         JButton btnGiaHan = new JButton("⚡ Gia Hạn Thẻ Tập");
         btnGiaHan.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -556,6 +526,21 @@ public class QuanLyHoiVienPanel extends JPanel implements Scrollable {
             return;
         }
 
+        boolean isChu = "Chủ".equalsIgnoreCase(com.nhom12.gym.util.Auth.vaiTro);
+        boolean isVip = com.nhom12.gym.service.VipPolicyService.getInstance().laHoiVienVipDacQuyen(
+                hv.getSoDienThoai(), hv.getHoTen(), hv.getMaTheQR());
+
+        if (!isChu && isVip) {
+            JOptionPane.showMessageDialog(this,
+                    "THÔNG BÁO QUYỀN HẠN:\n"
+                            + "Hội viên " + hv.getHoTen() + " (" + (hv.getMaTheQR() != null ? hv.getMaTheQR() : ("HV" + hv.getMaHoiVien())) + ") là Hội Viên VIP Đặc Quyền của hệ thống.\n\n"
+                            + "Theo quy định, nghiệp vụ Mua gói & Gia hạn cho Hội viên VIP chỉ do CHỦ PHÒNG (Anh Đức) trực tiếp thực hiện.\n"
+                            + "Trạm Lễ tân và Quản lý chỉ tiếp nhận Check-in và phục vụ tập luyện thông thường.\n"
+                            + "Vui lòng hướng dẫn hội viên liên hệ trực tiếp Anh Đức để gia hạn gói tập!",
+                    "Chính Sách Đặc Quyền VIP", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
         if (onOpenRenewal != null) {
             onOpenRenewal.accept(hv);
             return;
@@ -571,11 +556,6 @@ public class QuanLyHoiVienPanel extends JPanel implements Scrollable {
         dlg.setContentPane(pnlRenew);
         dlg.setVisible(true);
         loadDataToTable();
-    }
-
-    private void moDialogKiemTraBaoMatGiaVip() {
-        Window parent = SwingUtilities.getWindowAncestor(this);
-        new com.nhom12.gym.gui.KiemTraBaoMatGiaVipDialog(parent).setVisible(true);
     }
 
     public void loadDataToTable() {

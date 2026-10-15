@@ -287,6 +287,11 @@ public class CuaSoChuHeThongPanel extends JPanel {
                 if (tk == null) continue;
                 String role = tk.getVaiTro() != null ? tk.getVaiTro().trim().toLowerCase() : "";
 
+                // Bỏ qua tài khoản Hội viên (chỉ thống kê quân số Nhân sự chuỗi)
+                if (role.contains("hội viên") || role.contains("hoi vien") || role.contains("member")) {
+                    continue;
+                }
+
                 if (role.contains("lễ tân") || role.contains("le tan") || role.contains("reception")) {
                     stats.countLeTan++;
                 } else if (role.contains("hlv") || role.contains("huấn luyện") || role.contains("huan luyen")
@@ -300,8 +305,6 @@ public class CuaSoChuHeThongPanel extends JPanel {
                     if (!name.isEmpty() && !name.equalsIgnoreCase("admin") && !stats.chuNames.contains(name)) {
                         stats.chuNames.add(name);
                     }
-                } else {
-                    stats.countLeTan++;
                 }
             }
         }

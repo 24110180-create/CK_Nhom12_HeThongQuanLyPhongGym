@@ -1,8 +1,12 @@
 package com.nhom12.gym.service;
 
+import com.nhom12.gym.dao.HoiVienDAO;
 import com.nhom12.gym.dao.HoiVienVipDacQuyenDAO;
+import com.nhom12.gym.entity.HoiVien;
 import com.nhom12.gym.entity.HoiVienVipDacQuyen;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -82,6 +86,10 @@ public class VipPolicyService {
             danhSachVipDacQuyen.add(v2);
             danhSachVipDacQuyen.add(v3);
         }
+        // Tự động kiểm tra và đồng bộ các hội viên VIP vào danh sách hội viên chung
+        for (HoiVienVipDacQuyen v : danhSachVipDacQuyen) {
+            dongBoVaoDanhSachHoiVienChung(v);
+        }
     }
 
     public List<HoiVienVipDacQuyen> layDanhSachVip() {
@@ -97,6 +105,8 @@ public class VipPolicyService {
                     (vip.getSoDienThoai() != null && vip.getSoDienThoai().equalsIgnoreCase(v.getSoDienThoai()))
             );
             danhSachVipDacQuyen.add(vip);
+            // Đồng bộ lập tức vào danh sách hội viên của cả 4 trạm (Chủ, Quản lý, Lễ tân, HLV)
+            dongBoVaoDanhSachHoiVienChung(vip);
         }
         return ok;
     }
@@ -110,8 +120,72 @@ public class VipPolicyService {
                     v.getSoDienThoai().equalsIgnoreCase(key) ||
                     v.getMaThe().equalsIgnoreCase(key)
             );
+            DataSyncManager.fireDataChanged(DataSyncManager.DataType.HOI_VIEN);
+            DataSyncManager.fireDataChanged(DataSyncManager.DataType.ALL);
         }
         return ok;
+    }
+
+    /**
+     * Đồng bộ hội viên VIP vào danh sách chung HoiVienDAO để cả 4 trạm đều nhìn thấy
+     */
+    public void dongBoVaoDanhSachHoiVienChung(HoiVienVipDacQuyen vip) {
+        if (vip == null) return;
+        try {
+            HoiVienDAO hvDAO = HoiVienDAO.getInstance();
+            String code = vip.getMaThe() != null ? vip.getMaThe().trim() : "";
+            String phone = vip.getSoDienThoai() != null ? vip.getSoDienThoai().trim() : "";
+            String name = vip.getHoTen() != null ? vip.getHoTen().trim() : "Khách VIP";
+
+            HoiVien existing = null;
+            if (!code.isEmpty()) {
+                existing = hvDAO.timTheoMaQR(code);
+            }
+            if (existing == null && !phone.isEmpty()) {
+                existing = hvDAO.timKiemThongMinh(phone);
+            }
+
+            if (existing == null) {
+                HoiVien newHv = new HoiVien();
+                newHv.setMaTheQR(code.isEmpty() ? ("VIP" + (System.currentTimeMillis() % 10000)) : code);
+                newHv.setHoTen(name);
+                newHv.setSoDienThoai(phone);
+                newHv.setChiNhanhDangKy("Toàn hệ thống");
+                newHv.setGoiTapDangKy("Gói 12 Tháng VIP Diamond");
+                newHv.setNgayDangKy(new Date());
+
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.MONTH, 12);
+                newHv.setNgayHetHan(cal.getTime());
+                newHv.setSoTienDaThanhToan(3000000.0);
+                newHv.setHinhThucThanhToan("Chuyển khoản (VietQR)");
+                newHv.setTrangThai("Active");
+
+                hvDAO.them(newHv);
+            } else {
+                boolean changed = false;
+                if (name != null && !name.isEmpty() && !name.equalsIgnoreCase(existing.getHoTen())) {
+                    existing.setHoTen(name);
+                    changed = true;
+                }
+                if (code != null && !code.isEmpty() && !code.equalsIgnoreCase(existing.getMaTheQR())) {
+                    existing.setMaTheQR(code);
+                    changed = true;
+                }
+                if (existing.getTrangThai() == null || !existing.getTrangThai().equalsIgnoreCase("Active")) {
+                    existing.setTrangThai("Active");
+                    changed = true;
+                }
+                if (changed) {
+                    hvDAO.capNhat(existing);
+                }
+            }
+
+            DataSyncManager.fireDataChanged(DataSyncManager.DataType.HOI_VIEN);
+            DataSyncManager.fireDataChanged(DataSyncManager.DataType.ALL);
+        } catch (Exception ex) {
+            System.err.println("[VipPolicyService] Lỗi đồng bộ hội viên VIP vào danh sách chung: " + ex.getMessage());
+        }
     }
 
     /**

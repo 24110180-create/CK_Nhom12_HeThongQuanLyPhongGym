@@ -19,6 +19,12 @@ import org.hibernate.query.Query;
  */
 public class HoiVienDAO {
 
+    private static final HoiVienDAO INSTANCE = new HoiVienDAO();
+
+    public static HoiVienDAO getInstance() {
+        return INSTANCE;
+    }
+
     private static final Logger LOGGER = Logger.getLogger(HoiVienDAO.class.getName());
 
     // Bộ nhớ đệm dự phòng (Memory Fallback Buffer) đồng bộ khi CSDL offline

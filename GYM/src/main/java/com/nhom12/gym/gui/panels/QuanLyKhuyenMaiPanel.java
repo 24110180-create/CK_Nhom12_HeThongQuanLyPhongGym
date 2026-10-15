@@ -288,7 +288,14 @@ public class QuanLyKhuyenMaiPanel extends JPanel {
         vipService.themVipDacQuyen(new HoiVienVipDacQuyen(code, name, phone, rel.isEmpty() ? "Khách VIP nội bộ" : rel, 50.0, "Chính sách ưu đãi nội bộ"));
         loadVipTableData();
         txtVipCode.setText(""); txtVipName.setText(""); txtVipPhone.setText(""); txtVipRelation.setText("");
-        JOptionPane.showMessageDialog(this, "Đã thêm khách VIP '" + name + "' vào chính sách ưu đãi nội bộ!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this,
+                "Đã thêm khách VIP '" + name + "' (" + code + ") vào chính sách ưu đãi 50% nội bộ!\n"
+                + "• Hệ thống đã tự động đồng bộ hồ sơ hội viên lên danh sách của cả 4 trạm:\n"
+                + "  1. Trạm Chủ phòng tập (Anh Đức)\n"
+                + "  2. Trạm Quản lý chi nhánh\n"
+                + "  3. Trạm Lễ tân tại quầy (tự động nhận diện giá 50% ngầm)\n"
+                + "  4. Trạm Huấn luyện viên (PT sàn)",
+                "Thành Công - Đã Đồng Bộ 4 Trạm", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void actionXoaVip() {
@@ -300,7 +307,7 @@ public class QuanLyKhuyenMaiPanel extends JPanel {
         String code = (String) vipModel.getValueAt(row, 0);
         vipService.xoaVipDacQuyen(code);
         loadVipTableData();
-        JOptionPane.showMessageDialog(this, "Đã gỡ khách VIP '" + code + "' khỏi chính sách đặc quyền!", "Đã gỡ VIP", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, "Đã gỡ khách VIP '" + code + "' khỏi chính sách đặc quyền và đồng bộ lại toàn hệ thống!", "Đã Gỡ VIP", JOptionPane.INFORMATION_MESSAGE);
     }
 
     // =========================================================================

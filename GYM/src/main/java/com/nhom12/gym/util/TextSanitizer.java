@@ -44,20 +44,17 @@ public class TextSanitizer {
             return "Locked (Tạm khóa)";
         }
 
-        // 2. Khắc phục chi nhánh cơ sở
-        if (s.toLowerCase().contains("toàn hệ thống") || s.toLowerCase().contains("to?n") || s.toLowerCase().contains("vip")) {
+        // 2. Khắc phục chi nhánh cơ sở (chỉ áp dụng khi đúng là định dạng chi nhánh)
+        if (s.equalsIgnoreCase("Toàn hệ thống") || s.toLowerCase().contains("toàn hệ thống") || s.toLowerCase().contains("to?n h? th?ng")) {
             return "Toàn hệ thống (VIP)";
         }
-        if (s.toLowerCase().contains("b?nh th?nh") || s.toLowerCase().contains("bình thạnh") || s.toLowerCase().contains("cn03") ||
-            (s.toLowerCase().contains("cơ s") && s.contains("3"))) {
+        if (s.toLowerCase().startsWith("cn03") || (s.toLowerCase().startsWith("cơ s") && s.contains("3")) || s.equalsIgnoreCase("bình thạnh")) {
             return "CN03 - Cơ sở 3 (Bình Thạnh)";
         }
-        if (s.toLowerCase().contains("cn01") || s.toLowerCase().contains("quận 1") || s.toLowerCase().contains("qu?n 1") ||
-            (s.toLowerCase().contains("cơ s") && s.contains("1")) || s.toLowerCase().contains("gò vấp") || s.toLowerCase().contains("g? v")) {
+        if (s.toLowerCase().startsWith("cn01") || (s.toLowerCase().startsWith("cơ s") && s.contains("1")) || s.equalsIgnoreCase("quận 1") || s.equalsIgnoreCase("gò vấp")) {
             return "CN01 - Cơ sở 1 (Quận 1)";
         }
-        if (s.toLowerCase().contains("cn02") || s.toLowerCase().contains("tân bình") || s.toLowerCase().contains("t?n b") ||
-            (s.toLowerCase().contains("cơ s") && s.contains("2"))) {
+        if (s.toLowerCase().startsWith("cn02") || (s.toLowerCase().startsWith("cơ s") && s.contains("2")) || s.equalsIgnoreCase("tân bình")) {
             return "CN02 - Cơ sở 2 (Tân Bình)";
         }
 

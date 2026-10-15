@@ -9,6 +9,7 @@
         <property name="hibernate.connection.characterEncoding">UTF-8</property>
         <property name="hibernate.connection.useUnicode">true</property>
         <property name="hibernate.connection.CharSet">UTF-8</property>
+        <property name="hibernate.use_nationalized_character_data">true</property>
 
         <!-- Tài khoản và mật khẩu SQL Server (Được ghi đè bằng database.properties nếu có) -->
         <property name="hibernate.connection.username">admin123</property>

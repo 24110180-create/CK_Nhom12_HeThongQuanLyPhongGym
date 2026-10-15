@@ -21,13 +21,13 @@ public class NhatKyHeThong implements Serializable {
     @Column(name = "TenDangNhap", length = 50, nullable = false)
     private String tenDangNhap;
 
-    @Column(name = "VaiTro", length = 50)
+    @Column(name = "VaiTro", length = 50, columnDefinition = "NVARCHAR(50)")
     private String vaiTro;
 
-    @Column(name = "HanhDong", length = 100, nullable = false)
+    @Column(name = "HanhDong", length = 100, nullable = false, columnDefinition = "NVARCHAR(100)")
     private String hanhDong;
 
-    @Column(name = "ChiTiet", length = 500)
+    @Column(name = "ChiTiet", length = 500, columnDefinition = "NVARCHAR(500)")
     private String chiTiet;
 
     @Temporal(TemporalType.TIMESTAMP)

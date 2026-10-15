@@ -741,6 +741,7 @@ public class LichLopHocPanel extends JPanel {
     // 3. XỬ LÝ DỮ LIỆU & ĐỒNG BỘ
     // =========================================================================
     private void taiDuLieuLopHoc() {
+        String maLopCu = (lopDangChon != null) ? lopDangChon.getMaLop() : null;
         danhSachLop = lopHocDAO.layTatCa();
         modelLop.setRowCount(0);
 
@@ -808,26 +809,34 @@ public class LichLopHocPanel extends JPanel {
         lblCardTongHocVien.setText(tongHocVien + " Học viên");
         lblCardDaDiemDanh.setText(tongDaDiemDanh + " / " + tatCaDK.size());
 
-        if (lopDangChon != null) {
+        if (maLopCu != null) {
             // Chọn lại lớp cũ nếu còn tồn tại
             boolean timThay = false;
             for (int i = 0; i < tableLop.getRowCount(); i++) {
                 int mr = tableLop.convertRowIndexToModel(i);
-                if (modelLop.getValueAt(mr, 0).toString().equalsIgnoreCase(lopDangChon.getMaLop())) {
+                if (modelLop.getValueAt(mr, 0).toString().equalsIgnoreCase(maLopCu)) {
                     tableLop.setRowSelectionInterval(i, i);
+                    tableLop.scrollRectToVisible(tableLop.getCellRect(i, 0, true));
+                    lopDangChon = lopHocDAO.timTheoMa(maLopCu);
+                    taiDanhSachHocVienCuaLop(lopDangChon);
                     timThay = true;
                     break;
                 }
             }
             if (!timThay) {
-                lopDangChon = null;
-                xoaTrangBangHocVien();
+                if (tableLop.getRowCount() > 0) {
+                    tableLop.setRowSelectionInterval(0, 0);
+                } else {
+                    lopDangChon = null;
+                    xoaTrangBangHocVien();
+                }
             }
         } else {
             // Tự động chọn dòng đầu tiên nếu có
             if (tableLop.getRowCount() > 0) {
                 tableLop.setRowSelectionInterval(0, 0);
             } else {
+                lopDangChon = null;
                 xoaTrangBangHocVien();
             }
         }
@@ -864,8 +873,9 @@ public class LichLopHocPanel extends JPanel {
 
         int cur = danhSachHocVienLop.size();
         int max = lop.getSiSoToiDa();
-        lblDetailTitle.setText("HỌC VIÊN LỚP: " + lop.getTenLop().toUpperCase() + " (" + lop.getMaLop() + ") • SĨ SỐ: " + cur + "/" + max + " • ĐIỂM DANH: " + daDiemDanhCuaLop + "/" + cur);
-        lblCardLopDangChon.setText(lop.getTenLop() + " (" + cur + "/" + max + ")");
+        String tenLopHienThi = TextSanitizer.sanitize(lop.getTenLop());
+        lblDetailTitle.setText("HỌC VIÊN LỚP: " + tenLopHienThi.toUpperCase() + " (" + lop.getMaLop() + ") • SĨ SỐ: " + cur + "/" + max + " • ĐIỂM DANH: " + daDiemDanhCuaLop + "/" + cur);
+        lblCardLopDangChon.setText(tenLopHienThi + " (" + cur + "/" + max + ")");
         capNhatTrangThaiNutDetail(true);
     }
 
@@ -1333,6 +1343,9 @@ public class LichLopHocPanel extends JPanel {
         };
 
         List<HoiVien> tatCaHoiVien = hoiVienDAO.layTatCa();
+        if (tatCaHoiVien == null || tatCaHoiVien.isEmpty()) {
+            tatCaHoiVien = com.nhom12.gym.service.SampleDataService.getDanhSachHoiVienChuan();
+        }
         for (HoiVien hv : tatCaHoiVien) {
             String hoTen = TextSanitizer.sanitize(hv.getHoTen());
             String goiTap = TextSanitizer.sanitize(hv.getGoiTapDangKy() != null ? hv.getGoiTapDangKy() : "Gói Tiêu Chuẩn");
@@ -1390,37 +1403,61 @@ public class LichLopHocPanel extends JPanel {
         JPanel pBot = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         pBot.setOpaque(false);
 
+        final String targetMaLop = lopDangChon.getMaLop();
+        final String targetTenLop = lopDangChon.getTenLop();
+
         JButton btnConfirm = taoButtonFlat("Xác Nhận Ghi Danh", new Color(16, 185, 129), Color.WHITE);
+
+        // Hỗ trợ click đúp vào dòng học viên để ghi danh nhanh
+        tableHV.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (e.getClickCount() == 2 && tableHV.getSelectedRow() != -1) {
+                    btnConfirm.doClick();
+                }
+            }
+        });
+
         btnConfirm.addActionListener(e -> {
             int sel = tableHV.getSelectedRow();
             if (sel == -1) {
-                JOptionPane.showMessageDialog(dlg, "Vui lòng chọn một hội viên trong bảng để ghi danh!", "Chưa chọn", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(dlg, "Vui lòng click chọn một hội viên trong bảng để ghi danh!", "Chưa chọn hội viên", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
             int mr = tableHV.convertRowIndexToModel(sel);
-            int maHV = (int) hvModel.getValueAt(mr, 0);
-            String tenHV = hvModel.getValueAt(mr, 2).toString();
-            String sdt = hvModel.getValueAt(mr, 3).toString();
+            Object rawMa = hvModel.getValueAt(mr, 0);
+            int maHV = 0;
+            if (rawMa instanceof Number) {
+                maHV = ((Number) rawMa).intValue();
+            } else if (rawMa != null) {
+                try {
+                    maHV = Integer.parseInt(rawMa.toString().replaceAll("[^0-9]", ""));
+                } catch (Exception ignored) {}
+            }
+
+            String tenHV = (hvModel.getValueAt(mr, 2) != null) ? hvModel.getValueAt(mr, 2).toString() : "Hội viên";
+            String sdt = (hvModel.getValueAt(mr, 3) != null) ? hvModel.getValueAt(mr, 3).toString() : "";
             String ghiChu = txtGhiChu.getText().trim();
 
             // Kiểm tra xem hội viên này đã có trong lớp chưa
-            if (dangKyLopDAO.daDangKy(lopDangChon.getMaLop(), maHV)) {
+            if (dangKyLopDAO.daDangKy(targetMaLop, maHV)) {
                 JOptionPane.showMessageDialog(dlg,
-                        "Hội viên [" + tenHV + "] đã có tên trong danh sách đăng ký của lớp này rồi!",
+                        "Hội viên [" + tenHV + "] đã có tên trong danh sách đăng ký của lớp " + targetTenLop + " rồi!",
                         "Đã Đăng Ký", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
             // Tạo đối tượng đăng ký
-            DangKyLop dk = new DangKyLop(0, lopDangChon.getMaLop(), maHV, tenHV, sdt, new Date(), "Chưa điểm danh", ghiChu);
+            DangKyLop dk = new DangKyLop(0, targetMaLop, maHV, tenHV, sdt, new Date(), "Chưa điểm danh", ghiChu);
             boolean ok = lopHocDAO.dangKyVaoLop(dk);
             if (ok) {
                 SoundHelper.playSuccessBeep();
-                taiDuLieuLopHoc();
                 dlg.dispose();
+                taiDuLieuLopHoc();
+                chonLopTheoMa(targetMaLop);
                 JOptionPane.showMessageDialog(this,
-                        "Đã ghi danh thành công hội viên [" + tenHV + "] vào lớp " + lopDangChon.getTenLop() + "!",
+                        "Đã ghi danh thành công hội viên [" + tenHV + "] vào lớp " + targetTenLop + "!",
                         "Ghi Danh Thành Công", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 SoundHelper.playErrorBeep();
@@ -1436,6 +1473,21 @@ public class LichLopHocPanel extends JPanel {
         dlg.add(pBot, BorderLayout.SOUTH);
 
         dlg.setVisible(true);
+    }
+
+    public void chonLopTheoMa(String maLop) {
+        if (maLop == null || maLop.trim().isEmpty()) return;
+        String code = maLop.trim();
+        for (int i = 0; i < tableLop.getRowCount(); i++) {
+            int mr = tableLop.convertRowIndexToModel(i);
+            if (modelLop.getValueAt(mr, 0).toString().equalsIgnoreCase(code)) {
+                tableLop.setRowSelectionInterval(i, i);
+                tableLop.scrollRectToVisible(tableLop.getCellRect(i, 0, true));
+                lopDangChon = lopHocDAO.timTheoMa(code);
+                taiDanhSachHocVienCuaLop(lopDangChon);
+                return;
+            }
+        }
     }
 
     // =========================================================================

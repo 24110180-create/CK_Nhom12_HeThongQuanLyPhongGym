@@ -29,6 +29,14 @@ class TextSanitizerTest {
         assertEquals("Gói Trải Nghiệm 1 Tháng", TextSanitizer.sanitize("Gói Tr?i Nghi?m 1 Tháng"));
         assertEquals("Chuyển khoản VietQR", TextSanitizer.sanitize("Chuy?n kho?n (VietQR)"));
         assertEquals("CN03 - Cơ sở 3 (Bình Thạnh)", TextSanitizer.sanitize("Cơ s? 3 - B?nh Th?nh"));
+
+        // Kiểm tra vai trò và nhật ký hệ thống (Audit Log)
+        assertEquals("Chủ", TextSanitizer.sanitize("Ch?"));
+        assertEquals("Chủ", TextSanitizer.sanitizeRole("Ch?"));
+        assertEquals("Lễ tân", TextSanitizer.sanitizeRole("L? tân"));
+        assertEquals("Tạo hóa đơn", TextSanitizer.sanitize("T?o hóa đơn"));
+        assertEquals("Mã: HD-POS-1792067944669, Số tiền: 15000.0", 
+                TextSanitizer.sanitize("M?: HD-POS-1792067944669, S? ti?n: 15000.0"));
     }
 
     @Test

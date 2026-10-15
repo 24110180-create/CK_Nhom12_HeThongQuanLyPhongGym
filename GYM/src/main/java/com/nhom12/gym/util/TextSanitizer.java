@@ -16,6 +16,20 @@ public class TextSanitizer {
         }
         String s = input.trim();
 
+        // 0. Khắc phục vai trò nhân sự
+        if (s.equals("Ch?") || s.equalsIgnoreCase("ch?") || s.equalsIgnoreCase("Chu") || s.equalsIgnoreCase("Chủ")) {
+            return "Chủ";
+        }
+        if (s.equalsIgnoreCase("L? tân") || s.equalsIgnoreCase("L? Tân") || s.equalsIgnoreCase("l? tân") || s.equalsIgnoreCase("Le tan") || s.equalsIgnoreCase("Lễ tân") || s.equalsIgnoreCase("letan")) {
+            return "Lễ tân";
+        }
+        if (s.equalsIgnoreCase("Qu?n lý") || s.equalsIgnoreCase("Qu?n l?") || s.equalsIgnoreCase("Quan ly") || s.equalsIgnoreCase("Quản lý")) {
+            return "Quản lý";
+        }
+        if (s.equalsIgnoreCase("Hu?n luy?n viên") || s.equalsIgnoreCase("hu?n luy?n viên") || s.equalsIgnoreCase("Huan luyen vien") || s.equalsIgnoreCase("HLV") || s.equalsIgnoreCase("Huấn luyện viên")) {
+            return "Huấn luyện viên";
+        }
+
         // 1. Khắc phục trạng thái hoạt động
         if (s.equalsIgnoreCase("Active") || s.equalsIgnoreCase("Hoạt động") ||
             s.toLowerCase().contains("ho?t") || s.toLowerCase().contains("hoat")) {
@@ -71,6 +85,81 @@ public class TextSanitizer {
         }
 
         String res = text;
+        // Khắc phục hành động & vai trò nhật ký kiểm toán (Audit Log)
+        res = res.replace("T?o hóa đơn", "Tạo hóa đơn");
+        res = res.replace("t?o hóa đơn", "tạo hóa đơn");
+        res = res.replace("T?o h?a đ?n", "Tạo hóa đơn");
+        res = res.replace("t?o h?a đ?n", "tạo hóa đơn");
+        res = res.replace("T?o tài khoản", "Tạo tài khoản");
+        res = res.replace("t?o tài khoản", "tạo tài khoản");
+        res = res.replace("T?o t?i kho?n", "Tạo tài khoản");
+        res = res.replace("t?o t?i kho?n", "tạo tài khoản");
+        res = res.replace("T?o m?i", "Tạo mới");
+        res = res.replace("t?o m?i", "tạo mới");
+        res = res.replace("T?o", "Tạo");
+        res = res.replace("t?o", "tạo");
+        res = res.replace("Thêm hội viên m?i", "Thêm hội viên mới");
+        res = res.replace("Thêm h?i viên m?i", "Thêm hội viên mới");
+        res = res.replace("thêm h?i viên m?i", "thêm hội viên mới");
+        res = res.replace("Thêm hội viên", "Thêm hội viên");
+        res = res.replace("Thêm h?i viên", "Thêm hội viên");
+        res = res.replace("thêm h?i viên", "thêm hội viên");
+        res = res.replace("X?a hội viên", "Xóa hội viên");
+        res = res.replace("X?a h?i viên", "Xóa hội viên");
+        res = res.replace("x?a h?i viên", "xóa hội viên");
+        res = res.replace("X?a", "Xóa");
+        res = res.replace("x?a", "xóa");
+        res = res.replace("Đăng nh?p h? th?ng", "Đăng nhập hệ thống");
+        res = res.replace("đăng nh?p h? th?ng", "đăng nhập hệ thống");
+        res = res.replace("Đăng nh?p", "Đăng nhập");
+        res = res.replace("đăng nh?p", "đăng nhập");
+        res = res.replace("Đăng xu?t", "Đăng xuất");
+        res = res.replace("đăng xu?t", "đăng xuất");
+        res = res.replace("Thao t?c", "Thao tác");
+        res = res.replace("thao t?c", "thao tác");
+        res = res.replace("th?nh công", "thành công");
+        res = res.replace("Th?nh công", "Thành công");
+
+        // Chi tiết giao dịch & mã hóa đơn, số tiền
+        res = res.replace("M?:", "Mã:");
+        res = res.replace("m?:", "mã:");
+        res = res.replace("M? ", "Mã ");
+        res = res.replace("S? ti?n:", "Số tiền:");
+        res = res.replace("s? ti?n:", "số tiền:");
+        res = res.replace("S? ti?n", "Số tiền");
+        res = res.replace("s? ti?n", "số tiền");
+        res = res.replace("S? l??ng", "Số lượng");
+        res = res.replace("S? lư?ng:", "Số lượng:");
+        res = res.replace("s? lư?ng:", "số lượng:");
+        res = res.replace("S? lượng:", "Số lượng:");
+        res = res.replace("S? lượng", "Số lượng");
+        res = res.replace("S? lư?ng", "Số lượng");
+        res = res.replace("s? lư?ng", "số lượng");
+        res = res.replace("S? thẻ:", "Số thẻ:");
+        res = res.replace("S? th?:", "Số thẻ:");
+        res = res.replace("s? th?:", "số thẻ:");
+        res = res.replace("S? thẻ", "Số thẻ");
+        res = res.replace("S? th?", "Số thẻ");
+        res = res.replace("s? th?", "số thẻ");
+        res = res.replace("S? điện thoại", "Số điện thoại");
+        res = res.replace("S? đi?n tho?i", "Số điện thoại");
+        res = res.replace("H? tên:", "Họ tên:");
+        res = res.replace("h? tên:", "họ tên:");
+        res = res.replace("H? tên", "Họ tên");
+        res = res.replace("h? tên", "họ tên");
+        res = res.replace("Ch? phòng", "Chủ phòng");
+        res = res.replace("Ch? cơ sở", "Chủ cơ sở");
+        res = res.replace("Ch?", "Chủ");
+        res = res.replace("L? tân", "Lễ tân");
+        res = res.replace("L? Tân", "Lễ tân");
+        res = res.replace("Qu?n lý", "Quản lý");
+        res = res.replace("Qu?n l?", "Quản lý");
+        res = res.replace("Hu?n luy?n viên", "Huấn luyện viên");
+        res = res.replace("H? th?ng", "Hệ thống");
+        res = res.replace("h? th?ng", "hệ thống");
+        res = res.replace("m?i", "mới");
+        res = res.replace("M?i", "Mới");
+
         // Giao dịch, POS, Hóa đơn & Bán hàng
         res = res.replace("Đăng k?", "Đăng ký");
         res = res.replace("đăng k?", "đăng ký");
@@ -176,6 +265,11 @@ public class TextSanitizer {
         res = res.replace("Th?ng", "Tháng");
 
         // Lớp học & bộ môn
+        res = res.replace("Gi?m cân", "Giảm cân");
+        res = res.replace("gi?m cân", "giảm cân");
+        res = res.replace("Gi?m Cân", "Giảm Cân");
+        res = res.replace("Gi?m", "Giảm");
+        res = res.replace("gi?m", "giảm");
         res = res.replace("Kháng L?c", "Kháng Lực");
         res = res.replace("Kháng l?c", "Kháng lực");
         res = res.replace("Tr? Li?u", "Trị Liệu");
@@ -301,5 +395,28 @@ public class TextSanitizer {
 
         // So khớp trực tiếp hoặc contains chuỗi
         return mLower.contains(sLower) || sLower.contains(mLower);
+    }
+
+    /**
+     * Chuẩn hóa riêng tên Vai Trò nhân sự (Chủ, Lễ tân, Quản lý, Huấn luyện viên)
+     */
+    public static String sanitizeRole(String role) {
+        if (role == null || role.trim().isEmpty()) {
+            return "Chủ";
+        }
+        String r = role.trim();
+        if (r.equalsIgnoreCase("Ch?") || r.equalsIgnoreCase("Chu") || r.equalsIgnoreCase("Chủ") || r.contains("Ch?")) {
+            return "Chủ";
+        }
+        if (r.toLowerCase().contains("l? tân") || r.toLowerCase().contains("le tan") || r.equalsIgnoreCase("Lễ tân") || r.equalsIgnoreCase("letan")) {
+            return "Lễ tân";
+        }
+        if (r.toLowerCase().contains("qu?n") || r.toLowerCase().contains("quan ly") || r.equalsIgnoreCase("Quản lý")) {
+            return "Quản lý";
+        }
+        if (r.toLowerCase().contains("hu?n") || r.toLowerCase().contains("hlv") || r.equalsIgnoreCase("Huấn luyện viên")) {
+            return "Huấn luyện viên";
+        }
+        return restoreCorruptedVietnamese(r);
     }
 }

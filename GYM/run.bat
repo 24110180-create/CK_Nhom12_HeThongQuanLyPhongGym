@@ -11,7 +11,7 @@ echo ========================================================
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$cp = (Get-ChildItem -Path '%USERPROFILE%\.m2\repository' -Filter '*.jar' -Recurse | Select-Object -ExpandProperty FullName) -join ';'; " ^
   "$cp = 'src\main\resources;target\classes;' + $cp; " ^
-  "java -cp $cp com.nhom12.gym.gui.LoginForm"
+  "& java '-Dfile.encoding=UTF-8' -cp $cp com.nhom12.gym.gui.LoginForm"
 
 if %ERRORLEVEL% NEQ 0 (
     echo.

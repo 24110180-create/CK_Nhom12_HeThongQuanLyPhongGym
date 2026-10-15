@@ -50,18 +50,47 @@ public class BanHangPOSPanel extends JPanel implements KhoHangService.KhoHangLis
         JPanel leftContainer = new JPanel(new BorderLayout(0, 10));
         leftContainer.setOpaque(false);
 
-        JPanel headerLeft = new JPanel(new BorderLayout());
+        JPanel headerLeft = new JPanel(new BorderLayout(10, 0));
         headerLeft.setOpaque(false);
         JLabel lblLeftTitle = new JLabel("DANH MỤC HÀNG HÓA TỒN KHO (CLICK ĐỂ THÊM VÀO HÓA ĐƠN)");
         lblLeftTitle.setFont(new Font("Segoe UI", Font.BOLD, 15));
         lblLeftTitle.setForeground(new Color(30, 41, 59));
 
-        JLabel lblSyncStatus = new JLabel("Đồng bộ kho thời gian thực");
+        JPanel rightHeaderActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        rightHeaderActions.setOpaque(false);
+
+        JLabel lblSyncStatus = new JLabel("● Đồng bộ kho thời gian thực");
         lblSyncStatus.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblSyncStatus.setForeground(new Color(16, 185, 129));
 
+        JButton btnChiTietKho = new JButton("📦 Xem Chi Tiết Kho Hàng");
+        btnChiTietKho.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnChiTietKho.setBackground(new Color(37, 99, 235));
+        btnChiTietKho.setForeground(Color.WHITE);
+        btnChiTietKho.setFocusPainted(false);
+        btnChiTietKho.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnChiTietKho.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(29, 78, 216), 1),
+                BorderFactory.createEmptyBorder(6, 14, 6, 14)
+        ));
+        btnChiTietKho.setToolTipText("Bấm để mở bảng chi tiết xuất nhập tồn kho, nhập thêm hàng và theo dõi sản phẩm đã bán");
+        btnChiTietKho.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                btnChiTietKho.setBackground(new Color(29, 78, 216));
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                btnChiTietKho.setBackground(new Color(37, 99, 235));
+            }
+        });
+        btnChiTietKho.addActionListener(e -> openChiTietKhoDialog());
+
+        rightHeaderActions.add(lblSyncStatus);
+        rightHeaderActions.add(btnChiTietKho);
+
         headerLeft.add(lblLeftTitle, BorderLayout.WEST);
-        headerLeft.add(lblSyncStatus, BorderLayout.EAST);
+        headerLeft.add(rightHeaderActions, BorderLayout.EAST);
         leftContainer.add(headerLeft, BorderLayout.NORTH);
 
         productGridPanel = new JPanel(new GridLayout(0, 3, 14, 14));
@@ -529,6 +558,22 @@ public class BanHangPOSPanel extends JPanel implements KhoHangService.KhoHangLis
         } catch (Exception e) {
             return 0;
         }
+    }
+
+    /**
+     * Mở Dialog hiển thị toàn diện bảng Quản Lý Kho Hàng & Xuất Nhập Tồn
+     */
+    private void openChiTietKhoDialog() {
+        Window parent = SwingUtilities.getWindowAncestor(this);
+        JDialog dialog = new JDialog(parent instanceof Frame ? (Frame) parent : null, "Chi Tiết Kho Hàng & Quản Lý Xuất Nhập Tồn - FitLife Gym", true);
+        QuanLyKhoHangPanel khoPanel = new QuanLyKhoHangPanel();
+        dialog.setContentPane(khoPanel);
+        dialog.setSize(1220, 750);
+        dialog.setLocationRelativeTo(this);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setVisible(true);
+        // Tự động nạp lại danh sách card sản phẩm sau khi đóng dialog
+        loadProductCards();
     }
 
     @Override

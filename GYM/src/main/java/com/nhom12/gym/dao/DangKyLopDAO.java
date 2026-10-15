@@ -103,9 +103,18 @@ public class DangKyLopDAO {
                 );
                 query.setParameter("ma", code);
                 List<DangKyLop> list = query.list();
-                if (list != null && !list.isEmpty()) {
+                if (list != null) {
                     for (DangKyLop dk : list) {
                         result.add(sanitizeDangKyLop(dk));
+                    }
+                    // Đồng bộ thêm các bản ghi vừa ghi danh trong bộ nhớ tạm nếu chưa có
+                    for (DangKyLop dk : memoryCache) {
+                        if (dk.getMaLop() != null && dk.getMaLop().equalsIgnoreCase(code)) {
+                            boolean daCo = result.stream().anyMatch(r -> r.getMaHoiVien() == dk.getMaHoiVien());
+                            if (!daCo) {
+                                result.add(sanitizeDangKyLop(dk));
+                            }
+                        }
                     }
                     return result;
                 }
@@ -117,13 +126,17 @@ public class DangKyLopDAO {
         // Fallback bộ nhớ đệm
         for (DangKyLop dk : memoryCache) {
             if (dk.getMaLop() != null && dk.getMaLop().equalsIgnoreCase(code)) {
-                result.add(sanitizeDangKyLop(dk));
+                boolean daCo = result.stream().anyMatch(r -> r.getMaHoiVien() == dk.getMaHoiVien());
+                if (!daCo) {
+                    result.add(sanitizeDangKyLop(dk));
+                }
             }
         }
         return result;
     }
 
     public boolean daDangKy(String maLop, int maHoiVien) {
+        if (maLop == null || maHoiVien <= 0) return false;
         List<DangKyLop> list = layDanhSachTheoLop(maLop);
         for (DangKyLop dk : list) {
             if (dk.getMaHoiVien() == maHoiVien) {
@@ -139,6 +152,7 @@ public class DangKyLopDAO {
         SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf == null) {
             if (dk.getId() <= 0) dk.setId(memoryCache.size() + 1);
+            memoryCache.removeIf(item -> item.getMaLop().equalsIgnoreCase(dk.getMaLop()) && item.getMaHoiVien() == dk.getMaHoiVien());
             memoryCache.add(dk);
             com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
             return true;
@@ -150,6 +164,7 @@ public class DangKyLopDAO {
             session.persist(dk);
             tx.commit();
 
+            memoryCache.removeIf(item -> item.getMaLop().equalsIgnoreCase(dk.getMaLop()) && item.getMaHoiVien() == dk.getMaHoiVien());
             memoryCache.add(dk);
             com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
             return true;
@@ -157,6 +172,7 @@ public class DangKyLopDAO {
             if (tx != null) tx.rollback();
             LOGGER.log(Level.WARNING, "Lỗi thêm đăng ký lớp vào CSDL, lưu vào bộ nhớ tạm", e);
             if (dk.getId() <= 0) dk.setId(memoryCache.size() + 1);
+            memoryCache.removeIf(item -> item.getMaLop().equalsIgnoreCase(dk.getMaLop()) && item.getMaHoiVien() == dk.getMaHoiVien());
             memoryCache.add(dk);
             com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.LOP_HOC);
             return true;

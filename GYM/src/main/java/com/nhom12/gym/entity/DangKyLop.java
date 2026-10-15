@@ -18,7 +18,7 @@ public class DangKyLop {
     @Column(name = "MaHoiVien")
     private int maHoiVien;
 
-    @Column(name = "TenHoiVien", length = 100)
+    @Column(name = "TenHoiVien", length = 100, columnDefinition = "NVARCHAR(100)")
     private String tenHoiVien;
 
     @Column(name = "SoDienThoai", length = 20)
@@ -28,10 +28,10 @@ public class DangKyLop {
     @Column(name = "NgayDangKy")
     private Date ngayDangKy;
 
-    @Column(name = "TrangThaiDiemDanh", length = 50)
+    @Column(name = "TrangThaiDiemDanh", length = 50, columnDefinition = "NVARCHAR(50)")
     private String trangThaiDiemDanh; // "Đã điểm danh", "Chưa điểm danh", "Vắng mặt"
 
-    @Column(name = "GhiChu", length = 255)
+    @Column(name = "GhiChu", length = 255, columnDefinition = "NVARCHAR(255)")
     private String ghiChu;
 
     public DangKyLop() {

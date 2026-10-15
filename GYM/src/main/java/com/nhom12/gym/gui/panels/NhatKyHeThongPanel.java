@@ -3,6 +3,7 @@ package com.nhom12.gym.gui.panels;
 import com.nhom12.gym.dao.NhatKyHeThongDAO;
 import com.nhom12.gym.entity.NhatKyHeThong;
 import com.nhom12.gym.util.ExcelExportHelper;
+import com.nhom12.gym.util.TextSanitizer;
 import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -206,9 +207,13 @@ public class NhatKyHeThongPanel extends JPanel {
 
         int count = 0;
         for (NhatKyHeThong log : list) {
-            // Lọc theo hành động
+            String cleanVaiTro = (log.getVaiTro() != null) ? TextSanitizer.sanitizeRole(log.getVaiTro()) : "—";
+            String cleanHanhDong = (log.getHanhDong() != null) ? TextSanitizer.sanitize(log.getHanhDong()) : "—";
+            String cleanChiTiet = (log.getChiTiet() != null) ? TextSanitizer.sanitize(log.getChiTiet()) : "";
+
+            // Lọc theo hành động (so khớp theo chuỗi đã chuẩn hóa để không bị lệch)
             if (selectedAction != null && !"Tất cả hành động".equals(selectedAction)) {
-                if (log.getHanhDong() == null || !log.getHanhDong().equalsIgnoreCase(selectedAction)) {
+                if (cleanHanhDong == null || !cleanHanhDong.equalsIgnoreCase(selectedAction)) {
                     continue;
                 }
             }
@@ -237,9 +242,9 @@ public class NhatKyHeThongPanel extends JPanel {
                     log.getMaNhatKy(),
                     log.getThoiGian() != null ? sdf.format(log.getThoiGian()) : "—",
                     log.getTenDangNhap(),
-                    log.getVaiTro() != null ? log.getVaiTro() : "—",
-                    log.getHanhDong(),
-                    log.getChiTiet()
+                    cleanVaiTro,
+                    cleanHanhDong,
+                    cleanChiTiet
             });
             count++;
         }

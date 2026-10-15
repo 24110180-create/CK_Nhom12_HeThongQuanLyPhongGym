@@ -22,9 +22,9 @@ public class NhatKyHeThongDAO {
 
     public boolean ghiLog(String tenDangNhap, String vaiTro, String hanhDong, String chiTiet) {
         String u = (tenDangNhap != null && !tenDangNhap.trim().isEmpty()) ? tenDangNhap.trim() : "he_thong";
-        String r = (vaiTro != null) ? vaiTro.trim() : "Hệ thống";
-        String h = (hanhDong != null) ? hanhDong.trim() : "Thao tác";
-        String c = (chiTiet != null) ? chiTiet.trim() : "";
+        String r = (vaiTro != null) ? com.nhom12.gym.util.TextSanitizer.sanitizeRole(vaiTro) : "Hệ thống";
+        String h = (hanhDong != null) ? com.nhom12.gym.util.TextSanitizer.sanitize(hanhDong) : "Thao tác";
+        String c = (chiTiet != null) ? com.nhom12.gym.util.TextSanitizer.sanitize(chiTiet) : "";
 
         NhatKyHeThong log = new NhatKyHeThong(u, r, h, c);
 
@@ -48,6 +48,15 @@ public class NhatKyHeThongDAO {
         }
     }
 
+    private void sanitizeList(List<NhatKyHeThong> list) {
+        if (list == null) return;
+        for (NhatKyHeThong log : list) {
+            if (log.getVaiTro() != null) log.setVaiTro(com.nhom12.gym.util.TextSanitizer.sanitizeRole(log.getVaiTro()));
+            if (log.getHanhDong() != null) log.setHanhDong(com.nhom12.gym.util.TextSanitizer.sanitize(log.getHanhDong()));
+            if (log.getChiTiet() != null) log.setChiTiet(com.nhom12.gym.util.TextSanitizer.sanitize(log.getChiTiet()));
+        }
+    }
+
     public List<NhatKyHeThong> layTatCa() {
         SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf != null) {
@@ -55,6 +64,7 @@ public class NhatKyHeThongDAO {
                 List<NhatKyHeThong> list = session.createQuery(
                         "FROM NhatKyHeThong ORDER BY thoiGian DESC", NhatKyHeThong.class).list();
                 if (list != null && !list.isEmpty()) {
+                    sanitizeList(list);
                     memoryCache.clear();
                     memoryCache.addAll(list);
                     return new ArrayList<>(list);
@@ -63,6 +73,7 @@ public class NhatKyHeThongDAO {
                 LOGGER.log(Level.WARNING, "Không thể tải nhật ký từ CSDL, dùng bộ nhớ đệm: {0}", e.getMessage());
             }
         }
+        sanitizeList(memoryCache);
         return new ArrayList<>(memoryCache);
     }
 
@@ -79,6 +90,7 @@ public class NhatKyHeThongDAO {
                         .setParameter("user", "%" + u + "%")
                         .list();
                 if (list != null) {
+                    sanitizeList(list);
                     return list;
                 }
             } catch (Exception e) {
@@ -92,6 +104,7 @@ public class NhatKyHeThongDAO {
                 result.add(log);
             }
         }
+        sanitizeList(result);
         return result;
     }
 }

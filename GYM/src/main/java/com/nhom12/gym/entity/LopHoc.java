@@ -13,22 +13,22 @@ public class LopHoc {
     @Column(name = "MaLop", length = 30)
     private String maLop;
 
-    @Column(name = "TenLop", nullable = false, length = 100)
+    @Column(name = "TenLop", nullable = false, length = 100, columnDefinition = "NVARCHAR(100)")
     private String tenLop;
 
-    @Column(name = "BoMon", length = 50)
+    @Column(name = "BoMon", length = 50, columnDefinition = "NVARCHAR(50)")
     private String boMon;
 
-    @Column(name = "HuanLuyenVien", length = 100)
+    @Column(name = "HuanLuyenVien", length = 100, columnDefinition = "NVARCHAR(100)")
     private String huanLuyenVien;
 
-    @Column(name = "ThoiGian", length = 100)
+    @Column(name = "ThoiGian", length = 100, columnDefinition = "NVARCHAR(100)")
     private String thoiGian;
 
-    @Column(name = "PhongTap", length = 50)
+    @Column(name = "PhongTap", length = 50, columnDefinition = "NVARCHAR(50)")
     private String phongTap;
 
-    @Column(name = "ChiNhanh", length = 50)
+    @Column(name = "ChiNhanh", length = 50, columnDefinition = "NVARCHAR(50)")
     private String chiNhanh = "CN01 - Quận 1";
 
     @Column(name = "SiSoToiDa")

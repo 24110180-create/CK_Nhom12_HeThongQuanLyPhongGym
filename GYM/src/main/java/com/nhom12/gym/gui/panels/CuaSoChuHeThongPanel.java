@@ -144,7 +144,11 @@ public class CuaSoChuHeThongPanel extends JPanel {
 
         List<HoiVien> members = hoiVienDAO.layTatCa();
         int totalMembers = members.size();
-        long activeMembers = members.stream().filter(m -> m.getTrangThai() == null || !m.getTrangThai().toLowerCase().contains("khóa")).count();
+        long activeMembers = members.stream().filter(m -> {
+            if (m.getTrangThai() == null) return true;
+            String st = m.getTrangThai().trim().toLowerCase();
+            return !st.contains("khóa") && !st.contains("lock") && !st.contains("hết hạn") && !st.contains("expired");
+        }).count();
         if (totalMembers == 0) {
             totalMembers = 6;
             activeMembers = 6;
@@ -158,8 +162,13 @@ public class CuaSoChuHeThongPanel extends JPanel {
 
         StaffStats staffStats = layThongKeNhanSu();
 
+        long inactiveCount = totalMembers - activeMembers;
+        String memberSub = inactiveCount > 0
+                ? "Tỷ lệ kích hoạt: " + (totalMembers > 0 ? (activeMembers * 100 / totalMembers) : 100) + "% • " + inactiveCount + " Thẻ hết hạn/khóa"
+                : "Tỷ lệ kích hoạt: 100% • 0 Thẻ bị khóa";
+
         row.add(createKpiCard("DOANH THU THỰC TẾ", df.format(totalRevenue), "Cập nhật thời gian thực từ hóa đơn & gói tập", new Color(37, 99, 235), new Color(239, 246, 255)));
-        row.add(createKpiCard("HỘI VIÊN CHUỖI", activeMembers + " / " + totalMembers + " HV", "Tỷ lệ kích hoạt: 100% • 0 Thẻ bị khóa", new Color(16, 185, 129), new Color(236, 253, 245)));
+        row.add(createKpiCard("HỘI VIÊN CHUỖI", activeMembers + " / " + totalMembers + " HV", memberSub, new Color(16, 185, 129), new Color(236, 253, 245)));
         row.add(createKpiCard("LƯỢT CHECK-IN HÔM NAY", todayCheckins + " Lượt quét", "Hệ thống trạm quét trơn tru 100%", new Color(245, 158, 11), new Color(254, 243, 199)));
         row.add(createKpiCard("QUÂN SỐ NHÂN SỰ ĐANG TRỰC", staffStats.totalStaff + " Nhân sự chuỗi", staffStats.countLeTan + " Lễ tân • " + staffStats.countHLV + " HLV • " + staffStats.countQuanLy + " Quản lý • " + staffStats.countChu + " Chủ", new Color(147, 51, 234), new Color(250, 245, 255)));
 

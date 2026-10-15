@@ -571,7 +571,7 @@ public class DangKyHoiVienPanel extends JPanel {
                     if (success) {
                         try {
                             HoiVien hv = new HoiVien();
-                            hv.setMaHoiVien(finalNextId);
+                            hv.setMaHoiVien(0); // Để 0 để IDENTITY SQL Server tự động tăng ID chính xác
                             hv.setHoTen(name);
                             hv.setMaTheQR(finalCode);
                             hv.setSoDienThoai(phone);
@@ -592,13 +592,20 @@ public class DangKyHoiVienPanel extends JPanel {
                             cal.add(Calendar.MONTH, currentMonths);
                             Date expireDate = cal.getTime();
                             hv.setNgayHetHan(expireDate);
-                            hoiVienDAO.them(hv);
+
+                            boolean added = hoiVienDAO.them(hv);
+                            if (!added) {
+                                JOptionPane.showMessageDialog(this, "Không thể lưu hồ sơ hội viên vào hệ thống!", "Lỗi Đăng Ký", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+
+                            int memberId = hv.getMaHoiVien() > 0 ? hv.getMaHoiVien() : finalNextId;
 
                             // Đồng bộ tạo Hóa đơn vào HoaDonDAO cho toàn hệ thống
                             String maHD = "HD" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
                             com.nhom12.gym.entity.HoaDon hd = new com.nhom12.gym.entity.HoaDon(
                                     maHD,
-                                    finalNextId,
+                                    memberId,
                                     name,
                                     "Đăng ký mới " + pkgName,
                                     displayGiaGoc,
@@ -613,14 +620,20 @@ public class DangKyHoiVienPanel extends JPanel {
                             );
                             com.nhom12.gym.dao.HoaDonDAO.getInstance().them(hd);
 
+                            // Đồng bộ toàn hệ thống và cập nhật số lượng Trang Chủ ngay lập tức
+                            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN);
+                            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOA_DON);
+                            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.ALL);
+
+                            resetForm();
+
                             String expireStr = new SimpleDateFormat("dd/MM/yyyy").format(expireDate);
                             Window f = SwingUtilities.getWindowAncestor(this);
                             new GuiMaQRDialog(f, finalCode, name, phone, pkgName, cbBranch.getSelectedItem().toString(), expireStr).setVisible(true);
                         } catch (Exception ex) {
                             System.err.println("[DangKyHoiVienPanel] Lỗi lưu hội viên hoặc hóa đơn: " + ex.getMessage());
                             ex.printStackTrace();
-                            Window f = SwingUtilities.getWindowAncestor(this);
-                            new GuiMaQRDialog(f, finalCode, name, phone, pkgName, cbBranch.getSelectedItem().toString()).setVisible(true);
+                            JOptionPane.showMessageDialog(this, "Lỗi đăng ký hội viên: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
                         }
 
                         if (onRegistrationSuccess != null) {

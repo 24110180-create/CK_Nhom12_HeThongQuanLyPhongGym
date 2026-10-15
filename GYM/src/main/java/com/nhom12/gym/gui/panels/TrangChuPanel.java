@@ -3,6 +3,7 @@ package com.nhom12.gym.gui.panels;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.util.List;
 
 public class TrangChuPanel extends JPanel {
 
@@ -96,8 +97,13 @@ public class TrangChuPanel extends JPanel {
         widgetPanel.removeAll();
 
         java.text.DecimalFormat df = new java.text.DecimalFormat("#,### đ");
-        int totalMembers = new com.nhom12.gym.dao.HoiVienDAO().layTatCa().size();
-        long activeMembers = new com.nhom12.gym.dao.HoiVienDAO().layTatCa().stream().filter(m -> "Active".equalsIgnoreCase(m.getTrangThai()) || "Hoạt động".equalsIgnoreCase(m.getTrangThai())).count();
+        List<com.nhom12.gym.entity.HoiVien> listHV = new com.nhom12.gym.dao.HoiVienDAO().layTatCa();
+        int totalMembers = listHV.size();
+        long activeMembers = listHV.stream().filter(m -> {
+            if (m.getTrangThai() == null) return true;
+            String st = m.getTrangThai().trim().toLowerCase();
+            return !st.contains("khóa") && !st.contains("lock") && !st.contains("hết hạn") && !st.contains("expired");
+        }).count();
         int todayCheckins = new com.nhom12.gym.dao.LichSuCheckInDAO().layLichSuHomNay().size();
         if (todayCheckins == 0) todayCheckins = new com.nhom12.gym.dao.LichSuCheckInDAO().layTatCaLichSu().size();
         double totalRev = com.nhom12.gym.dao.HoaDonDAO.getInstance().layTongDoanhThu();

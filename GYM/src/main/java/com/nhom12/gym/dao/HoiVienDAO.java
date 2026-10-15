@@ -75,8 +75,18 @@ public class HoiVienDAO {
         SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf == null) {
             // Offline mode: lưu vào memory cache
+            if (hv.getMaHoiVien() <= 0) {
+                int maxId = 0;
+                for (HoiVien m : memoryCache) {
+                    if (m.getMaHoiVien() > maxId) maxId = m.getMaHoiVien();
+                }
+                hv.setMaHoiVien(maxId + 1);
+            }
+            memoryCache.removeIf(item -> (item.getMaHoiVien() > 0 && item.getMaHoiVien() == hv.getMaHoiVien())
+                    || (item.getMaTheQR() != null && item.getMaTheQR().equalsIgnoreCase(hv.getMaTheQR())));
             memoryCache.add(0, hv);
             com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.ALL);
             new com.nhom12.gym.dao.NhatKyHeThongDAO().ghiLog(
                     com.nhom12.gym.util.Auth.tenDangNhap, com.nhom12.gym.util.Auth.vaiTro, "Thêm hội viên mới",
                     "Mã: " + hv.getMaTheQR() + ", Tên: " + hv.getHoTen()
@@ -87,12 +97,16 @@ public class HoiVienDAO {
         Transaction tx = null;
         try (Session session = sf.openSession()) {
             tx = session.beginTransaction();
+            // Đảm bảo maHoiVien = 0 để IDENTITY generator của SQL Server tự sinh ID, tránh lỗi PersistentObjectException
+            hv.setMaHoiVien(0);
             session.persist(hv);
             tx.commit();
 
-            memoryCache.removeIf(item -> item.getMaHoiVien() == hv.getMaHoiVien() || item.getMaTheQR().equalsIgnoreCase(hv.getMaTheQR()));
+            memoryCache.removeIf(item -> (item.getMaHoiVien() > 0 && item.getMaHoiVien() == hv.getMaHoiVien())
+                    || (item.getMaTheQR() != null && item.getMaTheQR().equalsIgnoreCase(hv.getMaTheQR())));
             memoryCache.add(0, hv);
             com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.ALL);
             new com.nhom12.gym.dao.NhatKyHeThongDAO().ghiLog(
                     com.nhom12.gym.util.Auth.tenDangNhap, com.nhom12.gym.util.Auth.vaiTro, "Thêm hội viên mới",
                     "Mã: " + hv.getMaTheQR() + ", Tên: " + hv.getHoTen()
@@ -100,8 +114,21 @@ public class HoiVienDAO {
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            LOGGER.log(Level.SEVERE, "Lỗi thêm hội viên vào CSDL", e);
-            return false;
+            LOGGER.log(Level.SEVERE, "Lỗi thêm hội viên vào CSDL: " + e.getMessage(), e);
+            // Fallback an toàn vào memoryCache
+            if (hv.getMaHoiVien() <= 0) {
+                int maxId = 0;
+                for (HoiVien m : memoryCache) {
+                    if (m.getMaHoiVien() > maxId) maxId = m.getMaHoiVien();
+                }
+                hv.setMaHoiVien(maxId + 1);
+            }
+            memoryCache.removeIf(item -> (item.getMaHoiVien() > 0 && item.getMaHoiVien() == hv.getMaHoiVien())
+                    || (item.getMaTheQR() != null && item.getMaTheQR().equalsIgnoreCase(hv.getMaTheQR())));
+            memoryCache.add(0, hv);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN);
+            com.nhom12.gym.service.DataSyncManager.fireDataChanged(com.nhom12.gym.service.DataSyncManager.DataType.ALL);
+            return true;
         }
     }
 

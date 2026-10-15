@@ -276,15 +276,27 @@ public class ThanhToanHoaDonDialog extends JDialog {
                 new EmptyBorder(8, 0, 0, 0)
         ));
 
-        JPanel rowSub = new JPanel(new BorderLayout()); rowSub.setOpaque(false);
-        rowSub.add(new JLabel("Tổng tiền gốc:"), BorderLayout.WEST);
-        rowSub.add(new JLabel(df.format(tongTien)), BorderLayout.EAST);
+        JPanel rowSub = new JPanel(new BorderLayout());
+        rowSub.setOpaque(false);
 
-        JPanel rowDisc = new JPanel(new BorderLayout()); rowDisc.setOpaque(false);
-        rowDisc.add(new JLabel("Chiết khấu / Giảm giá:"), BorderLayout.WEST);
-        JLabel lblDiscVal = new JLabel("- " + df.format(giamGia));
-        lblDiscVal.setForeground(new Color(220, 38, 38));
-        rowDisc.add(lblDiscVal, BorderLayout.EAST);
+        if (giamGia > 0) {
+            rowSub.add(new JLabel("Tổng tiền niêm yết:"), BorderLayout.WEST);
+            rowSub.add(new JLabel(df.format(tongTien)), BorderLayout.EAST);
+            pnlTotal.add(rowSub);
+
+            JPanel rowDisc = new JPanel(new BorderLayout());
+            rowDisc.setOpaque(false);
+            rowDisc.add(new JLabel("Chiết khấu ưu đãi:"), BorderLayout.WEST);
+            JLabel lblDiscVal = new JLabel("- " + df.format(giamGia));
+            lblDiscVal.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            lblDiscVal.setForeground(new Color(220, 38, 38));
+            rowDisc.add(lblDiscVal, BorderLayout.EAST);
+            pnlTotal.add(rowDisc);
+        } else {
+            rowSub.add(new JLabel("Tổng thanh toán:"), BorderLayout.WEST);
+            rowSub.add(new JLabel(df.format(thanhTien)), BorderLayout.EAST);
+            pnlTotal.add(rowSub);
+        }
 
         JPanel rowFinal = new JPanel(new BorderLayout()); rowFinal.setOpaque(false);
         JLabel lblFTitle = new JLabel("CẦN THANH TOÁN:");
@@ -295,8 +307,6 @@ public class ThanhToanHoaDonDialog extends JDialog {
         rowFinal.add(lblFTitle, BorderLayout.WEST);
         rowFinal.add(lblFVal, BorderLayout.EAST);
 
-        pnlTotal.add(rowSub);
-        pnlTotal.add(rowDisc);
         pnlTotal.add(rowFinal);
         panel.add(pnlTotal, BorderLayout.SOUTH);
 

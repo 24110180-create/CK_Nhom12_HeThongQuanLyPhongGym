@@ -435,6 +435,7 @@ public class MainDashboard extends JFrame {
         addSidebarCategoryHeader(menuContainer, "Vận Hành Quầy & Dịch Vụ");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên & flap barrier", () -> new CheckInForm(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ hội viên, gói tập, tái ký & tra cứu toàn diện", () -> new QuanLyHoiVienHubPanel(), accent, false);
+        addSidebarItem(menuContainer, "Gia Hạn Gói Tập", "Gia hạn thẻ tập, nâng cấp gói & chiết khấu bảo mật VIP", () -> new GiaHanGoiTapPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Lớp Học Theo Lịch", "Thời khóa biểu lớp Yoga, Zumba, Cardio & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Bán nước giải khát, whey & đồ tập", () -> new BanHangPOSPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Kho Hàng", "Kiểm kê xuất nhập tồn kho & hàng hóa", () -> new QuanLyKhoHangPanel(), accent, false);
@@ -457,6 +458,7 @@ public class MainDashboard extends JFrame {
         addSidebarCategoryHeader(menuContainer, "Vận Hành Quầy & Dịch Vụ");
         addSidebarItem(menuContainer, "Quét Thẻ & Check-in", "Check-in hội viên & cửa flap barrier", () -> new CheckInForm(), accent, true);
         addSidebarItem(menuContainer, "Quản Lý Hội Viên", "Hồ sơ hội viên, gói tập, tái ký & tra cứu toàn diện", () -> new QuanLyHoiVienHubPanel(), accent, false);
+        addSidebarItem(menuContainer, "Gia Hạn Gói Tập", "Gia hạn thẻ tập, nâng cấp gói & chiết khấu bảo mật VIP", () -> new GiaHanGoiTapPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Lớp Học Theo Lịch", "Thời khóa biểu lớp Yoga, Zumba, Cardio & điểm danh", () -> new LichLopHocPanel(), accent, false);
         addSidebarItem(menuContainer, "Quầy Bán Hàng POS", "Bán nước giải khát, whey & đồ tập", () -> new BanHangPOSPanel(), accent, false);
         addSidebarItem(menuContainer, "Quản Lý Kho Hàng", "Kiểm kê xuất nhập tồn kho & hàng hóa", () -> new QuanLyKhoHangPanel(), accent, false);

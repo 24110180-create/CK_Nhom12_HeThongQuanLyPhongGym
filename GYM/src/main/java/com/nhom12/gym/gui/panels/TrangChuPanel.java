@@ -99,7 +99,7 @@ public class TrangChuPanel extends JPanel {
 
         btnGiaHan.addActionListener(e -> {
             if (com.nhom12.gym.gui.MainDashboard.getInstance() != null) {
-                com.nhom12.gym.gui.MainDashboard.getInstance().navigateTo("Quản Lý Hội Viên", 2);
+                com.nhom12.gym.gui.MainDashboard.getInstance().navigateTo("Quản Lý Hội Viên", 3);
             } else {
                 JOptionPane.showMessageDialog(this, "Chuyển hướng đến màn hình: GIA HẠN GÓI TẬP", "Thao Tác Nhanh", JOptionPane.INFORMATION_MESSAGE);
             }

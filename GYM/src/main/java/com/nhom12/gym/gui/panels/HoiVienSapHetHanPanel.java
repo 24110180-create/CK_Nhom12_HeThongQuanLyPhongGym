@@ -5,6 +5,7 @@ import com.nhom12.gym.dao.HoiVienDAO;
 import com.nhom12.gym.entity.HoaDon;
 import com.nhom12.gym.entity.HoiVien;
 import com.nhom12.gym.service.DataSyncManager;
+import com.nhom12.gym.service.VipPolicyService;
 import com.nhom12.gym.util.Auth;
 import com.nhom12.gym.util.ExcelExportHelper;
 import com.nhom12.gym.util.TextSanitizer;
@@ -430,14 +431,23 @@ public class HoiVienSapHetHanPanel extends JPanel {
             pkg = "Gói VIP Tái Ký 1 Năm";
         }
 
+        String role = Auth.vaiTro != null ? Auth.vaiTro : "Lễ tân";
+        boolean isChu = "Chủ".equalsIgnoreCase(role) || (role != null && role.toLowerCase().contains("chủ"));
+        VipPolicyService.ThongTinGiaHienThi giaInfo = VipPolicyService.getInstance().tinhGiaTheoPhanQuyen(
+                role, hv.getSoDienThoai(), hv.getHoTen(), hv.getMaTheQR(), fee);
+
+        double displayGiaGoc = isChu ? giaInfo.giaGoc : giaInfo.soTienThucThu;
+        double displayGiamGia = isChu ? giaInfo.soTienGiam : 0.0;
+        double finalPrice = giaInfo.soTienThucThu;
+
         Date newExp = cal.getTime();
         hv.setNgayHetHan(newExp);
         hv.setTrangThai("Active");
         hv.setGoiTapDangKy(pkg);
         if (hv.getSoTienDaThanhToan() != null) {
-            hv.setSoTienDaThanhToan(hv.getSoTienDaThanhToan() + fee);
+            hv.setSoTienDaThanhToan(hv.getSoTienDaThanhToan() + finalPrice);
         } else {
-            hv.setSoTienDaThanhToan(fee);
+            hv.setSoTienDaThanhToan(finalPrice);
         }
 
         hoiVienDAO.capNhat(hv);
@@ -450,17 +460,24 @@ public class HoiVienSapHetHanPanel extends JPanel {
                     hv.getMaHoiVien(),
                     hv.getHoTen(),
                     "Gia hạn thẻ tập: " + pkg,
-                    fee,
-                    0.0,
-                    fee,
+                    displayGiaGoc,
+                    displayGiamGia,
+                    finalPrice,
                     "Tiền mặt / VietQR",
                     (Auth.tenDangNhap != null ? Auth.tenDangNhap : "letan1"),
                     (hv.getChiNhanhDangKy() != null ? hv.getChiNhanhDangKy() : Auth.getChiNhanhHienTai()),
                     new Date(),
                     "Đã thanh toán",
-                    "Gia hạn gói " + pkg + " đến ngày " + sdf.format(newExp)
+                    "Gia hạn gói " + pkg + " đến ngày " + sdf.format(newExp) + (giaInfo.isVipDacQuyen ? " [Ưu đãi VIP]" : "")
             );
             HoaDonDAO.getInstance().them(hd);
+
+            new com.nhom12.gym.dao.NhatKyHeThongDAO().ghiLog(
+                    Auth.tenDangNhap != null ? Auth.tenDangNhap : "letan1",
+                    role,
+                    "GIA_HAN_HOI_VIEN",
+                    "Gia hạn gói " + pkg + " cho " + hv.getHoTen() + " (" + hv.getMaTheQR() + ") - Thu: " + String.format("%,.0f đ", finalPrice)
+            );
         } catch (Exception ex) {
             System.err.println("[HoiVienSapHetHanPanel] Lỗi tạo hóa đơn gia hạn: " + ex.getMessage());
         }
@@ -468,11 +485,16 @@ public class HoiVienSapHetHanPanel extends JPanel {
         DataSyncManager.fireDataChanged(DataSyncManager.DataType.ALL);
         loadData();
 
+        String priceInfo = giaInfo.isVipDacQuyen && isChu
+                ? "<p>Giá gốc: <del>" + String.format("%,.0f đ", giaInfo.giaGoc) + "</del> | Giảm VIP 50%: <b>" + String.format("%,.0f đ", giaInfo.soTienThucThu) + "</b></p>"
+                : "<p>Số tiền thanh toán: <b>" + String.format("%,.0f đ", finalPrice) + "</b></p>";
+
         JOptionPane.showMessageDialog(this,
                 "<html><body>" +
                         "<h3 style='color: #10B981;'>GIA HẠN THÀNH CÔNG!</h3>" +
                         "<p>Hội viên: <b>" + hoTen + "</b></p>" +
                         "<p>Gói gia hạn: <b>" + pkg + "</b></p>" +
+                        priceInfo +
                         "<p>Hạn sử dụng mới: <b>" + sdf.format(newExp) + "</b></p>" +
                         "</body></html>",
                 "Thành Công", JOptionPane.INFORMATION_MESSAGE);

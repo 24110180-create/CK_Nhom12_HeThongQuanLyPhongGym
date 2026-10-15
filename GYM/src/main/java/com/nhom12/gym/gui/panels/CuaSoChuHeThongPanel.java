@@ -5,6 +5,7 @@ import com.nhom12.gym.dao.HoiVienDAO;
 import com.nhom12.gym.dao.LichSuCheckInDAO;
 import com.nhom12.gym.dao.TaiKhoanDAO;
 import com.nhom12.gym.entity.HoiVien;
+import com.nhom12.gym.entity.TaiKhoan;
 import com.nhom12.gym.gui.MainDashboard;
 import com.nhom12.gym.gui.QRScannerSimulatorDialog;
 import com.nhom12.gym.service.DataSyncManager;
@@ -14,6 +15,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -154,10 +156,12 @@ public class CuaSoChuHeThongPanel extends JPanel {
         }
         if (todayCheckins == 0) todayCheckins = 89;
 
+        StaffStats staffStats = layThongKeNhanSu();
+
         row.add(createKpiCard("DOANH THU THỰC TẾ", df.format(totalRevenue), "Cập nhật thời gian thực từ hóa đơn & gói tập", new Color(37, 99, 235), new Color(239, 246, 255)));
         row.add(createKpiCard("HỘI VIÊN CHUỖI", activeMembers + " / " + totalMembers + " HV", "Tỷ lệ kích hoạt: 100% • 0 Thẻ bị khóa", new Color(16, 185, 129), new Color(236, 253, 245)));
         row.add(createKpiCard("LƯỢT CHECK-IN HÔM NAY", todayCheckins + " Lượt quét", "Hệ thống trạm quét trơn tru 100%", new Color(245, 158, 11), new Color(254, 243, 199)));
-        row.add(createKpiCard("QUÂN SỐ NHÂN SỰ ĐANG TRỰC", "7 Nhân sự chuỗi", "2 Lễ tân • 3 HLV • 1 Quản lý • 1 Chủ", new Color(147, 51, 234), new Color(250, 245, 255)));
+        row.add(createKpiCard("QUÂN SỐ NHÂN SỰ ĐANG TRỰC", staffStats.totalStaff + " Nhân sự chuỗi", staffStats.countLeTan + " Lễ tân • " + staffStats.countHLV + " HLV • " + staffStats.countQuanLy + " Quản lý • " + staffStats.countChu + " Chủ", new Color(147, 51, 234), new Color(250, 245, 255)));
 
         return row;
     }
@@ -265,6 +269,59 @@ public class CuaSoChuHeThongPanel extends JPanel {
         return box;
     }
 
+    private static class StaffStats {
+        int totalStaff = 0;
+        int countLeTan = 0;
+        int countHLV = 0;
+        int countQuanLy = 0;
+        int countChu = 0;
+        final List<String> chuNames = new ArrayList<>();
+    }
+
+    private StaffStats layThongKeNhanSu() {
+        StaffStats stats = new StaffStats();
+        List<TaiKhoan> list = taiKhoanDAO.layTatCa();
+
+        if (list != null && !list.isEmpty()) {
+            for (TaiKhoan tk : list) {
+                if (tk == null) continue;
+                String role = tk.getVaiTro() != null ? tk.getVaiTro().trim().toLowerCase() : "";
+
+                if (role.contains("lễ tân") || role.contains("le tan") || role.contains("reception")) {
+                    stats.countLeTan++;
+                } else if (role.contains("hlv") || role.contains("huấn luyện") || role.contains("huan luyen")
+                        || role.contains("trainer") || role.contains("coach") || role.contains("pt")) {
+                    stats.countHLV++;
+                } else if (role.contains("quản lý") || role.contains("quan ly") || role.contains("manager")) {
+                    stats.countQuanLy++;
+                } else if (role.contains("chủ") || role.contains("chu") || role.contains("admin") || role.contains("owner")) {
+                    stats.countChu++;
+                    String name = tk.getHoTen() != null ? tk.getHoTen().trim() : "";
+                    if (!name.isEmpty() && !name.equalsIgnoreCase("admin") && !stats.chuNames.contains(name)) {
+                        stats.chuNames.add(name);
+                    }
+                } else {
+                    stats.countLeTan++;
+                }
+            }
+        }
+
+        // Fallbacks nếu CSDL trống
+        if (stats.countLeTan == 0 && stats.countHLV == 0 && stats.countQuanLy == 0 && stats.countChu == 0) {
+            stats.countLeTan = 2;
+            stats.countHLV = 3;
+            stats.countQuanLy = 1;
+            stats.countChu = 1;
+        }
+
+        if (stats.chuNames.isEmpty()) {
+            stats.chuNames.add("Võ Anh Đức");
+        }
+
+        stats.totalStaff = stats.countLeTan + stats.countHLV + stats.countQuanLy + stats.countChu;
+        return stats;
+    }
+
     private JPanel createStaffingCard() {
         JPanel card = new JPanel(new BorderLayout(0, 10));
         card.setBackground(Color.WHITE);
@@ -281,14 +338,23 @@ public class CuaSoChuHeThongPanel extends JPanel {
         JPanel stats = new JPanel(new GridLayout(4, 1, 0, 6));
         stats.setOpaque(false);
 
-        stats.add(createStaffRow("Lễ tân Quầy:", "2 Nhân sự phụ trách trực quầy & check-in 2 chi nhánh", new Color(16, 185, 129)));
-        stats.add(createStaffRow("Huấn Luyện Viên:", "3 HLV chuyên môn phụ trách lớp nhóm & kèm PT 1-1", new Color(245, 158, 11)));
-        stats.add(createStaffRow("Quản Lý Cơ Sở:", "1 Quản lý điều hành vận hành chi nhánh", new Color(37, 99, 235)));
-        stats.add(createStaffRow("Chủ Hệ Thống:", "Võ Anh Đức (Điều hành chuỗi & phân bổ KPI)", new Color(147, 51, 234)));
+        StaffStats staffStats = layThongKeNhanSu();
+
+        String leTanDesc = staffStats.countLeTan + " Nhân sự phụ trách trực quầy & check-in 2 chi nhánh";
+        String hlvDesc = staffStats.countHLV + " HLV chuyên môn phụ trách lớp nhóm & kèm PT 1-1";
+        String quanLyDesc = staffStats.countQuanLy + " Quản lý điều hành vận hành chi nhánh";
+        String chuDesc = staffStats.countChu > 1
+                ? staffStats.countChu + " Chủ hệ thống: " + String.join(", ", staffStats.chuNames) + " (Điều hành chuỗi & phân bổ KPI)"
+                : staffStats.chuNames.get(0) + " (Điều hành chuỗi & phân bổ KPI)";
+
+        stats.add(createStaffRow("Lễ tân Quầy:", leTanDesc, new Color(16, 185, 129)));
+        stats.add(createStaffRow("Huấn Luyện Viên:", hlvDesc, new Color(245, 158, 11)));
+        stats.add(createStaffRow("Quản Lý Cơ Sở:", quanLyDesc, new Color(37, 99, 235)));
+        stats.add(createStaffRow("Chủ Hệ Thống:", chuDesc, new Color(147, 51, 234)));
 
         card.add(stats, BorderLayout.CENTER);
 
-        JLabel lblFooter = new JLabel("Đầy đủ nhân lực trực ca sáng (06:00 - 14:00) & chiều (14:00 - 22:00)");
+        JLabel lblFooter = new JLabel("Tổng quân số: " + staffStats.totalStaff + " nhân sự • Đầy đủ nhân lực trực ca sáng (06:00 - 14:00) & chiều (14:00 - 22:00)");
         lblFooter.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         lblFooter.setForeground(new Color(16, 185, 129));
         card.add(lblFooter, BorderLayout.SOUTH);

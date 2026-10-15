@@ -29,7 +29,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * 3. YÊU CẦU ẨN 3:
  *    - Anh Đức từng bị 1 lễ tân cũ "bán chui" gói lẻ lấy tiền riêng không nhập hệ thống.
- *    - Giải pháp Flap Barrier bắt buộc quét mã QR mới mở: Xuất Vé Lẻ Ngày (Guest Pass 1 Ngày - 80.000đ) dùng 1 lần duy nhất.
+ *    - Giải pháp Flap Barrier bắt buộc quét mã QR mới mở: Xuất Vé Lẻ Ngày (Guest Pass 1 Ngày - 30.000đ) dùng 1 lần duy nhất.
  *    - Bảng đối soát số lượt mở Barrier vs Số vé bán ra; tự động cảnh báo gian lận nếu mở cửa thủ công trái phép.
  */
 public class QuanLyKhuyenMaiPanel extends JPanel {
@@ -378,7 +378,7 @@ public class QuanLyKhuyenMaiPanel extends JPanel {
         lblStatTotalPass = new JLabel("0 Vé");
         lblStatTotalPass.setFont(new Font("Segoe UI", Font.BOLD, 17));
         lblStatTotalPass.setForeground(new Color(30, 41, 59));
-        topMetrics.add(createMiniCard("VÉ LẺ ĐÃ BÁN", lblStatTotalPass, "Thu 80,000 đ/vé"));
+        topMetrics.add(createMiniCard("VÉ LẺ ĐÃ BÁN", lblStatTotalPass, "Thu 30,000 đ/vé"));
 
         lblStatUsedPass = new JLabel("0 Lượt");
         lblStatUsedPass.setFont(new Font("Segoe UI", Font.BOLD, 17));
@@ -437,22 +437,22 @@ public class QuanLyKhuyenMaiPanel extends JPanel {
         JPanel bottomBar = new JPanel(new BorderLayout());
         bottomBar.setOpaque(false);
 
-        JLabel lblDesc = new JLabel("<html><b>Cơ chế chống bán chui:</b> Khách bắt buộc phải có mã QR vé lẻ 80.000đ do hệ thống sinh ra mới mở được cổng Flap Barrier.<br>Nếu lễ tân tự mở cửa tay hoặc cho khách vào chui, số lượt mở barrier sẽ lệch với số hóa đơn và hệ thống gắn cờ đỏ cảnh báo ngay!</html>");
+        JLabel lblDesc = new JLabel("<html><b>Cơ chế chống bán chui:</b> Khách bắt buộc phải có mã QR vé lẻ 30.000đ do hệ thống sinh ra mới mở được cổng Flap Barrier.<br>Nếu lễ tân tự mở cửa tay hoặc cho khách vào chui, số lượt mở barrier sẽ lệch với số hóa đơn và hệ thống gắn cờ đỏ cảnh báo ngay!</html>");
         lblDesc.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblDesc.setForeground(new Color(71, 85, 105));
 
         JPanel rightBtns = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         rightBtns.setOpaque(false);
 
-        JButton btnTestPass = new JButton("+ Xuất Thử Vé Lẻ 80,000 đ");
+        JButton btnTestPass = new JButton("+ Xuất Thử Vé Lẻ 30,000 đ");
         btnTestPass.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnTestPass.setBackground(new Color(245, 158, 11));
         btnTestPass.setForeground(Color.WHITE);
         btnTestPass.addActionListener(e -> {
-            CheckInService.GuestPassTicket t = checkInService.banVeLeNgay("Khách Demo " + (System.currentTimeMillis() % 1000), "0911223344", "CN01 - Quận 1", 80000);
+            CheckInService.GuestPassTicket t = checkInService.banVeLeNgay("Khách Demo " + (System.currentTimeMillis() % 1000), "0911223344", "CN01 - Quận 1", 30000);
             loadPassTableData();
             updateAuditStats();
-            JOptionPane.showMessageDialog(this, "Đã xuất thử thành công Vé Lẻ Ngày: " + t.ticketCode + " (80,000 đ)", "Xuất Vé Thành Công", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Đã xuất thử thành công Vé Lẻ Ngày: " + t.ticketCode + " (30,000 đ)", "Xuất Vé Thành Công", JOptionPane.INFORMATION_MESSAGE);
         });
 
         JButton btnRefreshAudit = new JButton("Đối Soát Gian Lận Ngay");

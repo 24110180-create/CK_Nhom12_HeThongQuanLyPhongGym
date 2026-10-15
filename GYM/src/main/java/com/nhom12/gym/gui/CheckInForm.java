@@ -180,7 +180,7 @@ public class CheckInForm extends JPanel implements Scrollable {
         JPanel pControlsRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
         pControlsRight.setOpaque(false);
 
-        btnGuestPass = new JButton("Bán Vé Lẻ (80,000 đ)");
+        btnGuestPass = new JButton("Bán Vé Lẻ (30,000 đ)");
         btnGuestPass.setFont(new Font("Segoe UI", Font.BOLD, 11));
         btnGuestPass.setBackground(new Color(245, 158, 11));
         btnGuestPass.setForeground(Color.WHITE);
@@ -518,7 +518,7 @@ public class CheckInForm extends JPanel implements Scrollable {
         });
 
         // Khởi tạo trước 1 vé test mẫu PASS-8888 chống bán chui
-        checkInService.banVeLeNgay("Võ Hoàng Yến (Khách Vãng Lai)", "0901112233", "CN01 - Cơ sở 1 (Quận 1)", 80000);
+        checkInService.banVeLeNgay("Võ Hoàng Yến (Khách Vãng Lai)", "0901112233", "CN01 - Cơ sở 1 (Quận 1)", 30000);
     }
 
     private JButton createTestBadge(String label, String code, Color bg) {
@@ -649,7 +649,7 @@ public class CheckInForm extends JPanel implements Scrollable {
         pnlInput.add(txtSdt);
 
         int opt = JOptionPane.showConfirmDialog(this, pnlInput,
-                "Bán Vé Lẻ Ngày (Guest Pass 1 Ngày - 80,000 đ)",
+                "Bán Vé Lẻ Ngày (Guest Pass 1 Ngày - 30,000 đ)",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if (opt != JOptionPane.OK_OPTION) return;
@@ -661,9 +661,9 @@ public class CheckInForm extends JPanel implements Scrollable {
         final String finalName = name;
         final String finalPhone = phone;
 
-        // Mở hộp thoại thanh toán VietQR 80.000đ
+        // Mở hộp thoại thanh toán VietQR 30.000đ
         java.util.List<com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang> items = new java.util.ArrayList<>();
-        items.add(new com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang("Vé Lẻ Tập Gym 1 Ngày (Guest Pass)", 1, 80000, 80000));
+        items.add(new com.nhom12.gym.gui.ThanhToanHoaDonDialog.ChiTietMucHang("Vé Lẻ Tập Gym 1 Ngày (Guest Pass)", 1, 30000, 30000));
 
         Window topFrame = SwingUtilities.getWindowAncestor(this);
         com.nhom12.gym.gui.ThanhToanHoaDonDialog payDialog = new com.nhom12.gym.gui.ThanhToanHoaDonDialog(
@@ -671,18 +671,18 @@ public class CheckInForm extends JPanel implements Scrollable {
                 null,
                 finalName + " (" + finalPhone + ")",
                 "Vé Lẻ 1 Ngày (" + currentBranch + ")",
-                80000,
+                30000,
                 0,
-                80000,
+                30000,
                 items,
                 success -> {
                     if (success) {
-                        CheckInService.GuestPassTicket ticket = checkInService.banVeLeNgay(finalName, finalPhone, currentBranch, 80000);
+                        CheckInService.GuestPassTicket ticket = checkInService.banVeLeNgay(finalName, finalPhone, currentBranch, 30000);
                         JOptionPane.showMessageDialog(this,
                                 "ĐÃ XUẤT VÉ LẺ 1 NGÀY THÀNH CÔNG!\n"
                                         + "• Mã Vé Quét QR: " + ticket.ticketCode + "\n"
                                         + "• Khách Hàng: " + ticket.customerName + "\n"
-                                        + "• Giá Vé: 80,000 đ (Đã xuất hóa đơn VietQR)\n"
+                                        + "• Giá Vé: 30,000 đ (Đã xuất hóa đơn VietQR)\n"
                                         + "• Chi Nhánh: " + ticket.branch + "\n\n"
                                         + "LƯU Ý: Mã vé này chỉ có hiệu lực mở cổng Flap Barrier đúng 1 lần duy nhất trong ngày hôm nay!",
                                 "Xuất Vé Lẻ Thành Công", JOptionPane.INFORMATION_MESSAGE);

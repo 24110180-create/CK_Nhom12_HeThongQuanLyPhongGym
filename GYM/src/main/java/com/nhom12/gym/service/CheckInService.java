@@ -170,11 +170,11 @@ public class CheckInService {
             guest.setTrangThai("Hoạt động");
             guest.setNgayHetHan(new Date(System.currentTimeMillis() + 86400000L));
 
-            String note = "Vé lẻ 1 ngày hợp lệ - Thu phí 80,000đ - Cổng Flap Barrier mở";
+            String note = "Vé lẻ 1 ngày hợp lệ - Thu phí 30,000đ - Cổng Flap Barrier mở";
             ghiNhanLog(timeNowStr, code, ticket.customerName, currentBranch, true, note, startTime);
             long elapsed = System.currentTimeMillis() - startTime;
             return new CheckInResult(true, "CHECK-IN THÀNH CÔNG: Mời " + ticket.customerName + " qua cổng Barrier!", guest,
-                    "Vé lẻ 1 ngày hợp lệ", false, false, elapsed, "OPEN", timeNowStr, "Vé Lẻ 1 Ngày (80,000 đ)");
+                    "Vé lẻ 1 ngày hợp lệ", false, false, elapsed, "OPEN", timeNowStr, "Vé Lẻ 1 Ngày (30,000 đ)");
         }
 
         HoiVien hv = null;

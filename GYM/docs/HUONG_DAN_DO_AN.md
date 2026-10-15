@@ -216,7 +216,7 @@ Hệ thống được thiết kế phân tầng chuẩn mực theo mô hình ki�
 * **`QR003`**: Thẻ bị tạm khóa ➔ Cảnh báo 420Hz, cổng khóa đỏ, từ chối cho vào.
 * **`QR004`**: Thẻ sai chi nhánh ➔ Cảnh báo 420Hz, cổng khóa đỏ, báo thẻ cơ sở CN01 không được vào CN02.
 * **`VIP007`**: Hội viên VIP đặc biệt của Anh Đức ➔ Bíp thành công, kích hoạt chính sách bảo mật giá ẩn.
-* **`PASS-8888`**: Vé lẻ 1 ngày (80,000 đ) ➔ Bíp thành công, mở cổng đúng 1 lần duy nhất trong ngày.
+* **`PASS-8888`**: Vé lẻ 1 ngày (30,000 đ) ➔ Bíp thành công, mở cổng đúng 1 lần duy nhất trong ngày.
 
 ### C. 3 Cách Quét Mã Check-in Trong Phần Mềm (Hỗ Trợ Cả Thiết Bị Thật Lẫn Chấm Thi Trên Máy Tính):
 1. **Cách 1: Sử dụng Súng Quét Mã Vạch USB Honeywell Voyager 1450g Thật (Hardware Plug & Play)**:

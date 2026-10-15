@@ -396,7 +396,22 @@ public class CheckInService {
         manualGateOpenCount++;
         String timeNowStr = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy").format(new Date());
         String note = "[CẢNH BÁO KIỂM TOÁN]: Cổng Barrier bị mở thủ công bởi " + nguoiThaoTac + " (" + lyDo + ")";
-        todayLogs.add(0, new CheckInLogEntry(timeNowStr, "MANUAL-OPEN", "Lễ tân can thiệp", "Cổng Flap A1", false, note));
+        todayLogs.add(0, new CheckInLogEntry(timeNowStr, "MANUAL-OPEN", "Lễ tân can thiệp (" + nguoiThaoTac + ")", "Cổng Flap A1", false, note));
+
+        try {
+            checkInDAO.luuCheckIn(new com.nhom12.gym.entity.LichSuCheckIn(
+                    0, 0, "Lễ tân can thiệp (" + nguoiThaoTac + ")", "MANUAL-OPEN", new Date(),
+                    "Cổng Flap A1", "Cổng Flap Barrier", "Mở Thủ Công", "Mở khẩn cấp", note, 0));
+        } catch (Exception ignored) {}
+
+        try {
+            new com.nhom12.gym.dao.NhatKyHeThongDAO().ghiLog(
+                    com.nhom12.gym.util.Auth.tenDangNhap != null ? com.nhom12.gym.util.Auth.tenDangNhap : "letan1",
+                    com.nhom12.gym.util.Auth.vaiTro != null ? com.nhom12.gym.util.Auth.vaiTro : "Lễ tân",
+                    "Mở Cửa Khẩn Cấp",
+                    "Mở Flap Barrier thủ công. Lý do: " + lyDo
+            );
+        } catch (Exception ignored) {}
     }
 
     public int getManualGateOpenCount() {

@@ -745,12 +745,19 @@ public class CheckInForm extends JPanel implements Scrollable {
             return;
         }
 
-        checkInService.ghiNhanMoCongThuCong(com.nhom12.gym.util.Auth.vaiTro != null ? com.nhom12.gym.util.Auth.vaiTro : "Lễ tân", reason.trim());
+        String role = com.nhom12.gym.util.Auth.vaiTro != null ? com.nhom12.gym.util.Auth.vaiTro : "Lễ tân";
+        checkInService.ghiNhanMoCongThuCong(role, reason.trim());
+
+        String timeNowStr = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy").format(new Date());
+        String currentBranch = (cbStationBranch != null && cbStationBranch.getSelectedItem() != null)
+                ? (String) cbStationBranch.getSelectedItem()
+                : com.nhom12.gym.util.Auth.getChiNhanhHienTai();
+        logModel.insertRow(0, new Object[]{timeNowStr, "MANUAL-OPEN", "Lễ tân can thiệp (" + (com.nhom12.gym.util.Auth.hoTen != null ? com.nhom12.gym.util.Auth.hoTen : role) + ")", currentBranch, "Mở khẩn cấp", "[MỞ CỬA TAY]: " + reason.trim()});
 
         pnlGateStatus.setBackground(new Color(254, 243, 199));
         lblGateStatusText.setText("CỬA FLAP BARRIER: MỞ THỦ CÔNG");
         lblGateStatusText.setForeground(new Color(180, 83, 9));
-        lblGateSubText.setText("[CẢNH BÁO KIỂM TOÁN]: Mở bởi Lễ tân - Lý do: " + reason.trim());
+        lblGateSubText.setText("[CẢNH BÁO KIỂM TOÁN]: Mở bởi " + role + " - Lý do: " + reason.trim());
         pnlGateStatus.repaint();
         com.nhom12.gym.util.SoundHelper.playNotice();
 

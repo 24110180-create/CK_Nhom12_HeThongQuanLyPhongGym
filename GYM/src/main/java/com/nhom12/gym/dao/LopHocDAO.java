@@ -254,9 +254,6 @@ public class LopHocDAO {
 
     public void diemDanhTatCa(String maLop, String trangThai) {
         if (maLop == null || maLop.trim().isEmpty()) return;
-        List<DangKyLop> dks = dangKyLopDAO.layDanhSachTheoLop(maLop);
-        for (DangKyLop dk : dks) {
-            dangKyLopDAO.capNhatDiemDanh(dk.getId(), trangThai);
-        }
+        dangKyLopDAO.diemDanhTatCa(maLop, trangThai);
     }
 }

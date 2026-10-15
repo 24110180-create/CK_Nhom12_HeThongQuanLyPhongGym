@@ -151,6 +151,14 @@ public class LichDayHLVPanel extends JPanel {
         studentTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
         studentTable.getTableHeader().setBackground(new Color(241, 245, 249));
         studentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        studentTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (e.getClickCount() == 2 && studentTable.getSelectedRow() != -1) {
+                    xuLyDiemDanhChon();
+                }
+            }
+        });
         rightPanel.add(new JScrollPane(studentTable), BorderLayout.CENTER);
 
         // Action Buttons on Right Bottom
@@ -273,13 +281,17 @@ public class LichDayHLVPanel extends JPanel {
         if (id <= 0) return;
 
         String cur = studentModel.getValueAt(sel, 4).toString();
-        String nxt = cur.contains("Đã có mặt") || cur.contains("Đã điểm danh") ? "Chưa điểm danh" : "Đã có mặt";
+        String nxt = (cur.contains("Đã có mặt") || cur.contains("Đã điểm danh")) ? "Chưa điểm danh" : "Đã điểm danh";
 
-        dangKyLopDAO.capNhatDiemDanh(id, nxt);
-        studentModel.setValueAt(nxt, sel, 4);
-        String name = studentModel.getValueAt(sel, 2).toString();
-        DataSyncManager.fireDataChanged(DataSyncManager.DataType.LOP_HOC);
-        JOptionPane.showMessageDialog(this, "Đã cập nhật trạng thái điểm danh của học viên [" + name + "] sang: " + nxt, "Điểm Danh Thành Công", JOptionPane.INFORMATION_MESSAGE);
+        boolean ok = dangKyLopDAO.capNhatDiemDanh(id, nxt);
+        if (ok) {
+            studentModel.setValueAt(nxt, sel, 4);
+            String name = studentModel.getValueAt(sel, 2).toString();
+            DataSyncManager.fireDataChanged(DataSyncManager.DataType.LOP_HOC);
+            JOptionPane.showMessageDialog(this, "Đã cập nhật trạng thái điểm danh của học viên [" + name + "] sang: " + nxt, "Điểm Danh Thành Công", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Cập nhật điểm danh thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void xuLyGhiChuHocVien() {
@@ -314,13 +326,15 @@ public class LichDayHLVPanel extends JPanel {
 
     private void xuLyDiemDanhTatCa() {
         if (studentModel.getRowCount() == 0) return;
+        if (currentMaLop != null && !currentMaLop.trim().isEmpty()) {
+            dangKyLopDAO.diemDanhTatCa(currentMaLop, "Đã điểm danh");
+        }
         int count = 0;
         for (int i = 0; i < studentModel.getRowCount(); i++) {
             Object idObj = studentModel.getValueAt(i, 0);
             int id = (idObj instanceof Number) ? ((Number) idObj).intValue() : Integer.parseInt(idObj.toString());
             if (id > 0) {
-                dangKyLopDAO.capNhatDiemDanh(id, "Đã có mặt");
-                studentModel.setValueAt("Đã có mặt", i, 4);
+                studentModel.setValueAt("Đã điểm danh", i, 4);
                 count++;
             }
         }

@@ -369,14 +369,38 @@ public class LichLopHocPanel extends JPanel {
         JButton btnDiemDanh = taoButtonFlat("Điểm Danh Lớp Này", new Color(147, 51, 234), Color.WHITE);
         btnDiemDanh.addActionListener(e -> {
             if (lopDangChon == null) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn một lớp học trong bảng để điểm danh!", "Chưa chọn lớp", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn một lớp học trong danh sách bên trên để điểm danh!", "Chưa chọn lớp", JOptionPane.WARNING_MESSAGE);
                 return;
+            }
+            if (modelHocVien.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(this, "Lớp [" + lopDangChon.getTenLop() + "] hiện chưa có học viên nào đăng ký!\nVui lòng bấm '+ Ghi Danh Học Viên' để thêm học viên vào lớp.", "Chưa có học viên", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            int sel = tableHocVien.getSelectedRow();
+            if (sel != -1) {
+                int mr = tableHocVien.convertRowIndexToModel(sel);
+                String cur = String.valueOf(modelHocVien.getValueAt(mr, 5));
+                String nxt = cur.contains("Đã điểm danh") ? "Chưa điểm danh" : "Đã điểm danh";
+                actionCapNhatDiemDanh(nxt);
+            } else {
+                String[] options = {"Điểm Danh Tất Cả Lớp", "Chọn Học Viên Đầu Tiên", "Hủy Bỏ"};
+                int choice = JOptionPane.showOptionDialog(this,
+                        "Bạn muốn thực hiện điểm danh cho lớp [" + lopDangChon.getTenLop() + "] (" + modelHocVien.getRowCount() + " học viên):\n\n" +
+                        "• Bấm 'Điểm Danh Tất Cả Lớp' để đánh dấu CÓ MẶT cho toàn bộ học viên.\n" +
+                        "• Hoặc chọn từng học viên trong bảng bên dưới rồi bấm các nút 'Điểm Danh (Có Mặt)', 'Báo Vắng', 'Hủy Điểm Danh'.",
+                        "Điểm Danh Lớp Học: " + lopDangChon.getTenLop(),
+                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+                if (choice == 0) {
+                    actionDiemDanhTatCa();
+                } else if (choice == 1) {
+                    tableHocVien.setRowSelectionInterval(0, 0);
+                    actionCapNhatDiemDanh("Đã điểm danh");
+                }
             }
             if (tableHocVien != null) {
                 tableHocVien.requestFocusInWindow();
-                if (tableHocVien.getRowCount() > 0) {
-                    tableHocVien.setRowSelectionInterval(0, 0);
-                }
             }
         });
 
@@ -994,6 +1018,12 @@ public class LichLopHocPanel extends JPanel {
         if (ok) {
             SoundHelper.playSuccessBeep();
             modelHocVien.setValueAt(trangThai, mr, 5);
+            for (DangKyLop dk : danhSachHocVienLop) {
+                if (dk.getId() == idDangKy) {
+                    dk.setTrangThaiDiemDanh(trangThai);
+                    break;
+                }
+            }
             capNhatKpiSauDiemDanh();
         } else {
             SoundHelper.playErrorBeep();
@@ -1016,6 +1046,9 @@ public class LichLopHocPanel extends JPanel {
             SoundHelper.playSuccessBeep();
             for (int i = 0; i < modelHocVien.getRowCount(); i++) {
                 modelHocVien.setValueAt("Đã điểm danh", i, 5);
+            }
+            for (DangKyLop dk : danhSachHocVienLop) {
+                dk.setTrangThaiDiemDanh("Đã điểm danh");
             }
             capNhatKpiSauDiemDanh();
             JOptionPane.showMessageDialog(this, "Đã điểm danh thành công cho toàn bộ học viên trong lớp!", "Thành công", JOptionPane.INFORMATION_MESSAGE);

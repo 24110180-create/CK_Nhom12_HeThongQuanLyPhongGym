@@ -154,11 +154,9 @@ public class SampleDataService {
 
         SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf != null) {
-            Transaction tx = null;
+            // 1. Đồng bộ Hội Viên
             try (Session session = sf.openSession()) {
-                tx = session.beginTransaction();
-
-                // 1. Đồng bộ Hội Viên (merge nếu đã có mã QR)
+                Transaction tx = session.beginTransaction();
                 for (HoiVien hv : hoiViens) {
                     try {
                         HoiVien existing = session.createQuery("FROM HoiVien WHERE maTheQR = :qr", HoiVien.class)
@@ -182,18 +180,29 @@ public class SampleDataService {
                         LOGGER.log(Level.FINE, "Bỏ qua lỗi hội viên " + hv.getMaTheQR(), ex);
                     }
                 }
+                tx.commit();
+            } catch (Exception e) {
+                LOGGER.log(Level.FINE, "Lỗi đồng bộ Hội Viên: {0}", e.getMessage());
+            }
 
-                // 2. Đồng bộ 5 Lớp Học chuẩn (xóa triệt để lớp rác 'freee' trong CSDL)
+            // 2. Đồng bộ 5 Lớp Học chuẩn (xóa triệt để lớp rác 'freee' trong CSDL)
+            try (Session session = sf.openSession()) {
+                Transaction tx = session.beginTransaction();
                 try {
                     session.createQuery("DELETE FROM LopHoc WHERE LOWER(tenLop) LIKE '%freee%'").executeUpdate();
                 } catch (Exception ignored) {}
                 for (LopHoc lh : lopHocs) {
                     session.merge(lh);
                 }
+                tx.commit();
+            } catch (Exception e) {
+                LOGGER.log(Level.FINE, "Lỗi đồng bộ Lớp Học: {0}", e.getMessage());
+            }
 
-                // 3. Đồng bộ Danh sách Đăng Ký & Điểm danh
+            // 3. Đồng bộ Danh sách Đăng Ký & Điểm danh
+            try (Session session = sf.openSession()) {
+                Transaction tx = session.beginTransaction();
                 if (forceOverwrite) {
-                    // Xóa các đăng ký cũ của 5 lớp chuẩn để nạp bộ mới sạch sẽ
                     try {
                         session.createQuery("DELETE FROM DangKyLop WHERE maLop IN ('LH01', 'LH02', 'LH03', 'LH04', 'LH05')").executeUpdate();
                     } catch (Exception ex) {
@@ -206,19 +215,16 @@ public class SampleDataService {
                         session.persist(newDk);
                     }
                 } else {
-                    // Kiểm tra nếu lớp chưa có học viên nào thì nạp bù
-                    for (LopHoc lh : lopHocs) {
-                        Long count = session.createQuery("SELECT COUNT(d.id) FROM DangKyLop d WHERE d.maLop = :ml", Long.class)
-                                .setParameter("ml", lh.getMaLop())
+                    for (DangKyLop dk : dangKyLops) {
+                        Long count = session.createQuery(
+                                "SELECT COUNT(d.id) FROM DangKyLop d WHERE UPPER(d.maLop) = UPPER(:ml) AND d.maHoiVien = :mhv", Long.class)
+                                .setParameter("ml", dk.getMaLop())
+                                .setParameter("mhv", dk.getMaHoiVien())
                                 .uniqueResult();
                         if (count == null || count == 0) {
-                            for (DangKyLop dk : dangKyLops) {
-                                if (dk.getMaLop().equalsIgnoreCase(lh.getMaLop())) {
-                                    DangKyLop newDk = new DangKyLop(0, dk.getMaLop(), dk.getMaHoiVien(), dk.getTenHoiVien(),
-                                            dk.getSoDienThoai(), dk.getNgayDangKy(), dk.getTrangThaiDiemDanh(), dk.getGhiChu());
-                                    session.persist(newDk);
-                                }
-                            }
+                            DangKyLop newDk = new DangKyLop(0, dk.getMaLop(), dk.getMaHoiVien(), dk.getTenHoiVien(),
+                                    dk.getSoDienThoai(), dk.getNgayDangKy(), dk.getTrangThaiDiemDanh(), dk.getGhiChu());
+                            session.persist(newDk);
                         }
                     }
                 }
@@ -226,8 +232,7 @@ public class SampleDataService {
                 tx.commit();
                 LOGGER.info("Đã đồng bộ thành công dữ liệu mẫu chuẩn xuống CSDL SQL Server!");
             } catch (Exception e) {
-                if (tx != null) tx.rollback();
-                LOGGER.log(Level.WARNING, "Không thể lưu vào CSDL, tiến hành nạp vào bộ nhớ tạm: {0}", e.getMessage());
+                LOGGER.log(Level.WARNING, "Không thể lưu Đăng Ký Lớp vào CSDL: {0}", e.getMessage());
             }
         }
 

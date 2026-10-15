@@ -117,6 +117,13 @@ public class MainDashboard extends JFrame {
                 repaint();
             });
         });
+
+        // Tự động kiểm tra và đồng bộ học viên lớp học & điểm danh xuống CSDL
+        new Thread(() -> {
+            try {
+                com.nhom12.gym.service.SampleDataService.napDuLieuMauDongBo(false);
+            } catch (Exception ignored) {}
+        }).start();
     }
 
     private String getRoleDisplayName(String role) {

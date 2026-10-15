@@ -189,16 +189,15 @@ public class VipPolicyService {
                     true
             );
         } else {
-            // Lễ tân / Quản lý đăng nhập: Hệ thống nhận diện hội viên VIP, hiển thị trực tiếp giá sau giảm 50% (ví dụ: 3M) và thu đúng 3M
-            // Hoàn toàn ẩn giá gốc niêm yết 6M và ẩn tỷ lệ -50% để bảo mật nội bộ
-            String giaFmt = String.format("%,d đ", (long) giaSauGiam50).replace(',', '.');
+            // Lễ tân / Quản lý đăng nhập: Hệ thống tự động áp dụng mức giảm 50% ngầm, hiển thị trực tiếp giá thực thu (3M) và thu đúng 3M
+            // Hoàn toàn ẩn giá gốc niêm yết 6M, ẩn tỷ lệ -50%, ẩn mọi dấu hiệu chiết khấu để nhân viên chỉ đơn thuần tạo đơn và thu tiền
             return new ThongTinGiaHienThi(
                     true,
                     giaSauGiam50, // Hiển thị giá thực thu (đã giảm 50%) thay cho giá gốc
                     giaSauGiam50, // Thu đúng 3M
                     0,            // Ẩn chi tiết mức giảm
                     0,            // Ẩn tỷ lệ phần trăm giảm
-                    "👑 Hội Viên VIP - Đơn giá hợp đồng phê duyệt: " + giaFmt,
+                    "Hội phí tiêu chuẩn gói tập",
                     false         // Giới hạn quyền xem chi tiết giá gốc
             );
         }

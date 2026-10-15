@@ -79,18 +79,21 @@ public class DangKyHoiVienPanel extends JPanel {
         JPanel headerRightBtns = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         headerRightBtns.setOpaque(false);
 
-        JButton btnKiemTraGia = new JButton("🔍 Kiểm Tra Giá VIP (50%)");
-        btnKiemTraGia.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnKiemTraGia.setBackground(new Color(245, 158, 11)); // Amber
-        btnKiemTraGia.setForeground(Color.WHITE);
-        btnKiemTraGia.setFocusPainted(false);
-        btnKiemTraGia.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnKiemTraGia.setToolTipText("Mở bảng kiểm tra bảo mật giá thực theo phân quyền: Chủ vs Quản lý vs Lễ tân");
-        btnKiemTraGia.addActionListener(e -> {
-            Window parent = SwingUtilities.getWindowAncestor(this);
-            new com.nhom12.gym.gui.KiemTraBaoMatGiaVipDialog(parent).setVisible(true);
-        });
-        headerRightBtns.add(btnKiemTraGia);
+        boolean isOwnerRole = com.nhom12.gym.util.Auth.vaiTro != null && "Chủ".equalsIgnoreCase(com.nhom12.gym.util.Auth.vaiTro);
+        if (isOwnerRole) {
+            JButton btnKiemTraGia = new JButton("🔍 Kiểm Tra Giá VIP (50%)");
+            btnKiemTraGia.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            btnKiemTraGia.setBackground(new Color(245, 158, 11)); // Amber
+            btnKiemTraGia.setForeground(Color.WHITE);
+            btnKiemTraGia.setFocusPainted(false);
+            btnKiemTraGia.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            btnKiemTraGia.setToolTipText("Mở bảng kiểm tra bảo mật giá thực theo phân quyền: Chủ vs Quản lý vs Lễ tân");
+            btnKiemTraGia.addActionListener(e -> {
+                Window parent = SwingUtilities.getWindowAncestor(this);
+                new com.nhom12.gym.gui.KiemTraBaoMatGiaVipDialog(parent).setVisible(true);
+            });
+            headerRightBtns.add(btnKiemTraGia);
+        }
 
         if (onBackToList != null) {
             JButton btnBack = new JButton("Xem Danh Sách Hội Viên");
@@ -289,8 +292,10 @@ public class DangKyHoiVienPanel extends JPanel {
         btnSubmit.setBackground(new Color(16, 185, 129));
         btnSubmit.setForeground(Color.WHITE);
 
-        actionButtons.add(btnQuickVip);
-        actionButtons.add(btnCheckPrice);
+        if (isOwnerRole) {
+            actionButtons.add(btnQuickVip);
+            actionButtons.add(btnCheckPrice);
+        }
         actionButtons.add(btnReset);
         actionButtons.add(btnSubmit);
         gbc.gridy = r++;
@@ -522,7 +527,8 @@ public class DangKyHoiVienPanel extends JPanel {
         lblTotalCost.setText(df.format(giaInfo.soTienThucThu));
 
         if (lblVipPolicyNotice != null) {
-            if (giaInfo.isVipDacQuyen) {
+            boolean isOwner = "Chủ".equalsIgnoreCase(currentRole);
+            if (isOwner && giaInfo.isVipDacQuyen) {
                 lblVipPolicyNotice.setText(giaInfo.moTaGiaHienThi);
                 lblVipPolicyNotice.setForeground(new Color(16, 185, 129));
             } else {

@@ -161,38 +161,31 @@ public class QuanLyHoiVienPanel extends JPanel {
         filterBox.add(lblFStatus);
         filterBox.add(cbFilterStatus);
 
-        JButton btnFilterVip = new JButton("👑 Lọc Khách VIP (50%)");
-        btnFilterVip.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnFilterVip.setBackground(new Color(254, 243, 199));
-        btnFilterVip.setForeground(new Color(180, 83, 9));
-        btnFilterVip.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(245, 158, 11), 1),
-                new EmptyBorder(4, 10, 4, 10)
-        ));
-        btnFilterVip.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnFilterVip.setToolTipText("Bấm để hiển thị nhanh danh sách khách VIP được giảm 50% trọn đời");
-        filterBox.add(btnFilterVip);
+        JTextField txtSearch = new JTextField(15);
+        txtSearch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        txtSearch.putClientProperty("JTextField.placeholderText", "Tìm tên, SĐT, mã QR, gói...");
+
+        boolean isOwner = com.nhom12.gym.util.Auth.vaiTro != null && "Chủ".equalsIgnoreCase(com.nhom12.gym.util.Auth.vaiTro);
+        if (isOwner) {
+            JButton btnFilterVip = new JButton("👑 Lọc Khách VIP");
+            btnFilterVip.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            btnFilterVip.setBackground(new Color(254, 243, 199));
+            btnFilterVip.setForeground(new Color(180, 83, 9));
+            btnFilterVip.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(245, 158, 11), 1),
+                    new EmptyBorder(4, 10, 4, 10)
+            ));
+            btnFilterVip.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            btnFilterVip.setToolTipText("Hiển thị nhanh danh sách khách VIP đặc quyền");
+            btnFilterVip.addActionListener(e -> txtSearch.setText("VIP"));
+            filterBox.add(btnFilterVip);
+        }
 
         toolBar.add(filterBox, BorderLayout.WEST);
 
         // Bên phải toolbar: Tìm kiếm + Nút Đăng ký mới + Xuất Excel + Nút Kiểm Tra Giá
         JPanel actionBox = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 4));
         actionBox.setOpaque(false);
-
-        JTextField txtSearch = new JTextField(15);
-        txtSearch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtSearch.putClientProperty("JTextField.placeholderText", "Tìm tên, SĐT, mã QR, gói...");
-
-        btnFilterVip.addActionListener(e -> txtSearch.setText("VIP"));
-
-        JButton btnCheckPriceTop = new JButton("🔍 Kiểm Tra Giá VIP (50%)");
-        btnCheckPriceTop.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnCheckPriceTop.setBackground(new Color(245, 158, 11)); // Amber
-        btnCheckPriceTop.setForeground(Color.WHITE);
-        btnCheckPriceTop.setFocusPainted(false);
-        btnCheckPriceTop.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnCheckPriceTop.setToolTipText("Mô phỏng bảo mật hiển thị giá thực tế: Chủ xem 6M/giảm 50% vs Lễ tân xem 3M/ẩn 50%");
-        btnCheckPriceTop.addActionListener(e -> moDialogKiemTraBaoMatGiaVip());
 
         JButton btnDangKyMoi = new JButton("+ Đăng Ký Hội Viên Mới");
         btnDangKyMoi.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -217,7 +210,17 @@ public class QuanLyHoiVienPanel extends JPanel {
 
         actionBox.add(new JLabel("Tìm kiếm:"));
         actionBox.add(txtSearch);
-        actionBox.add(btnCheckPriceTop);
+        if (isOwner) {
+            JButton btnCheckPriceTop = new JButton("🔍 Kiểm Tra Giá VIP (50%)");
+            btnCheckPriceTop.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            btnCheckPriceTop.setBackground(new Color(245, 158, 11)); // Amber
+            btnCheckPriceTop.setForeground(Color.WHITE);
+            btnCheckPriceTop.setFocusPainted(false);
+            btnCheckPriceTop.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            btnCheckPriceTop.setToolTipText("Mô phỏng bảo mật hiển thị giá thực tế: Chủ xem 6M/giảm 50% vs Lễ tân xem 3M/ẩn 50%");
+            btnCheckPriceTop.addActionListener(e -> moDialogKiemTraBaoMatGiaVip());
+            actionBox.add(btnCheckPriceTop);
+        }
         actionBox.add(btnDangKyMoi);
         actionBox.add(btnExport);
 
@@ -343,8 +346,8 @@ public class QuanLyHoiVienPanel extends JPanel {
                 String qr = String.valueOf(t.getModel().getValueAt(modelRow, 1));
                 boolean isChu = "Chủ".equalsIgnoreCase(com.nhom12.gym.util.Auth.vaiTro)
                         || (com.nhom12.gym.util.Auth.tenDangNhap != null && com.nhom12.gym.util.Auth.tenDangNhap.contains("admin"));
-                if (qr != null && qr.startsWith("VIP")) {
-                    l.setText(isChu ? ("👑 " + s + " [VIP 50% - Đặc quyền Chủ]") : ("👑 " + s + " [Hội Viên VIP]"));
+                if (isChu && qr != null && qr.startsWith("VIP")) {
+                    l.setText("👑 " + s + " [VIP 50% - Đặc quyền Chủ]");
                     l.setForeground(new Color(180, 83, 9));
                     l.setFont(new Font("Segoe UI", Font.BOLD, 12));
                 } else {
@@ -474,17 +477,21 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnLamMoi.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnLamMoi.addActionListener(e -> loadDataToTable());
 
-        JButton btnKiemTraGiaVip = new JButton("🔍 Kiểm Tra Giá VIP (50%)");
-        btnKiemTraGiaVip.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnKiemTraGiaVip.setBackground(new Color(254, 243, 199)); // Amber
-        btnKiemTraGiaVip.setForeground(new Color(180, 83, 9));
-        btnKiemTraGiaVip.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(245, 158, 11), 1),
-                new EmptyBorder(4, 10, 4, 10)
-        ));
-        btnKiemTraGiaVip.setFocusPainted(false);
-        btnKiemTraGiaVip.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnKiemTraGiaVip.addActionListener(e -> moDialogKiemTraBaoMatGiaVip());
+        boolean isOwnerBottom = com.nhom12.gym.util.Auth.vaiTro != null && "Chủ".equalsIgnoreCase(com.nhom12.gym.util.Auth.vaiTro);
+        if (isOwnerBottom) {
+            JButton btnKiemTraGiaVip = new JButton("🔍 Kiểm Tra Giá VIP (50%)");
+            btnKiemTraGiaVip.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            btnKiemTraGiaVip.setBackground(new Color(254, 243, 199)); // Amber
+            btnKiemTraGiaVip.setForeground(new Color(180, 83, 9));
+            btnKiemTraGiaVip.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(245, 158, 11), 1),
+                    new EmptyBorder(4, 10, 4, 10)
+            ));
+            btnKiemTraGiaVip.setFocusPainted(false);
+            btnKiemTraGiaVip.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            btnKiemTraGiaVip.addActionListener(e -> moDialogKiemTraBaoMatGiaVip());
+            btnActions.add(btnKiemTraGiaVip);
+        }
 
         JButton btnGiaHan = new JButton("⚡ Gia Hạn Thẻ Tập");
         btnGiaHan.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -492,10 +499,9 @@ public class QuanLyHoiVienPanel extends JPanel {
         btnGiaHan.setForeground(Color.WHITE);
         btnGiaHan.setFocusPainted(false);
         btnGiaHan.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnGiaHan.setToolTipText("Gia hạn gói tập cho hội viên đang chọn (Tự động áp dụng giá VIP nếu có)");
+        btnGiaHan.setToolTipText("Gia hạn gói tập cho hội viên đang chọn");
         btnGiaHan.addActionListener(e -> giaHanHoiVienDangChon());
 
-        btnActions.add(btnKiemTraGiaVip);
         btnActions.add(btnGiaHan);
         btnActions.add(btnXemTheQR);
         btnActions.add(btnCapNhat);

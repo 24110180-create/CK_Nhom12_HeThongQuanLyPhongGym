@@ -292,7 +292,7 @@ public class QRScannerSimulatorDialog extends JDialog {
         pnlList.add(createCardItem("QR002", "Võ Lê Ngọc Hưng (CN02 - Tân Bình)", "Sai chi nhánh (Đăng ký CN02 quẹt tại CN01) - Khóa cổng", new Color(139, 92, 246)));
         pnlList.add(createCardItem("QR003", "Võ Tấn Phát (Cơ bản 1M)", "Gói tập đã hết hạn - Khóa cổng đỏ & hiện nút Gia Hạn", new Color(239, 68, 68)));
         pnlList.add(createCardItem("KHOA", "Trần Văn Khóa (Vi phạm)", "Thẻ bị tạm khóa vi phạm nội quy - Từ chối check-in", new Color(245, 158, 11)));
-        pnlList.add(createCardItem("VIP007", "Đỗ Minh Trí (Khách VIP Anh Đức)", "Giảm giá 50% bảo mật nội bộ & Check-in mọi cơ sở", new Color(14, 165, 233)));
+        pnlList.add(createCardItem("VIP007", "Đỗ Minh Trí (Hội Viên Ưu Tiên)", "Thẻ ưu tiên nội bộ & Check-in mọi cơ sở", new Color(14, 165, 233)));
         pnlList.add(createCardItem("PASS-8888", "Võ Hoàng Yến (Khách Vãng Lai)", "Vé lẻ 1 ngày (80k) xuất VietQR - Chỉ mở cổng 1 lần", new Color(217, 119, 6)));
 
         pnl.add(pnlList, BorderLayout.CENTER);

@@ -113,13 +113,13 @@ public class GiaHanGoiTapPanel extends JPanel {
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
         lblTitle.setForeground(new Color(30, 41, 59));
 
-        JLabel lblSubtitle = new JLabel("Tra cứu hội viên thực tế, gia hạn thời hạn thẻ và áp dụng bảo mật chiết khấu VIP theo đúng phân quyền");
+        JLabel lblSubtitle = new JLabel("Tra cứu hội viên thực tế, gia hạn thời hạn thẻ tập & xuất hóa đơn thanh toán");
         lblSubtitle.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         lblSubtitle.setForeground(new Color(100, 116, 139));
         titleBox.add(lblTitle);
         titleBox.add(lblSubtitle);
 
-        // Góc phải Header: Hiển thị quyền đăng nhập & Công cụ mô phỏng phân quyền nhanh
+        // Góc phải Header: Hiển thị quyền đăng nhập & Công cụ mô phỏng phân quyền nhanh (chỉ dành cho Chủ)
         JPanel roleToolBox = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         roleToolBox.setOpaque(false);
 
@@ -162,10 +162,14 @@ public class GiaHanGoiTapPanel extends JPanel {
         cbRolePreview.setFocusable(false);
         cbRolePreview.addActionListener(e -> updatePrice());
 
-        roleToolBox.add(btnCheckPrice);
-        roleToolBox.add(lblRoleStatus);
-        roleToolBox.add(lblPreviewPrompt);
-        roleToolBox.add(cbRolePreview);
+        if (isMaster) {
+            roleToolBox.add(btnCheckPrice);
+            roleToolBox.add(lblRoleStatus);
+            roleToolBox.add(lblPreviewPrompt);
+            roleToolBox.add(cbRolePreview);
+        } else {
+            roleToolBox.add(lblRoleStatus);
+        }
 
         headerPanel.add(titleBox, BorderLayout.WEST);
         headerPanel.add(roleToolBox, BorderLayout.EAST);
@@ -237,8 +241,11 @@ public class GiaHanGoiTapPanel extends JPanel {
         ));
         btnQuickNormal.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        searchRight.add(btnQuickVip);
-        searchRight.add(btnQuickVip2);
+        boolean isMaster = "Chủ".equalsIgnoreCase(Auth.vaiTro);
+        if (isMaster) {
+            searchRight.add(btnQuickVip);
+            searchRight.add(btnQuickVip2);
+        }
         searchRight.add(btnQuickNormal);
 
         searchPanel.add(searchLeft, BorderLayout.WEST);
@@ -499,8 +506,9 @@ public class GiaHanGoiTapPanel extends JPanel {
         String maQR = hv.getMaTheQR() != null ? hv.getMaTheQR() : ("HV" + maHV);
         String branch = hv.getChiNhanhDangKy() != null ? hv.getChiNhanhDangKy() : "CN01";
 
+        boolean isMasterUser = "Chủ".equalsIgnoreCase(Auth.vaiTro);
         boolean isVip = VipPolicyService.getInstance().laHoiVienVipDacQuyen(hv.getSoDienThoai(), hv.getHoTen(), maQR);
-        String vipBadge = isVip ? " [⭐ HỘI VIÊN VIP ĐẶC QUYỀN]" : "";
+        String vipBadge = (isVip && isMasterUser) ? " [⭐ HỘI VIÊN VIP ĐẶC QUYỀN]" : "";
 
         lblTen.setText("<html>" + hv.getHoTen() + "<span style='color:#7c3aed;font-weight:bold;'>" + vipBadge + "</span>"
                 + " — Mã HV: " + maHV + " • Mã Thẻ: " + maQR + " (" + branch + ")</html>");
@@ -586,6 +594,7 @@ public class GiaHanGoiTapPanel extends JPanel {
                 lblVipPolicyNotice.setText("👑 VIP ĐẶC QUYỀN CỦA CHỦ PHÒNG - ÁP DỤNG GIẢM 50% TRỰC TIẾP");
                 lblVipPolicyNotice.setForeground(new Color(16, 185, 129));
 
+                lblSecurityBanner.setVisible(true);
                 lblSecurityBanner.setText("<html>👑 <b>[GÓC NHÌN CHỦ HỆ THỐNG]:</b> Đang hiển thị đầy đủ thông tin bảo mật. Hội viên này được hưởng đặc quyền giảm giá 50% trọn đời của Chủ.</html>");
                 lblSecurityBanner.setBackground(new Color(240, 253, 244));
                 lblSecurityBanner.setForeground(new Color(22, 101, 52));
@@ -594,39 +603,29 @@ public class GiaHanGoiTapPanel extends JPanel {
                         BorderFactory.createEmptyBorder(6, 10, 6, 10)
                 ));
             } else {
-                // LỄ TÂN / QUẢN LÝ: HỆ THỐNG NHẬN DIỆN VIP, HIỂN THỊ TRỰC TIẾP GIÁ 3M VÀ THU ĐÚNG 3M (ẨN 6M & 50%)
+                // LỄ TÂN / QUẢN LÝ: HỆ THỐNG TỰ ĐỘNG BIẾT VÀ TÍNH ĐÚNG MỨC GIÁ, ẨN TOÀN BỘ DẤU VẾT 50%
                 pnlRowGiaGoc.setVisible(false); // Ẩn hoàn toàn dòng giá gốc 6M
                 pnlRowGiamGia.setVisible(false); // Ẩn hoàn toàn dòng giảm giá -50%
 
-                lblVipPolicyNotice.setText("👑 HỘI VIÊN VIP - ÁP DỤNG ĐƠN GIÁ PHÊ DUYỆT: " + df.format(giaInfo.soTienThucThu));
-                lblVipPolicyNotice.setForeground(new Color(16, 185, 129)); // Emerald
+                lblVipPolicyNotice.setText("Hội phí tiêu chuẩn gói tập");
+                lblVipPolicyNotice.setForeground(new Color(100, 116, 139));
 
-                lblSecurityBanner.setText("<html>👑 <b>[HỆ THỐNG ĐÃ NHẬN DIỆN HỘI VIÊN VIP]:</b> Tự động áp dụng mức phí hợp đồng đã phê duyệt (<b>" + df.format(giaInfo.soTienThucThu) + "</b>). Lễ tân và Quản lý thực hiện thanh toán đúng <b>" + df.format(giaInfo.soTienThucThu) + "</b> (đã giảm 50%). Giá niêm yết gốc và tỷ lệ -50% được ẩn bảo mật theo đúng chính sách.</html>");
-                lblSecurityBanner.setBackground(new Color(254, 243, 199));
-                lblSecurityBanner.setForeground(new Color(180, 83, 9));
-                lblSecurityBanner.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(253, 230, 138), 1),
-                        BorderFactory.createEmptyBorder(6, 10, 6, 10)
-                ));
+                lblSecurityBanner.setVisible(false); // ẨN HOÀN TOÀN BANNER BẢO MẬT KHỎI MÀN HÌNH LỄ TÂN & QUẢN LÝ
             }
         } else {
             // HỘI VIÊN TIÊU CHUẨN (KHÔNG PHẢI VIP)
-            pnlRowGiaGoc.setVisible(true);
-            lblGiaGoc.setText(df.format(basePrice));
-            lblGiaGoc.setForeground(new Color(71, 85, 105));
+            pnlRowGiaGoc.setVisible(isChu);
+            if (isChu) {
+                lblGiaGoc.setText(df.format(basePrice));
+                lblGiaGoc.setForeground(new Color(71, 85, 105));
+            }
 
             pnlRowGiamGia.setVisible(false);
 
             lblVipPolicyNotice.setText("Hội phí tiêu chuẩn niêm yết");
             lblVipPolicyNotice.setForeground(new Color(100, 116, 139));
 
-            lblSecurityBanner.setText("<html>ℹ️ Hội viên tiêu chuẩn theo bảng giá dịch vụ niêm yết của hệ thống.</html>");
-            lblSecurityBanner.setBackground(new Color(248, 250, 252));
-            lblSecurityBanner.setForeground(new Color(71, 85, 105));
-            lblSecurityBanner.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
-                    BorderFactory.createEmptyBorder(6, 10, 6, 10)
-            ));
+            lblSecurityBanner.setVisible(false);
         }
 
         lblThanhTien.setText(df.format(giaInfo.soTienThucThu));

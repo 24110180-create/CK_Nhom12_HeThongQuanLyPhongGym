@@ -67,6 +67,7 @@ public class ThanhToanHoaDonDialog extends JDialog {
 
     public ThanhToanHoaDonDialog(Window parent, String maHoaDon, String tenKhachHang, String loaiGiaoDich,
                                  double tongTien, double giamGia, double thanhTien,
+                                 String chiNhanh,
                                  List<ChiTietMucHang> danhSachMuc, Consumer<Boolean> onThanhToanThanhCong) {
         super(parent, "Xác Nhận Hóa Đơn & Thanh Toán - " + (maHoaDon != null ? maHoaDon : "FitLife Gym"), ModalityType.APPLICATION_MODAL);
 
@@ -78,7 +79,7 @@ public class ThanhToanHoaDonDialog extends JDialog {
         this.tongTien = tongTien;
         this.giamGia = giamGia;
         this.thanhTien = thanhTien;
-        this.chiNhanh = Auth.getChiNhanhHienTai();
+        this.chiNhanh = (chiNhanh != null && !chiNhanh.trim().isEmpty()) ? chiNhanh : Auth.getChiNhanhHienTai();
         this.nguoiLap = (Auth.hoTen != null && !Auth.hoTen.trim().isEmpty())
                 ? Auth.hoTen
                 : (Auth.tenDangNhap != null ? Auth.tenDangNhap : "letan1");
@@ -91,6 +92,12 @@ public class ThanhToanHoaDonDialog extends JDialog {
         this.onThanhToanThanhCong = onThanhToanThanhCong;
 
         initUI();
+    }
+
+    public ThanhToanHoaDonDialog(Window parent, String maHoaDon, String tenKhachHang, String loaiGiaoDich,
+                                 double tongTien, double giamGia, double thanhTien,
+                                 List<ChiTietMucHang> danhSachMuc, Consumer<Boolean> onThanhToanThanhCong) {
+        this(parent, maHoaDon, tenKhachHang, loaiGiaoDich, tongTien, giamGia, thanhTien, Auth.getChiNhanhHienTai(), danhSachMuc, onThanhToanThanhCong);
     }
 
     private void initUI() {

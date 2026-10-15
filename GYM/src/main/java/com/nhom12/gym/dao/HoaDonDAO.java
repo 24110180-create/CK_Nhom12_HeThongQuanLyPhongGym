@@ -37,6 +37,18 @@ public class HoaDonDAO {
 
         cal.add(Calendar.DAY_OF_MONTH, 2);
         memoryCache.add(new HoaDon("HD2026-005", 6, "Đỗ Minh Trí", "Đăng ký gói 6 Tháng", 2500000, 200000, 2300000, "Chuyển khoản VietQR", "admin", "CN02 - Cơ sở 2 (Tân Bình)", cal.getTime(), "Đã thanh toán", "Khách VIP"));
+
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        memoryCache.add(new HoaDon("HD2026-006", 7, "Phạm Quốc Tuấn", "Gói Hội Viên Chuỗi 12 Tháng", 6500000, 0, 6500000, "Chuyển khoản VietQR", "letan1", "CN01 - Cơ sở 1 (Quận 1)", cal.getTime(), "Đã thanh toán", "Tập toàn hệ thống"));
+
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        memoryCache.add(new HoaDon("HD2026-007", 8, "Nguyễn Mai Phương", "Đăng ký gói Yoga & Gym 6 Tháng", 3500000, 0, 3500000, "Tiền mặt", "letan1", "CN01 - Cơ sở 1 (Quận 1)", cal.getTime(), "Đã thanh toán", "Chi nhánh Quận 1"));
+
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        memoryCache.add(new HoaDon("HD2026-008", 9, "Bùi Thế Phong", "Đăng ký Gói Kickboxing PT kèm riêng", 4800000, 250000, 4550000, "Chuyển khoản VietQR", "admin", "CN02 - Cơ sở 2 (Tân Bình)", cal.getTime(), "Đã thanh toán", "HLV chuyên biệt"));
+
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        memoryCache.add(new HoaDon("HD2026-009", 10, "Lê Thị Thảo", "Gói Bơi Thủy Liệu & Gym 3 Tháng", 2500000, 0, 2500000, "Chuyển khoản VietQR", "letan1", "CN02 - Cơ sở 2 (Tân Bình)", cal.getTime(), "Đã thanh toán", "Cơ sở Tân Bình"));
     }
 
     private static final HoaDonDAO INSTANCE = new HoaDonDAO();
@@ -52,6 +64,15 @@ public class HoaDonDAO {
     public boolean them(HoaDon hd) {
         if (hd == null) return false;
         sanitizeHoaDon(hd);
+
+        // Tránh ghi trùng mã hóa đơn nếu đã tồn tại
+        if (hd.getMaHoaDon() != null) {
+            for (HoaDon existing : memoryCache) {
+                if (hd.getMaHoaDon().equalsIgnoreCase(existing.getMaHoaDon())) {
+                    return true;
+                }
+            }
+        }
 
         org.hibernate.SessionFactory sf = HibernateUtil.getSessionFactory();
         if (sf == null) {

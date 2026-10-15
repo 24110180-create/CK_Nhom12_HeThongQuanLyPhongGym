@@ -58,15 +58,21 @@ public class BaoCaoThongKePanel extends JPanel {
 
         // Lắng nghe sự kiện đồng bộ toàn hệ thống để cập nhật số liệu và biểu đồ ngay lập tức
         com.nhom12.gym.service.DataSyncManager.addListener(type -> {
-            if (type == com.nhom12.gym.service.DataSyncManager.DataType.HOA_DON ||
-                type == com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN ||
-                type == com.nhom12.gym.service.DataSyncManager.DataType.CHECK_IN ||
-                type == com.nhom12.gym.service.DataSyncManager.DataType.ALL) {
-                int sel = tabbedPane.getSelectedIndex();
-                initTabs();
-                if (sel >= 0 && sel < tabbedPane.getTabCount()) {
-                    tabbedPane.setSelectedIndex(sel);
-                }
+            if (type == com.nhom12.gym.service.DataSyncManager.DataType.HOA_DON) {
+                SwingUtilities.invokeLater(this::capNhatDoanhThuTheoChiNhanh);
+            } else if (type == com.nhom12.gym.service.DataSyncManager.DataType.HOI_VIEN ||
+                       type == com.nhom12.gym.service.DataSyncManager.DataType.CHECK_IN ||
+                       type == com.nhom12.gym.service.DataSyncManager.DataType.ALL) {
+                SwingUtilities.invokeLater(() -> {
+                    capNhatDoanhThuTheoChiNhanh();
+                    int sel = tabbedPane.getSelectedIndex();
+                    if (sel > 0) {
+                        initTabs();
+                        if (sel >= 0 && sel < tabbedPane.getTabCount()) {
+                            tabbedPane.setSelectedIndex(sel);
+                        }
+                    }
+                });
             }
         });
     }
@@ -80,6 +86,37 @@ public class BaoCaoThongKePanel extends JPanel {
         tabbedPane.addTab("Mức Độ Sử Dụng Theo Giờ", createHourlyUsageTab());
     }
 
+    private DefaultTableModel revenueModel;
+    private BranchBarChart revenueChart;
+    private JLabel lblRevenueLiveStatus;
+
+    public void capNhatDoanhThuTheoChiNhanh() {
+        if (revenueModel == null || revenueChart == null) return;
+        Map<String, Double> branchRevenue = baoCaoService.getDoanhThuTheoChiNhanh();
+        double totalRev = 0;
+        for (double v : branchRevenue.values()) totalRev += v;
+        if (totalRev == 0) totalRev = 1.0;
+
+        double cn01Amount = branchRevenue.getOrDefault("CN01 - Quận 1", 0.0);
+        double cn02Amount = branchRevenue.getOrDefault("CN02 - Tân Bình", 0.0);
+
+        revenueModel.setRowCount(0);
+        for (Map.Entry<String, Double> entry : branchRevenue.entrySet()) {
+            double amount = entry.getValue();
+            double pct = (totalRev > 1.0) ? (amount / totalRev) * 100.0 : 0.0;
+            String code = entry.getKey().contains("CN01") ? "CN01" : "CN02";
+            revenueModel.addRow(new Object[]{
+                    code, entry.getKey(), dfMoney.format(amount), String.format("%.1f%%", pct), "Hoạt động tốt"
+            });
+        }
+
+        revenueChart.updateData(new String[]{"CN01 - Quận 1", "CN02 - Tân Bình"}, new double[]{cn01Amount, cn02Amount});
+        if (lblRevenueLiveStatus != null) {
+            String timeNow = new SimpleDateFormat("HH:mm:ss").format(new Date());
+            lblRevenueLiveStatus.setText("● REAL-TIME: Tự động cập nhật theo từng giao dịch • Tổng: " + dfMoney.format(totalRev) + " • Lúc: " + timeNow);
+        }
+    }
+
     // ==========================================
     // TAB 1: BÁO CÁO DOANH THU THEO CHI NHÁNH
     // ==========================================
@@ -89,8 +126,16 @@ public class BaoCaoThongKePanel extends JPanel {
         panel.setBorder(new EmptyBorder(12, 12, 12, 12));
 
         // Top Toolbar
-        JPanel topBar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
+        JPanel topBar = new JPanel(new BorderLayout(10, 5));
         topBar.setOpaque(false);
+
+        lblRevenueLiveStatus = new JLabel("● REAL-TIME: Tự động cập nhật theo từng giao dịch");
+        lblRevenueLiveStatus.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblRevenueLiveStatus.setForeground(new Color(16, 185, 129));
+        topBar.add(lblRevenueLiveStatus, BorderLayout.WEST);
+
+        JPanel rightBtns = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        rightBtns.setOpaque(false);
 
         JButton btnExportExcel = new JButton("Xuất Báo Cáo Doanh Thu (Excel)");
         btnExportExcel.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -98,7 +143,8 @@ public class BaoCaoThongKePanel extends JPanel {
         btnExportExcel.setForeground(Color.WHITE);
         btnExportExcel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        topBar.add(btnExportExcel);
+        rightBtns.add(btnExportExcel);
+        topBar.add(rightBtns, BorderLayout.EAST);
         panel.add(topBar, BorderLayout.NORTH);
 
         // Split: Left Table, Right Chart
@@ -110,7 +156,7 @@ public class BaoCaoThongKePanel extends JPanel {
 
         // Table Model
         String[] cols = {"Mã Chi Nhánh", "Tên Chi Nhánh", "Doanh Thu", "Tỷ Lệ Đóng Góp", "Trạng Thái"};
-        DefaultTableModel model = new DefaultTableModel(cols, 0) {
+        revenueModel = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int r, int c) { return false; }
         };
@@ -118,7 +164,7 @@ public class BaoCaoThongKePanel extends JPanel {
         Map<String, Double> branchRevenue = baoCaoService.getDoanhThuTheoChiNhanh();
         double totalRev = 0;
         for (double v : branchRevenue.values()) totalRev += v;
-        if (totalRev == 0) totalRev = 1.0; // Tránh chia cho 0
+        if (totalRev == 0) totalRev = 1.0;
 
         double cn01Amount = branchRevenue.getOrDefault("CN01 - Quận 1", 0.0);
         double cn02Amount = branchRevenue.getOrDefault("CN02 - Tân Bình", 0.0);
@@ -127,12 +173,12 @@ public class BaoCaoThongKePanel extends JPanel {
             double amount = entry.getValue();
             double pct = (totalRev > 1.0) ? (amount / totalRev) * 100.0 : 0.0;
             String code = entry.getKey().contains("CN01") ? "CN01" : "CN02";
-            model.addRow(new Object[]{
+            revenueModel.addRow(new Object[]{
                     code, entry.getKey(), dfMoney.format(amount), String.format("%.1f%%", pct), "Hoạt động tốt"
             });
         }
 
-        JTable table = new JTable(model);
+        JTable table = new JTable(revenueModel);
         table.setRowHeight(32);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -166,9 +212,9 @@ public class BaoCaoThongKePanel extends JPanel {
         lblC.setForeground(new Color(15, 23, 42));
         chartCard.add(lblC, BorderLayout.NORTH);
 
-        BranchBarChart chart = new BranchBarChart(new String[]{"CN01 - Quận 1", "CN02 - Tân Bình"},
+        revenueChart = new BranchBarChart(new String[]{"CN01 - Quận 1", "CN02 - Tân Bình"},
                 new double[]{cn01Amount, cn02Amount});
-        chartCard.add(chart, BorderLayout.CENTER);
+        chartCard.add(revenueChart, BorderLayout.CENTER);
 
         split.setRightComponent(chartCard);
         panel.add(split, BorderLayout.CENTER);
@@ -381,14 +427,20 @@ public class BaoCaoThongKePanel extends JPanel {
     // BIỂU ĐỒ DOANH THU CHI NHÁNH
     // ==========================================
     static class BranchBarChart extends JPanel {
-        private final String[] branches;
-        private final double[] revenues;
-        private final DecimalFormat df = new DecimalFormat("###,### Triệu");
+        private String[] branches;
+        private double[] revenues;
+        private final DecimalFormat df = new DecimalFormat("#,### đ");
 
         public BranchBarChart(String[] branches, double[] revenues) {
             this.branches = branches;
             this.revenues = revenues;
             setOpaque(false);
+        }
+
+        public void updateData(String[] branches, double[] revenues) {
+            this.branches = branches;
+            this.revenues = revenues;
+            repaint();
         }
 
         @Override
@@ -400,37 +452,49 @@ public class BaoCaoThongKePanel extends JPanel {
             int w = getWidth();
             int h = getHeight();
             int pad = 50;
-            double max = 90000000.0;
+
+            if (branches == null || revenues == null || branches.length == 0) return;
+
+            // Tính giá trị lớn nhất linh hoạt có thêm 25% khoảng đệm phía trên
+            double max = 1000000.0;
+            for (double r : revenues) {
+                if (r > max) max = r;
+            }
+            max = max * 1.25;
 
             g2.setColor(new Color(226, 232, 240));
+            g2.setStroke(new BasicStroke(2f));
             g2.drawLine(pad, h - pad, w - pad, h - pad);
 
             int n = branches.length;
-            int barWidth = Math.min(80, (w - 2 * pad) / (n * 2));
+            int barWidth = Math.min(100, (w - 2 * pad) / (n * 2));
             int gap = (w - 2 * pad - n * barWidth) / (n + 1);
 
             Color[] colors = {new Color(37, 99, 235), new Color(16, 185, 129), new Color(245, 158, 11)};
+            Color[] gradients = {new Color(96, 165, 250), new Color(52, 211, 153), new Color(251, 191, 36)};
 
             for (int i = 0; i < n; i++) {
                 int barH = (int) ((revenues[i] / max) * (h - 2 * pad));
+                if (barH < 10 && revenues[i] > 0) barH = 10;
                 int x = pad + gap + i * (barWidth + gap);
                 int y = h - pad - barH;
 
-                g2.setColor(colors[i % colors.length]);
-                g2.fill(new RoundRectangle2D.Double(x, y, barWidth, barH, 8, 8));
+                GradientPaint gp = new GradientPaint(x, y, colors[i % colors.length], x, y + barH, gradients[i % gradients.length]);
+                g2.setPaint(gp);
+                g2.fill(new RoundRectangle2D.Double(x, y, barWidth, barH, 10, 10));
 
-                // Value label on top
+                // Value label on top (Hiển thị đầy đủ số tiền chính xác định dạng VND: ví dụ 21,530,000 đ)
                 g2.setColor(new Color(15, 23, 42));
-                g2.setFont(new Font("Segoe UI", Font.BOLD, 11));
-                String vStr = String.format("%.0f tr", revenues[i] / 1000000.0);
+                g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                String vStr = df.format(revenues[i]);
                 FontMetrics fm = g2.getFontMetrics();
-                g2.drawString(vStr, x + (barWidth - fm.stringWidth(vStr)) / 2, y - 6);
+                g2.drawString(vStr, x + (barWidth - fm.stringWidth(vStr)) / 2, y - 8);
 
                 // Branch label below
-                g2.setColor(new Color(100, 116, 139));
+                g2.setColor(new Color(71, 85, 105));
                 g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
                 fm = g2.getFontMetrics();
-                g2.drawString(branches[i], x + (barWidth - fm.stringWidth(branches[i])) / 2, h - pad + 20);
+                g2.drawString(branches[i], x + (barWidth - fm.stringWidth(branches[i])) / 2, h - pad + 24);
             }
         }
     }

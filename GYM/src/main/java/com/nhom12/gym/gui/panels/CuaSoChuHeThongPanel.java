@@ -44,6 +44,11 @@ public class CuaSoChuHeThongPanel extends JPanel {
         setBorder(new EmptyBorder(16, 20, 20, 20));
 
         initUI();
+
+        // Lắng nghe sự kiện đồng bộ toàn hệ thống để cập nhật doanh thu và KPI thời gian thực
+        com.nhom12.gym.service.DataSyncManager.addListener(type -> {
+            SwingUtilities.invokeLater(this::rebuildContent);
+        });
     }
 
     private void initUI() {

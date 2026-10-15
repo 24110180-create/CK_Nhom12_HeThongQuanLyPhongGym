@@ -450,9 +450,16 @@ public class QuanLyKhuyenMaiPanel extends JPanel {
         btnTestPass.setForeground(Color.WHITE);
         btnTestPass.addActionListener(e -> {
             CheckInService.GuestPassTicket t = checkInService.banVeLeNgay("Khách Demo " + (System.currentTimeMillis() % 1000), "0911223344", "CN01 - Quận 1", 30000);
+            String maHD = "HD" + new java.text.SimpleDateFormat("yyyyMMddHHmmss").format(new java.util.Date());
+            com.nhom12.gym.entity.HoaDon hd = new com.nhom12.gym.entity.HoaDon(
+                    maHD, 0, t.customerName, "Vé Lẻ 1 Ngày (CN01)", 30000, 0, 30000,
+                    "Chuyển khoản VietQR", com.nhom12.gym.util.Auth.tenDangNhap != null ? com.nhom12.gym.util.Auth.tenDangNhap : "letan1",
+                    "CN01 - Cơ sở 1 (Quận 1)", new java.util.Date(), "Đã thanh toán", "Xuất vé lẻ đối soát"
+            );
+            com.nhom12.gym.dao.HoaDonDAO.getInstance().them(hd);
             loadPassTableData();
             updateAuditStats();
-            JOptionPane.showMessageDialog(this, "Đã xuất thử thành công Vé Lẻ Ngày: " + t.ticketCode + " (30,000 đ)", "Xuất Vé Thành Công", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Đã xuất thử thành công Vé Lẻ Ngày: " + t.ticketCode + " (30,000 đ)\nDoanh thu toàn hệ thống đã được đồng bộ tự động!", "Xuất Vé Thành Công", JOptionPane.INFORMATION_MESSAGE);
         });
 
         JButton btnRefreshAudit = new JButton("Đối Soát Gian Lận Ngay");
